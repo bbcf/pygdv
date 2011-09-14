@@ -1,0 +1,20 @@
+2011-09-14 09:47:15,837 -- repoze.who request started (/toscawidgets/resources/tw.forms/static/grid.css) --
+2011-09-14 09:47:15,838 request classification: browser
+2011-09-14 09:47:15,838 identifier plugins registered [<pygdv.lib.auth_plugin.CustomCommandLinePlugin object at 0x322a0d0>, <CustomCookiePlugin 31413008>]
+2011-09-14 09:47:15,838 identifier plugins matched for classification "browser": [<CustomCookiePlugin 31413008>]
+2011-09-14 09:47:15,921 identity returned from <CustomCookiePlugin 31413008>: {'tokens': ['G', 'D', 'V'], 'timestamp': 1315916073, 'repoze.who.userid': 'yohan.jarosz@epfl.ch', 'userdata': '1'}
+2011-09-14 09:47:15,922 identities found: [(<CustomCookiePlugin 31413008>, {'tokens': ['G', 'D', 'V'], 'timestamp': 1315916073, 'repoze.who.userid': 'yohan.jarosz@epfl.ch', 'userdata': '1'})]
+2011-09-14 09:47:15,936 authenticator plugins registered [<CustomAuthPlugin 36195216>]
+2011-09-14 09:47:15,937 authenticator plugins matched for classification "browser": [<CustomAuthPlugin 36195216>]
+2011-09-14 09:47:15,937 userid preauthenticated by <CustomCookiePlugin 31413008>: "yohan.jarosz@epfl.ch" (repoze.who.userid set)
+2011-09-14 09:47:15,937 identities authenticated: [((0, 0), None, <CustomCookiePlugin 31413008>, {'tokens': ['G', 'D', 'V'], 'timestamp': 1315916073, 'repoze.who.userid': 'yohan.jarosz@epfl.ch', 'userdata': '1'}, 'yohan.jarosz@epfl.ch')]
+2011-09-14 09:48:52,473 -- repoze.who request started (/) --
+2011-09-14 09:48:52,473 request classification: browser
+2011-09-14 09:48:52,473 identifier plugins registered [<pygdv.lib.auth_plugin.CustomCommandLinePlugin object at 0x322a0d0>, <CustomCookiePlugin 31413008>]
+2011-09-14 09:48:52,473 identifier plugins matched for classification "browser": [<CustomCookiePlugin 31413008>]
+2011-09-14 09:48:52,474 identity returned from <CustomCookiePlugin 31413008>: {'tokens': ['G', 'D', 'V'], 'timestamp': 1315916073, 'repoze.who.userid': 'yohan.jarosz@epfl.ch', 'userdata': '1'}
+2011-09-14 09:48:52,474 identities found: [(<CustomCookiePlugin 31413008>, {'tokens': ['G', 'D', 'V'], 'timestamp': 1315916073, 'repoze.who.userid': 'yohan.jarosz@epfl.ch', 'userdata': '1'})]
+2011-09-14 09:48:52,474 authenticator plugins registered [<CustomAuthPlugin 36195216>]
+2011-09-14 09:48:52,474 authenticator plugins matched for classification "browser": [<CustomAuthPlugin 36195216>]
+2011-09-14 09:48:52,474 userid preauthenticated by <CustomCookiePlugin 31413008>: "yohan.jarosz@epfl.ch" (repoze.who.userid set)
+2011-09-14 09:48:52,474 identities authenticated: [((0, 0), None, <CustomCookiePlugin 31413008>, {'tokens': ['G', 'D', 'V'], 'timestamp': 1315916073, 'repoze.who.userid': 'yohan.jarosz@epfl.ch', 'userdata': '1'}, 'yohan.jarosz@epfl.ch')]
