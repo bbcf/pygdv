@@ -60,3 +60,4 @@ def init_model(engine):
 
 # Import your model modules here.
 from pygdv.model.auth import User, Group, Permission
+from pygdv.model.database import *

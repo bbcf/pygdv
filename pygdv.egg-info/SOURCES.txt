@@ -23,7 +23,9 @@ pygdv/controllers/login.py
 pygdv/controllers/permission.py
 pygdv/controllers/root.py
 pygdv/controllers/secure.py
+pygdv/controllers/sequence.py
 pygdv/controllers/template.py
+pygdv/controllers/track.py
 pygdv/controllers/user.py
 pygdv/data/__init__.py
 pygdv/data/tmp/__init__.py
@@ -69,6 +71,7 @@ pygdv/public/images/strype2.png
 pygdv/public/images/under_the_hood_blue.png
 pygdv/public/images/warning.png
 pygdv/templates/__init__.py
+pygdv/templates/__init__.pyc
 pygdv/templates/about.html
 pygdv/templates/authentication.html
 pygdv/templates/data.html
@@ -104,4 +107,5 @@ pygdv/websetup/schema.py
 pygdv/widgets/__init__.py
 pygdv/widgets/group.py
 pygdv/widgets/permission.py
+pygdv/widgets/track.py
 pygdv/widgets/user.py

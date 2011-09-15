@@ -59,4 +59,6 @@ def init_model(engine):
     #metadata.create_all(bind=DBSession.bind)
 
 # Import your model modules here.
+from pygdv.model.constants import *
 from pygdv.model.auth import User, Group, Permission
+from pygdv.model.database import *

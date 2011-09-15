@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 
 """The application's Globals object"""
-from pygdv.websetup.bootstrap import group_admins, group_users, perm_admin, perm_user
+#from pygdv.websetup.bootstrap import group_admins, group_users, perm_admin, perm_user
 __all__ = ['Globals']
 
+group_admins = 'Admins'
+perm_admin = 'admin'
+
+group_users = 'Users'
+perm_user = 'user'
 
 class Globals(object):
     """Container for objects available throughout the life of the application.

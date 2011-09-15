@@ -9,31 +9,30 @@ from sqlalchemy.types import Unicode, Integer, DateTime, Enum, Text, Boolean
 from sqlalchemy.orm import relationship, synonym
 
 from pygdv.model import DeclarativeBase, metadata, DBSession
+import transaction
 
 from datetime import datetime
 
 import uuid
+from sqlalchemy.engine.base import Transaction
 
-__all__ = ['Project','PublicProject',
-           'Track','TrackParameters',
-           'TrackType','Style',
-           'UserStyle','Input',
-           'Sequence','AdminTrack',
-           'Species','Status',
-           'Job','JobParameter']
+__all__ = ['Right', 'Circle', 'Project',
+           'RightCircleAssociation','Sequence',
+           'Species','InputParameters',
+           'Track','Input',
+           'Sequence',
+           'Species',
+           'Job','JobParameters']
+
+from pygdv.model.constants import *
+
+statuses = Enum('SUCCESS', 'PENDING', 'ERROR', 'RUNNING', name='job_status')
+image_types = Enum('FeatureTrack', 'ImageTrack', name='image_type')
+datatypes = Enum(QUALITATIVE_DATATYPE, QUANTITATIVE_DATATYPE, QUALITATIVE_EXTENDED_DATATYPE, NOT_DETERMINED_DATATYPE ,name="datatype")
+job_types = Enum('NEW_SELECTION', 'NEW_TRACK', 'GFEATMINER', 'NEW_PROJECT', name='job_type')
+job_outputs = Enum('RELOAD', 'IMAGE', name='job_output')
 
 
-
-statuses = Enum('SUCCESS','PENDING','ERROR','RUNNING',name='job_status')
-image_types = Enum('FeatureTrack','ImageTrack',name='image_type')
-datatypes = Enum('QUALITATIVE','QUANTITATIVE','QUALITATIVE_EXTENDED',name="datatype")
-job_types = Enum('NEW_SELECTION','NEW_TRACK','GFEATMINER','NEW_PROJECT',name='job_type')
-job_outputs = Enum('RELOAD','IMAGE',name='job_output')
-
-
-
-
-date_format = "%A %d. %B %Y %H.%M.%S"
 
 
 
@@ -69,7 +68,7 @@ class Right(DeclarativeBase):
     '''
     Like permissions, but not for the control of access on pages but for sharing between projects.
     '''
-    __tablename__='right'
+    __tablename__='Right'
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Unicode(255), nullable=False)
     description = Column(Text(), nullable=False)
@@ -78,15 +77,26 @@ class Circle(DeclarativeBase):
     '''
     A group of users.
     '''
-    __tablename__='circle'
+    __tablename__='Circle'
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Unicode(255), nullable=False)
     description = Column(Text(), nullable=False)
-    creator = relationship('User')
+    creator_id = Column(Integer, ForeignKey('User.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
     
     users = relationship('User', secondary=user_circle_table, backref='circles')
     
 
+class RightCircleAssociation(DeclarativeBase):
+    __tablename__='RightCircleAssociation'
+    
+    right = relationship('Right')
+    right_id = Column(Integer,
+                       ForeignKey('Right.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False, primary_key=True)
+    circle =  relationship('Circle')
+    circle_id = Column(Integer,
+                       ForeignKey('Circle.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False, primary_key=True)
+    project_id = Column(Integer, ForeignKey('Project.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+    
 
 class Project(DeclarativeBase):
     '''
@@ -113,7 +123,7 @@ class Project(DeclarativeBase):
     
     sequences = relationship('Sequence', backref='projects')
     
-    _circle_right = relationship('RightGroupAssociation', backref='project')
+    _circle_right = relationship('RightCircleAssociation', backref='project')
     
     jobs = relationship('Job', backref='project')
     
@@ -149,13 +159,7 @@ class Project(DeclarativeBase):
     
 
 
-class RightCircleAssociation(DeclarativeBase):
-    __tablename__='right_group_assoc'
-    
-    right = relationship('Right')
-    circle =  relationship('Circle')
-    project_id = Column(Integer, ForeignKey('Project.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
-    
+
     
  
     
@@ -200,11 +204,20 @@ class Input(DeclarativeBase):
     An unique input.
     '''
     __tablename__ = 'Input'
+    
+    def init_parameters(self):
+        p = InputParameters()
+        DBSession.add(p)
+        transaction.commit()
+        return p.id
+    
     # columns
     id = Column(Integer, autoincrement=True, primary_key=True)
     sha1 = Column(Unicode(255), unique=True, nullable=False)
     _last_access = Column(DateTime, default=datetime.now, nullable=False)
     tracks = relationship('Track', backref='input')
+    parameter_id = Column(Integer, ForeignKey('InputParameters.id', onupdate="CASCADE", ondelete="CASCADE"), 
+                          default=init_parameters, nullable=False)
     
     # special methods
     def __repr__(self):
@@ -233,20 +246,20 @@ class Input(DeclarativeBase):
     
     
     
-class TrackParameters(DeclarativeBase):
+class InputParameters(DeclarativeBase):
     '''
     Track parameters.
     Based on the type, parameters can be different.
     '''
-    __tablename__='Track_parameters'
+    __tablename__='InputParameters'
     id = Column(Integer, autoincrement=True, primary_key=True)
-    url = Column(Unicode(255), nullable=False)
-    label = Column(Unicode(255), nullable=False)
-    type = Column(image_types, nullable=False)
-    key = Column(Unicode(255), nullable=False)
-    color = Column(Unicode(255), nullable=False)
-    track_id = Column(Integer, nullable=False, ForeignKey('Track.id', onupdate="CASCADE", ondelete="CASCADE"))
-    track = relationship('Track', uselist=False, backref='parameters')
+    url = Column(Unicode(255), nullable=True)
+    label = Column(Unicode(255), nullable=True)
+    type = Column(image_types, nullable=True)
+    key = Column(Unicode(255), nullable=True)
+    color = Column(Unicode(255), nullable=True)
+    
+    input = relationship('Input', uselist=False, backref='parameters')
 
 
 class Track(DeclarativeBase):
@@ -254,6 +267,8 @@ class Track(DeclarativeBase):
     Represent a track on the view.
     '''
     __tablename__ = 'Track'
+    
+    
     # columns
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Unicode(255), nullable=False)
@@ -263,7 +278,7 @@ class Track(DeclarativeBase):
     
     input_id = Column(Integer, ForeignKey('Input.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
     user_id = Column(Integer, ForeignKey('User.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
-    parameter_id = Column(Integer, ForeignKey('TrackParameters.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+    
     
     sequence_id = Column(Integer, ForeignKey('Sequence.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=True)
     # special methods
@@ -295,11 +310,11 @@ class Track(DeclarativeBase):
         
         
 
-class JobParameter(DeclarativeBase):
+class JobParameters(DeclarativeBase):
     '''
     Jobs parameters.
     '''
-    __tablename__='Job_parameter'
+    __tablename__='JobParameters'
     #column
     id = Column(Integer, autoincrement=True, primary_key=True)
     type = Column(job_types, nullable=False)
@@ -325,7 +340,7 @@ class Job(DeclarativeBase):
     
     project_id = Column(Integer, ForeignKey('Project.id',onupdate="CASCADE", ondelete="CASCADE"), nullable=True)
     
-    parameters = relationship('JobParameter', uselist=False, backref='job')
+    parameters = relationship('JobParameters', uselist=False, backref='job')
     
     def _get_date(self):
         return self._created.strftime(date_format);

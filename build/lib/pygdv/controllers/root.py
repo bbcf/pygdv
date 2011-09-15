@@ -10,7 +10,7 @@ from repoze.what.predicates import has_permission
 
 
 from pygdv.controllers import ErrorController, LoginController, GroupController
-from pygdv.controllers import PermissionController, UserController
+from pygdv.controllers import PermissionController, UserController, TrackController
 
 
  
@@ -57,6 +57,8 @@ class RootController(BaseController):
     permissions = PermissionController(DBSession, menu_items=models)
     users = UserController(DBSession, menu_items=models)
     
+    # users controllers
+    tracks = TrackController(DBSession)
 
 
     @expose('pygdv.templates.index')

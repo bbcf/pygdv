@@ -58,8 +58,8 @@ class Group(DeclarativeBase):
     __tablename__ = 'Group'
     # columns
     id = Column(Integer, autoincrement=True, primary_key=True)
-    name = Column(Unicode(255))
-    _created = Column(DateTime, default=datetime.now)
+    name = Column(Unicode(255), unique=True, nullable=False)
+    _created = Column(DateTime, default=datetime.now, nullable=False)
     # relations
     users = relationship('User', secondary=user_group_table, backref='groups')
     
@@ -113,12 +113,14 @@ class User(DeclarativeBase):
    
     # columns
     id = Column(Integer, autoincrement=True, primary_key=True)
-    name = Column(Unicode(255))
-    _email = Column(Unicode(255), unique=True, info={'rum': {'field':'Email'}})
-    _created = Column(DateTime, default=datetime.now)
-    key = Column(Unicode(255), unique=True,default=setdefaultkey)
+    name = Column(Unicode(255), nullable=False)
+    _email = Column(Unicode(255), unique=True, nullable=False, info={'rum': {'field':'Email'}})
+    _created = Column(DateTime, default=datetime.now, nullable=False)
+    key = Column(Unicode(255), unique=True,default=setdefaultkey, nullable=False)
     
-  
+    tracks = relationship('Track', backref='user')
+    projects = relationship('Project', backref='user')
+    jobs = relationship('Job', backref='user')
     
     def _get_date(self):
         return self._created.strftime(date_format);
@@ -166,30 +168,11 @@ class User(DeclarativeBase):
                 return g.permissions
         return []
     
-    def has_access(self, permission, group_id):
-        '''
-        Return True if the user has the desired access.
-        (Alway true if the user is the creator).
-        @param permission: which permission
-        @type permission: the string representing the permission
-        @param group_id : the identifier of the group
-        @type group_id: an integer
-        '''
-        group_id = int(group_id)
-        for g in self.groups :
-            if g.id == group_id :
-                if g.creator_id == self.id :
-                    return True
-                for p in permission :
-                    if p.name == permission :
-                        return True
-        return False
-    
     def __repr__(self):
         return '<User: id=%r, name=%r, email=%r, key=%r>' % (self.id, self.name, self.email,self.key)
  
     def __unicode__(self):
-        return self.name
+        return self.email
  
  
  
@@ -209,7 +192,7 @@ class Permission(DeclarativeBase):
  
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Unicode(63), unique=True, nullable=False)
-    description = Column(Unicode(255))
+    description = Column(Unicode(255), nullable=False)
  
     # relations
  
