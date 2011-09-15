@@ -56,7 +56,6 @@ def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None):
     '''
     files = []  
     if file_upload is not None:
-        print 'upload files from file upload'
         filename = file_upload.filename
         file_value = file_upload.value
         tmp_file = tempfile.NamedTemporaryFile(delete=False)

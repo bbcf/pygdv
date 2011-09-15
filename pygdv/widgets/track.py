@@ -60,12 +60,12 @@ class UploadForm(AddRecordForm):
     show_errors = True
     __limit_fields__ = []
     __field_order__ = ['upload_field', 'urls']
-    __base_widget_args__ = {'hover_help': True, 'show_errors' : True}
+    __base_widget_args__ = {'hover_help': True, 'show_errors' : True, 'action'='post'}
     upload_field = twf.FileField(label_text='Select a file in your computer ',id='file_upload',
     help_text = 'Browse the file to upload in your computer. It will be converted to a Track.')
     urls =  twf.TextArea(id='urls',label_text='Or enter url(s) to access your file(s)',
                           help_text = 'You can enter multiple urls separated by space or "enter".')
- 
+    action='toto'
 
 
 #def get_import_file_form(project_id):

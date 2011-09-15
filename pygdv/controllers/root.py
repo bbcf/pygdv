@@ -58,7 +58,7 @@ class RootController(BaseController):
     users = UserController(DBSession, menu_items=models)
     
     # users controllers
-    tracks = TrackController(DBSession)
+    tracks = TrackController()
 
 
     @expose('pygdv.templates.index')

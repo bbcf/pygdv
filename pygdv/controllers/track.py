@@ -1,7 +1,7 @@
 """User Controller"""
 from tgext.crud import CrudRestController
 from tgext.crud.decorators import registered_validate
-
+from pygdv.lib.base import BaseController
 from repoze.what.predicates import not_anonymous, has_any_permission
 
 from tg import expose, flash, require, request, tmpl_context
@@ -9,15 +9,17 @@ from tg import app_globals as gl
 from tg.controllers import redirect
 from tg.decorators import paginate,with_trailing_slash
 
-from pygdv.model import DBSession, Track
+from pygdv.model import DBSession, Track, Input
 from pygdv.widgets.track import track_table, track_table_filler, track_new_form, track_edit_filler, track_edit_form, track_grid
 from pygdv import handler
-
+from pygdv.lib import util
 import os
+import transaction
+
 __all__ = ['TrackController']
 
 
-class TrackController(CrudRestController):
+class TrackController(BaseController):
     allow_only = has_any_permission(gl.perm_user, gl.perm_admin)
     model = Track
     table = track_table
@@ -33,11 +35,18 @@ class TrackController(CrudRestController):
     @expose('pygdv.templates.list')
     @expose('json')
     #@paginate('items', items_per_page=10)
-    def get_all(self, *args, **kw):
+    def index(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        data = [handler.util.to_datagrid(track_grid, user.tracks, "Track list", len(user.tracks)>0)]
+        data = [util.to_datagrid(track_grid, user.tracks, "Track list", len(user.tracks)>0)]
         return dict(page='track', model='track', form_title="new track",items=data,value=kw)
     
+    
+    
+    @require(not_anonymous())
+    @expose('pygdv.templates.form')
+    def new(self, *args, **kw):
+        tmpl_context.widget = track_new_form
+        return dict(page='tracks', value=kw, title='new Track')
 
     @expose('genshi:tgext.crud.templates.post_delete')
     def post_delete(self, *args, **kw):
@@ -53,10 +62,7 @@ class TrackController(CrudRestController):
     
     
     
-    @require(not_anonymous())
-    @expose('genshi:tgext.crud.templates.new')
-    def new(self, *args, **kw):
-        return super(TrackController, self).new(*args, **kw)
+  
    
     @expose()
     @registered_validate(error_handler=new)
@@ -64,12 +70,20 @@ class TrackController(CrudRestController):
         del kw['sprox_id']
         print kw
         user = handler.user.get_user_in_session(request)
-        files = handler.util.upload(file_upload=kw['file_upload'], urls=kw['urls'], url=None, fsys=None, fsys_list=None)
+        files = util.upload(file_upload=kw['file_upload'], urls=kw['urls'], url=None, fsys=None, fsys_list=None)
         if files is not None:
             for filename, file in files:
                 handler.track.create_track(user.id, file=file, trackname=filename)
+          
+        return 'ok'
     
-    
+    @expose()
+    def test(self):
+        input = Input()
+        input.sha1 = 'toto'
+        DBSession.add(input)
+        transaction.commit()
+        return 'ok'
     @expose()
     @registered_validate(error_handler=edit)
     def put(self, *args, **kw):
