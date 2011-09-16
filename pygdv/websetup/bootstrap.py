@@ -35,11 +35,6 @@ def bootstrap(command, conf, vars):
             perm.groups.append(admins)
             model.DBSession.add(perm)
             transaction.commit()
-            
-           
-            
-        
-            transaction.commit()
         else :
             # USER GROUP
             users = model.Group()

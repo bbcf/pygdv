@@ -11,7 +11,9 @@ from repoze.what.predicates import has_permission
 
 from pygdv.controllers import ErrorController, LoginController, GroupController
 from pygdv.controllers import PermissionController, UserController, TrackController
+from pygdv.controllers import SequenceController, ProjectController
 
+import pygdv
 
  
 __all__ = ['RootController']
@@ -20,10 +22,9 @@ __all__ = ['RootController']
 import inspect
 from sqlalchemy.orm import class_mapper
 
-import pygdv.model.auth
 models = {}
-for m in pygdv.model.auth.__all__:
-    m = getattr(pygdv.model.auth, m)
+for m in pygdv.model.admin_models:
+    m = getattr(pygdv.model, m)
     if not inspect.isclass(m):
         continue
     try:
@@ -31,6 +32,7 @@ for m in pygdv.model.auth.__all__:
         models[m.__name__.lower()] = m
     except:
         pass
+
 
 
 class RootController(BaseController):
@@ -51,15 +53,18 @@ class RootController(BaseController):
    
     error = ErrorController()
     login = LoginController()
+   
+    
     
     # admin controllers
     groups = GroupController(DBSession, menu_items=models)
     permissions = PermissionController(DBSession, menu_items=models)
     users = UserController(DBSession, menu_items=models)
+    sequences = SequenceController(DBSession, menu_items=models)
     
     # users controllers
-    tracks = TrackController()
-
+    tracks = TrackController(DBSession)
+    projects = ProjectController(DBSession)
 
     @expose('pygdv.templates.index')
     def index(self,*args,**kw):

@@ -4,6 +4,7 @@
 
 from webhelpers import date, feedgenerator, html, number, misc, text
 
+
 def get_delete_link(obj_id):
     '''
     Get an HTML delete link for an object.

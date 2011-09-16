@@ -7,5 +7,7 @@ from pygdv.controllers.group import GroupController
 from pygdv.controllers.permission import PermissionController
 from pygdv.controllers.user import UserController
 from pygdv.controllers.track import TrackController
+from pygdv.controllers.project import ProjectController
+from pygdv.controllers.sequence import SequenceController
 
 from pygdv.controllers.root import RootController

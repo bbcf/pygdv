@@ -58,10 +58,12 @@ class LoginController(BaseController):
             user_group = DBSession.query(Group).filter(Group.name == gl.group_users).first()
             user_group.users.append(tmp_user)
             DBSession.add(tmp_user)
-            transaction.commit()
+            DBSession.flush()
+            #transaction.commit()
             user = DBSession.query(User).filter(User.email == mail).first()
             flash( '''Your account has been created: %s'''%( user, ))
-            transaction.commit()
+            DBSession.flush()
+            #transaction.commit()
         elif user.name == gl.tmp_user_name:
             user.name = tmp_user.name
             user._set_date(datetime.datetime.now())
@@ -69,8 +71,10 @@ class LoginController(BaseController):
             user_group.users.append(tmp_user)
             flash( '''Your account has been created: %s'''%( user, ))
             DBSession.add(user)
-            transaction.commit()
-        
+            DBSession.flush()
+            #transaction.commit()
+        else :
+            flash( '''Welcome back: %s'''%( user, ))
         
         # create the authentication ticket
         user = DBSession.query(User).filter(User.email == mail).first()
@@ -92,7 +96,7 @@ class LoginController(BaseController):
                      comment=None, 
                      expires=None, 
                      overwrite=False)
-        
+        transaction.commit()
         redirect(came_from)
       
     @expose('pygdv.templates.index')
@@ -114,6 +118,7 @@ class LoginController(BaseController):
         @param principal: the hash from Tequila
         @return: an User
         '''
+        print principal
         hash = dict(item.split('=') for item in principal.split('\n') if len(item.split('='))>1)
         user = User()
         if(hash.has_key('name')):

@@ -39,33 +39,34 @@ class TEditFiller(EditFormFiller):
 track_grid = twf.DataGrid(fields=[
     ('Name', 'name'),
     ('Created', 'created'),
-    ('Last access','last_access'),
-    ('Type','vizu'),
+    ('Last access', 'last_access'),
+    ('Type', 'visu'),
+    ('Status', 'get_status'),
     ('Action', lambda obj:genshi.Markup(
-        '<a href="%s">export</a> <a href="%s">link</a> '+ get_delete_link(obj.id) 
+        '<a href="%s">export</a> <a href="%s">link</a> '
         % (
            url('/tracks/export', params=dict(track_id=obj.id)),
            url('/group/link', params=dict(track_id=obj.id))
-           )))
+           ) 
+        + get_delete_link(obj.id) 
+        ))
 ])
 
 
 
+class UploadFrom(twf.TableForm):
 
-
-class UploadForm(AddRecordForm):
-    __model__= Track
     submit_text = 'Upload a file'
     hover_help = True
     show_errors = True
-    __limit_fields__ = []
-    __field_order__ = ['upload_field', 'urls']
-    __base_widget_args__ = {'hover_help': True, 'show_errors' : True, 'action'='post'}
-    upload_field = twf.FileField(label_text='Select a file in your computer ',id='file_upload',
-    help_text = 'Browse the file to upload in your computer. It will be converted to a Track.')
-    urls =  twf.TextArea(id='urls',label_text='Or enter url(s) to access your file(s)',
+    action='post'
+    fields = [
+    twf.FileField(label_text='Select a file in your computer ',id='file_upload',
+    help_text = 'Browse the file to upload in your computer. It will be converted to a Track.'),
+    twf.TextArea(id='urls',label_text='Or enter url(s) to access your file(s)',
                           help_text = 'You can enter multiple urls separated by space or "enter".')
-    action='toto'
+              ]
+    
 
 
 #def get_import_file_form(project_id):
@@ -80,6 +81,6 @@ class UploadForm(AddRecordForm):
 
 track_table = TTable(DBSession)
 track_table_filler = TTableFiller(DBSession)
-track_new_form = UploadForm(DBSession)
+track_new_form = UploadFrom('upload_form',action='post')
 track_edit_form = TEditForm(DBSession)
 track_edit_filler = TEditFiller(DBSession)

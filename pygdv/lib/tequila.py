@@ -10,7 +10,7 @@ default_request = {'host':'paprika.epfl.ch',
                              'language' : 'english',
                              'service' : 'GDV',
                              'allows' : 'categorie=SHIBBOLETH',
-                             'request':'name firstname email title unit office phone user'}
+                             'request':'name firstname email title unit office phone user groupid allunits group'}
 
 def create_request(url_access, host,
                    request= default_request):
@@ -37,6 +37,7 @@ def validate_key(key, host):
     url = 'http://'+host+'/cgi-bin/tequila/validatekey'
     request = {'key':key}
     try:
-        return urllib2.urlopen( url, urllib.urlencode(request)).read()
+        u = urllib2.urlopen( url, urllib.urlencode(request))
+        return u.read() 
     except urllib2.HTTPError :
         return None

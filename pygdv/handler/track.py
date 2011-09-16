@@ -5,14 +5,13 @@ from pygdv.model import DBSession, Input, Track
 import os
 from pygdv.model import constants
 from pygdv.lib import util
-import transaction
 
 def create_track(user_id, trackname=None, file=None):
     '''
     Create track from files :
     
-    create input : can exist or not
-    create track
+        create input 
+        create track from input
     
     @param trackname : name to give to the track
     @param file : the file
@@ -27,8 +26,7 @@ def create_track(user_id, trackname=None, file=None):
         track.user_id = user_id
         track.input_id = input.id
         DBSession.add(track)
-        transaction.commit()
-    
+        DBSession.flush()
    
     
     
@@ -46,19 +44,17 @@ def create_input(file):
     print 'creating input'
     sha1 = util.get_file_sha1(os.path.abspath(file.name))
     print "getting sha1 %s" % sha1
-    transaction.begin()
     input = DBSession.query(Input).filter(Input.sha1 == sha1).first()
     if input is not None: 
         print "file already exist"
     else :
-        print "new input"
         input = Input()
         input.sha1 = sha1
         DBSession.add(input)
+       
         #PROCESS INPUT
         print 'TODO : processing input'
-        
-    transaction.commit()
+    DBSession.flush()
     return input   
         
         

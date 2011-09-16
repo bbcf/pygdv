@@ -37,10 +37,11 @@ metadata = DeclarativeBase.metadata
 # and import them at the bottom of this file.
 #
 ######
-
+from tg import config
 def init_model(engine):
     """Call me before using any of the tables or classes in the model."""
     DBSession.configure(bind=engine)
+    #DBSession.configure(bind=config['pylons.app_globals'].sa_engine)
     # If you are using reflection to introspect your database and create
     # table objects for you, your tables must be defined and mapped inside
     # the init_model function, so that the engine is available if you
@@ -56,9 +57,10 @@ def init_model(engine):
     #    autoload=True, autoload_with=engine)
 
     #mapper(Reflected, t_reflected)
-    #metadata.create_all(bind=DBSession.bind)
+    metadata.create_all(bind=DBSession.bind)
 
 # Import your model modules here.
 from pygdv.model.constants import *
 from pygdv.model.auth import User, Group, Permission
 from pygdv.model.database import *
+admin_models = ['User', 'Group', 'Permission', 'Sequence']

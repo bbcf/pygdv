@@ -53,12 +53,12 @@ user_circle_table = Table('user_circle', metadata,
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
 
-user_track_table = Table('user_track', metadata,
-    Column('user_id', Integer, ForeignKey('User.id',
-        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
-    Column('track_id', Integer, ForeignKey('Track.id',
-        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
-)
+#user_track_table = Table('user_track', metadata,
+#    Column('user_id', Integer, ForeignKey('User.id',
+#        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
+#    Column('track_id', Integer, ForeignKey('Track.id',
+#        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
+#)
 
 
 
@@ -120,8 +120,6 @@ class Project(DeclarativeBase):
     user_id = Column(Integer, ForeignKey('User.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
  
     tracks = relationship('Track', secondary=project_track_table, backref='projects')
-    
-    sequences = relationship('Sequence', backref='projects')
     
     _circle_right = relationship('RightCircleAssociation', backref='project')
     
@@ -205,11 +203,7 @@ class Input(DeclarativeBase):
     '''
     __tablename__ = 'Input'
     
-    def init_parameters(self):
-        p = InputParameters()
-        DBSession.add(p)
-        transaction.commit()
-        return p.id
+    
     
     # columns
     id = Column(Integer, autoincrement=True, primary_key=True)
@@ -217,7 +211,7 @@ class Input(DeclarativeBase):
     _last_access = Column(DateTime, default=datetime.now, nullable=False)
     tracks = relationship('Track', backref='input')
     parameter_id = Column(Integer, ForeignKey('InputParameters.id', onupdate="CASCADE", ondelete="CASCADE"), 
-                          default=init_parameters, nullable=False)
+                           nullable=False)
     
     # special methods
     def __repr__(self):
@@ -296,19 +290,26 @@ class Track(DeclarativeBase):
     def _get_last_access(self):
         return self._last_access.strftime(date_format);
         
-    def _set_last_access(self,date):
+    def _set_last_access(self, date):
         self._last_access=date
 
+    
+        
     created = synonym('_created', descriptor=property(_get_date, _set_date))
     last_access = synonym('_last_access', descriptor=property(_get_last_access, _set_last_access))
     
+    @property
     def accessed(self):
         '''
         Update the field 'last_access' by the current time
         '''
         self._set_last_access(datetime.now())
-        
-        
+    @property
+    def get_status(self):
+        '''
+        Get the status of the job processing the track.
+        '''
+        return 'not implemented'
 
 class JobParameters(DeclarativeBase):
     '''

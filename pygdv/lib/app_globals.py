@@ -10,6 +10,8 @@ perm_admin = 'admin'
 group_users = 'Users'
 perm_user = 'user'
 
+from bbcflib.genrep import GenRep
+
 class Globals(object):
     """Container for objects available throughout the life of the application.
 
@@ -33,3 +35,7 @@ class Globals(object):
         self.group_users = group_users
         self.perm_user = perm_user
         self.perm_admin = perm_admin
+        
+        self.genrep = GenRep()
+        
+        
