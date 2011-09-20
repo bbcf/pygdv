@@ -11,7 +11,7 @@ from repoze.what.predicates import has_permission
 
 from pygdv.controllers import ErrorController, LoginController, GroupController
 from pygdv.controllers import PermissionController, UserController, TrackController
-from pygdv.controllers import SequenceController, ProjectController
+from pygdv.controllers import SequenceController, ProjectController, CircleController
 
 import pygdv
 
@@ -65,7 +65,8 @@ class RootController(BaseController):
     # users controllers
     tracks = TrackController(DBSession)
     projects = ProjectController(DBSession)
-
+    circles = CircleController(DBSession)
+    
     @expose('pygdv.templates.index')
     def index(self,*args,**kw):
         return dict(page='index')

@@ -7,10 +7,10 @@ from repoze.what.predicates import not_anonymous, has_any_permission
 from tg import expose, flash, require, request, tmpl_context, validate
 from tg import app_globals as gl
 from tg.controllers import redirect
-from tg.decorators import paginate,with_trailing_slash
+from tg.decorators import paginate, with_trailing_slash,without_trailing_slash
 
 from pygdv.model import DBSession, Project
-from pygdv.widgets.project import project_table, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid
+from pygdv.widgets.project import project_table, project_table_filler, project_new_form,NewProjectFrom, project_edit_filler, project_edit_form, project_grid
 from pygdv import handler
 from pygdv.lib import util
 import os
@@ -39,7 +39,28 @@ class ProjectController(CrudRestController):
         data = [util.to_datagrid(project_grid, user.projects, "Project list", len(user.projects)>0)]
         return dict(page='projects', model='project', form_title="new project",items=data,value=kw)
     
+    @require(not_anonymous())
+    @expose('pygdv.templates.form')
+    def new(self, *args, **kw):
+        tmpl_context.widget = project_new_form
+        user = handler.user.get_user_in_session(request)
+        tmpl_context.tracks=user.tracks
+        tmpl_context.circle_rights=user.circles
+        return dict(page='projects', value=kw, title='new Project')
     
+    @expose()
+    @validate(project_new_form, error_handler=new)
+    def post(self, *args, **kw):
+        user = handler.user.get_user_in_session(request)
+        '''
+        create(name, sequence_id, user_id, tracks=None, isPublic=False, cicle_right):
+        {'nr_assembly': u'70', 'name': None, 'species': u'2'}  
+        
+        '''
+        handler.project.create(kw['name'], kw['nr_assembly'], user.id, tracks=kw['tracks'])
+        print args
+        print kw
+        raise redirect('./') 
     
 #    @require(not_anonymous())
 #    @expose('pygdv.templates.form')

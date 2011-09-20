@@ -40,7 +40,7 @@ def get_species():
 def get_assemblies(species):
         if species and species[0] and species[0][0]:
             nr_assemblies = genrep.get_nr_assemblies_not_created_from_species_id(species[0][0])
-            return [(nr.id,nr.name) for nr in nr_assemblies]
+            return [(nr.id, nr.name) for nr in nr_assemblies]
         return []
     
 

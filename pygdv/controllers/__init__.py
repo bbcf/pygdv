@@ -9,5 +9,6 @@ from pygdv.controllers.user import UserController
 from pygdv.controllers.track import TrackController
 from pygdv.controllers.project import ProjectController
 from pygdv.controllers.sequence import SequenceController
+from pygdv.controllers.circle import CircleController
 
 from pygdv.controllers.root import RootController
