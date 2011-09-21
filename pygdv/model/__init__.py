@@ -63,4 +63,5 @@ def init_model(engine):
 from pygdv.model.constants import *
 from pygdv.model.auth import User, Group, Permission
 from pygdv.model.database import *
-admin_models = ['User', 'Group', 'Permission', 'Sequence']
+
+admin_models = ['User', 'Group', 'Permission', 'Sequence', 'Right']

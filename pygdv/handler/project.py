@@ -1,5 +1,8 @@
+from pygdv.model import DBSession, Project, Circle, Track, Right, RightCircleAssociation
+from tg import app_globals as gl
+from sqlalchemy.sql import and_
 
-def create(name, sequence_id, user_id, tracks=None, isPublic=False, circle_right=None):
+def create(name, sequence_id, user_id, tracks=None, isPublic=False, circles=None):
     '''
     Create a new project.
     @param name: name of the project
@@ -7,8 +10,37 @@ def create(name, sequence_id, user_id, tracks=None, isPublic=False, circle_right
     @param user_id: the user identifier
     @param tracks: a list of tracks
     @param isPublic : if the project is public
-    @param circle_right : a dict {circle_id : right_id}
+    @param circles : a list of circles with 'read' permission
     '''
+    project = Project()
+    project.name=name
+    project.sequence_id = sequence_id
+    project.user_id = user_id
+    project.is_public = isPublic
+    DBSession.add(project)
+    DBSession.flush()
+    print project
+    project_id = project.id
+    #project = DBSession.query(Project).filter(Project.id == project_id).first()
+    print project
+    if tracks is not None:
+        for track_id in tracks :
+            t = DBSession.query(Track).filter(Track.id == track_id).first()
+            project.tracks.append(t)
     
-    
+    if circles is not None: # adding circle with the read permission by default
+        read_right = DBSession.query(Right).filter(Right.name == gl.right_read).first()
+        for circle_id in circles :
+            cr_assoc = DBSession.query(RightCircleAssociation).filter(
+                                    and_(RightCircleAssociation.right_id == read_right.id,
+                                         RightCircleAssociation.circle_id == circle_id)).first()
+            if cr_assoc is None :
+                cr_assoc = RightCircleAssociation()
+                cr_assoc.circle_id = circle_id
+                cr_assoc.right = read_right
+                DBSession.add(cr_assoc)
+            project._circle_right.append(cr_assoc)
+        
+    DBSession.add(project)
+    DBSession.flush()
     

@@ -11,6 +11,9 @@ perm_admin = 'admin'
 group_users = 'Users'
 perm_user = 'user'
 
+right_write = 'write'
+right_execute = 'execute'
+right_read = 'read'
 def bootstrap(command, conf, vars):
     """Place any commands to setup turbotequila here.
     Note that you will have to log in the application one before launching the bootstrap."""
@@ -46,6 +49,22 @@ def bootstrap(command, conf, vars):
             read.description = u'This permission give "read" right to the bearer'
             read.groups.append(users)
             model.DBSession.add(read)
+            # RIGHTS
+            write = model.Right()
+            write.name = right_write
+            write.description = u'A group with this permission can upload/download tracks to the project'
+            model.DBSession.add(write)
+            
+            execute = model.Right()
+            execute.name = right_execute
+            execute.description = u'A group with this permission can execute jobs on the project'
+            model.DBSession.add(execute)
+            
+            read = model.Right()
+            read.name = right_read
+            read.description = u'A group with this permission can view the project'
+            model.DBSession.add(read)
+            
             transaction.commit()
             print '''
                     

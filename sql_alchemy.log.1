@@ -1,0 +1,83 @@
+16:41:09,777    INFO  [sqlalchemy.engine.base.Engine] SELECT "Track".id AS "Track_id", "Track".name AS "Track_name", "Track"._created AS "Track__created", "Track"._last_access AS "Track__last_access", "Track".visu AS "Track_visu", "Track".input_id AS "Track_input_id", "Track".user_id AS "Track_user_id", "Track".sequence_id AS "Track_sequence_id" 
+FROM "Track" 
+WHERE %(param_1)s = "Track".user_id
+16:41:09,777    INFO  [sqlalchemy.engine.base.Engine] {'param_1': 1}
+16:41:09,780    INFO  [sqlalchemy.engine.base.Engine] SELECT "Project".id AS "Project_id", "Project".name AS "Project_name", "Project"._created AS "Project__created", "Project".sequence_id AS "Project_sequence_id", "Project".user_id AS "Project_user_id", "Project".is_public AS "Project_is_public", "Project".key AS "Project_key" 
+FROM "Project" 
+WHERE %(param_1)s = "Project".user_id
+16:41:09,781    INFO  [sqlalchemy.engine.base.Engine] {'param_1': 1}
+16:41:09,783    INFO  [sqlalchemy.engine.base.Engine] SELECT "Job".id AS "Job_id", "Job".name AS "Job_name", "Job".description AS "Job_description", "Job"._created AS "Job__created", "Job".status AS "Job_status", "Job".user_id AS "Job_user_id", "Job".project_id AS "Job_project_id" 
+FROM "Job" 
+WHERE %(param_1)s = "Job".user_id
+16:41:09,784    INFO  [sqlalchemy.engine.base.Engine] {'param_1': 1}
+16:41:09,789    INFO  [sqlalchemy.engine.base.Engine] SELECT "Group".id AS "Group_id", "Group".name AS "Group_name", "Group"._created AS "Group__created" 
+FROM "Group", "UserGroup" 
+WHERE %(param_1)s = "UserGroup".user_id AND "Group".id = "UserGroup".group_id
+16:41:09,790    INFO  [sqlalchemy.engine.base.Engine] {'param_1': 1}
+16:41:09,792    INFO  [sqlalchemy.engine.base.Engine] SELECT "Circle".id AS "Circle_id", "Circle".name AS "Circle_name", "Circle".description AS "Circle_description", "Circle".creator_id AS "Circle_creator_id" 
+FROM "Circle", user_circle 
+WHERE %(param_1)s = user_circle.user_id AND "Circle".id = user_circle.circle_id
+16:41:09,793    INFO  [sqlalchemy.engine.base.Engine] {'param_1': 1}
+16:41:09,796    INFO  [sqlalchemy.engine.base.Engine] SELECT "Track".id AS "Track_id", "Track".name AS "Track_name", "Track"._created AS "Track__created", "Track"._last_access AS "Track__last_access", "Track".visu AS "Track_visu", "Track".input_id AS "Track_input_id", "Track".user_id AS "Track_user_id", "Track".sequence_id AS "Track_sequence_id" 
+FROM "Track" 
+WHERE %(param_1)s = "Track".user_id
+16:41:09,796    INFO  [sqlalchemy.engine.base.Engine] {'param_1': 2}
+16:41:09,799    INFO  [sqlalchemy.engine.base.Engine] SELECT "Project".id AS "Project_id", "Project".name AS "Project_name", "Project"._created AS "Project__created", "Project".sequence_id AS "Project_sequence_id", "Project".user_id AS "Project_user_id", "Project".is_public AS "Project_is_public", "Project".key AS "Project_key" 
+FROM "Project" 
+WHERE %(param_1)s = "Project".user_id
+16:41:09,799    INFO  [sqlalchemy.engine.base.Engine] {'param_1': 2}
+16:41:09,801    INFO  [sqlalchemy.engine.base.Engine] SELECT "Job".id AS "Job_id", "Job".name AS "Job_name", "Job".description AS "Job_description", "Job"._created AS "Job__created", "Job".status AS "Job_status", "Job".user_id AS "Job_user_id", "Job".project_id AS "Job_project_id" 
+FROM "Job" 
+WHERE %(param_1)s = "Job".user_id
+16:41:09,801    INFO  [sqlalchemy.engine.base.Engine] {'param_1': 2}
+16:41:09,803    INFO  [sqlalchemy.engine.base.Engine] SELECT "Group".id AS "Group_id", "Group".name AS "Group_name", "Group"._created AS "Group__created" 
+FROM "Group", "UserGroup" 
+WHERE %(param_1)s = "UserGroup".user_id AND "Group".id = "UserGroup".group_id
+16:41:09,803    INFO  [sqlalchemy.engine.base.Engine] {'param_1': 2}
+16:41:09,805    INFO  [sqlalchemy.engine.base.Engine] SELECT "Circle".id AS "Circle_id", "Circle".name AS "Circle_name", "Circle".description AS "Circle_description", "Circle".creator_id AS "Circle_creator_id" 
+FROM "Circle", user_circle 
+WHERE %(param_1)s = user_circle.user_id AND "Circle".id = user_circle.circle_id
+16:41:09,805    INFO  [sqlalchemy.engine.base.Engine] {'param_1': 2}
+16:41:09,934    INFO  [sqlalchemy.engine.base.Engine] BEGIN (implicit)
+16:41:09,935    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key" 
+FROM "User" 
+WHERE "User"._email = %(_email_1)s
+16:41:09,936    INFO  [sqlalchemy.engine.base.Engine] {'_email_1': 'yohan.jarosz@epfl.ch'}
+16:41:09,945    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key", "Group_1".id AS "Group_1_id", "Group_1".name AS "Group_1_name", "Group_1"._created AS "Group_1__created" 
+FROM "User" LEFT OUTER JOIN "UserGroup" AS "UserGroup_1" ON "User".id = "UserGroup_1".user_id LEFT OUTER JOIN "Group" AS "Group_1" ON "Group_1".id = "UserGroup_1".group_id 
+WHERE "User"._email = %(_email_1)s
+16:41:09,946    INFO  [sqlalchemy.engine.base.Engine] {'_email_1': 'yohan.jarosz@epfl.ch'}
+16:41:09,950    INFO  [sqlalchemy.engine.base.Engine] SELECT "Group".id AS "Group_id", "Group".name AS "Group_name", "Group"._created AS "Group__created", "Permission_1".id AS "Permission_1_id", "Permission_1".name AS "Permission_1_name", "Permission_1".description AS "Permission_1_description" 
+FROM "Group" LEFT OUTER JOIN "GroupPermissions" AS "GroupPermissions_1" ON "Group".id = "GroupPermissions_1".group_id LEFT OUTER JOIN "Permission" AS "Permission_1" ON "Permission_1".id = "GroupPermissions_1".permission_id 
+WHERE "Group".id = %(id_1)s
+16:41:09,951    INFO  [sqlalchemy.engine.base.Engine] {'id_1': 1}
+16:41:09,955    INFO  [sqlalchemy.engine.base.Engine] SELECT "Group".id AS "Group_id", "Group".name AS "Group_name", "Group"._created AS "Group__created", "Permission_1".id AS "Permission_1_id", "Permission_1".name AS "Permission_1_name", "Permission_1".description AS "Permission_1_description" 
+FROM "Group" LEFT OUTER JOIN "GroupPermissions" AS "GroupPermissions_1" ON "Group".id = "GroupPermissions_1".group_id LEFT OUTER JOIN "Permission" AS "Permission_1" ON "Permission_1".id = "GroupPermissions_1".permission_id 
+WHERE "Group".id = %(id_1)s
+16:41:09,956    INFO  [sqlalchemy.engine.base.Engine] {'id_1': 2}
+16:41:11,011    INFO  [sqlalchemy.engine.base.Engine] BEGIN (implicit)
+16:41:11,012    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key" 
+FROM "User" 
+WHERE "User"._email = %(_email_1)s
+16:41:11,012    INFO  [sqlalchemy.engine.base.Engine] {'_email_1': 'yohan.jarosz@epfl.ch'}
+16:41:11,016    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key", "Group_1".id AS "Group_1_id", "Group_1".name AS "Group_1_name", "Group_1"._created AS "Group_1__created" 
+FROM "User" LEFT OUTER JOIN "UserGroup" AS "UserGroup_1" ON "User".id = "UserGroup_1".user_id LEFT OUTER JOIN "Group" AS "Group_1" ON "Group_1".id = "UserGroup_1".group_id 
+WHERE "User"._email = %(_email_1)s
+16:41:11,016    INFO  [sqlalchemy.engine.base.Engine] {'_email_1': 'yohan.jarosz@epfl.ch'}
+16:41:11,020    INFO  [sqlalchemy.engine.base.Engine] SELECT "Group".id AS "Group_id", "Group".name AS "Group_name", "Group"._created AS "Group__created", "Permission_1".id AS "Permission_1_id", "Permission_1".name AS "Permission_1_name", "Permission_1".description AS "Permission_1_description" 
+FROM "Group" LEFT OUTER JOIN "GroupPermissions" AS "GroupPermissions_1" ON "Group".id = "GroupPermissions_1".group_id LEFT OUTER JOIN "Permission" AS "Permission_1" ON "Permission_1".id = "GroupPermissions_1".permission_id 
+WHERE "Group".id = %(id_1)s
+16:41:11,021    INFO  [sqlalchemy.engine.base.Engine] {'id_1': 1}
+16:41:11,025    INFO  [sqlalchemy.engine.base.Engine] SELECT "Group".id AS "Group_id", "Group".name AS "Group_name", "Group"._created AS "Group__created", "Permission_1".id AS "Permission_1_id", "Permission_1".name AS "Permission_1_name", "Permission_1".description AS "Permission_1_description" 
+FROM "Group" LEFT OUTER JOIN "GroupPermissions" AS "GroupPermissions_1" ON "Group".id = "GroupPermissions_1".group_id LEFT OUTER JOIN "Permission" AS "Permission_1" ON "Permission_1".id = "GroupPermissions_1".permission_id 
+WHERE "Group".id = %(id_1)s
+16:41:11,025    INFO  [sqlalchemy.engine.base.Engine] {'id_1': 2}
+16:41:11,036    INFO  [sqlalchemy.engine.base.Engine] BEGIN (implicit)
+16:41:11,037    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key" 
+FROM "User" 
+WHERE "User"._email = %(_email_1)s
+16:41:11,037    INFO  [sqlalchemy.engine.base.Engine] {'_email_1': 'yohan.jarosz@epfl.ch'}
+16:41:11,042    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key", "Group_1".id AS "Group_1_id", "Group_1".name AS "Group_1_name", "Group_1"._created AS "Group_1__created" 
+FROM "User" LEFT OUTER JOIN "UserGroup" AS "UserGroup_1" ON "User".id = "UserGroup_1".user_id LEFT OUTER JOIN "Group" AS "Group_1" ON "Group_1".id = "UserGroup_1".group_id 
+WHERE "User"._email = %(_email_1)s
+16:41:11,042    INFO  [sqlalchemy.engine.base.Engine] {'_email_1': 'yohan.jarosz@epfl.ch'}

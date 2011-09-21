@@ -70,9 +70,12 @@ class Right(DeclarativeBase):
     '''
     __tablename__='Right'
     id = Column(Integer, autoincrement=True, primary_key=True)
-    name = Column(Unicode(255), nullable=False)
+    name = Column(Unicode(255), unique=True, nullable=False)
     description = Column(Text(), nullable=False)
 
+    def __str__(self):
+        return self.name
+    
 class Circle(DeclarativeBase):
     '''
     A group of users.
@@ -116,6 +119,7 @@ class Project(DeclarativeBase):
     name = Column(Unicode(255), nullable=False)
     _created = Column(DateTime, default=datetime.now, nullable=False)
     sequence_id = Column(Integer, ForeignKey('Sequence.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+    sequence = relationship("Sequence")
     #relations
     user_id = Column(Integer, ForeignKey('User.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
  
@@ -142,21 +146,35 @@ class Project(DeclarativeBase):
     def __unicode__(self):
         return self.name
     @property
-    def species(self):
-        return self.sequence.species
+    def assembly(self):
+        return self.sequence_id
     
     @property
     def circles_with_rights(self):
         '''
-        Get a list of tuples (Circle, associated rights)
+        Get a list of dict {Circle : [associated rights]}
         '''
-        result = []
+        result = {}
         for cr in self._circle_right:
-            result.append((cr.circle, cr.right))
+            if result.has_key(cr.circle) :
+                rights = result.get(cr.circle)
+            else :
+                rights = []
+            rights.append(cr.right)
+            result[cr.circle]=rights
         return result
     
-
-
+    @property
+    def get_circle_with_right_display(self):
+        '''
+        Get a list of groups with rights associated
+        in a suitable manner for display : Circle (associated rights) )
+        '''
+        crs = self.circles_with_rights
+        result = []
+        for circle, rights in crs.items():
+            result.append('%s (%s)\n' %(circle.name, ', '.join([right.name for right in rights])))
+        return result
 
     
  

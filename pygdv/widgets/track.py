@@ -45,8 +45,8 @@ track_grid = twf.DataGrid(fields=[
     ('Action', lambda obj:genshi.Markup(
         '<a href="%s">export</a> <a href="%s">link</a> '
         % (
-           url('/tracks/export', params=dict(track_id=obj.id)),
-           url('/group/link', params=dict(track_id=obj.id))
+           url('./export', params=dict(track_id=obj.id)),
+           url('./link', params=dict(track_id=obj.id))
            ) 
         + get_delete_link(obj.id) 
         ))

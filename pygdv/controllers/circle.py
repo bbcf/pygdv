@@ -47,6 +47,7 @@ class CircleController(CrudRestController):
     @expose('json')
     @paginate('value_list', items_per_page=7)
     def get_all(self, *args, **kw):
+        kw['page']='circle'
         return CrudRestController.get_all(self, *args, **kw)
 
     @expose('genshi:tgext.crud.templates.post_delete')

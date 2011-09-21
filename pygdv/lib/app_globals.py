@@ -10,6 +10,10 @@ perm_admin = 'admin'
 group_users = 'Users'
 perm_user = 'user'
 
+right_write = 'write'
+right_execute = 'execute'
+right_read = 'read'
+
 from bbcflib.genrep import GenRep
 
 class Globals(object):
@@ -35,6 +39,9 @@ class Globals(object):
         self.group_users = group_users
         self.perm_user = perm_user
         self.perm_admin = perm_admin
+        self.right_write = right_write
+        self.right_execute = right_execute
+        self.right_read = right_read
         
         self.genrep = GenRep()
         

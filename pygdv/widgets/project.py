@@ -46,9 +46,10 @@ def get_assemblies(species):
 def get_tracks():
     return [(track.id, track.name) for track in tmpl_context.tracks]
 
-def get_circles_right():
-    return [(circle_right.id) for circle_right in tmpl_context.circle_rights]
-       
+def get_circles():
+    return [(circle.id, '%s (%s)' %(circle.name, circle.description)) for circle in tmpl_context.circles]
+
+
 class NewProjectFrom(twf.TableForm):
 
     submit_text = 'New project'
@@ -69,8 +70,9 @@ class NewProjectFrom(twf.TableForm):
               twf.Spacer(),
             twf.MultipleSelectField(id='tracks', label_text='Tracks : ',options=get_tracks,
               help_text = 'Add tracks to the project'),
-              twf.MultipleSelectField(id='circle_right', label_text="Circles with rights : ",options=get_circles_right,
-                                      help_text="Choose group to share with")
+             twf.MultipleSelectField(id='circles', label_text="Circles : ",options=get_circles,
+                                      help_text="Add Circles to share with. Circle(s) selected will automatically see your project.")
+              
               
 ]              
     def update_params(self, d):
@@ -79,7 +81,9 @@ class NewProjectFrom(twf.TableForm):
         d['species']=species
         d['nr_assembly']=get_assemblies(species)
         return d
-    
+
+
+
 # EDIT
 class PEditForm(EditableForm):
     __model__ = Project
@@ -93,14 +97,13 @@ class PEditFiller(EditFormFiller):
 project_grid = twf.DataGrid(fields=[
     ('Name', 'name'),
     ('Created', 'created'),
-    ('Last access', 'last_access'),
-    ('Type', 'visu'),
-    ('Status', 'get_status'),
+    ('Assembly', 'assembly'),
+    ('Groups', 'get_circle_with_right_display'),
     ('Action', lambda obj:genshi.Markup(
-        '<a href="%s">export</a> <a href="%s">link</a> '
+        '<a href="%s">view</a> <a href="%s">share</a> '
         % (
-           url('/projects/export', params=dict(project_id=obj.id)),
-           url('/group/link', params=dict(project_id=obj.id))
+           url('./view', params=dict(project_id=obj.id)),
+           url('./share', params=dict(project_id=obj.id))
            ) 
         + get_delete_link(obj.id) 
         ))

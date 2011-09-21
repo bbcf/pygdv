@@ -12,8 +12,9 @@ def create(name, description, creator_id, users=None):
     c.name = name
     c.description = description
     c.creator_id = creator_id
-    if users :
+    if users is not None:
         for user_id in users :
+            c.users.append(user_id)
             u = DBSession.query(User).filter(User.id == user_id).first()
             c.users.append(u)
     DBSession.add(c)

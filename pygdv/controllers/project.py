@@ -45,7 +45,7 @@ class ProjectController(CrudRestController):
         tmpl_context.widget = project_new_form
         user = handler.user.get_user_in_session(request)
         tmpl_context.tracks=user.tracks
-        tmpl_context.circle_rights=user.circles
+        tmpl_context.circles=user.circles
         return dict(page='projects', value=kw, title='new Project')
     
     @expose()
@@ -57,11 +57,15 @@ class ProjectController(CrudRestController):
         {'nr_assembly': u'70', 'name': None, 'species': u'2'}  
         
         '''
-        handler.project.create(kw['name'], kw['nr_assembly'], user.id, tracks=kw['tracks'])
+        handler.project.create(kw['name'], kw['nr_assembly'], user.id, tracks=kw['tracks'], circles=kw['circles'])
         print args
         print kw
+        transaction.commit()
         raise redirect('./') 
     
+    @expose()
+    def share(self, *args, **kw):
+        pass
 #    @require(not_anonymous())
 #    @expose('pygdv.templates.form')
 #    def new(self, *args, **kw):
