@@ -60,3 +60,5 @@ base_config.call_on_shutdown = [on_shutdown]
 
 token = 'GDV'
 
+import pygdv.celery
+

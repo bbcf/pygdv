@@ -10,7 +10,7 @@ from tg.controllers import redirect
 from tg.decorators import paginate, with_trailing_slash,without_trailing_slash
 
 from pygdv.model import DBSession, Project
-from pygdv.widgets.project import project_table, project_table_filler, project_new_form,NewProjectFrom, project_edit_filler, project_edit_form, project_grid
+from pygdv.widgets.project import project_table, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid
 from pygdv import handler
 from pygdv.lib import util
 import os
@@ -36,12 +36,13 @@ class ProjectController(CrudRestController):
     #@paginate('items', items_per_page=10)
     def get_all(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        data = [util.to_datagrid(project_grid, user.projects, "Project list", len(user.projects)>0)]
+        data = [util.to_datagrid(project_grid, user.projects, "Project Listing", len(user.projects)>0)]
         return dict(page='projects', model='project', form_title="new project",items=data,value=kw)
     
     @require(not_anonymous())
     @expose('pygdv.templates.form')
     def new(self, *args, **kw):
+        print 'new'
         tmpl_context.widget = project_new_form
         user = handler.user.get_user_in_session(request)
         tmpl_context.tracks=user.tracks
@@ -51,6 +52,7 @@ class ProjectController(CrudRestController):
     @expose()
     @validate(project_new_form, error_handler=new)
     def post(self, *args, **kw):
+        print 'post'
         user = handler.user.get_user_in_session(request)
         '''
         create(name, sequence_id, user_id, tracks=None, isPublic=False, cicle_right):
@@ -58,71 +60,53 @@ class ProjectController(CrudRestController):
         
         '''
         handler.project.create(kw['name'], kw['nr_assembly'], user.id, tracks=kw['tracks'], circles=kw['circles'])
-        print args
-        print kw
         transaction.commit()
         raise redirect('./') 
     
+    @expose('genshi:tgext.crud.templates.post_delete')
+    def post_delete(self, *args, **kw):
+        print 'post_del'
+        user = handler.user.get_user_in_session(request)
+        id = args[0]
+        for project in user.projects :
+            if int(id) == project.id :
+                return CrudRestController.post_delete(self, *args, **kw)
+        flash("You haven't the right to delete any project which is not yours")
+        raise redirect('./')
+    
+    
+    @expose('pygdv.templates.form')
+    def edit(self, *args, **kw):
+        print 'edit'
+        project = DBSession.query(Project).filter(Project.id == args[0]).first()
+        tmpl_context.widget = project_edit_form
+        tmpl_context.project = project
+        kw['_method']='PUT'
+        return dict(page='projects', value=kw, title='edit Project')
+    
+    @expose()
+    @validate(project_edit_form, error_handler=edit)
+    def put(self, *args, **kw):
+        print 'put'
+        print args
+        print kw
+        user = handler.user.get_user_in_session(request)
+        id = args[0]
+        for project in user.projects :
+            if int(id) == project.id:
+                handler.project.edit(project, kw['name'], kw['nr_assembly'], 
+                                     user.id, tracks=kw['tracks'], circles=kw['circles'])
+                raise redirect('../')
+        flash("You haven't the right to edit any project which is not yours")
+        raise redirect('../')
+    
+    
+    @expose()
+    def view(self, *args, **kw):
+        return 'not implemented'
     @expose()
     def share(self, *args, **kw):
-        pass
-#    @require(not_anonymous())
-#    @expose('pygdv.templates.form')
-#    def new(self, *args, **kw):
-#        tmpl_context.widget = project_new_form
-#        return dict(page='projects', value=kw, title='new Track')
-#    
-#    
-#
-#    @expose('genshi:tgext.crud.templates.post_delete')
-#    def post_delete(self, *args, **kw):
-#        user = handler.user.get_user_in_session(request)
-#        id = args[0]
-#        for project in user.projects :
-#            if int(id) == project.id :
-#                return CrudRestController.post_delete(self, *args, **kw)
-#        flash("You haven't the right to delete any projects which is not yours")
-#        raise redirect('./')
-#    
-#    
-#    
-#    @expose('tgext.crud.templates.edit')
-#    def edit(self, *args, **kw):
-#        flash("You haven't the right to edit any projects")
-#        raise redirect('./')
-#    
-#    
-#    
-#  
-#   
-#    @expose()
-#    @validate(project_new_form, error_handler=new)
-#    def post(self, *args, **kw):
-#        user = handler.user.get_user_in_session(request)
-#        files = util.upload(**kw)
-#        if files is not None:
-#            for filename, file in files:
-#                handler.project.create_project(user.id, file=file, projectname=filename)
-#            transaction.commit()
-#            flash("Track(s) successfully uploaded.")
-#        else :
-#            flash("No file to upload.")
-#        raise redirect('./') 
-#        
-#    
-##    @with_trailing_slash
-##    @expose('tgext.crud.templates.get_all')
-##    @expose('json')
-##    @paginate('value_list', items_per_page=7)
-##    def get_all(self, *args, **kw):
-##        return CrudRestController.get_all(self, *args, **kw)
-#
-#   
-#  
-#    
-#    
-#    @expose()
-#    @registered_validate(error_handler=edit)
-#    def put(self, *args, **kw):
-#        pass
-        
+        return 'not implemented'
+    
+    
+    

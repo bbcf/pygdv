@@ -38,7 +38,7 @@ a.edit_link{
 .crud_table .grid td.col_0 div{
     float: left;
 }
-.crud_table .grid td.col_0 .edit_link, .crud_table .grid td.col_0 .delete-button{
+.crud_table .grid td.col_0 .edit_link, .crud_table .grid td.col_0 .delete-button, .crud_table .grid .button-to .delete-button{
     display:block;
     height:17px;
     width:20px;
@@ -46,7 +46,7 @@ a.edit_link{
     text-indent:-400px;
     background-repeat: no-repeat;
 }
-.crud_table .grid td.col_0 .delete-button{
+.crud_table .grid td.col_0 .delete-button, .crud_table .grid .button-to .delete-button{
     font-size: inherit;
     background-image: url('/images/delete.png');
     cursor: pointer;

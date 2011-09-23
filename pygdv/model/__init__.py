@@ -64,4 +64,4 @@ from pygdv.model.constants import *
 from pygdv.model.auth import User, Group, Permission
 from pygdv.model.database import *
 
-admin_models = ['User', 'Group', 'Permission', 'Sequence', 'Right']
+admin_models = ['User', 'Group', 'Permission', 'Sequence', 'Right', 'CeleryTask']

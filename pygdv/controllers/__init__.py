@@ -11,5 +11,7 @@ from pygdv.controllers.project import ProjectController
 from pygdv.controllers.sequence import SequenceController
 from pygdv.controllers.circle import CircleController
 from pygdv.controllers.right import RightController
+from pygdv.controllers.worker import WorkerController
+from pygdv.controllers.task import TaskController
 
 from pygdv.controllers.root import RootController

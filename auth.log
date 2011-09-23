@@ -1,15 +1,16 @@
-2011-09-21 14:48:54,347 -- repoze.who request started (/projects/share) --
-2011-09-21 14:48:54,348 request classification: browser
-2011-09-21 14:48:54,348 identifier plugins registered [<pygdv.lib.auth_plugin.CustomCommandLinePlugin object at 0x307a910>, <CustomCookiePlugin 27673232>]
-2011-09-21 14:48:54,348 identifier plugins matched for classification "browser": [<CustomCookiePlugin 27673232>]
-2011-09-21 14:48:54,348 identity returned from <CustomCookiePlugin 27673232>: {'tokens': ['G', 'D', 'V'], 'timestamp': 1316596795, 'repoze.who.userid': 'yohan.jarosz@epfl.ch', 'userdata': '1'}
-2011-09-21 14:48:54,349 identities found: [(<CustomCookiePlugin 27673232>, {'tokens': ['G', 'D', 'V'], 'timestamp': 1316596795, 'repoze.who.userid': 'yohan.jarosz@epfl.ch', 'userdata': '1'})]
-2011-09-21 14:48:54,349 authenticator plugins registered [<CustomAuthPlugin 32455504>]
-2011-09-21 14:48:54,349 authenticator plugins matched for classification "browser": [<CustomAuthPlugin 32455504>]
-2011-09-21 14:48:54,349 userid preauthenticated by <CustomCookiePlugin 27673232>: "yohan.jarosz@epfl.ch" (repoze.who.userid set)
-2011-09-21 14:48:54,349 identities authenticated: [((0, 0), None, <CustomCookiePlugin 27673232>, {'tokens': ['G', 'D', 'V'], 'timestamp': 1316596795, 'repoze.who.userid': 'yohan.jarosz@epfl.ch', 'userdata': '1'}, 'yohan.jarosz@epfl.ch')]
-2011-09-21 14:48:54,406 User belongs to the following groups: (1, 2)
-2011-09-21 14:48:54,407 User has the following permissions: (u'admin', u'user')
-2011-09-21 14:48:54,602 Authorization granted
-2011-09-21 14:48:54,604 no challenge required
-2011-09-21 14:48:54,604 -- repoze.who request ended (/projects/share) --
+2011-09-23 16:33:17,978 -- repoze.who request started (/workers/add.json) --
+2011-09-23 16:33:17,978 request classification: command_line
+2011-09-23 16:33:17,978 identifier plugins registered [<pygdv.lib.auth_plugin.CustomCommandLinePlugin object at 0x340c210>, <CustomCookiePlugin 31806288>]
+2011-09-23 16:33:17,978 identifier plugins matched for classification "command_line": [<pygdv.lib.auth_plugin.CustomCommandLinePlugin object at 0x340c210>]
+2011-09-23 16:33:18,023 identity returned from <pygdv.lib.auth_plugin.CustomCommandLinePlugin object at 0x340c210>: {'repoze.who.userid': u'yohan.jarosz@epfl.ch'}
+2011-09-23 16:33:18,023 identities found: [(<pygdv.lib.auth_plugin.CustomCommandLinePlugin object at 0x340c210>, {'repoze.who.userid': u'yohan.jarosz@epfl.ch'})]
+2011-09-23 16:33:18,023 authenticator plugins registered [<CustomAuthPlugin 36659472>]
+2011-09-23 16:33:18,023 authenticator plugins matched for classification "command_line": [<CustomAuthPlugin 36659472>]
+2011-09-23 16:33:18,023 userid preauthenticated by <pygdv.lib.auth_plugin.CustomCommandLinePlugin object at 0x340c210>: "yohan.jarosz@epfl.ch" (repoze.who.userid set)
+2011-09-23 16:33:18,023 identities authenticated: [((0, 0), None, <pygdv.lib.auth_plugin.CustomCommandLinePlugin object at 0x340c210>, {'repoze.who.userid': u'yohan.jarosz@epfl.ch'}, u'yohan.jarosz@epfl.ch')]
+2011-09-23 16:33:18,051 User belongs to the following groups: (1, 2)
+2011-09-23 16:33:18,051 User has the following permissions: (u'admin', u'user')
+2011-09-23 16:33:18,329 Authorization granted
+2011-09-23 16:33:18,330 Authorization granted
+2011-09-23 16:33:18,918 no challenge required
+2011-09-23 16:33:18,918 -- repoze.who request ended (/workers/add.json) --

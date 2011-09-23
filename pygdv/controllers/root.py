@@ -12,7 +12,7 @@ from repoze.what.predicates import has_permission
 from pygdv.controllers import ErrorController, LoginController, GroupController
 from pygdv.controllers import PermissionController, UserController, TrackController
 from pygdv.controllers import SequenceController, ProjectController, CircleController
-from pygdv.controllers import RightController
+from pygdv.controllers import RightController, WorkerController, TaskController
 
 import pygdv
 
@@ -63,11 +63,14 @@ class RootController(BaseController):
     users = UserController(DBSession, menu_items=models)
     sequences = SequenceController(DBSession, menu_items=models)
     rights = RightController(DBSession, menu_items=models)
-    
+    celerytasks = TaskController(DBSession, menu_items=models)
     # users controllers
     tracks = TrackController(DBSession)
     projects = ProjectController(DBSession)
     circles = CircleController(DBSession)
+    
+    #tasks controller
+    workers = WorkerController()
     
     @expose('pygdv.templates.index')
     def index(self,*args,**kw):
@@ -104,7 +107,9 @@ class RootController(BaseController):
         """This method showcases how you can use the same controller for a data page and a display page"""
         return dict(page='data',params=kw)
 
-
+    @expose('jsonp')
+    def test(self, **kw):
+        return dict(kw)
     
     
     

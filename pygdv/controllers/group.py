@@ -31,3 +31,11 @@ class GroupController(CrudRestController):
                 redirect('/groups')
         return CrudRestController.post_delete(self, *args, **kw)
     
+    @expose('tgext.crud.templates.edit')
+    def edit(self, *args, **kw):
+        return CrudRestController.edit(self, *args, **kw)
+    
+    @expose()
+    def put(self, *args, **kw):
+        1/0
+        CrudRestController.put(self, *args, **kw)

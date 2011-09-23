@@ -30,14 +30,18 @@ class TrackController(CrudRestController):
     edit_filler = track_edit_filler
 
    
-    
+    @expose('json')
+    def all(self, *args, **kw):
+        user=handler.user.get_user_in_session(request)
+        return dict(tracks=user.tracks)
+
     @with_trailing_slash
     @expose('pygdv.templates.list')
     @expose('json')
     #@paginate('items', items_per_page=10)
     def get_all(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        data = [util.to_datagrid(track_grid, user.tracks, "Track list", len(user.tracks)>0)]
+        data = [util.to_datagrid(track_grid, user.tracks, "Track Listing", len(user.tracks)>0)]
         return dict(page='tracks', model='track', form_title="new track",items=data,value=kw)
     
     
@@ -48,29 +52,6 @@ class TrackController(CrudRestController):
         tmpl_context.widget = track_new_form
         return dict(page='tracks', value=kw, title='new Track')
     
-    
-
-    @expose('genshi:tgext.crud.templates.post_delete')
-    def post_delete(self, *args, **kw):
-        user = handler.user.get_user_in_session(request)
-        id = args[0]
-        for track in user.tracks :
-            if int(id) == track.id :
-                return CrudRestController.post_delete(self, *args, **kw)
-        flash("You haven't the right to delete any tracks which is not yours")
-        raise redirect('./')
-    
-    
-    
-    @expose('tgext.crud.templates.edit')
-    def edit(self, *args, **kw):
-        flash("You haven't the right to edit any tracks")
-        raise redirect('./')
-    
-    
-    
-  
-   
     @expose()
     @validate(track_new_form, error_handler=new)
     def post(self, *args, **kw):
@@ -84,21 +65,43 @@ class TrackController(CrudRestController):
         else :
             flash("No file to upload.")
         raise redirect('./') 
-        
     
-#    @with_trailing_slash
-#    @expose('tgext.crud.templates.get_all')
-#    @expose('json')
-#    @paginate('value_list', items_per_page=7)
-#    def get_all(self, *args, **kw):
-#        return CrudRestController.get_all(self, *args, **kw)
 
-   
-  
+    @expose('genshi:tgext.crud.templates.post_delete')
+    def post_delete(self, *args, **kw):
+        user = handler.user.get_user_in_session(request)
+        id = args[0]
+        for track in user.tracks :
+            if int(id) == track.id :
+                return CrudRestController.post_delete(self, *args, **kw)
+        flash("You haven't the right to delete any tracks which is not yours")
+        raise redirect('./')
     
+    
+    @expose('tgext.crud.templates.edit')
+    def edit(self, *args, **kw):
+        return CrudRestController.edit(self, *args, **kw)
     
     @expose()
-    @registered_validate(error_handler=edit)
+    @validate(track_edit_form, error_handler=edit)
     def put(self, *args, **kw):
-        pass
+        user = handler.user.get_user_in_session(request)
+        id = args[0]
+        for track in user.tracks :
+            if int(id) == track.id :
+                track = DBSession.query(Track).filter(Track.id == id).first()
+                track.name = kw['name']
+                DBSession.flush()
+                redirect('../')
         
+        flash("You haven't the right to edit any tracks which is not yours")
+        raise redirect('../')
+    
+    @expose()
+    def export(self, *args, **kw):
+        return 'not implemented'
+    @expose()
+    def link(self, *args, **kw):
+        return 'not implemented'
+    
+    

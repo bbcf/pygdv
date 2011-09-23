@@ -1,4 +1,4 @@
-from pygdv.model import DBSession, Project, Circle, Track, Right, RightCircleAssociation
+from pygdv.model import DBSession, Project, Track, Right, RightCircleAssociation
 from tg import app_globals as gl
 from sqlalchemy.sql import and_
 
@@ -12,17 +12,18 @@ def create(name, sequence_id, user_id, tracks=None, isPublic=False, circles=None
     @param isPublic : if the project is public
     @param circles : a list of circles with 'read' permission
     '''
-    project = Project()
+    edit(Project(), name, sequence_id, user_id, tracks, isPublic, circles)
+    
+def edit(project, name, sequence_id, user_id, tracks=None, isPublic=False, circles=None):
+    '''
+    Like create but edit an existing project.
+    '''
     project.name=name
     project.sequence_id = sequence_id
     project.user_id = user_id
     project.is_public = isPublic
     DBSession.add(project)
     DBSession.flush()
-    print project
-    project_id = project.id
-    #project = DBSession.query(Project).filter(Project.id == project_id).first()
-    print project
     if tracks is not None:
         for track_id in tracks :
             t = DBSession.query(Track).filter(Track.id == track_id).first()
@@ -43,4 +44,5 @@ def create(name, sequence_id, user_id, tracks=None, isPublic=False, circles=None
         
     DBSession.add(project)
     DBSession.flush()
+    
     

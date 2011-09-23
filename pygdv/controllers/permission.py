@@ -31,3 +31,8 @@ class PermissionController(CrudRestController):
                 flash('Cannot delete read permission')
                 redirect('/permissions')
         return CrudRestController.post_delete(self, *args, **kw)
+    
+    
+    @expose('tgext.crud.templates.edit')
+    def edit(self, *args, **kw):
+        pass

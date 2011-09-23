@@ -14,10 +14,18 @@ def get_delete_link(obj_id):
     '''
     return '''
     <form method="POST" action=%s class="button-to">
-    <input name="_method" value="DELETE" type="hidden">
+    <input name="_method" value="DELETE" type="hidden"/>
+   
     <input class="delete-button" onclick="return confirm('Are you sure?');" 
         value="delete" style="background-color: transparent; float:left; 
         border:0; color: #286571; display: inline; margin: 0; padding: 0;" 
-    type="submit">
+    type="submit"/>
     </form>
         ''' % (obj_id)
+        
+        
+        
+def get_edit_link(obj_id):
+    return '''
+    <a class="edit_link" href="%s/edit" style="text-decoration:none"></a>
+           ''' %(obj_id)

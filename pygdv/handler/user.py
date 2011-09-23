@@ -21,10 +21,10 @@ def get_user_in_session(request):
 
     
     
-def get_user(key,mail):
+def get_user(key, mail):
     '''
     Get the user with the the given mail, 
     with the given key.
     '''
-    return DBSession.query(User).filter(and_(User.email == mail, User.key == key)).first()
-    
+    user = DBSession.query(User).filter(and_(User.email == mail, User.key == key)).first()
+    return user

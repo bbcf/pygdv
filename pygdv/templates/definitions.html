@@ -36,7 +36,7 @@
   <py:def function="item_list(items)">
     
     <div class="crud_table" style="height:50%; width:90%">
-      <a href='/${model}s/new' class="add_link">New $model</a>
+     
       
       
       <div py:for="item in items">
@@ -44,6 +44,7 @@
 	  
 	<span py:when="True">
 	  <h1><span py:replace="item.grid_title"/></h1>
+	  <a href='/${model}s/new' class="add_link">New $model</a>
 	  <div py:content="item.grid(item.grid_data)"></div>
 	</span>
 	

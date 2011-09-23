@@ -8,7 +8,7 @@ import genshi
 from tg import url
 
 from pygdv.model import DBSession, Track
-from pygdv.lib.helpers import get_delete_link
+from pygdv.lib.helpers import get_delete_link, get_edit_link
 
 
 
@@ -29,11 +29,11 @@ class NewTForm(AddRecordForm):
 # EDIT
 class TEditForm(EditableForm):
     __model__ = Track
+    __limit_fields__ = ['name']
 
 # EDIT FILLER
 class TEditFiller(EditFormFiller):
     __model__ = Track
-
 
 
 track_grid = twf.DataGrid(fields=[
@@ -49,6 +49,7 @@ track_grid = twf.DataGrid(fields=[
            url('./link', params=dict(track_id=obj.id))
            ) 
         + get_delete_link(obj.id) 
+        + get_edit_link(obj.id)
         ))
 ])
 

@@ -5,7 +5,7 @@ Database model
 
 
 from sqlalchemy import Table, ForeignKey, Column
-from sqlalchemy.types import Unicode, Integer, DateTime, Enum, Text, Boolean
+from sqlalchemy.types import Unicode, Integer, DateTime, Enum, Text, Boolean, VARCHAR, BLOB, Binary
 from sqlalchemy.orm import relationship, synonym
 
 from pygdv.model import DeclarativeBase, metadata, DBSession
@@ -22,7 +22,7 @@ __all__ = ['Right', 'Circle', 'Project',
            'Track','Input',
            'Sequence',
            'Species',
-           'Job','JobParameters']
+           'Job','JobParameters','CeleryTask']
 
 from pygdv.model.constants import *
 
@@ -98,7 +98,7 @@ class RightCircleAssociation(DeclarativeBase):
     circle =  relationship('Circle')
     circle_id = Column(Integer,
                        ForeignKey('Circle.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False, primary_key=True)
-    project_id = Column(Integer, ForeignKey('Project.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+    project_id = Column(Integer, ForeignKey('Project.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=True)
     
 
 class Project(DeclarativeBase):
@@ -139,7 +139,7 @@ class Project(DeclarativeBase):
         self._created=date
 
     created = synonym('_created', descriptor=property(_get_date, _set_date))
-        
+    
     # special methods
     def __repr__(self):
         return '<Project: id=%r, name=%r, created=%r>' % (self.id,self.name,self.created)
@@ -148,7 +148,9 @@ class Project(DeclarativeBase):
     @property
     def assembly(self):
         return self.sequence_id
-    
+    @property
+    def species(self):
+        return self.sequence.species
     @property
     def circles_with_rights(self):
         '''
@@ -163,7 +165,12 @@ class Project(DeclarativeBase):
             rights.append(cr.right)
             result[cr.circle]=rights
         return result
-    
+    @property
+    def circles(self):
+        res = []
+        for cr in self._circle_right:
+            res.append(cr.circle)
+        return res
     @property
     def get_circle_with_right_display(self):
         '''
@@ -375,7 +382,34 @@ class Job(DeclarativeBase):
     
     
     
-
-
+class CeleryTask(DeclarativeBase):
+    __tablename__='celery_taskmeta'
      
+    id = Column(Integer, primary_key=True)
+    task_id = Column(VARCHAR(255), unique=True)                                                                                        
+    status = Column(VARCHAR(50))                                                                                          
+    result = Column(Binary)                                                                                                 
+    date_done = Column(DateTime)                                                                                          
+    traceback = Column(Text)                                                                                              
+     
+     
+     
+    '''
+     CREATE TABLE celery_taskmeta (                                                                                       
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,                                                               
+        task_id VARCHAR(255),                                                                                        
+        status VARCHAR(50),                                                                                          
+        result BLOB,                                                                                                 
+        date_done DATETIME,                                                                                          
+        traceback TEXT,                                                                                              
+        UNIQUE (task_id)                                                                                             
+);                                                                                                                   
+CREATE TABLE celery_tasksetmeta (                                                                                    
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,                                                               
+        taskset_id VARCHAR(255),                                                                                     
+        result BLOB,                                                                                                 
+        date_done DATETIME,                                                                                          
+        UNIQUE (taskset_id)                                                                                          
+);                                 
+'''
     
