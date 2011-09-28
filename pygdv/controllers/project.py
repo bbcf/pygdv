@@ -104,9 +104,16 @@ class ProjectController(CrudRestController):
     @expose()
     def view(self, *args, **kw):
         return 'not implemented'
-    @expose()
-    def share(self, *args, **kw):
-        return 'not implemented'
+
+    
+    @expose('pygdv.templates.list')
+    def share(self, project_id, *args, **kw):
+        if project_id is None:
+            raise redirect('./')
+        user = handler.user.get_user_in_session(request)
+        for project in user.pro
+        data = [util.to_datagrid(project_grid, user.projects, "Project Listing", len(user.projects)>0)]
+        return dict(page='projects', model='project', form_title="new project",items=data,value=kw)
     
     
     

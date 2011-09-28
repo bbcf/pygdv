@@ -8,5 +8,5 @@ def add(x, y):
     return result
     
 
-from celery.task import Task
+
 

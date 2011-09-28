@@ -9,16 +9,8 @@ It's perfectly fine to re-use this definition in the pygdv application,
 though.
 
 """
-import uuid
 
- 
-from datetime import datetime
- 
-from sqlalchemy import Table, ForeignKey, Column
-from sqlalchemy.types import Unicode, Integer, DateTime
-from sqlalchemy.orm import relationship, synonym
 
-from pygdv.model import DeclarativeBase, metadata, DBSession
 date_format = "%A %d. %B %Y %H.%M.%S"
 
 __all__ = ['User', 'Group', 'Permission']
@@ -167,44 +159,36 @@ class User(DeclarativeBase):
             if g.id == group_id :
                 return g.permissions
         return []
-    
     def __repr__(self):
         return '<User: id=%r, name=%r, email=%r, key=%r>' % (self.id, self.name, self.email,self.key)
  
     def __unicode__(self):
         return self.email
- 
- 
+  
  
  
  
  
  
 class Permission(DeclarativeBase):
-    """
-    Permission definition for :mod:`repoze.what`.
-    Only the ``permission_name`` column is required by :mod:`repoze.what`.
-    """
+    '''
+    This class handle the ``permissions`` existing in the application
  
+    '''
     __tablename__ = 'Permission'
- 
     # columns
- 
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Unicode(63), unique=True, nullable=False)
     description = Column(Unicode(255), nullable=False)
- 
+
     # relations
- 
     groups = relationship(Group, secondary=group_permission_table, backref='permissions')
- 
+    
     # special methods
- 
     def __repr__(self):
         return '<Permission: name=%r>' % self.name
- 
     def __unicode__(self):
-        return self.name
+        return '%s (%s)' %(self.name, self.description)
 
 
 
