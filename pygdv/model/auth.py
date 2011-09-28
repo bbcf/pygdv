@@ -9,7 +9,13 @@ It's perfectly fine to re-use this definition in the pygdv application,
 though.
 
 """
+from datetime import datetime
 
+from sqlalchemy import Table, ForeignKey, Column
+from sqlalchemy.types import Unicode, Integer, DateTime
+from sqlalchemy.orm import relationship, synonym
+
+from pygdv.model import DeclarativeBase, metadata, DBSession
 
 date_format = "%A %d. %B %Y %H.%M.%S"
 
