@@ -9,6 +9,8 @@ It's perfectly fine to re-use this definition in the pygdv application,
 though.
 
 """
+import uuid
+
 from datetime import datetime
 
 from sqlalchemy import Table, ForeignKey, Column

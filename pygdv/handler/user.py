@@ -28,3 +28,10 @@ def get_user(key, mail):
     '''
     user = DBSession.query(User).filter(and_(User.email == mail, User.key == key)).first()
     return user
+
+
+
+
+
+def is_authorized():
+    pass

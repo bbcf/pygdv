@@ -4,15 +4,17 @@ from sprox.fillerbase import EditFormFiller, TableFiller
 from sprox.widgets import PropertyMultipleSelectField
 from tw.api import WidgetsList
 from sqlalchemy import and_
-
+from tw.api import Widget
 import tw.forms as twf,tw.dynforms as twd
+import tw
 import genshi
 from tw.forms.validators import Int, NotEmpty
 from tg import url, tmpl_context
 
 from pygdv.model import DBSession, Project, Species, Sequence, Track, User, Group
-from pygdv.lib.helpers import get_delete_link, get_edit_link
+from pygdv.lib.helpers import get_delete_link, get_edit_link, get_project_right_sharing_form
 from pygdv import handler
+from tg import app_globals as gl
 
 
 # TABLE
@@ -63,7 +65,7 @@ class NewProjectFrom(twf.TableForm):
     fields = [
               twf.TextField(label_text='Name',id='name',
                             help_text = 'Give a name to your project', validator=NotEmpty),
-              twd.CascadingSingleSelectField(id='species', label_text='Species : ',options=species,
+              twd.CascadingSingleSelectField(id='species', label_text='Species : ',options=get_species,
             help_text = 'Choose the species',cascadeurl='/sequences/get_nr_assemblies_from_species_id'),
               twf.Spacer(),
                 twf.SingleSelectField(id='nr_assembly', label_text='Assembly : ',options=nr_assemblies,
@@ -79,6 +81,7 @@ class NewProjectFrom(twf.TableForm):
     def update_params(self, d):
         super(NewProjectFrom,self).update_params(d)
         species=get_species()
+        print species
         d['species']=species
         d['nr_assembly']=get_assemblies(species)
         return d
@@ -164,6 +167,31 @@ project_grid = twf.DataGrid(fields=[
         ))
 ])
 
+
+    
+class ProjectSharingDataGrid(twf.DataGrid):
+    sharing_project_js = tw.api.JSLink(modname='pygdv', filename='public/js/helpers.js')
+    javascript=[sharing_project_js]
+    
+    
+    
+class RightSharingForm(twf.TableForm):
+    submit_text = 'change rights'
+    action='post_share'
+    fields = [
+              twf.HiddenField(id='cicle_id'),
+              twf.CheckBoxTable(id='rights_checkboxes', num_cols=3, options=['Read','Download','Upload'])
+              ]
+    
+    
+project_sharing_grid = ProjectSharingDataGrid(fields=[
+    ('Circle', 'circle.display'),
+    ('Rights', lambda obj:genshi.Markup(
+                        get_project_right_sharing_form(obj)))
+    #('Rights',RightSharingForm() )                           
+#    ('Upload', lambda obj:genshi.Markup(
+#                get_right_checkbok(obj, gl.right_upload))),
+    ])
 
 
 

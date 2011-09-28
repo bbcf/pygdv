@@ -4,13 +4,13 @@ from tgext.crud.decorators import registered_validate
 
 from repoze.what.predicates import not_anonymous, has_any_permission
 
-from tg import expose, flash, require, request, tmpl_context, validate
+from tg import expose, flash, require, request, tmpl_context, validate, url
 from tg import app_globals as gl
 from tg.controllers import redirect
 from tg.decorators import paginate, with_trailing_slash,without_trailing_slash
 
-from pygdv.model import DBSession, Project
-from pygdv.widgets.project import project_table, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid
+from pygdv.model import DBSession, Project, User
+from pygdv.widgets.project import project_table, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid, project_sharing_grid
 from pygdv import handler
 from pygdv.lib import util
 import os
@@ -27,7 +27,8 @@ class ProjectController(CrudRestController):
     edit_form = project_edit_form
     new_form = project_new_form
     edit_filler = project_edit_filler
-
+    
+    
    
     
     @with_trailing_slash
@@ -105,15 +106,42 @@ class ProjectController(CrudRestController):
     def view(self, *args, **kw):
         return 'not implemented'
 
+
     
     @expose('pygdv.templates.list')
     def share(self, project_id, *args, **kw):
         if project_id is None:
             raise redirect('./')
         user = handler.user.get_user_in_session(request)
-        for project in user.pro
-        data = [util.to_datagrid(project_grid, user.projects, "Project Listing", len(user.projects)>0)]
-        return dict(page='projects', model='project', form_title="new project",items=data,value=kw)
+        if not checker.user_own_project(user.id, 1):
+            flash('You cannot share a project which is not yours')
+            raise redirect('./')
+        data = [util.to_datagrid(project_sharing_grid, project.circles_rights, "Project Sharing", len(project.circles_rights)>0)]
+        return dict(page='projects', model='project', form_title="project sharing",items=data,value=kw)
+       
     
+    @expose()
+    def post_share(self, project_id, circle_id, rights_checkboxes, *args, **kw):
+        user = handler.user.get_user_in_session(request)
+        if not checker.user_own_project(user.id, 1):
+             flash('You cannot modify a project which is not yours')   
+             raise redirect('/')
+        '''
+        {'rights_checkboxes': [u'Read', u'Upload'], 'project_id': u'2', 'circle_id': u'1'}
+        '''
+        project = DBSession.query(Project).filter(Project.id == project_id).first()
+        circle_rights = DBSession.query(Project).filter()
+        if not rights_checkboxes:
+            
+        #TODO change permissions
+        raise redirect(url('/projects/share', {'project_id':project_id}))
+                
+       
     
-    
+    @expose()
+    def test(self):
+        from pygdv.lib import checker
+        user = handler.user.get_user_in_session(request)
+        print DBSession.query(Project).all()
+        
+        print checker.user_own_project(user.id, 1)

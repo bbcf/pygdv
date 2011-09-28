@@ -1,7 +1,7 @@
 '''
 Tracks handler.
 '''
-from pygdv.model import DBSession, Input, Track
+from pygdv.model import DBSession, Input, Track, InputParameters
 import os
 from pygdv.model import constants
 from pygdv.lib import util
@@ -48,8 +48,13 @@ def create_input(file):
     if input is not None: 
         print "file already exist"
     else :
+        params = InputParameters()
+        DBSession.add(params)
+        DBSession.flush()
+        
         input = Input()
         input.sha1 = sha1
+        input.parameters = params
         DBSession.add(input)
        
         #PROCESS INPUT

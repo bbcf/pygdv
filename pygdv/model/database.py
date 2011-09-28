@@ -88,6 +88,9 @@ class Circle(DeclarativeBase):
     
     users = relationship('User', secondary=user_circle_table, backref='circles')
     
+    @property
+    def display(self):
+        return '%s (%s)' % (self.name, self.description)
 
 class RightCircleAssociation(DeclarativeBase):
     __tablename__='RightCircleAssociation'
@@ -99,8 +102,24 @@ class RightCircleAssociation(DeclarativeBase):
     circle_id = Column(Integer,
                        ForeignKey('Circle.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False, primary_key=True)
     project_id = Column(Integer, ForeignKey('Project.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=True)
-    
 
+    @property
+    def circle_display(self):
+        return '%s (%s)' %(self.circle.name, self.circle.description)
+    
+    
+    def hello(self, x):
+        return x
+
+class CircleRights(object):
+    '''
+    Represent a circle with the rights associated
+    '''
+    def __init__(self, project_id, circle, rights):
+        self.project_id = project_id
+        self.circle = circle
+        self.rights = rights
+ 
 class Project(DeclarativeBase):
     '''
     Project table. It is a view that an user can browse.
@@ -165,6 +184,7 @@ class Project(DeclarativeBase):
             rights.append(cr.right)
             result[cr.circle]=rights
         return result
+    
     @property
     def circles(self):
         res = []
@@ -182,9 +202,12 @@ class Project(DeclarativeBase):
         for circle, rights in crs.items():
             result.append('%s (%s)\n' %(circle.name, ', '.join([right.name for right in rights])))
         return result
-
     
- 
+    @property
+    def circles_rights(self):
+        data = self.circles_with_rights
+        return [CircleRights(self.id, circle, rights) for circle, rights in data.iteritems()]
+            
     
 class Sequence(DeclarativeBase):
     '''

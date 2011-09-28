@@ -5,15 +5,9 @@ from pygdv import model
 from sqlalchemy.exc import IntegrityError
 import transaction
 
-group_admins = 'Admins'
-perm_admin = 'admin'
 
-group_users = 'Users'
-perm_user = 'user'
+from pygdv.lib.app_globals import right_upload, right_download, right_read, group_admins, perm_admin, group_users, perm_user
 
-right_write = 'write'
-right_execute = 'execute'
-right_read = 'read'
 def bootstrap(command, conf, vars):
     """Place any commands to setup turbotequila here.
     Note that you will have to log in the application one before launching the bootstrap."""
@@ -34,7 +28,7 @@ def bootstrap(command, conf, vars):
             # ADMIN PERMISSION
             perm = model.Permission()
             perm.name = perm_admin
-            perm.description = u'This permission give admin right to the bearer'
+            perm.description = u'This permission give admin right to the bearer.'
             perm.groups.append(admins)
             model.DBSession.add(perm)
             transaction.commit()
@@ -46,29 +40,29 @@ def bootstrap(command, conf, vars):
             # READ PERMISSION
             read = model.Permission()
             read.name = perm_user
-            read.description = u'This permission give "read" right to the bearer'
+            read.description = u'This permission give "read" right to the bearer.'
             read.groups.append(users)
             model.DBSession.add(read)
             # RIGHTS
             write = model.Right()
-            write.name = right_write
-            write.description = u'A group with this permission can upload/download tracks to the project'
+            write.name = right_upload
+            write.description = u'A group with this permission can upload tracks to the project and execute jobs on the web interface.'
             model.DBSession.add(write)
             
             execute = model.Right()
-            execute.name = right_execute
-            execute.description = u'A group with this permission can execute jobs on the project'
+            execute.name = right_download
+            execute.description = u'A group with this permission can download files on a project.'
             model.DBSession.add(execute)
             
             read = model.Right()
             read.name = right_read
-            read.description = u'A group with this permission can view the project'
+            read.description = u'A group with this permission can view the project.'
             model.DBSession.add(read)
             
             transaction.commit()
             print '''
                     
-                    Change email value in " turbotequila.websetup.bootstrap.py ".
+                    Change email value in " pygdv.websetup.bootstrap.py ".
                     Launch " paster serve --reload development.ini ".
                     Log in the application.
                     Re-run "python setup-app development.ini". 
