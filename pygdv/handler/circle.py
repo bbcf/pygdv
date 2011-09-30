@@ -1,4 +1,5 @@
 from pygdv.model import DBSession, Circle, User
+from sqlalchemy.sql import and_
 
 def create(name, description, creator_id, users=None):
     '''
@@ -18,3 +19,23 @@ def create(name, description, creator_id, users=None):
             c.users.append(u)
     DBSession.add(c)
     DBSession.flush()
+    
+def create_admin(name):
+    '''
+    Create a new admin circle.
+    @param name : the name
+    '''
+    c = Circle()
+    c.name = name
+    c.description = 'Circle created with Tequila'
+    c.admin = True
+    DBSession.add(c)
+    DBSession.flush()
+    return c
+
+def get_tequila_circle(name):
+    '''
+    Get the Circle created by Tequila with the specified name
+    @param name : the name
+    '''
+    return DBSession.query(Circle).filter(and_(Circle.admin == True, Circle.name == name)).first()

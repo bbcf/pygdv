@@ -6,23 +6,25 @@ import urllib2
 import shutil
 import hashlib
 
-def to_datagrid(grid_type, grid_data, grid_title, grid_display):
+def to_datagrid(grid_type, grid_data, grid_title = None, grid_display = None):
     '''
     Special method which format the parameters to fit
     on the datagrid template.
     @param grid_type : The DataGrid.
     @type grid_type : a DataGrid Object
     @param grid_data : The data.
-    @type grid_data : a list of Object to fill in the DataGrid.
+    @type grid_data : a list of Object to fill in the DataGrid
     @param grid_title : DataGrid title
     @type grid_title : A string.
     @param grid_display :True if the DataGrid has to be displayed.
     @type grid_display : a boolean. (Normally it's the len() of the 'grid_data' )
     '''
     data = {'grid':grid_type, 
-    'grid_data':grid_data, 
-    'grid_title':grid_title, 
-    'grid_display':grid_display}
+    'grid_data':grid_data}
+    if grid_title is not None :
+        data['grid_title'] = grid_title
+    if grid_display is not None :
+        data['grid_display'] = grid_display
     return data
 
 
@@ -125,7 +127,15 @@ def get_file_sha1(file_path):
 
 
 
-    
+def obfuscate_email(mail):
+    '''
+    Not really an obfuscator, but hide a part of the mail.
+    Still readeable by user.
+    '''
+    start, end = mail.split('@')
+    start_obfs = start[:-len(start)*10/100]
+    end_obfs = end[:len(end)*100/100]
+    return '%s..@%s..' % (start_obfs, end_obfs)
     
     
     

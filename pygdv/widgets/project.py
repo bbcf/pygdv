@@ -10,7 +10,8 @@ import tw
 import genshi
 from tw.forms.validators import Int, NotEmpty
 from tg import url, tmpl_context
-
+from sprox.dojo.formbase import DojoEditableForm
+from sprox.widgets.dojo import SproxDojoSelectShuttleField, SproxDojoSortedSelectShuttleField
 from pygdv.model import DBSession, Project, Species, Sequence, Track, User, Group
 from pygdv.lib.helpers import get_delete_link, get_edit_link, get_project_right_sharing_form
 from pygdv import handler
@@ -41,10 +42,10 @@ def get_species():
         return [(sp.id,sp.name) for sp in species]   
 
 def get_assemblies(species):
-        if species and species[0] and species[0]:
-            nr_assemblies = DBSession.query(Sequence).join(Species).filter(Sequence.species_id == species[0][0]).all()
-            return [(nr.id,nr.name) for nr in nr_assemblies]
-        return []
+    if species and species[0] and species[0]:
+        nr_assemblies = DBSession.query(Sequence).join(Species).filter(Sequence.species_id == species[0][0]).all()
+        return [(nr.id,nr.name) for nr in nr_assemblies]
+    return []
     
 def get_tracks():
     return [(track.id, track.name) for track in tmpl_context.tracks]
@@ -73,8 +74,8 @@ class NewProjectFrom(twf.TableForm):
               twf.Spacer(),
             twf.MultipleSelectField(id='tracks', label_text='Tracks : ',options=get_tracks,
               help_text = 'Add tracks to the project'),
-             twf.MultipleSelectField(id='circles', label_text="Circles : ",options=get_circles,
-                                      help_text="Add Circles to share with. Circle(s) selected will automatically see your project.")
+             #twf.MultipleSelectField(id='circles', label_text="Circles : ",options=get_circles,
+              #                        help_text="Add Circles to share with. Circle(s) selected will automatically see your project.")
               
               
 ]              
@@ -127,9 +128,9 @@ class EditProjectForm(twf.TableForm):
                 twf.SingleSelectField(id='nr_assembly', label_text='Assembly : ',options=get_project_nr_assemblies,
             help_text = 'Choose the assembly.'),
               twf.Spacer(),
-            twf.MultipleSelectField(id='tracks', label_text='Tracks : ',options=get_project_tracks,
+            twf.MultipleSelectField(id='tracks', label_text='Tracks : ',options=get_tracks,
               help_text = 'Add tracks to the project'),
-             twf.MultipleSelectField(id='circles', label_text="Circles : ",options=get_project_circles,
+             twf.MultipleSelectField(id='circles', label_text="Circles : ",options=get_circles,
                                       help_text="Add Circles to share with. Circle(s) selected will automatically see your project.")
               
               
@@ -140,6 +141,48 @@ class EditProjectForm(twf.TableForm):
         d['species']=species
         d['nr_assembly']=get_assemblies(species)
         return d
+    
+    
+    
+class TracksSelectField(SproxDojoSelectShuttleField):
+    def _my_update_params(self, d, nullable=False):
+        d['options']=get_tracks()
+        return d
+class CircleSelectField(SproxDojoSelectShuttleField):
+    size = 'circle_select_field'
+    def _my_update_params(self, d, nullable=False):
+        d['options']=get_circles()
+        return d
+
+class EditProjectForm2(DojoEditableForm):
+    __model__ = Project
+    __base_widget_args__ = {'hover_help': True,'submit_text':'Edit project','show_errors':True}
+    __limit_fields__ = ['name', 'species', 'assembly']
+    __field_order__ = ['name', 'species', 'assembly']
+    __require_fields__ = ['name', 'species', 'assembly']
+    
+    twf.HiddenField('_method')
+    name = twf.TextField(label_text='Name',id='name',
+                            help_text = 'Give a name to your project', validator=NotEmpty, default=get_project_name)
+    species = twd.CascadingSingleSelectField(id='species', label_text='Species : ',options=get_project_species,
+            help_text = 'Choose the species',cascadeurl='/sequences/get_nr_assemblies_from_species_id')
+    assembly = twf.SingleSelectField(id='nr_assembly', label_text='Assembly : ',options=get_project_nr_assemblies,
+            help_text = 'Choose the assembly.')
+    tracks = twf.MultipleSelectField(id='tracks', label_text='Tracks : ',options=get_tracks,
+              help_text = 'Add tracks to the project')
+    #tracks = TracksSelectField
+    #_circle_right = CircleSelectField
+    
+    def _my_update_params(self, d, nullable=False):
+        super(EditProjectForm,self).update_params(d)
+        species=get_species()
+        d['species']=species
+        d['nr_assembly']=get_assemblies(species)
+        return d
+    
+    
+    
+
 # EDIT
 class PEditForm(EditableForm):
     __model__ = Project
@@ -179,7 +222,7 @@ class RightSharingForm(twf.TableForm):
     submit_text = 'change rights'
     action='post_share'
     fields = [
-              twf.HiddenField(id='cicle_id'),
+              twf.HiddenField(id='circle_id'),
               twf.CheckBoxTable(id='rights_checkboxes', num_cols=3, options=['Read','Download','Upload'])
               ]
     
@@ -193,11 +236,23 @@ project_sharing_grid = ProjectSharingDataGrid(fields=[
 #                get_right_checkbok(obj, gl.right_upload))),
     ])
 
+class AvailableCirclesForm(twf.TableForm):
+    submit_text = 'Add a circle to share with'
+    hover_help = True
+    show_errors = True
+    action='./post_share_add'
 
+    fields = [
+              twf.HiddenField('project_id'),
+             twf.MultipleSelectField(id='circles', label_text="Circles : ",options=get_circles, validator=NotEmpty,
+                                     help_text="Add Circles to share with. Circle(s) selected will automatically have the ``read`` permission'")
+                          ]              
+    
 
 
 project_table = PTable(DBSession)
 project_table_filler = PTableFiller(DBSession)
 project_new_form = NewProjectFrom()
-project_edit_form = EditProjectForm()
+project_edit_form = EditProjectForm2(DBSession)
 project_edit_filler = PEditFiller(DBSession)
+circles_available_form = AvailableCirclesForm()

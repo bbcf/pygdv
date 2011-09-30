@@ -25,21 +25,26 @@
   </py:def>
 
 
+
 <!-- A simple form -->
   <py:def function="item_form">
     <h1><div py:replace="form_title"/></h1>
     <div py:replace="tmpl_context.form(value)">Input Form</div>
   </py:def>
 
+<!-- An info on an item -->
+<py:def function="item_info(info)">
+  <h1>$model</h1>
+  <div py:content="info.grid(info.grid_data)"></div>
+</py:def>
+
+
+
 
   <!-- A simple item grid -->
   <py:def function="item_list(items)">
-    
-    <div class="crud_table" style="height:50%; width:90%">
-     
-      
-      
-      <div py:for="item in items">
+      <div class="crud_table" style="height:50%; width:90%">
+        <div py:for="item in items">
 	<div py:choose="item.grid_display">
 	  
 	<span py:when="True">
@@ -56,9 +61,31 @@
 	</div>
       </div>
     </div>
-      
-      
+        
   </py:def>
+
+
+<py:def function="item_list_without_link(items)">
+      <div class="crud_table" style="height:50%; width:90%">
+        <div py:for="item in items">
+	<div py:choose="item.grid_display">
+	  
+	<span py:when="True">
+	  <h1><span py:replace="item.grid_title"/></h1>
+	  <a href='/${model}s/new' class="add_link">New $model</a>
+	  <div py:content="item.grid(item.grid_data)"></div>
+	</span>
+	
+	<span py:when="False">
+	  <h1>No ${item.grid_title}</h1>
+	</span>
+	
+	</div>
+      </div>
+    </div>
+        
+  </py:def>
+
   
   
 </html>

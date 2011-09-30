@@ -18,7 +18,7 @@ from sqlalchemy.types import Unicode, Integer, DateTime
 from sqlalchemy.orm import relationship, synonym
 
 from pygdv.model import DeclarativeBase, metadata, DBSession
-
+from pygdv.lib.util import obfuscate_email
 date_format = "%A %d. %B %Y %H.%M.%S"
 
 __all__ = ['User', 'Group', 'Permission']
@@ -114,6 +114,7 @@ class User(DeclarativeBase):
     # columns
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Unicode(255), nullable=False)
+    firstname = Column(Unicode(255), nullable=False)
     _email = Column(Unicode(255), unique=True, nullable=False, info={'rum': {'field':'Email'}})
     _created = Column(DateTime, default=datetime.now, nullable=False)
     key = Column(Unicode(255), unique=True,default=setdefaultkey, nullable=False)
@@ -150,7 +151,11 @@ class User(DeclarativeBase):
     def validate_login(self, password):
         print 'validate_login' 
         print password        
- 
+    
+    @property
+    def obsfuscated_email(self):
+        return obfuscate_email(self.email)
+    
     @property
     def permissions(self):
         """Return a set with all permissions granted to the user."""
@@ -171,12 +176,15 @@ class User(DeclarativeBase):
         return '<User: id=%r, name=%r, email=%r, key=%r>' % (self.id, self.name, self.email,self.key)
  
     def __unicode__(self):
-        return self.email
+        return self.__str__()
   
+    def __str__(self):
+        return '%s %s (%s)' % (self.name, self.firstname, self.obsfuscated_email)
  
- 
- 
- 
+    def short(self):
+        return '%s %s' % (self.name, self.firstname)
+    def long(self):
+        return '%s %s (%s)' % (self.name, self.firstname, self.obsfuscated_email)
  
 class Permission(DeclarativeBase):
     '''

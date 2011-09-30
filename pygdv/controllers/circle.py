@@ -12,8 +12,9 @@ from tg.decorators import paginate,with_trailing_slash, without_trailing_slash
 from pygdv.model import DBSession, Circle, Species, User
 from pygdv.widgets.circle import circle_table, circle_table_filler, circle_new_form, circle_edit_filler, circle_edit_form
 from pygdv import handler
-from pygdv.lib import util
+from pygdv.lib import util, checker
 from sqlalchemy import and_
+
 
 import transaction
 
@@ -53,58 +54,19 @@ class CircleController(CrudRestController):
     @expose('genshi:tgext.crud.templates.post_delete')
     def post_delete(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        for id in args :
-            circle = DBSession.query(Circle).filter(Circle.id == id).first()
-            if user.id == circle.creator_id :
-                return CrudRestController.post_delete(self, id)
-        flash('you have no right to delete this circle : you are not the creator of it')
-        raise redirect('./')                                      
+        circle_id = args[0]
+        if not checker.user_own_circle(user.id, circle_id):
+            flash('you have no right to delete this circle : you are not the creator of it')
+            raise redirect('/circles') 
+        return CrudRestController.post_delete(self, circle_id)
+                                             
     
     @expose('tgext.crud.templates.edit')
     def edit(self, *args, **kw):
-        print 'edit'
-        print args
-        print kw
         user = handler.user.get_user_in_session(request)
-        for id in args :
-            circle = DBSession.query(Circle).filter(Circle.id == id).first()
-            if user.id == circle.creator_id or DBSession.query(User).join(
-                            Circle, User.circles).filter(
-                            and_(Circle.id == id, User.id == user.id)).first() is not None :
-                return CrudRestController.edit(self, id)
-        flash('you have no right to edit this circle : you are not in the circle or you are not the creator of it')
-        raise redirect('./')            
-        #return CrudRestController.edit(self, *args, **kw)      
-          
-#          if circle.name == gl.perm_admin:
-#              flash('Cannot delete admin permission')
-#              redirect('/permissions')
-#          if permission.name == gl.perm_user:
-#              flash('Cannot delete read permission')
-#              redirect('/permissions')
-        #return CrudRestController.post_delete(self, *args, **kw)
-    
-    
-#    
-    
-#    
-#    
-#    
-#    @require(not_anonymous())
-#    @expose('genshi:tgext.crud.templates.new')
-#    def new(self, *args, **kw):
-#        flash("You haven't the right to add any users, this is the job of Tequila system")
-#        redirect('/users')
-#   
-#    @expose()
-#    @registered_validate(error_handler=new)
-#    def post(self, *args, **kw):
-#        pass
-#    
-#    
-#    @expose()
-#    @registered_validate(error_handler=edit)
-#    def put(self, *args, **kw):
-#        pass
-#    
+        circle_id = args[0]
+        if not checker.user_own_circle(user.id, circle_id):
+            flash('you have no right to edit this circle : you are not the creator of it')
+            raise redirect('/circles') 
+        return CrudRestController.edit(self, circle_id)
     

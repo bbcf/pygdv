@@ -53,4 +53,3 @@ class Globals(object):
         
         self.genrep = GenRep()
         
-        

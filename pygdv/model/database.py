@@ -53,15 +53,6 @@ user_circle_table = Table('user_circle', metadata,
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
 
-#user_track_table = Table('user_track', metadata,
-#    Column('user_id', Integer, ForeignKey('User.id',
-#        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
-#    Column('track_id', Integer, ForeignKey('Track.id',
-#        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
-#)
-
-
-
 
 
 class Right(DeclarativeBase):
@@ -84,7 +75,8 @@ class Circle(DeclarativeBase):
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Unicode(255), nullable=False)
     description = Column(Text(), nullable=False)
-    creator_id = Column(Integer, ForeignKey('User.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+    creator_id = Column(Integer, ForeignKey('User.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=True)
+    admin = Column(Boolean, nullable= False, default = False)
     
     users = relationship('User', secondary=user_circle_table, backref='circles')
     
@@ -325,7 +317,7 @@ class Track(DeclarativeBase):
     sequence_id = Column(Integer, ForeignKey('Sequence.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=True)
     # special methods
     def __repr__(self):
-        return '<Track: id=%r, name=%r, created=%r, visu=%r>' % (self.id,self.name,self.created,self.visu)
+        return '<Track: id=%r, name=%r, created=%r, visu=%r, user_id=%r>' % (self.id, self.name, self.created, self.visu, self.user_id)
     def __unicode__(self):
         return self.name
     

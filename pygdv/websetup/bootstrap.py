@@ -31,6 +31,7 @@ def bootstrap(command, conf, vars):
             perm.description = u'This permission give admin right to the bearer.'
             perm.groups.append(admins)
             model.DBSession.add(perm)
+            
             transaction.commit()
         else :
             # USER GROUP

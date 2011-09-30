@@ -16,6 +16,7 @@ from pygdv import handler
 from pygdv.lib import util
 import os
 import transaction
+from pygdv.lib import checker
 
 __all__ = ['TrackController']
 
@@ -98,10 +99,22 @@ class TrackController(CrudRestController):
         raise redirect('../')
     
     @expose()
-    def export(self, *args, **kw):
+    def export(self, track_id, format=None, *args, **kw):
+        user = handler.user.get_user_in_session(request)
+        if not checker.user_own_track(user.id, track_id):
+            flash("You haven't the right to export any tracks which is not yours")
+        if format is None :
+            return 'specify the format sql, gff, bed, wig, tsv'
+        
         return 'not implemented'
+    
     @expose()
-    def link(self, *args, **kw):
+    def link(self, track_id, *args, **kw):
+        user = handler.user.get_user_in_session(request)
+        if not checker.user_own_track(user.id, track_id):
+            flash("You haven't the right to download any tracks which is not yours")
+        
+        raise redirect('./')
         return 'not implemented'
     
     

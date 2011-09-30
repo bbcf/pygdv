@@ -12,6 +12,7 @@ from paste.request import resolve_relative_url
 import transaction
 import datetime
 from tg import app_globals as gl
+from pygdv import handler
 __all__ = ['LoginController']
 
 
@@ -48,13 +49,13 @@ class LoginController(BaseController):
         remote_addr = environ['REMOTE_ADDR']
         # get user
         principal = tequila.validate_key(key,'tequila.epfl.ch')
-        if not principal :
+        if principal is None:
             redirect('/login/go')
         tmp_user = self.build_user(principal)
         mail = tmp_user.email
         # log or create him
         user = DBSession.query(User).filter(User.email == tmp_user.email).first()
-        if not user:
+        if user is None:
             user_group = DBSession.query(Group).filter(Group.name == gl.group_users).first()
             user_group.users.append(tmp_user)
             DBSession.add(tmp_user)
@@ -62,6 +63,8 @@ class LoginController(BaseController):
             #transaction.commit()
             user = DBSession.query(User).filter(User.email == mail).first()
             flash( '''Your account has been created: %s'''%( user, ))
+            DBSession.flush()
+            self.build_circles_with_user(tmp_user, principal)
             DBSession.flush()
             #transaction.commit()
         elif user.name == gl.tmp_user_name:
@@ -71,6 +74,8 @@ class LoginController(BaseController):
             user_group.users.append(tmp_user)
             flash( '''Your account has been created: %s'''%( user, ))
             DBSession.add(user)
+            DBSession.flush()
+            self.build_circles_with_user(tmp_user, principal)
             DBSession.flush()
             #transaction.commit()
         else :
@@ -125,4 +130,33 @@ class LoginController(BaseController):
             user.name = hash.get('name')
         if(hash.has_key('email')):
             user.email = hash.get('email')
+        if(hash.has_key('firstname')):
+            user.firstname = hash.get('firstname')
         return user
+    
+    def build_circles_with_user(self, user, principal):
+        '''
+        Build the groups that are in tequila and add the user to it.
+        Must use the ``fake user``
+        '''
+        hash = dict(item.split('=') for item in principal.split('\n') if len(item.split('='))>1)
+        if(hash.has_key('group')):
+            group_list = hash.get('group').split(',')
+            for group_name in group_list:
+                circle = handler.circle.get_tequila_circle(group_name)
+                if circle is None:
+                    circle = handler.circle.create_admin(group_name)
+                circle.users.append(user)
+                DBSession.flush()
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+    
