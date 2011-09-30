@@ -200,10 +200,11 @@ project_grid = twf.DataGrid(fields=[
     ('Circles', 'get_circle_with_right_display'),
     ('Tracks', 'tracks'),
     ('Action', lambda obj:genshi.Markup(
-        '<a href="%s">view</a> <a href="%s">share</a> '
+        '<a href="%s">view</a> <a href="%s">share</a> <a href="%s">add track</a> '
         % (
            url('./view', params=dict(project_id=obj.id)),
-           url('./share', params=dict(project_id=obj.id))
+           url('./share', params=dict(project_id=obj.id)),
+           url('./add_track', params=dict(project_id=obj.id))
            ) 
         + get_delete_link(obj.id) 
         + get_edit_link(obj.id)

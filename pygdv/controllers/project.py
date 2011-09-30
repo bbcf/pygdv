@@ -38,7 +38,13 @@ class ProjectController(CrudRestController):
     #@paginate('items', items_per_page=10)
     def get_all(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
+        
+        # user project
         data = [util.to_datagrid(project_grid, user.projects, "Project Listing", len(user.projects)>0)]
+        
+        # shared projects
+        #TODO check with permissions
+        
         return dict(page='projects', model='project', form_title="new project",items=data,value=kw)
     
 
@@ -189,3 +195,16 @@ class ProjectController(CrudRestController):
         print DBSession.query(Project).all()
         
         print checker.user_own_project(user.id, 1)
+        
+        
+    @expose()
+    def add_track(self, project_id, *args, **kw):
+        return 'not implemented'
+    
+    @expose()
+    def add(self, project_id, *args, **kw):
+        return 'not implemented'
+
+        
+        
+        
