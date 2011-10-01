@@ -178,6 +178,9 @@ class Project(DeclarativeBase):
         return result
     
     @property
+    def get_tracks(self):
+        return ', '.join([track.name for track in self.tracks])
+    @property
     def circles(self):
         res = []
         for cr in self._circle_right:

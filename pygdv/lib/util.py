@@ -138,4 +138,12 @@ def obfuscate_email(mail):
     return '%s..@%s..' % (start_obfs, end_obfs)
     
     
+def get_directory(tag, filename):
+    '''
+    Get a pathname for the resource specified.
+    @param tag : a string telling the path to get from ``pygdv.lib.app_globals``, representing the path were to put the file
+    @param filename : the filename
+    ''' 
+    return resource_filename(getattr(gl, tag), filename)
+    
     

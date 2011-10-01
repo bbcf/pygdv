@@ -198,7 +198,7 @@ project_grid = twf.DataGrid(fields=[
     ('Created', 'created'),
     ('Assembly', 'assembly'),
     ('Circles', 'get_circle_with_right_display'),
-    ('Tracks', 'tracks'),
+    ('Tracks', 'get_tracks'),
     ('Action', lambda obj:genshi.Markup(
         '<a href="%s">view</a> <a href="%s">share</a> <a href="%s">add track</a> '
         % (
@@ -249,7 +249,19 @@ class AvailableCirclesForm(twf.TableForm):
                                      help_text="Add Circles to share with. Circle(s) selected will automatically have the ``read`` permission'")
                           ]              
     
+class AvailableTracksForm(twf.TableForm):
+    submit_text = 'Add track(s) to the project'
+    hover_help = True
+    show_errors = True
+    action='./add'
 
+    fields = [
+              twf.HiddenField('project_id'),
+             twf.MultipleSelectField(id='tracks', label_text="Tracks : ",options=get_tracks, validator=NotEmpty,
+                help_text="Add track(s) to the project by selecting them. You can select more the one by holding the Ctrl button.")
+              ]         
+    
+    
 
 project_table = PTable(DBSession)
 project_table_filler = PTableFiller(DBSession)
@@ -257,3 +269,4 @@ project_new_form = NewProjectFrom()
 project_edit_form = EditProjectForm2(DBSession)
 project_edit_filler = PEditFiller(DBSession)
 circles_available_form = AvailableCirclesForm()
+tracks_available_form = AvailableTracksForm()

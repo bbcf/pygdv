@@ -10,7 +10,7 @@ from tg.controllers import redirect
 from tg.decorators import paginate, with_trailing_slash,without_trailing_slash
 
 from pygdv.model import DBSession, Project, User, RightCircleAssociation
-from pygdv.widgets.project import project_table, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid,circles_available_form, project_sharing_grid
+from pygdv.widgets.project import project_table, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid,circles_available_form, tracks_available_form, project_sharing_grid
 from pygdv import handler
 from pygdv.lib import util
 import os
@@ -62,9 +62,8 @@ class ProjectController(CrudRestController):
     @expose()
     @validate(project_new_form, error_handler=new)
     def post(self, *args, **kw):
-        print 'post'
         user = handler.user.get_user_in_session(request)
-        handler.project.create(kw['name'], kw['nr_assembly'], user.id, tracks=kw['tracks'], circles=kw['circles'])
+        handler.project.create(kw['name'], kw['nr_assembly'], user.id, tracks=kw['tracks'])
         transaction.commit()
         raise redirect('./') 
     
@@ -113,7 +112,7 @@ class ProjectController(CrudRestController):
         for project in user.projects :
             if int(id) == project.id:
                 handler.project.edit(project, kw['name'], kw['nr_assembly'], 
-                                     user.id, tracks=kw['tracks'], circles=kw['_circle_right'])
+                                     user.id, tracks=kw['tracks'])
                 raise redirect('../')
         flash("You haven't the right to edit any project which is not yours")
         raise redirect('../')
@@ -197,13 +196,33 @@ class ProjectController(CrudRestController):
         print checker.user_own_project(user.id, 1)
         
         
-    @expose()
+    @expose('pygdv.templates.add_track')
     def add_track(self, project_id, *args, **kw):
-        return 'not implemented'
+        # project info
+        project = DBSession.query(Project).filter(Project.id == project_id).first()
+        data = util.to_datagrid(project_grid, [project])
+        user = handler.user.get_user_in_session(request)
+        if not checker.user_own_project(user.id, project_id):
+             flash('You cannot modify a project which is not yours')   
+             raise redirect('/')
+        tmpl_context.widget = tracks_available_form
+        tmpl_context.tracks = user.tracks
+        kw['project_id'] = project_id
+        return dict(page='projects', model='Project', info=data, form_title='Add track(s)',
+                    value=kw)
     
     @expose()
-    def add(self, project_id, *args, **kw):
-        return 'not implemented'
+    def add(self, project_id, tracks, **kw):
+        user = handler.user.get_user_in_session(request)
+        if not checker.user_own_project(user.id, project_id):
+             flash('You cannot modify a project which is not yours')   
+             raise redirect('/')
+        project = DBSession.query(Project).filter(Project.id == project_id).first()
+        if not isinstance(tracks,list):
+                handler.project.add_tracks(project,[tracks])
+        else :
+             handler.project.add_tracks(project,tracks)
+        raise redirect(url('/projects/add_track', {'project_id':project_id}))
 
         
         

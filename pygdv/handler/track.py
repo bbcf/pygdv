@@ -2,7 +2,7 @@
 Tracks handler.
 '''
 from pygdv.model import DBSession, Input, Track, InputParameters
-import os
+import os, shutil
 from pygdv.model import constants
 from pygdv.lib import util
 
@@ -57,8 +57,16 @@ def create_input(file):
         input.parameters = params
         DBSession.add(input)
        
-        #PROCESS INPUT
-        print 'TODO : processing input'
+        # process input
+        print 'Processing input %s' % os.path.abspath(file.name)
+        out_dir = util.get_directory('tracks_dir', sha1)
+        print 'to %s : ' % out_dir
+        
+        #TODO : launch the task on Celery
+         
+        print 'deleting file'
+        os.remove(os.path.abspath(file.name))
+        
     DBSession.flush()
     return input   
         

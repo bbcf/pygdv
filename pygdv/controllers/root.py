@@ -106,8 +106,9 @@ class RootController(BaseController):
     def data(self, **kw):
         """This method showcases how you can use the same controller for a data page and a display page"""
         return dict(page='data',params=kw)
+    
 
-    @expose('jsonp')
+    @expose()
     def test(self, **kw):
         return dict(kw)
     

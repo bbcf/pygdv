@@ -112,3 +112,20 @@ def get_circle_right_assocs(circle_id, project_id):
     return DBSession.query(RightCircleAssociation).filter(
                         and_(RightCircleAssociation.circle_id == circle_id,
                             RightCircleAssociation.project_id == project_id)).all()
+                            
+                            
+def add_tracks(project, track_ids):
+    '''
+    Add a list of track to the project specified.
+    '''
+    for track_id in track_ids:
+        track = DBSession.query(Track).filter(Track.id == track_id).first()
+        project.tracks.append(track)
+    DBSession.add(project)
+    DBSession.flush()
+    
+    
+    
+    
+    
+    

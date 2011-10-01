@@ -39,6 +39,10 @@ class Globals(object):
         '''
         self.tmp_pkg = 'pygdv.data.tmp'
         self.tmp_user_name = 'tmp_user'
+        self.public_dir = 'pygdv.public'
+        self.data_dir = 'pygdv.data'
+        self.tracks_dir = 'pygdv.data.tracks'
+        self.json_dir = 'pygdv.data.json'
         
         '''
         Default groups and permissions
