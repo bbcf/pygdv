@@ -145,5 +145,10 @@ def get_directory(tag, filename):
     @param filename : the filename
     ''' 
     return resource_filename(getattr(gl, tag), filename)
-    
-    
+
+
+def float_equals(a, b, epsilon=0.0000001):
+    '''
+    Look if two float are equals or not, with an epsilon error 
+    '''
+    return abs(a - b) < epsilon

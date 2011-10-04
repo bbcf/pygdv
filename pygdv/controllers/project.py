@@ -225,5 +225,3 @@ class ProjectController(CrudRestController):
         raise redirect(url('/projects/add_track', {'project_id':project_id}))
 
         
-        
-        

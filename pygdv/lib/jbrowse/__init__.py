@@ -1,11 +1,16 @@
 '''
 Contains everything that touch to JBrowse
 '''
-import math, sqlite3
+import math, sqlite3, shutil, os
+import numpy as np
+#from pygdv.lib.util import float_equals
 
 
-
-
+def float_equals(a, b, epsilon=0.0000001):
+    '''
+    Look if two float are equals or not, with an epsilon error 
+    '''
+    return abs(a - b) < epsilon
 
 '''
 Number of scores per images = tab width
@@ -30,8 +35,9 @@ def get_image_nb(position, zoom):
     Get the image number to put in the sqlite database.
     @param position : the position of the cursor
     @param zoom : the zoom
+    @return an int
     '''
-    return math.ceil(position/TAB_WIDTH)/zoom
+    return int(math.ceil(float(position)/TAB_WIDTH/zoom))
 
 
 def get_tab_index(position, zoom):
@@ -42,163 +48,144 @@ def get_tab_index(position, zoom):
     '''
     return math.ceil(position/zoom)%TAB_WIDTH
 
-
-
-def do(database, chromosome, output):
+def get_position_start(image_nb, tab_index, zoom):
     '''
-    Get the features in the database for the chromosome specified.
+    Get the start position on the genome from an image number, a tab index and a zoom
     '''
-    zoom = 1
+    return (image_nb * TAB_WIDTH + tab_index - TAB_WIDTH) * zoom
+
+def get_position_end(image_nb, tab_index, zoom):
+    '''
+    Get the end position on the genome from an image number, a tab index and a zoom
+    '''
+    return (image_nb * TAB_WIDTH + tab_index - TAB_WIDTH) * zoom + zoom - 1 
+
     
-    manager = SQLiteManager.connect(database, chromosome, output)
+def generate_array(cursor, max, max_zoom):
+    '''
+    Generate a numpy array that will represent the last feature on the cursor
+    '''
     
-    cursor = manager.get_features()
-    
-    prev_img_nb_stop = prev_tab_index_stop = prev_stop = None
-    
-    prev_stop = None
-    
+    if max_zoom % max != 0:
+        max = max_zoom - (max % max_zoom) + max
+    array = np.zeros(max )
     for row in cursor :
         start = row[0]
         stop = row[1]
         score = row[2]
         
-        print 'start : %s, stop: %s (score : %s)' % (start, stop, score)
+        img_nb_start = get_image_nb(start, 1)
+        tab_index_start = get_tab_index(start, 1)
         
-        # get where to start
-        img_nb_start = get_image_nb(start, zoom)
-        tab_index_start = get_tab_index(start, zoom)
+        img_nb_stop = get_image_nb(stop, 1)
+        tab_index_stop = get_tab_index(stop, 1)
+    
+        index_start = img_nb_start * TAB_WIDTH + tab_index_start
+        index_stop = img_nb_stop * TAB_WIDTH + tab_index_stop
         
-        # write previous stop (if)
-        ''' if the previous end of the feature is just next to the next one, doesn't write the previous end to 0.0 score'''
-        if prev_stop is not None and not prev_stop+1 == start:
-            fstop = prev_stop + 1
-            img_nb = get_image_nb(fstop, zoom)
-            tab_ind = get_tab_index(fstop, zoom)
-            manager.add_tuple(img_nb, tab_ind, 0)
+        array[index_start:index_stop+1] = score
+    return array
 
-        # write current
-        manager.add_tuple(img_nb_start, tab_index_start, score)
+def gen_tuples(array, max, zoom):
+    '''
+    Generate the features (number, pos, score) to write in the db
+    @param array : the array containning all scores
+    @param max: the stop of the last feature
+    @param zoom : the zoom level
+    '''
+    max_images = get_image_nb(max, zoom)
+    tab_list = range(TAB_WIDTH)
+    prev_score = None
+    ## 'm im : %s' % max_images
+    for i in range(1, max_images+1):
+        for t in tab_list:
+            index_start = get_position_start(i, t, zoom)
+            index_end = get_position_end(i, t, zoom)
+            if index_start > max :
+                break
+            ### 'i(%s), t(%s), z(%s), start %s, end %s' %(i, t, zoom, index_start, index_end)
+            tmp = array[index_start:index_end+1]
+            max_score = tmp.max()
+            min_score = tmp.min()
+            if(abs(max_score) - abs(min_score) < 0) :
+                max_score = min_score
+            if prev_score is None or not float_equals(prev_score, max_score):
+                yield i, t, max_score
+            prev_score = max_score
+                    
+                
+                
+    
 
-        # remember value for next iteration        
-        prev_stop = stop
     
-    # write final stop
-    fstop = prev_stop + 1
-    img_nb = get_image_nb(fstop, zoom)
-    tab_ind = get_tab_index(fstop, zoom)
-    manager.add_tuple(img_nb, tab_ind, 0)
-    
-    
-    # close cursor
+def get_features(connection, chromosome):
+    '''
+    Get the features on a chromosome.
+    @param chromosome : the chromosome
+    @return a Cursor Object
+    '''
+    cursor = connection.cursor()
+    return cursor.execute('select start, end, score from "%s"' % chromosome)
+
+def get_chromosomes(connection):
+    '''
+    Get the chromosomes in the database
+    '''
+    cursor = connection.cursor()
+    return cursor.execute("select name from chrNames;")
+
+def write_tuples(conn, generator):
+    '''
+    Write tuples in the oupput specified.
+    '''
+    cursor = conn.cursor()
+    cursor.execute('CREATE TABLE sc (number INT, pos INT, score REAL)')
+    cursor.executemany('insert into sc values (?, ?, ?);', generator)
+    conn.commit()
     cursor.close()
     
-    
-    manager.close()
-    
-    
-    
-    
-    
-    
-class SQLiteManager(object):
+def get_last_feature_stop(conn, chromosome):
     '''
-    Link between the algorith and the SQLite database
+    Get the stop of the last feature.
     '''
+    cursor = conn.cursor()
+    max = cursor.execute('select max(end) from "%s";' % chromosome).fetchone()[0]
+    cursor.close()
+    return max
+           
+def pre_compute_sql_scores(database, sha1, output_dir):
+    ## 'prepare output directory'
+    out_path = os.path.join(output_dir, sha1)
+    os.mkdir(out_path)
     
-    SIZE_LIMIT = 1024
+    ## 'prepare connection'
+    conn = sqlite3.connect(database)
     
-    @classmethod
-    def connect(cls, database, chromosome, output):
-        '''
-        @param database : the database to connect to
-        @param output : where to write the values after computation. This is a DIRECTORY.
-        @param chromosome : the chromosome to get the features from
-        '''
-        obj = cls(chromosome,output)
-        obj.conn = sqlite3.connect(database)
-        return obj
+    c = get_chromosomes(conn)
+    
+    for row in c:
+        chromosome = row[0]
+        ## 'getting max'
+        max = get_last_feature_stop(conn, chromosome)
+        ## 'getting features'
+        features = get_features(conn, chromosome)
+        ## 'generating score array'
+        array = generate_array(features, max, 100000)
+        features.close()
         
-    @classmethod    
-    def new(cls, connection, chromosome, output):
-        '''
-        @param connection : the connection to the database
-        @param output : where to write the values after computation. This is a DIRECTORY.
-        @param chromosome : the chromosome to get the features from
-        '''
-        obj = cls(chromosome, output)
-        obj.conn = connection
-        return obj
-        
+        for zoom in zooms:
+            ## 'compute : zoom = %s' % zoom
+            gen = gen_tuples(array, max, zoom)
             
-    def __init__(self, chromosome, output):
-        self.chromosome = chromosome
-        
-        
-        # init output
-        self.output = output
-        self.output_conn = sqlite3.connect('%s/%s.sqlite3' % (self.output, self.chromosome))
-        self.output_cursor = self.output_conn.cursor()
-        self.output_cursor.execute('CREATE TABLE sc (number INT, pos INT, score REAL)')
-        '''
-        @param tuples : containing tuples to write
-        '''
-        self.tuples = []
-        '''
-        @param cur_size : the current size of self.tuples
-        '''
-        self.cur_size = 0
-        '''
-        @param no_values : True if all values in self.tuples are written
-        '''
-        self.no_values = True
-        
-        
-        
-    def add_tuple(self, x, y, z):    
-        '''
-        Put value to write in the db in memory to build a generator in order to 
-        speed up SQL efficiency
-        '''
-        self.no_values = False
-        self.cur_size+=1
-        self.tuples.append((x, y, z))
-        
-        if self.cur_size >= self.SIZE_LIMIT:
-            self.cur_size = 0
-            self.no_values = True
-            self.write_tuples()
-            self.tuples = []
-        
-        
-    def close(self):
-        if not self.no_values:
-            self.write_tuples()
-        self.conn.commit()
-        self.conn.close()
-        self.output_conn.commit()
-        self.output_cursor.close()
-        self.output_conn.close()
-        
-    def get_features(self):
-        '''
-        Get the features on a chromosome.
-        @param chromosome : the chromosome
-        @return a Cursor Object
-        '''
-        cursor = self.conn.cursor()
-        return cursor.execute('select start, end, score from "%s"' % self.chromosome)
-    
-    def write_tuples(self):
-        '''
-        Write tuples in the oupput specified.
-        '''
-        self.output_cursor.executemany('insert into sc values (?, ?, ?);', self.tuples)
-        self.output_conn.commit()
-
-
-
-
+            ## 'prepare output'
+            output = os.path.join(out_path, '%s_%s.db' % (chromosome, zoom))
+            out_connection = sqlite3.connect(output)
+            
+            ## 'write'
+            write_tuples(out_connection, gen)
+            
+    c.close()
+    conn.close()
 
 
 
@@ -208,9 +195,11 @@ import sys
 
 if __name__ == '__main__':
     database = sys.argv[1]
-    output = sys.argv[2]
-    chromosome = sys.argv[3]
-    do(database, chromosome, output)
+    sha1 = sys.argv[2]
+    output_dir = sys.argv[3]
+    pre_compute_sql_scores(database, sha1, output_dir)
+    
+    
 
 
 
