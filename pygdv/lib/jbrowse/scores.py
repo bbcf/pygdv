@@ -131,13 +131,19 @@ def get_last_feature_stop(conn, chromosome):
     cursor.close()
     return max
            
-def pre_compute_sql_scores(database, sha1, output_dir):
+def pre_compute_sql_scores(database_path, sha1, output_dir):
+    '''
+    Pre compute scores for a quantitative database
+    @param database_path : the path to the database
+    @param sha1 : the sha1 sun hexdigest of the database
+    @param output_dir : where files will be write
+    '''
     ## 'prepare output directory'
     out_path = os.path.join(output_dir, sha1)
     os.mkdir(out_path)
     
     ## 'prepare connection'
-    conn = sqlite3.connect(database)
+    conn = sqlite3.connect(database_path)
     
     c = get_chromosomes(conn)
     

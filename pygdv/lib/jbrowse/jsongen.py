@@ -1,5 +1,6 @@
-import os
-from pygdv.lib.jbrowse import TYPE, zooms, JSON_HEIGHT, SUBLIST_INDEX, CHUNK_SIZE, LAZY_INDEX, ARROWHEAD_CLASS, CLASSNAME
+import os, sqlite3, json, math
+from pygdv.lib.jbrowse import TYPE, zooms, JSON_HEIGHT, SUBLIST_INDEX, CHUNK_SIZE, LAZY_INDEX, ARROWHEAD_CLASS, CLASSNAME, HIST_CHUNK_SIZE
+import numpy as np
 
 
 #####################################################################
@@ -188,35 +189,33 @@ def _generate_basic_json(cursor):
     yield prev_feature, nb_feature
         
 
-def _generate_features(cursor, field_number):
-    stack = []
-    prev_feature = None
-    nb_feature = 1
+
+        
+########################################################################
+      
+def _get_array_index(position, loop):
+    '''
+    From a position, get the index of the array.
+    '''
+    return (position - 1)/loop
+
+def _count_features(cursor, loop, chr_length):
+    '''
+    Generate a big array, that will contains the count of all features. Each index of 
+    the array corresponding to a loop interval.
+    '''        
+    # build the big array
+    nb = math.ceil(chr_length/float(loop))
+    array = np.zeros(nb)
     
     for row in cursor:
-        feature = [row[i] for i in range(field_number)]
-        
-        if prev_feature is not None:
-            if feature['end'] < prev_feature['end']:
-                stack.append(prev_feature)
-            else :
-                while stack :
-                    tmp_feature = stack.pop()
-                    _nest(tmp_feature, prev_feature)
-                    nb_feature+=1
-                    prev_feature = tmp_feature
-                    if feature['end'] < prev_feature['end']:
-                        stack.append(prev_feature)
-                        break
-                else:
-                    yield prev_feature, nb_feature
-                    #result.append(prev_feature)
-      
-        prev_feature = feature
-    yield prev_feature, nb_feature  
-        
-        
-        
+        start = row[0]
+        start_pos = _get_array_index(start, loop)
+        end = row[1]
+        end_pos = _get_array_index(end, loop)
+        array[start_pos:end_pos+1]+=1
+    return array
+
 ###########################################################################
        
 def _nest(feature, to_nest):
@@ -238,9 +237,9 @@ def _generate_lazy_output(feature_generator, field_number):
     '''
     Build a generator that yield the feature NCList to write
     for each chunk, and the buffer to write in the file
-    @param feature_generator :the gererator of features
+    @param feature_generator :the generator of features
     @param field_number : the number of fields in the feature
-    @return start, stop, chunk_number, buffer
+    @return start, stop, chunk_number, buffer, nb_features
     '''
     chunk_size = 0
     chunk_number = 0
@@ -248,51 +247,183 @@ def _generate_lazy_output(feature_generator, field_number):
     buffer_list = []
     for feat, nb in feature_generator:
         if start == 0:
-            start=feat['start']
-        stop = feat['stop']
+            start=feat[0]
+        stop = feat[1]
         
         chunk_size+= nb
-        buffer_list.append(','.join([feat[i] for i in range(field_number)]))
+        buffer_list.append(str(feat))
         if chunk_size >= CHUNK_SIZE :
+            nb_feature = chunk_size
             chunk_size = 0
             chunk_number += 1
+            buf = ','.join(buffer_list)
             buffer_list = []
-            yield start, stop, chunk_number, ','.join(buffer_list)
-    yield start, stop, chunk_number, buffer
+            yield start, stop, chunk_number, buf, nb_feature
+    yield start, stop, chunk_number, ','.join(buffer_list), chunk_size
         
         
-        
+#########################################################################
+def _histogram_meta(chr_length, threshold, resource_url):
+    '''
+    Output the histogram meta parameter.
+    @param chr_length : the chromosome length
+    @param threshold : the threshold defined
+    @param resource_url : the url where to fetch the resources
+    '''
+    
+    length = int(math.ceil(chr_length/threshold)) 
+    url_template = os.path.join(resource_url, 'hist-%s-{chunk}.json' % threshold)
+    
+    array_param = _prepare_array_param(length, CHUNK_SIZE -1, url_template)
+    
+    return _prepare_histogram_meta(threshold, array_param)
+#######################################################################       
+
+def _write_histo_stats(generator, threshold, output):
+    '''
+    Write the files hist-{threshold}-{chunk}.json
+    '''
+     # write
+    chunk_nb = 0
+    for array in generator:
+        chunk_nb += 1
+        with open(os.path.join(output, 'hist-%s-%s.json' % (threshold, chunk_nb)), 'w', -1) as file:
+             file.write(str(array))
+             
+     
     
 
+    
+def _calculate_histo_stats(array, threshold, chr_length):
+    '''
+    Calculate the histo stats to write in track data.
+    @param array : the array containing count of features
+    '''
+    data = []
+    for zoom in zooms:
+        base = zoom * threshold;
+        if base < chr_length :
+            sum_array = array.reshape(array.size/zoom, zoom).sum(axis=1)
+            stats = _prepare_hist_stats(base, sum_array.mean(), sum_array.max())
+            data.append(stats)
+    return data
 
-def jsonify(name, extended = False):
+def _generate_hist_outputs(array, chr_length):
+    '''
+    Generate the hist-output. 
+    '''
+    for i in range(1, chr_length, HIST_CHUNK_SIZE):
+        yield array[i:i+HIST_CHUNK_SIZE]
+    
+    
+    
+def _threshold(chr_length, feature_count):
+    '''
+    Get the threshold : when the view switch from feature to histogram
+    @param chr_length : the chromosome's length
+    @param feature_count : the total number of features
+    @return the threshold
+    '''
+    t = (chr_length *2.5 ) / feature_count;
+    for zoom in zooms :
+        if zoom>t : return zoom
+
+
+
+    
+    
+def jsonify(database_path, name, sha1, output_root_directory, public_url, browser_url, extended = False):
     '''
     Make a JSON representation of the database.
-    @name : name of the track
-    @param extended : if the format is extended
+    @param database_path : the path to the sqlite database
+    @param name : the name of the track
+    @param sha1 : the sha1 sum of the file
+    @param public_url : he base url where the file can be fetched from external request
+    @param browser_url : he base url where the file can be fetched from internal request
+    @param output_root_directory : the base system path where to write the output
+    @param extended : if the format is ``basic`` or ``extended``
     '''
-   
+    # configure outputs
+    output_path = os.path.join(output_root_directory, sha1)
+    out_public_url = os.path.join(public_url, sha1)
+    out_browser_url = os.path.join(browser_url, sha1)
+    os.mkdir(output_path)
+    
+    
+    conn = sqlite3.connect(database_path)
+    cursor = conn.cursor()
+    cursor.execute('select * from chrNames;')
+    
+    for row in cursor:
+        chr_name = row[0]
+        chr_length = row[1]
+        out = os.path.join(output_path, chr_name)
+        os.mkdir(out)
+        lazy_url = os.path.join(out_browser_url, chr_name, 'lazyfeatures-{chunk}.json')
+        _jsonify(conn, name, chr_length, chr_name, os.path.join(out_public_url, chr_name), lazy_url, out, extended)
+    cursor.close()
+    conn.close()
+    
+    
+def _jsonify(connection, name, chr_length, chr_name, url_output, lazy_url, output_directory, extended):
+    '''
+    Make a JSON representation of the chromosome.
+    @param connection : the connection to the sqlite database
+    @param output_directory : where files will be write
+    @param url_output : url access to the ressources
+    '''
+    
+    ##' init standard fields'
     if extended :
-        field_number = 5
+        field_number = 7
         headers = _extended_headers
         subfeature_headers = _extended_subfeature_headers
         client_config = _extended_client_config
     else :
-        field_number = 7
+        field_number = 5
         headers = _basic_headers
         subfeature_headers = _basic_subfeature_headers
         client_config = _basic_client_config
 
-    cursor = None
-    lazy_feats = _generate_lazy_output(_generate_features(cursor, field_number), field_number)
+    ##' calculate lazy features'
+    cursor = connection.cursor()
+    cursor.execute("select * from '%s' ;" % chr_name)
+    lazy_feats = _generate_lazy_output(_generate_nested_features(cursor, field_number), field_number)
     NCList = []
-    for start, stop, chunk_number, buffer in lazy_feats:
+    feature_count = 0
+    for start, stop, chunk_number, buffer, nb_feats in lazy_feats:
          NCList.append([start, stop,{'chunk' : chunk_number}])
          last_chunk_number = chunk_number
-         #TODO write in output
-    feature_NCList = str(NCList)
-    feature_count = last_chunk_number * CHUNK_SIZE
+         feature_count += nb_feats
+         ##' write in output'
+         output_chunk = os.path.join(output_directory, 'lazyfeatures-%s.json' % chunk_number)
+         with open(output_chunk, 'w', -1) as file:
+             file.write(buffer)
+             
     cursor.close()
+    feature_NCList = str(NCList)
+    
+    if feature_count == 0 : feature_count = 1
+    
+    ##' threshold'
+    threshold = _threshold(chr_length, feature_count)
+    
+    ##' histogram meta'
+    histogram_meta = _histogram_meta(chr_length, threshold, url_output)
+    
+    ##' count array'
+    cursor = connection.cursor()
+    cursor.execute("select * from '%s' ;" % (chr_name))
+    array = _count_features(cursor, threshold, chr_length)
+    cursor.close()
+    
+    ##' hists stats'
+    hist_stats = _calculate_histo_stats(array, threshold, chr_length)
+    
+    ##' write hist in output' 
+    _write_histo_stats(_generate_hist_outputs(array, chr_length), threshold, output_directory)
+    
+    
     data = _prepare_track_data(
                                headers, 
                                subfeature_headers, 
@@ -308,7 +439,34 @@ def jsonify(name, extended = False):
                                ARROWHEAD_CLASS, 
                                TYPE, 
                                name, 
-                               lasyfeature_url_template, 
+                               lazy_url, 
                                CLASSNAME
-                                )
+                               )
+    
+    
+    
+    ##' convert to json'
+    json_data = json.dumps(data)
+    
+    ##' write track data'
+    track_data_output = os.path.join(output_directory, 'trackData.json')
+    with open(track_data_output, 'w', -1) as file:
+            file.write(json_data)
+
+
+
+
+import sys
+
+if __name__ == '__main__':
+    database_path = sys.argv[1]
+    name = 'test'
+    sha1 = 'sha1sum'
+    out_root = sys.argv[2]
+    public_url = 'pub/url'
+    browser_url = '..'
+
+    
+    jsonify(database_path, name, sha1, out_root, public_url, browser_url, extended = False)
+    
     
