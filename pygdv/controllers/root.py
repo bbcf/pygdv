@@ -63,7 +63,7 @@ class RootController(BaseController):
     users = UserController(DBSession, menu_items=models)
     sequences = SequenceController(DBSession, menu_items=models)
     #rights = RightController(DBSession, menu_items=models)
-    celerytasks = TaskController(DBSession, menu_items=models)
+    tasks = TaskController(DBSession, menu_items=models)
     # users controllers
     tracks = TrackController(DBSession)
     projects = ProjectController(DBSession)

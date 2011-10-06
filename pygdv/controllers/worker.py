@@ -17,6 +17,7 @@ class WorkerController(BaseController):
     @expose('json')
     def add(self, x, y, *args, **kw):
         t = tasks.add.delay(x,y)
-        return dict(result=t.get())
+        return 'task launched'
+    
     
     

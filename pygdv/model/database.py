@@ -22,7 +22,7 @@ __all__ = ['Right', 'Circle', 'Project',
            'Track','Input',
            'Sequence',
            'Species',
-           'Job','JobParameters','CeleryTask']
+           'Job','JobParameters','Task']
 
 from pygdv.model.constants import *
 
@@ -400,7 +400,7 @@ class Job(DeclarativeBase):
     
     
     
-class CeleryTask(DeclarativeBase):
+class Task(DeclarativeBase):
     __tablename__='celery_taskmeta'
      
     id = Column(Integer, primary_key=True)
@@ -410,8 +410,10 @@ class CeleryTask(DeclarativeBase):
     date_done = Column(DateTime)                                                                                          
     traceback = Column(Text)                                                                                              
      
-     
-     
+
+    
+    
+    
     '''
      CREATE TABLE celery_taskmeta (                                                                                       
         id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,                                                               
