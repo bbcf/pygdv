@@ -1,79 +1,98 @@
-16:38:58,123    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key", "Group_1".id AS "Group_1_id", "Group_1".name AS "Group_1_name", "Group_1"._created AS "Group_1__created" 
-FROM "User" LEFT OUTER JOIN "UserGroup" AS "UserGroup_1" ON "User".id = "UserGroup_1".user_id LEFT OUTER JOIN "Group" AS "Group_1" ON "Group_1".id = "UserGroup_1".group_id 
-WHERE "User"._email = %(_email_1)s
-16:38:58,125    INFO  [sqlalchemy.engine.base.Engine] {'_email_1': 'yohan.jarosz@epfl.ch'}
-16:38:58,134    INFO  [sqlalchemy.engine.base.Engine] SELECT "Group".id AS "Group_id", "Group".name AS "Group_name", "Group"._created AS "Group__created", "Permission_1".id AS "Permission_1_id", "Permission_1".name AS "Permission_1_name", "Permission_1".description AS "Permission_1_description" 
-FROM "Group" LEFT OUTER JOIN "GroupPermissions" AS "GroupPermissions_1" ON "Group".id = "GroupPermissions_1".group_id LEFT OUTER JOIN "Permission" AS "Permission_1" ON "Permission_1".id = "GroupPermissions_1".permission_id 
-WHERE "Group".id = %(id_1)s
-16:38:58,135    INFO  [sqlalchemy.engine.base.Engine] {'id_1': 1}
-16:38:58,140    INFO  [sqlalchemy.engine.base.Engine] SELECT "Group".id AS "Group_id", "Group".name AS "Group_name", "Group"._created AS "Group__created", "Permission_1".id AS "Permission_1_id", "Permission_1".name AS "Permission_1_name", "Permission_1".description AS "Permission_1_description" 
-FROM "Group" LEFT OUTER JOIN "GroupPermissions" AS "GroupPermissions_1" ON "Group".id = "GroupPermissions_1".group_id LEFT OUTER JOIN "Permission" AS "Permission_1" ON "Permission_1".id = "GroupPermissions_1".permission_id 
-WHERE "Group".id = %(id_1)s
-16:38:58,141    INFO  [sqlalchemy.engine.base.Engine] {'id_1': 2}
-16:39:26,351    INFO  [sqlalchemy.engine.base.Engine] select version()
-16:39:26,351    INFO  [sqlalchemy.engine.base.Engine] {}
-16:39:26,353    INFO  [sqlalchemy.engine.base.Engine] select current_schema()
-16:39:26,353    INFO  [sqlalchemy.engine.base.Engine] {}
-16:39:26,357    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:39:26,358    INFO  [sqlalchemy.engine.base.Engine] {'name': u'inputparameters'}
-16:39:26,360    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:39:26,360    INFO  [sqlalchemy.engine.base.Engine] {'name': u'species'}
-16:39:26,362    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:39:26,362    INFO  [sqlalchemy.engine.base.Engine] {'name': u'group'}
-16:39:26,363    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:39:26,363    INFO  [sqlalchemy.engine.base.Engine] {'name': u'permission'}
-16:39:26,365    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:39:26,365    INFO  [sqlalchemy.engine.base.Engine] {'name': u'user'}
-16:39:26,366    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:39:26,366    INFO  [sqlalchemy.engine.base.Engine] {'name': u'right'}
-16:39:26,367    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:39:26,368    INFO  [sqlalchemy.engine.base.Engine] {'name': u'grouppermissions'}
-16:39:26,369    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:39:26,369    INFO  [sqlalchemy.engine.base.Engine] {'name': u'usergroup'}
-16:39:26,370    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:39:26,370    INFO  [sqlalchemy.engine.base.Engine] {'name': u'sequence'}
-16:39:26,372    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:39:26,372    INFO  [sqlalchemy.engine.base.Engine] {'name': u'circle'}
-16:39:26,373    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:39:26,373    INFO  [sqlalchemy.engine.base.Engine] {'name': u'input'}
-16:39:26,375    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:39:26,375    INFO  [sqlalchemy.engine.base.Engine] {'name': u'user_circle'}
-16:39:26,376    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:39:26,376    INFO  [sqlalchemy.engine.base.Engine] {'name': u'track'}
-16:39:26,377    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:39:26,378    INFO  [sqlalchemy.engine.base.Engine] {'name': u'project'}
-16:39:26,379    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:39:26,379    INFO  [sqlalchemy.engine.base.Engine] {'name': u'rightcircleassociation'}
-16:39:26,380    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:39:26,380    INFO  [sqlalchemy.engine.base.Engine] {'name': u'job'}
-16:39:26,382    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:39:26,382    INFO  [sqlalchemy.engine.base.Engine] {'name': u'project_track'}
-16:39:26,383    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:39:26,383    INFO  [sqlalchemy.engine.base.Engine] {'name': u'jobparameters'}
-16:39:27,636    INFO  [sqlalchemy.engine.base.Engine] BEGIN (implicit)
-16:39:27,638    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key" 
+09:49:32,806    INFO  [sqlalchemy.engine.base.Engine] 
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+09:49:32,807    INFO  [sqlalchemy.engine.base.Engine] {'typname': u'job_output'}
+09:49:32,809    INFO  [sqlalchemy.engine.base.Engine] CREATE TYPE job_output AS ENUM ('RELOAD','IMAGE')
+09:49:32,809    INFO  [sqlalchemy.engine.base.Engine] {}
+09:49:32,810    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+09:49:32,830    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "JobParameters" (
+	id SERIAL NOT NULL, 
+	type job_type NOT NULL, 
+	output job_output NOT NULL, 
+	data TEXT, 
+	job_id INTEGER NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(job_id) REFERENCES "Job" (id) ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+
+09:49:32,830    INFO  [sqlalchemy.engine.base.Engine] {}
+09:49:32,883    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+09:49:32,939    INFO  [sqlalchemy.engine.base.Engine] BEGIN (implicit)
+09:49:32,943    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User".firstname AS "User_firstname", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key" 
+FROM "User" 
+WHERE "User"._email = %(_email_1)s 
+ LIMIT %(param_1)s OFFSET %(param_2)s
+09:49:32,946    INFO  [sqlalchemy.engine.base.Engine] {'_email_1': 'yohan.jarosz@epfl.ch', 'param_1': 1, 'param_2': 0}
+09:49:32,952    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Right" (name, description) VALUES (%(name)s, %(description)s) RETURNING "Right".id
+09:49:32,952    INFO  [sqlalchemy.engine.base.Engine] {'description': u'A group with this permission can upload tracks to the project and execute jobs on the web interface.', 'name': 'Upload'}
+09:49:32,954    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Right" (name, description) VALUES (%(name)s, %(description)s) RETURNING "Right".id
+09:49:32,954    INFO  [sqlalchemy.engine.base.Engine] {'description': u'A group with this permission can download files on a project.', 'name': 'Download'}
+09:49:32,955    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Right" (name, description) VALUES (%(name)s, %(description)s) RETURNING "Right".id
+09:49:32,956    INFO  [sqlalchemy.engine.base.Engine] {'description': u'A group with this permission can view the project.', 'name': 'Read'}
+09:49:32,957    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Permission" (name, description) VALUES (%(name)s, %(description)s) RETURNING "Permission".id
+09:49:32,958    INFO  [sqlalchemy.engine.base.Engine] {'name': 'user', 'description': u'This permission give "read" right to the bearer.'}
+09:49:32,960    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Group" (name, _created) VALUES (%(name)s, %(_created)s) RETURNING "Group".id
+09:49:32,960    INFO  [sqlalchemy.engine.base.Engine] {'_created': datetime.datetime(2011, 10, 7, 9, 49, 32, 960058), 'name': 'Users'}
+09:49:32,962    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "GroupPermissions" (group_id, permission_id) VALUES (%(group_id)s, %(permission_id)s)
+09:49:32,963    INFO  [sqlalchemy.engine.base.Engine] {'permission_id': 1, 'group_id': 1}
+09:49:32,965    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+09:49:36,444    INFO  [sqlalchemy.engine.base.Engine] select version()
+09:49:36,444    INFO  [sqlalchemy.engine.base.Engine] {}
+09:49:36,446    INFO  [sqlalchemy.engine.base.Engine] select current_schema()
+09:49:36,447    INFO  [sqlalchemy.engine.base.Engine] {}
+09:49:36,452    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+09:49:36,453    INFO  [sqlalchemy.engine.base.Engine] {'name': u'right'}
+09:49:36,456    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+09:49:36,456    INFO  [sqlalchemy.engine.base.Engine] {'name': u'user'}
+09:49:36,458    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+09:49:36,458    INFO  [sqlalchemy.engine.base.Engine] {'name': u'celery_taskmeta'}
+09:49:36,459    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+09:49:36,460    INFO  [sqlalchemy.engine.base.Engine] {'name': u'inputparameters'}
+09:49:36,461    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+09:49:36,461    INFO  [sqlalchemy.engine.base.Engine] {'name': u'permission'}
+09:49:36,463    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+09:49:36,463    INFO  [sqlalchemy.engine.base.Engine] {'name': u'species'}
+09:49:36,465    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+09:49:36,465    INFO  [sqlalchemy.engine.base.Engine] {'name': u'group'}
+09:49:36,467    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+09:49:36,467    INFO  [sqlalchemy.engine.base.Engine] {'name': u'usergroup'}
+09:49:36,468    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+09:49:36,469    INFO  [sqlalchemy.engine.base.Engine] {'name': u'grouppermissions'}
+09:49:36,470    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+09:49:36,470    INFO  [sqlalchemy.engine.base.Engine] {'name': u'sequence'}
+09:49:36,472    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+09:49:36,472    INFO  [sqlalchemy.engine.base.Engine] {'name': u'input'}
+09:49:36,473    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+09:49:36,473    INFO  [sqlalchemy.engine.base.Engine] {'name': u'circle'}
+09:49:36,475    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+09:49:36,475    INFO  [sqlalchemy.engine.base.Engine] {'name': u'project'}
+09:49:36,476    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+09:49:36,476    INFO  [sqlalchemy.engine.base.Engine] {'name': u'track'}
+09:49:36,477    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+09:49:36,478    INFO  [sqlalchemy.engine.base.Engine] {'name': u'user_circle'}
+09:49:36,479    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+09:49:36,479    INFO  [sqlalchemy.engine.base.Engine] {'name': u'project_track'}
+09:49:36,480    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+09:49:36,481    INFO  [sqlalchemy.engine.base.Engine] {'name': u'rightcircleassociation'}
+09:49:36,482    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+09:49:36,482    INFO  [sqlalchemy.engine.base.Engine] {'name': u'job'}
+09:49:36,483    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+09:49:36,483    INFO  [sqlalchemy.engine.base.Engine] {'name': u'jobparameters'}
+09:49:41,476    INFO  [sqlalchemy.engine.base.Engine] BEGIN (implicit)
+09:49:41,478    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User".firstname AS "User_firstname", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key" 
 FROM "User" 
 WHERE "User"._email = %(_email_1)s
-16:39:27,638    INFO  [sqlalchemy.engine.base.Engine] {'_email_1': 'yohan.jarosz@epfl.ch'}
-16:39:27,643    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key", "Group_1".id AS "Group_1_id", "Group_1".name AS "Group_1_name", "Group_1"._created AS "Group_1__created" 
+09:49:41,478    INFO  [sqlalchemy.engine.base.Engine] {'_email_1': 'yohan.jarosz@epfl.ch'}
+09:49:41,484    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User".firstname AS "User_firstname", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key", "Group_1".id AS "Group_1_id", "Group_1".name AS "Group_1_name", "Group_1"._created AS "Group_1__created" 
 FROM "User" LEFT OUTER JOIN "UserGroup" AS "UserGroup_1" ON "User".id = "UserGroup_1".user_id LEFT OUTER JOIN "Group" AS "Group_1" ON "Group_1".id = "UserGroup_1".group_id 
 WHERE "User"._email = %(_email_1)s
-16:39:27,644    INFO  [sqlalchemy.engine.base.Engine] {'_email_1': 'yohan.jarosz@epfl.ch'}
-16:39:27,652    INFO  [sqlalchemy.engine.base.Engine] SELECT "Group".id AS "Group_id", "Group".name AS "Group_name", "Group"._created AS "Group__created", "Permission_1".id AS "Permission_1_id", "Permission_1".name AS "Permission_1_name", "Permission_1".description AS "Permission_1_description" 
-FROM "Group" LEFT OUTER JOIN "GroupPermissions" AS "GroupPermissions_1" ON "Group".id = "GroupPermissions_1".group_id LEFT OUTER JOIN "Permission" AS "Permission_1" ON "Permission_1".id = "GroupPermissions_1".permission_id 
-WHERE "Group".id = %(id_1)s
-16:39:27,652    INFO  [sqlalchemy.engine.base.Engine] {'id_1': 1}
-16:39:27,656    INFO  [sqlalchemy.engine.base.Engine] SELECT "Group".id AS "Group_id", "Group".name AS "Group_name", "Group"._created AS "Group__created", "Permission_1".id AS "Permission_1_id", "Permission_1".name AS "Permission_1_name", "Permission_1".description AS "Permission_1_description" 
-FROM "Group" LEFT OUTER JOIN "GroupPermissions" AS "GroupPermissions_1" ON "Group".id = "GroupPermissions_1".group_id LEFT OUTER JOIN "Permission" AS "Permission_1" ON "Permission_1".id = "GroupPermissions_1".permission_id 
-WHERE "Group".id = %(id_1)s
-16:39:27,656    INFO  [sqlalchemy.engine.base.Engine] {'id_1': 2}
-16:39:27,891    INFO  [sqlalchemy.engine.base.Engine] BEGIN (implicit)
-16:39:27,893    INFO  [sqlalchemy.engine.base.Engine] SELECT "Sequence".id AS "Sequence_id", "Sequence".name AS "Sequence_name", "Sequence".species_id AS "Sequence_species_id" 
-FROM "Sequence" 
-WHERE "Sequence".id = %(id_1)s 
- LIMIT %(param_1)s OFFSET %(param_2)s
-16:39:27,893    INFO  [sqlalchemy.engine.base.Engine] {'id_1': 70, 'param_1': 1, 'param_2': 0}
-16:39:27,904    INFO  [sqlalchemy.engine.base.Engine] SELECT "Sequence".id AS "Sequence_id", "Sequence".name AS "Sequence_name", "Sequence".species_id AS "Sequence_species_id" 
-FROM "Sequence" 
-WHERE "Sequence".id = %(param_1)s
-16:39:27,905    INFO  [sqlalchemy.engine.base.Engine] {'param_1': '70'}
+09:49:41,484    INFO  [sqlalchemy.engine.base.Engine] {'_email_1': 'yohan.jarosz@epfl.ch'}
+09:49:41,565    INFO  [sqlalchemy.engine.base.Engine] BEGIN (implicit)
+09:49:41,565    INFO  [sqlalchemy.engine.base.Engine] SELECT "Species".id AS "Species_id", "Species".name AS "Species_name" 
+FROM "Species"

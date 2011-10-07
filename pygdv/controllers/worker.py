@@ -11,7 +11,7 @@ __all__ = ['WorkerController']
 
 
 class WorkerController(BaseController):
-    allow_only = has_permission(gl.perm_admin)
+    #allow_only = has_permission(gl.perm_admin)
     
     
     @expose('json')

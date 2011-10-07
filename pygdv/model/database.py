@@ -5,9 +5,10 @@ Database model
 
 
 from sqlalchemy import Table, ForeignKey, Column
-from sqlalchemy.types import Unicode, Integer, DateTime, Enum, Text, Boolean, VARCHAR, BLOB, Binary
+from sqlalchemy.types import Unicode, Integer, DateTime, Enum, Text, Boolean, VARCHAR, Binary
 from sqlalchemy.orm import relationship, synonym
-
+from sqlalchemy import Sequence as Seq
+from pygdv.lib.celery import PickleType
 from pygdv.model import DeclarativeBase, metadata, DBSession
 import transaction
 
@@ -22,7 +23,7 @@ __all__ = ['Right', 'Circle', 'Project',
            'Track','Input',
            'Sequence',
            'Species',
-           'Job','JobParameters','Task']
+           'Job','JobParameters', 'Task']
 
 from pygdv.model.constants import *
 
@@ -177,7 +178,7 @@ class Project(DeclarativeBase):
             result[cr.circle]=rights
         return result
     
-    @property
+    @property 
     def get_tracks(self):
         return ', '.join([track.name for track in self.tracks])
     @property
@@ -398,38 +399,17 @@ class Job(DeclarativeBase):
     def get_type(self):
         return self.parameters.type
     
-    
-    
 class Task(DeclarativeBase):
-    __tablename__='celery_taskmeta'
-     
-    id = Column(Integer, primary_key=True)
-    task_id = Column(VARCHAR(255), unique=True)                                                                                        
-    status = Column(VARCHAR(50))                                                                                          
-    result = Column(Binary)                                                                                                 
-    date_done = Column(DateTime)                                                                                          
-    traceback = Column(Text)                                                                                              
-     
+    __tablename__ = "celery_taskmeta"
+    
+    id = Column('id', Integer, Seq('task_id_sequence'), primary_key=True, autoincrement=True )
+    task_id = Column(VARCHAR(255), unique=True)
+    status = Column(VARCHAR(50), default='PENDING')
+    result = Column(PickleType, nullable=True)
+    date_done = Column(DateTime, default=datetime.now,
+                       onupdate=datetime.now, nullable=True)
+    traceback = Column(Text, nullable=True)
 
-    
-    
-    
-    '''
-     CREATE TABLE celery_taskmeta (                                                                                       
-        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,                                                               
-        task_id VARCHAR(255),                                                                                        
-        status VARCHAR(50),                                                                                          
-        result BLOB,                                                                                                 
-        date_done DATETIME,                                                                                          
-        traceback TEXT,                                                                                              
-        UNIQUE (task_id)                                                                                             
-);                                                                                                                   
-CREATE TABLE celery_tasksetmeta (                                                                                    
-        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,                                                               
-        taskset_id VARCHAR(255),                                                                                     
-        result BLOB,                                                                                                 
-        date_done DATETIME,                                                                                          
-        UNIQUE (taskset_id)                                                                                          
-);                                 
-'''
-    
+    def __init__(self, task_id):
+        self.task_id = task_id
+
