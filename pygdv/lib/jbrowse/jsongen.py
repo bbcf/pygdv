@@ -7,7 +7,7 @@ import numpy as np
 #    QUANTITATIVE DATA
 #####################################################################
 
-def _prepare_qualitative_json(tile_width, min, max, sha1, chromosome):
+def _prepare_quantitative_json(tile_width, min, max, sha1, chromosome):
     '''
     Prepare the JSON output for a chromosome.
     '''
@@ -158,7 +158,7 @@ def _get_extended_features(connection, chromosome):
 #########################################################################
 
 
-def _generate_basic_json(cursor):
+def _generate_nested_features(cursor, field_number):
     '''
     Generate features that has to be written in JSON
     '''
@@ -167,10 +167,10 @@ def _generate_basic_json(cursor):
     nb_feature = 1
     
     for row in cursor:
-        feature = [row[0], row[1], row[2], row[3], row[4], row[5]]
+        feature = [row[i] for i in range(field_number)]
         
         if prev_feature is not None:
-            if feature['end'] < prev_feature['end']:
+            if feature[1] < prev_feature[1]:
                 stack.append(prev_feature)
             else :
                 while stack :
@@ -178,7 +178,7 @@ def _generate_basic_json(cursor):
                     _nest(tmp_feature, prev_feature)
                     nb_feature+=1
                     prev_feature = tmp_feature
-                    if feature['end'] < prev_feature['end']:
+                    if feature[1] < prev_feature[1]:
                         stack.append(prev_feature)
                         break
                 else:
@@ -233,12 +233,11 @@ def _nest(feature, to_nest):
 ###############################################################################
 
 
-def _generate_lazy_output(feature_generator, field_number):
+def _generate_lazy_output(feature_generator):
     '''
     Build a generator that yield the feature NCList to write
     for each chunk, and the buffer to write in the file
     @param feature_generator :the generator of features
-    @param field_number : the number of fields in the feature
     @return start, stop, chunk_number, buffer, nb_features
     '''
     chunk_size = 0
@@ -363,7 +362,32 @@ def jsonify(database_path, name, sha1, output_root_directory, public_url, browse
         _jsonify(conn, name, chr_length, chr_name, os.path.join(out_public_url, chr_name), lazy_url, out, extended)
     cursor.close()
     conn.close()
+    return 1
+
+def jsonify_quantitative(sha1, output_root_directory, database_path):
+    output_path = os.path.join(output_root_directory, sha1)
+    os.mkdir(output_path)
     
+    conn = sqlite3.connect(database_path)
+    cursor = conn.cursor()
+    cursor.execute('select * from chrNames;')
+    
+    for row in cursor:
+        chr_name = row[0]
+        chr_length = row[1]
+        out = os.path.join(output_path, chr_name)
+        os.mkdir(out)
+        
+        cur = conn.cursor()
+        cur.execute('select min(score), max(score) from "%s" ;' % chr_name).fetchone()
+        data = _prepare_quantitative_json(200, cur[0], cur[1], sha1, chr_name)
+        output = os.path.join(out, 'trackData.json')
+        with open(output, 'w', -1) as file:
+            file.write(data)
+        cur.close()
+    cursor.close()
+    conn.close()
+    return 1
     
 def _jsonify(connection, name, chr_length, chr_name, url_output, lazy_url, output_directory, extended):
     '''
@@ -388,17 +412,17 @@ def _jsonify(connection, name, chr_length, chr_name, url_output, lazy_url, outpu
     ##' calculate lazy features'
     cursor = connection.cursor()
     cursor.execute("select * from '%s' ;" % chr_name)
-    lazy_feats = _generate_lazy_output(_generate_nested_features(cursor, field_number), field_number)
+    lazy_feats = _generate_lazy_output(_generate_nested_features(cursor, field_number))
     NCList = []
     feature_count = 0
     for start, stop, chunk_number, buffer, nb_feats in lazy_feats:
-         NCList.append([start, stop,{'chunk' : chunk_number}])
-         last_chunk_number = chunk_number
-         feature_count += nb_feats
-         ##' write in output'
-         output_chunk = os.path.join(output_directory, 'lazyfeatures-%s.json' % chunk_number)
-         with open(output_chunk, 'w', -1) as file:
-             file.write(buffer)
+        NCList.append([start, stop,{'chunk' : chunk_number}])
+        last_chunk_number = chunk_number
+        feature_count += nb_feats
+        ##' write in output'
+        output_chunk = os.path.join(output_directory, 'lazyfeatures-%s.json' % chunk_number)
+        with open(output_chunk, 'w', -1) as file:
+            file.write(buffer)
              
     cursor.close()
     feature_NCList = str(NCList)
@@ -453,7 +477,7 @@ def _jsonify(connection, name, chr_length, chr_name, url_output, lazy_url, outpu
     with open(track_data_output, 'w', -1) as file:
             file.write(json_data)
 
-
+    return 1
 
 
 import sys

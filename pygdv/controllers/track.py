@@ -60,7 +60,8 @@ class TrackController(CrudRestController):
         files = util.upload(**kw)
         if files is not None:
             for filename, file in files:
-                handler.track.create_track(user.id, file=file, trackname=filename)
+                if 'sequence_id' in kw:
+                    handler.track.create_track(user.id, kw['sequence_id'], file=file, trackname=filename)
             transaction.commit()
             flash("Track(s) successfully uploaded.")
         else :

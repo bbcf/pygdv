@@ -54,7 +54,12 @@ user_circle_table = Table('user_circle', metadata,
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
 
-
+default_track_table = Table('default_tracks', metadata,
+        Column('track_id', Integer, ForeignKey('Track.id',
+        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
+        Column('sequence_id', Integer, ForeignKey('Sequence.id',
+        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
+)
 
 class Right(DeclarativeBase):
     '''
@@ -215,7 +220,7 @@ class Sequence(DeclarativeBase):
     name = Column(Unicode(255), nullable=False)
     species_id = Column(Integer, ForeignKey('Species.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
     
-    default_tracks = relationship('Track')
+    default_tracks = relationship('Track', secondary=default_track_table)
     
     def __repr__(self):
         return '<Sequence: id=%r, name=%r, species_id=%r>' % (self.id,self.name,self.species_id)
@@ -318,7 +323,10 @@ class Track(DeclarativeBase):
     user_id = Column(Integer, ForeignKey('User.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
     
     
-    sequence_id = Column(Integer, ForeignKey('Sequence.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=True)
+    sequence_id = Column(Integer, ForeignKey('Sequence.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+    sequence = relationship("Sequence")
+    
+    
     # special methods
     def __repr__(self):
         return '<Track: id=%r, name=%r, created=%r, visu=%r, user_id=%r>' % (self.id, self.name, self.created, self.visu, self.user_id)

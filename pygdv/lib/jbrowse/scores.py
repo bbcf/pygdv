@@ -170,7 +170,7 @@ def pre_compute_sql_scores(database_path, sha1, output_dir):
             
     c.close()
     conn.close()
-
+    return 1
 
 
 
@@ -182,7 +182,6 @@ if __name__ == '__main__':
     sha1 = sys.argv[2]
     output_dir = sys.argv[3]
     pre_compute_sql_scores(database, sha1, output_dir)
-    
     
 
 

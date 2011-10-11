@@ -6,7 +6,7 @@ import os, shutil
 from pygdv.model import constants
 from pygdv.lib import util
 
-def create_track(user_id, trackname=None, file=None):
+def create_track(user_id, sequence_id, trackname=None, file=None):
     '''
     Create track from files :
     
@@ -23,6 +23,7 @@ def create_track(user_id, trackname=None, file=None):
         if trackname is not None:
             track.name = trackname
         track.visu = constants.NOT_DETERMINED_DATATYPE
+        track.sequence_id = sequence_id
         track.user_id = user_id
         track.input_id = input.id
         DBSession.add(track)

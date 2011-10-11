@@ -13,8 +13,11 @@ import transaction
 import datetime
 from tg import app_globals as gl
 from pygdv import handler
+
 __all__ = ['LoginController']
 
+#from track.util import guess_file_format
+#extension = guess_file_format('/tmp/asdkljasdklj')
 
 class LoginController(BaseController):
 
