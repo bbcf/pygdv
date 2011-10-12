@@ -58,10 +58,13 @@ class TrackController(CrudRestController):
     def post(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
         files = util.upload(**kw)
+        print kw
+        print files
+        
         if files is not None:
             for filename, file in files:
-                if 'sequence_id' in kw:
-                    handler.track.create_track(user.id, kw['sequence_id'], file=file, trackname=filename)
+                if 'nr_assembly' in kw:
+                    handler.track.create_track(user.id, kw['nr_assembly'], file=file, trackname=filename)
             transaction.commit()
             flash("Track(s) successfully uploaded.")
         else :

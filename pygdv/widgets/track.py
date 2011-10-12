@@ -42,7 +42,7 @@ track_grid = twf.DataGrid(fields=[
     ('Created', 'created'),
     ('Last access', 'last_access'),
     ('Type', 'visu'),
-    ('Status', 'get_status'),
+    ('Status', 'status'),
     ('Action', lambda obj:genshi.Markup(
         '<a href="%s">export</a> <a href="%s">link</a> '
         % (

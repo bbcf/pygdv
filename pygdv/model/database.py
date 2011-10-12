@@ -20,16 +20,16 @@ from sqlalchemy.engine.base import Transaction
 __all__ = ['Right', 'Circle', 'Project',
            'RightCircleAssociation','Sequence',
            'Species','InputParameters',
-           'Track','Input',
+           'Track', 'Task', 'Input',
            'Sequence',
            'Species',
-           'Job','JobParameters', 'Task']
+           'Job','JobParameters']
 
-from pygdv.model.constants import *
+from pygdv.model import constants
 
 statuses = Enum('SUCCESS', 'PENDING', 'ERROR', 'RUNNING', name='job_status')
 image_types = Enum('FeatureTrack', 'ImageTrack', name='image_type')
-datatypes = Enum(QUALITATIVE_DATATYPE, QUANTITATIVE_DATATYPE, QUALITATIVE_EXTENDED_DATATYPE, NOT_DETERMINED_DATATYPE ,name="datatype")
+datatypes = Enum(constants.FEATURES, constants.SIGNAL, constants.RELATIONAL, constants.NOT_DETERMINED_DATATYPE ,name="datatype")
 job_types = Enum('NEW_SELECTION', 'NEW_TRACK', 'GFEATMINER', 'NEW_PROJECT', name='job_type')
 job_outputs = Enum('RELOAD', 'IMAGE', name='job_output')
 
@@ -150,7 +150,7 @@ class Project(DeclarativeBase):
     key = Column(Unicode(255), unique=True,default=setdefaultkey, nullable=False)
     
     def _get_date(self):
-        return self._created.strftime(date_format);
+        return self._created.strftime(constants.date_format);
         
     def _set_date(self,date):
         self._created=date
@@ -242,7 +242,22 @@ class Species(DeclarativeBase):
     def __str__(self):
         return self.name
     
+
+
+class Task(DeclarativeBase):
+    __tablename__ = "celery_taskmeta"
     
+    id = Column('id', Integer, Seq('task_id_sequence'), primary_key=True, autoincrement=True )
+    task_id = Column(VARCHAR(255), unique=True)
+    status = Column(VARCHAR(50), default='PENDING')
+    result = Column(PickleType, nullable=True)
+    date_done = Column(DateTime, default=datetime.now,
+                       onupdate=datetime.now, nullable=True)
+    traceback = Column(Text, nullable=True)
+
+    def __init__(self, task_id):
+        self.task_id = task_id
+
     
     
     
@@ -261,15 +276,20 @@ class Input(DeclarativeBase):
     tracks = relationship('Track', backref='input')
     parameter_id = Column(Integer, ForeignKey('InputParameters.id', onupdate="CASCADE", ondelete="CASCADE"), 
                            nullable=False)
+    task_id = Column(Integer, ForeignKey('celery_taskmeta.id', onupdate="CASCADE", ondelete="CASCADE"), 
+                           nullable=False)
+    task = relationship('Task')
+    
+    datatype = Column(datatypes, nullable=False, default=constants.NOT_DETERMINED_DATATYPE)
     
     # special methods
     def __repr__(self):
-        return '<Input: id=%r, sha1=%r>' % (self.input,self.sha1)
+        return '<Input: id=%r, sha1=%r>' % (self.id,self.sha1)
     def __unicode__(self):
         return self.sha1
     
     def _get_last_access(self):
-        return self._last_access.strftime(date_format);
+        return self._last_access.strftime(constants.date_format);
         
     def _set_last_access(self,date):
         self._last_access=date
@@ -283,8 +303,9 @@ class Input(DeclarativeBase):
         '''
         self._set_last_access(datetime.now())
 
-    
-
+    @property
+    def status(self):
+        return self.task.status
     
     
     
@@ -317,9 +338,9 @@ class Track(DeclarativeBase):
     name = Column(Unicode(255), nullable=False)
     _created = Column(DateTime, nullable=False, default=datetime.now)
     _last_access = Column(DateTime, default=datetime.now, nullable=False)
-    visu = Column(datatypes, nullable=False)
     
     input_id = Column(Integer, ForeignKey('Input.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+   
     user_id = Column(Integer, ForeignKey('User.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
     
     
@@ -334,19 +355,25 @@ class Track(DeclarativeBase):
         return self.name
     
     def _get_date(self):
-        return self._created.strftime(date_format);
+        return self._created.strftime(constants.date_format);
         
     def _set_date(self,date):
         self._created=date
         
     def _get_last_access(self):
-        return self._last_access.strftime(date_format);
+        return self._last_access.strftime(constants.date_format);
         
     def _set_last_access(self, date):
         self._last_access=date
 
+    @property
+    def status(self):
+        return self.input.status
     
-        
+    @property
+    def vizu(self):
+        return self.input.datatype
+    
     created = synonym('_created', descriptor=property(_get_date, _set_date))
     last_access = synonym('_last_access', descriptor=property(_get_last_access, _set_last_access))
     
@@ -356,12 +383,6 @@ class Track(DeclarativeBase):
         Update the field 'last_access' by the current time
         '''
         self._set_last_access(datetime.now())
-    @property
-    def get_status(self):
-        '''
-        Get the status of the job processing the track.
-        '''
-        return 'not implemented'
 
 class JobParameters(DeclarativeBase):
     '''
@@ -396,7 +417,7 @@ class Job(DeclarativeBase):
     parameters = relationship('JobParameters', uselist=False, backref='job')
     
     def _get_date(self):
-        return self._created.strftime(date_format);
+        return self._created.strftime(constants.date_format);
         
     def _set_date(self,date):
         self._created=date
@@ -406,18 +427,7 @@ class Job(DeclarativeBase):
     @property
     def get_type(self):
         return self.parameters.type
-    
-class Task(DeclarativeBase):
-    __tablename__ = "celery_taskmeta"
-    
-    id = Column('id', Integer, Seq('task_id_sequence'), primary_key=True, autoincrement=True )
-    task_id = Column(VARCHAR(255), unique=True)
-    status = Column(VARCHAR(50), default='PENDING')
-    result = Column(PickleType, nullable=True)
-    date_done = Column(DateTime, default=datetime.now,
-                       onupdate=datetime.now, nullable=True)
-    traceback = Column(Text, nullable=True)
 
-    def __init__(self, task_id):
-        self.task_id = task_id
+
+
 
