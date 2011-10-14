@@ -2,6 +2,7 @@ from sprox.tablebase import TableBase
 from sprox.formbase import AddRecordForm, EditableForm
 from sprox.fillerbase import EditFormFiller, TableFiller
 
+
 import tw.forms as twf
 import tw.dynforms as twd
 import genshi
@@ -9,8 +10,8 @@ import genshi
 from tg import url
 
 from pygdv.model import DBSession, Track, Species, Sequence
-from pygdv.lib.helpers import get_delete_link, get_edit_link
-
+from pygdv.lib.helpers import get_delete_link, get_edit_link, get_task_status
+from pygdv.lib import constants
 
 
 # TABLE
@@ -37,12 +38,13 @@ class TEditFiller(EditFormFiller):
     __model__ = Track
 
 
+        
 track_grid = twf.DataGrid(fields=[
     ('Name', 'name'),
     ('Created', 'created'),
     ('Last access', 'last_access'),
-    ('Type', 'visu'),
-    ('Status', 'status'),
+    ('Type', 'vizu'),
+    ('Status', lambda obj: get_task_status(obj)),
     ('Action', lambda obj:genshi.Markup(
         '<a href="%s">export</a> <a href="%s">link</a> '
         % (

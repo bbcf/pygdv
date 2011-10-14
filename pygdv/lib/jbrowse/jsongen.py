@@ -11,6 +11,7 @@ def _prepare_quantitative_json(tile_width, min, max, sha1, chromosome):
     '''
     Prepare the JSON output for a chromosome.
     '''
+    
     data = {}
     data['tileWidth'] = tile_width
     data['min'] = min
@@ -366,24 +367,27 @@ def jsonify(database_path, name, sha1, output_root_directory, public_url, browse
 
 def jsonify_quantitative(sha1, output_root_directory, database_path):
     output_path = os.path.join(output_root_directory, sha1)
-    os.mkdir(output_path)
-    
+    try :
+        os.mkdir(output_path)
+    except OSError: 
+        pass
     conn = sqlite3.connect(database_path)
     cursor = conn.cursor()
     cursor.execute('select * from chrNames;')
-    
     for row in cursor:
         chr_name = row[0]
         chr_length = row[1]
         out = os.path.join(output_path, chr_name)
-        os.mkdir(out)
-        
+        try :
+            os.mkdir(out)
+        except OSError: 
+            pass
         cur = conn.cursor()
-        cur.execute('select min(score), max(score) from "%s" ;' % chr_name).fetchone()
-        data = _prepare_quantitative_json(200, cur[0], cur[1], sha1, chr_name)
+        result = cur.execute('select min(score), max(score) from "%s" ;' % chr_name).fetchone()
+        data = _prepare_quantitative_json(200, result[0], result[1], sha1, chr_name)
         output = os.path.join(out, 'trackData.json')
         with open(output, 'w', -1) as file:
-            file.write(data)
+            file.write(str(data))
         cur.close()
     cursor.close()
     conn.close()
@@ -480,17 +484,3 @@ def _jsonify(connection, name, chr_length, chr_name, url_output, lazy_url, outpu
     return 1
 
 
-import sys
-
-if __name__ == '__main__':
-    database_path = sys.argv[1]
-    name = 'test'
-    sha1 = 'sha1sum'
-    out_root = sys.argv[2]
-    public_url = 'pub/url'
-    browser_url = '..'
-
-    
-    jsonify(database_path, name, sha1, out_root, public_url, browser_url, extended = False)
-    
-    

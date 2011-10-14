@@ -1,92 +1,201 @@
-09:49:41,566    INFO  [sqlalchemy.engine.base.Engine] {}
-09:49:41,678    INFO  [sqlalchemy.engine.base.Engine] SELECT "Sequence".id AS "Sequence_id", "Sequence".name AS "Sequence_name", "Sequence".species_id AS "Sequence_species_id" 
-FROM "Sequence" 
-WHERE "Sequence".id = %(id_1)s 
- LIMIT %(param_1)s OFFSET %(param_2)s
-09:49:41,678    INFO  [sqlalchemy.engine.base.Engine] {'id_1': 70, 'param_1': 1, 'param_2': 0}
-09:49:43,348    INFO  [sqlalchemy.engine.base.Engine] BEGIN (implicit)
-09:49:43,350    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User".firstname AS "User_firstname", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key" 
-FROM "User" 
-WHERE "User"._email = %(_email_1)s
-09:49:43,350    INFO  [sqlalchemy.engine.base.Engine] {'_email_1': 'yohan.jarosz@epfl.ch'}
-09:49:43,353    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User".firstname AS "User_firstname", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key", "Group_1".id AS "Group_1_id", "Group_1".name AS "Group_1_name", "Group_1"._created AS "Group_1__created" 
-FROM "User" LEFT OUTER JOIN "UserGroup" AS "UserGroup_1" ON "User".id = "UserGroup_1".user_id LEFT OUTER JOIN "Group" AS "Group_1" ON "Group_1".id = "UserGroup_1".group_id 
-WHERE "User"._email = %(_email_1)s
-09:49:43,354    INFO  [sqlalchemy.engine.base.Engine] {'_email_1': 'yohan.jarosz@epfl.ch'}
-09:49:43,435    INFO  [sqlalchemy.engine.base.Engine] BEGIN (implicit)
-09:49:43,436    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User".firstname AS "User_firstname", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key" 
-FROM "User" 
-WHERE "User"._email = %(_email_1)s
-09:49:43,436    INFO  [sqlalchemy.engine.base.Engine] {'_email_1': 'yohan.jarosz@epfl.ch'}
-09:49:43,439    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User".firstname AS "User_firstname", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key", "Group_1".id AS "Group_1_id", "Group_1".name AS "Group_1_name", "Group_1"._created AS "Group_1__created" 
-FROM "User" LEFT OUTER JOIN "UserGroup" AS "UserGroup_1" ON "User".id = "UserGroup_1".user_id LEFT OUTER JOIN "Group" AS "Group_1" ON "Group_1".id = "UserGroup_1".group_id 
-WHERE "User"._email = %(_email_1)s
-09:49:43,440    INFO  [sqlalchemy.engine.base.Engine] {'_email_1': 'yohan.jarosz@epfl.ch'}
-09:49:46,364    INFO  [sqlalchemy.engine.base.Engine] BEGIN (implicit)
-09:49:46,365    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User".firstname AS "User_firstname", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key" 
-FROM "User" 
-WHERE "User"._email = %(_email_1)s
-09:49:46,366    INFO  [sqlalchemy.engine.base.Engine] {'_email_1': 'yohan.jarosz@epfl.ch'}
-09:49:46,370    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User".firstname AS "User_firstname", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key", "Group_1".id AS "Group_1_id", "Group_1".name AS "Group_1_name", "Group_1"._created AS "Group_1__created" 
-FROM "User" LEFT OUTER JOIN "UserGroup" AS "UserGroup_1" ON "User".id = "UserGroup_1".user_id LEFT OUTER JOIN "Group" AS "Group_1" ON "Group_1".id = "UserGroup_1".group_id 
-WHERE "User"._email = %(_email_1)s
-09:49:46,371    INFO  [sqlalchemy.engine.base.Engine] {'_email_1': 'yohan.jarosz@epfl.ch'}
-09:49:48,778    INFO  [sqlalchemy.engine.base.Engine] BEGIN (implicit)
-09:49:48,779    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User".firstname AS "User_firstname", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key" 
-FROM "User" 
-WHERE "User"._email = %(_email_1)s 
- LIMIT %(param_1)s OFFSET %(param_2)s
-09:49:48,779    INFO  [sqlalchemy.engine.base.Engine] {'_email_1': 'yohan.jarosz@epfl.ch', 'param_1': 1, 'param_2': 0}
-09:49:48,781    INFO  [sqlalchemy.engine.base.Engine] SELECT "Group".id AS "Group_id", "Group".name AS "Group_name", "Group"._created AS "Group__created" 
-FROM "Group" 
-WHERE "Group".name = %(name_1)s 
- LIMIT %(param_1)s OFFSET %(param_2)s
-09:49:48,782    INFO  [sqlalchemy.engine.base.Engine] {'name_1': 'Users', 'param_1': 1, 'param_2': 0}
-09:49:48,784    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User".firstname AS "User_firstname", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key" 
-FROM "User", "UserGroup" 
-WHERE %(param_1)s = "UserGroup".group_id AND "User".id = "UserGroup".user_id
-09:49:48,785    INFO  [sqlalchemy.engine.base.Engine] {'param_1': 1}
-09:49:48,791    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User".firstname AS "User_firstname", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key" 
-FROM "User" 
-WHERE "User".key = %(key_1)s 
- LIMIT %(param_1)s OFFSET %(param_2)s
-09:49:48,791    INFO  [sqlalchemy.engine.base.Engine] {'key_1': 'df13dd00-8121-431b-804b-0b94dafaac72', 'param_1': 1, 'param_2': 0}
-09:49:48,792    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "User" (name, firstname, _email, _created, key) VALUES (%(name)s, %(firstname)s, %(_email)s, %(_created)s, %(key)s) RETURNING "User".id
-09:49:48,792    INFO  [sqlalchemy.engine.base.Engine] {'_created': datetime.datetime(2011, 10, 7, 9, 49, 48, 789680), '_email': 'yohan.jarosz@epfl.ch', 'key': 'df13dd00-8121-431b-804b-0b94dafaac72', 'firstname': 'Yohan', 'name': 'Jarosz'}
-09:49:48,795    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "UserGroup" (user_id, group_id) VALUES (%(user_id)s, %(group_id)s)
-09:49:48,795    INFO  [sqlalchemy.engine.base.Engine] {'group_id': 1, 'user_id': 1}
-09:49:48,797    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User".firstname AS "User_firstname", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key" 
-FROM "User" 
-WHERE "User"._email = %(_email_1)s 
- LIMIT %(param_1)s OFFSET %(param_2)s
-09:49:48,798    INFO  [sqlalchemy.engine.base.Engine] {'_email_1': 'yohan.jarosz@epfl.ch', 'param_1': 1, 'param_2': 0}
-09:49:48,800    INFO  [sqlalchemy.engine.base.Engine] SELECT "Circle".id AS "Circle_id", "Circle".name AS "Circle_name", "Circle".description AS "Circle_description", "Circle".creator_id AS "Circle_creator_id", "Circle".admin AS "Circle_admin" 
-FROM "Circle" 
-WHERE "Circle".admin = %(admin_1)s AND "Circle".name = %(name_1)s 
- LIMIT %(param_1)s OFFSET %(param_2)s
-09:49:48,801    INFO  [sqlalchemy.engine.base.Engine] {'name_1': 'EPFLBbcfGroup', 'param_1': 1, 'admin_1': True, 'param_2': 0}
-09:49:48,803    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Circle" (name, description, creator_id, admin) VALUES (%(name)s, %(description)s, %(creator_id)s, %(admin)s) RETURNING "Circle".id
-09:49:48,803    INFO  [sqlalchemy.engine.base.Engine] {'admin': True, 'creator_id': None, 'description': 'Circle created with Tequila', 'name': 'EPFLBbcfGroup'}
-09:49:48,805    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User".firstname AS "User_firstname", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key" 
-FROM "User", user_circle 
-WHERE %(param_1)s = user_circle.circle_id AND "User".id = user_circle.user_id
-09:49:48,806    INFO  [sqlalchemy.engine.base.Engine] {'param_1': 1}
-09:49:48,809    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO user_circle (user_id, circle_id) VALUES (%(user_id)s, %(circle_id)s)
-09:49:48,809    INFO  [sqlalchemy.engine.base.Engine] {'user_id': 1, 'circle_id': 1}
-09:49:48,811    INFO  [sqlalchemy.engine.base.Engine] SELECT "Circle".id AS "Circle_id", "Circle".name AS "Circle_name", "Circle".description AS "Circle_description", "Circle".creator_id AS "Circle_creator_id", "Circle".admin AS "Circle_admin" 
-FROM "Circle" 
-WHERE "Circle".admin = %(admin_1)s AND "Circle".name = %(name_1)s 
- LIMIT %(param_1)s OFFSET %(param_2)s
-09:49:48,811    INFO  [sqlalchemy.engine.base.Engine] {'name_1': 'EPFLPtbbGroup', 'param_1': 1, 'admin_1': True, 'param_2': 0}
-09:49:48,813    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Circle" (name, description, creator_id, admin) VALUES (%(name)s, %(description)s, %(creator_id)s, %(admin)s) RETURNING "Circle".id
-09:49:48,813    INFO  [sqlalchemy.engine.base.Engine] {'admin': True, 'creator_id': None, 'description': 'Circle created with Tequila', 'name': 'EPFLPtbbGroup'}
-09:49:48,815    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User".firstname AS "User_firstname", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key" 
-FROM "User", user_circle 
-WHERE %(param_1)s = user_circle.circle_id AND "User".id = user_circle.user_id
-09:49:48,815    INFO  [sqlalchemy.engine.base.Engine] {'param_1': 2}
-09:49:48,817    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO user_circle (user_id, circle_id) VALUES (%(user_id)s, %(circle_id)s)
-09:49:48,818    INFO  [sqlalchemy.engine.base.Engine] {'user_id': 1, 'circle_id': 2}
-09:49:48,820    INFO  [sqlalchemy.engine.base.Engine] SELECT "Circle".id AS "Circle_id", "Circle".name AS "Circle_name", "Circle".description AS "Circle_description", "Circle".creator_id AS "Circle_creator_id", "Circle".admin AS "Circle_admin" 
-FROM "Circle" 
-WHERE "Circle".admin = %(admin_1)s AND "Circle".name = %(name_1)s 
- LIMIT %(param_1)s OFFSET %(param_2)s
+17:26:23,988    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+17:26:23,988    INFO  [sqlalchemy.engine.base.Engine] {'name': u'celery_taskmeta'}
+17:26:23,990    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+17:26:23,990    INFO  [sqlalchemy.engine.base.Engine] {'name': u'group'}
+17:26:23,991    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+17:26:23,991    INFO  [sqlalchemy.engine.base.Engine] {'name': u'usergroup'}
+17:26:23,992    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+17:26:23,992    INFO  [sqlalchemy.engine.base.Engine] {'name': u'grouppermissions'}
+17:26:23,993    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+17:26:23,994    INFO  [sqlalchemy.engine.base.Engine] {'name': u'circle'}
+17:26:23,995    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+17:26:23,995    INFO  [sqlalchemy.engine.base.Engine] {'name': u'input'}
+17:26:23,996    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+17:26:23,996    INFO  [sqlalchemy.engine.base.Engine] {'name': u'sequence'}
+17:26:23,997    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+17:26:23,997    INFO  [sqlalchemy.engine.base.Engine] {'name': u'track'}
+17:26:23,998    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+17:26:23,999    INFO  [sqlalchemy.engine.base.Engine] {'name': u'user_circle'}
+17:26:24,000    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+17:26:24,000    INFO  [sqlalchemy.engine.base.Engine] {'name': u'project'}
+17:26:24,001    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+17:26:24,001    INFO  [sqlalchemy.engine.base.Engine] {'name': u'default_tracks'}
+17:26:24,002    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+17:26:24,002    INFO  [sqlalchemy.engine.base.Engine] {'name': u'rightcircleassociation'}
+17:26:24,003    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+17:26:24,004    INFO  [sqlalchemy.engine.base.Engine] {'name': u'job'}
+17:26:24,005    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+17:26:24,005    INFO  [sqlalchemy.engine.base.Engine] {'name': u'project_track'}
+17:26:24,006    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+17:26:24,006    INFO  [sqlalchemy.engine.base.Engine] {'name': u'jobparameters'}
+17:26:24,008    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Permission" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(63) NOT NULL, 
+	description VARCHAR(255) NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (name)
+)
+
+
+17:26:24,008    INFO  [sqlalchemy.engine.base.Engine] {}
+17:26:24,314    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+17:26:24,385    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "User" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	firstname VARCHAR(255) NOT NULL, 
+	_email VARCHAR(255) NOT NULL, 
+	_created TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	key VARCHAR(255) NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (_email), 
+	UNIQUE (key)
+)
+
+
+17:26:24,385    INFO  [sqlalchemy.engine.base.Engine] {}
+17:26:24,479    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+17:26:24,489    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Species" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	PRIMARY KEY (id)
+)
+
+
+17:26:24,490    INFO  [sqlalchemy.engine.base.Engine] {}
+17:26:24,540    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+17:26:24,557    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Right" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	description TEXT NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (name)
+)
+
+
+17:26:24,558    INFO  [sqlalchemy.engine.base.Engine] {}
+17:26:24,694    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+17:26:24,703    INFO  [sqlalchemy.engine.base.Engine] 
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+17:26:24,703    INFO  [sqlalchemy.engine.base.Engine] {'typname': u'image_type'}
+17:26:24,720    INFO  [sqlalchemy.engine.base.Engine] CREATE TYPE image_type AS ENUM ('FeatureTrack','ImageTrack')
+17:26:24,720    INFO  [sqlalchemy.engine.base.Engine] {}
+17:26:24,740    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+17:26:24,762    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "InputParameters" (
+	id SERIAL NOT NULL, 
+	url VARCHAR(255), 
+	label VARCHAR(255), 
+	type image_type, 
+	key VARCHAR(255), 
+	color VARCHAR(255), 
+	PRIMARY KEY (id)
+)
+
+
+17:26:24,762    INFO  [sqlalchemy.engine.base.Engine] {}
+17:26:24,813    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+17:26:24,823    INFO  [sqlalchemy.engine.base.Engine] SELECT relname FROM pg_class c join pg_namespace n on n.oid=c.relnamespace where relkind='S' and n.nspname=current_schema() and lower(relname)=%(name)s
+17:26:24,823    INFO  [sqlalchemy.engine.base.Engine] {'name': u'task_id_sequence'}
+17:26:24,824    INFO  [sqlalchemy.engine.base.Engine] CREATE SEQUENCE task_id_sequence
+17:26:24,825    INFO  [sqlalchemy.engine.base.Engine] {}
+17:26:24,826    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+17:26:24,856    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE celery_taskmeta (
+	id INTEGER NOT NULL, 
+	task_id VARCHAR(255), 
+	status VARCHAR(50), 
+	result BYTEA, 
+	date_done TIMESTAMP WITHOUT TIME ZONE, 
+	traceback TEXT, 
+	PRIMARY KEY (id), 
+	UNIQUE (task_id)
+)
+
+
+17:26:24,857    INFO  [sqlalchemy.engine.base.Engine] {}
+17:26:24,984    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+17:26:24,993    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Group" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	_created TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (name)
+)
+
+
+17:26:24,994    INFO  [sqlalchemy.engine.base.Engine] {}
+17:26:25,053    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+17:26:25,077    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "UserGroup" (
+	user_id INTEGER NOT NULL, 
+	group_id INTEGER NOT NULL, 
+	PRIMARY KEY (user_id, group_id), 
+	FOREIGN KEY(user_id) REFERENCES "User" (id) ON DELETE CASCADE ON UPDATE CASCADE, 
+	FOREIGN KEY(group_id) REFERENCES "Group" (id) ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+
+17:26:25,077    INFO  [sqlalchemy.engine.base.Engine] {}
+17:26:25,150    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+17:26:25,173    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "GroupPermissions" (
+	group_id INTEGER NOT NULL, 
+	permission_id INTEGER NOT NULL, 
+	PRIMARY KEY (group_id, permission_id), 
+	FOREIGN KEY(group_id) REFERENCES "Group" (id) ON DELETE CASCADE ON UPDATE CASCADE, 
+	FOREIGN KEY(permission_id) REFERENCES "Permission" (id) ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+
+17:26:25,174    INFO  [sqlalchemy.engine.base.Engine] {}
+17:26:25,270    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+17:26:25,286    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Circle" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	description TEXT NOT NULL, 
+	creator_id INTEGER, 
+	admin BOOLEAN NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(creator_id) REFERENCES "User" (id) ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+
+17:26:25,286    INFO  [sqlalchemy.engine.base.Engine] {}
+17:26:25,344    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+17:26:25,353    INFO  [sqlalchemy.engine.base.Engine] 
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+17:26:25,353    INFO  [sqlalchemy.engine.base.Engine] {'typname': u'datatype'}
+17:26:25,354    INFO  [sqlalchemy.engine.base.Engine] CREATE TYPE datatype AS ENUM ('Features','Signal','Relational','not determined')
+17:26:25,355    INFO  [sqlalchemy.engine.base.Engine] {}
+17:26:25,356    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+17:26:25,387    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Input" (
+	id SERIAL NOT NULL, 
+	sha1 VARCHAR(255) NOT NULL, 
+	_last_access TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	parameter_id INTEGER NOT NULL, 
+	task_id VARCHAR(255) NOT NULL, 
+	datatype datatype NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (sha1), 
+	FOREIGN KEY(parameter_id) REFERENCES "InputParameters" (id) ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+
+17:26:25,388    INFO  [sqlalchemy.engine.base.Engine] {}

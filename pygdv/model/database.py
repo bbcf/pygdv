@@ -42,23 +42,23 @@ job_outputs = Enum('RELOAD', 'IMAGE', name='job_output')
 
 project_track_table = Table('project_track', metadata,
     Column('project_id', Integer, ForeignKey('Project.id',
-        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
+         ondelete="CASCADE"), primary_key=True),
     Column('track_id', Integer, ForeignKey('Track.id',
-        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
+         ondelete="CASCADE"), primary_key=True)
 )
 
 user_circle_table = Table('user_circle', metadata,
     Column('user_id', Integer, ForeignKey('User.id',
-        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
+         ondelete="CASCADE"), primary_key=True),
     Column('circle_id', Integer, ForeignKey('Circle.id',
-        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
+         ondelete="CASCADE"), primary_key=True)
 )
 
 default_track_table = Table('default_tracks', metadata,
         Column('track_id', Integer, ForeignKey('Track.id',
-        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
+         ondelete="CASCADE"), primary_key=True),
         Column('sequence_id', Integer, ForeignKey('Sequence.id',
-        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
+         ondelete="CASCADE"), primary_key=True)
 )
 
 class Right(DeclarativeBase):
@@ -81,10 +81,10 @@ class Circle(DeclarativeBase):
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Unicode(255), nullable=False)
     description = Column(Text(), nullable=False)
-    creator_id = Column(Integer, ForeignKey('User.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=True)
+    creator_id = Column(Integer, ForeignKey('User.id',  ondelete="CASCADE"), nullable=True)
     admin = Column(Boolean, nullable= False, default = False)
     
-    users = relationship('User', secondary=user_circle_table, backref='circles')
+    users = relationship('User', secondary=user_circle_table, backref='circles',  cascade="all, delete, delete-orphan")
     
     @property
     def display(self):
@@ -93,13 +93,13 @@ class Circle(DeclarativeBase):
 class RightCircleAssociation(DeclarativeBase):
     __tablename__='RightCircleAssociation'
     
-    right = relationship('Right')
+    right = relationship('Right', cascade="all, delete, delete-orphan")
     right_id = Column(Integer,
-                       ForeignKey('Right.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False, primary_key=True)
-    circle =  relationship('Circle')
+                       ForeignKey('Right.id',  ondelete="CASCADE"), nullable=False, primary_key=True)
+    circle =  relationship('Circle',  cascade="all, delete, delete-orphan")
     circle_id = Column(Integer,
-                       ForeignKey('Circle.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False, primary_key=True)
-    project_id = Column(Integer, ForeignKey('Project.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=True)
+                       ForeignKey('Circle.id',  ondelete="CASCADE"), nullable=False, primary_key=True)
+    project_id = Column(Integer, ForeignKey('Project.id',  ondelete="CASCADE"), nullable=True)
 
     @property
     def circle_display(self):
@@ -135,16 +135,16 @@ class Project(DeclarativeBase):
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Unicode(255), nullable=False)
     _created = Column(DateTime, default=datetime.now, nullable=False)
-    sequence_id = Column(Integer, ForeignKey('Sequence.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
-    sequence = relationship("Sequence")
+    sequence_id = Column(Integer, ForeignKey('Sequence.id',  ondelete="CASCADE"), nullable=False)
+    sequence = relationship("Sequence",  cascade="all, delete, delete-orphan")
     #relations
-    user_id = Column(Integer, ForeignKey('User.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+    user_id = Column(Integer, ForeignKey('User.id',  ondelete="CASCADE"), nullable=False)
  
     tracks = relationship('Track', secondary=project_track_table, backref='projects')
     
     _circle_right = relationship('RightCircleAssociation', backref='project')
     
-    jobs = relationship('Job', backref='project')
+    jobs = relationship('Job', backref='project',  cascade="all, delete, delete-orphan")
     
     is_public = Column(Boolean, nullable=False)
     key = Column(Unicode(255), unique=True,default=setdefaultkey, nullable=False)
@@ -218,7 +218,7 @@ class Sequence(DeclarativeBase):
     # columns
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Unicode(255), nullable=False)
-    species_id = Column(Integer, ForeignKey('Species.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+    species_id = Column(Integer, ForeignKey('Species.id', ondelete="CASCADE"), nullable=False)
     
     default_tracks = relationship('Track', secondary=default_track_table)
     
@@ -259,8 +259,9 @@ class Task(DeclarativeBase):
         self.task_id = task_id
 
     
-    
-    
+from pygdv.lib.constants import track_directory
+import os
+
 class Input(DeclarativeBase):
     '''
     An unique input.
@@ -273,14 +274,18 @@ class Input(DeclarativeBase):
     id = Column(Integer, autoincrement=True, primary_key=True)
     sha1 = Column(Unicode(255), unique=True, nullable=False)
     _last_access = Column(DateTime, default=datetime.now, nullable=False)
-    tracks = relationship('Track', backref='input')
-    parameter_id = Column(Integer, ForeignKey('InputParameters.id', onupdate="CASCADE", ondelete="CASCADE"), 
+    tracks = relationship('Track', backref='input',  cascade="all, delete, delete-orphan")
+    parameter_id = Column(Integer, ForeignKey('InputParameters.id',  ondelete="CASCADE"), 
                            nullable=False)
-    task_id = Column(Integer, ForeignKey('celery_taskmeta.id', onupdate="CASCADE", ondelete="CASCADE"), 
-                           nullable=False)
-    task = relationship('Task')
+    task_id = Column(VARCHAR(255), nullable=False)
+    task = relationship('Task', uselist=False, primaryjoin='Input.task_id == Task.task_id', foreign_keys='Task.task_id')
     
     datatype = Column(datatypes, nullable=False, default=constants.NOT_DETERMINED_DATATYPE)
+    
+    @property
+    def path(self):
+        return os.path.join(track_directory(), '%s.%s' % (self.sha1, 'sql'))
+    
     
     # special methods
     def __repr__(self):
@@ -305,10 +310,14 @@ class Input(DeclarativeBase):
 
     @property
     def status(self):
+        if self.task is None:
+            return 'PENDING'
         return self.task.status
     
-    
-    
+    @property
+    def traceback(self):
+        if self.task is None: return ''
+        return self.task.traceback
     
 class InputParameters(DeclarativeBase):
     '''
@@ -323,7 +332,7 @@ class InputParameters(DeclarativeBase):
     key = Column(Unicode(255), nullable=True)
     color = Column(Unicode(255), nullable=True)
     
-    input = relationship('Input', uselist=False, backref='parameters')
+    input = relationship('Input', uselist=False, backref='parameters',  cascade="all, delete, delete-orphan")
 
 
 class Track(DeclarativeBase):
@@ -339,18 +348,18 @@ class Track(DeclarativeBase):
     _created = Column(DateTime, nullable=False, default=datetime.now)
     _last_access = Column(DateTime, default=datetime.now, nullable=False)
     
-    input_id = Column(Integer, ForeignKey('Input.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+    input_id = Column(Integer, ForeignKey('Input.id', ondelete="CASCADE"), nullable=False)
    
-    user_id = Column(Integer, ForeignKey('User.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+    user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=False)
     
     
-    sequence_id = Column(Integer, ForeignKey('Sequence.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+    sequence_id = Column(Integer, ForeignKey('Sequence.id', ondelete="CASCADE"), nullable=False)
     sequence = relationship("Sequence")
     
     
     # special methods
     def __repr__(self):
-        return '<Track: id=%r, name=%r, created=%r, visu=%r, user_id=%r>' % (self.id, self.name, self.created, self.visu, self.user_id)
+        return '<Track: id=%r, name=%r, created=%r, vizu=%r, user_id=%r>' % (self.id, self.name, self.created, self.vizu, self.user_id)
     def __unicode__(self):
         return self.name
     
@@ -369,6 +378,16 @@ class Track(DeclarativeBase):
     @property
     def status(self):
         return self.input.status
+    
+    
+    @property
+    def task(self):
+        return self.input.task
+    
+    @property
+    def traceback(self):
+        return self.input.traceback
+
     
     @property
     def vizu(self):
@@ -394,7 +413,7 @@ class JobParameters(DeclarativeBase):
     type = Column(job_types, nullable=False)
     output = Column(job_outputs, nullable=False)
     data = Column(Text(), nullable=True)
-    job_id = Column(Integer, ForeignKey('Job.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+    job_id = Column(Integer, ForeignKey('Job.id',  ondelete="CASCADE"), nullable=False)
     
 class Job(DeclarativeBase):
     '''
@@ -410,9 +429,9 @@ class Job(DeclarativeBase):
     _created = Column(DateTime, nullable=False, default=datetime.now)
     status = Column(statuses, nullable=False)
     
-    user_id = Column(Integer, ForeignKey('User.id',onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+    user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=False)
     
-    project_id = Column(Integer, ForeignKey('Project.id',onupdate="CASCADE", ondelete="CASCADE"), nullable=True)
+    project_id = Column(Integer, ForeignKey('Project.id', ondelete="CASCADE"), nullable=True)
     
     parameters = relationship('JobParameters', uselist=False, backref='job')
     

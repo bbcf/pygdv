@@ -123,9 +123,6 @@ class ProjectController(CrudRestController):
 
 
 
-    @expose()
-    def view(self, *args, **kw):
-        return 'not implemented'
 
 
 
@@ -158,8 +155,8 @@ class ProjectController(CrudRestController):
     def post_share(self, project_id, circle_id, *args, **kw):
         user = handler.user.get_user_in_session(request)
         if not checker.user_own_project(user.id, project_id):
-             flash('You cannot modify a project which is not yours')
-             raise redirect('/')
+            flash('You cannot modify a project which is not yours')
+            raise redirect('/')
         if 'rights_checkboxes' in kw:
             rights_checkboxes = kw['rights_checkboxes']
             if not isinstance(rights_checkboxes,list):
@@ -177,8 +174,8 @@ class ProjectController(CrudRestController):
     def post_share_add(self,project_id, *args, **kw):
         user = handler.user.get_user_in_session(request)
         if not checker.user_own_project(user.id, project_id):
-             flash('You cannot modify a project which is not yours')
-             raise redirect('/')
+            flash('You cannot modify a project which is not yours')
+            raise redirect('/')
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         if 'circles' in kw:
             if isinstance(kw['circles'], list):
@@ -203,8 +200,8 @@ class ProjectController(CrudRestController):
         data = util.to_datagrid(project_grid, [project])
         user = handler.user.get_user_in_session(request)
         if not checker.user_own_project(user.id, project_id):
-             flash('You cannot modify a project which is not yours')
-             raise redirect('/')
+            flash('You cannot modify a project which is not yours')
+            raise redirect('/')
         tmpl_context.widget = tracks_available_form
         tmpl_context.tracks = user.tracks
         kw['project_id'] = project_id
@@ -215,13 +212,23 @@ class ProjectController(CrudRestController):
     def add(self, project_id, tracks, **kw):
         user = handler.user.get_user_in_session(request)
         if not checker.user_own_project(user.id, project_id):
-             flash('You cannot modify a project which is not yours')
-             raise redirect('/')
+            flash('You cannot modify a project which is not yours')
+            raise redirect('/')
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         if not isinstance(tracks,list):
                 handler.project.add_tracks(project,[tracks])
         else :
-             handler.project.add_tracks(project,tracks)
+            handler.project.add_tracks(project,tracks)
         raise redirect(url('/projects/add_track', {'project_id':project_id}))
 
 
+
+
+
+
+    @expose('pygdv.templates.view')
+    def view(self, *args, **kw):
+        return dict(page='view')
+    
+    
+    

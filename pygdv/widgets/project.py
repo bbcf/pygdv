@@ -17,7 +17,6 @@ from pygdv.lib.helpers import get_delete_link, get_edit_link, get_project_right_
 from pygdv import handler
 from tg import app_globals as gl
 
-
 # TABLE
 class PTable(TableBase):
     __model__ = Project
@@ -48,12 +47,7 @@ def get_assemblies(species):
     return []
     
 def get_tracks():
-    return [(track.id,twd.CascadingSingleSelectField(id='species', label_text='Species : ',options=get_species,
-help_text = 'Choose the species',cascadeurl='/sequences/get_nr_assemblies_from_species_id'),
-  twf.Spacer(),
-    twf.SingleSelectField(id='nr_assembly', label_text='Assembly : ',options=nr_assemblies,
-help_text = 'Choose the assembly.'),
-  twf.Spacer(), track.name) for track in tmpl_context.tracks]
+    return [(track.id, track.name) for track in tmpl_context.tracks]
 
 def get_circles():
     return [(circle.id, '%s (%s)' %(circle.name, circle.description)) for circle in tmpl_context.circles]

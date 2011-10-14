@@ -8,14 +8,12 @@ import os, shutil
 from pygdv.model import constants
 from pygdv.lib import util
 from pygdv.celery import tasks
-
-
+from pygdv.lib.constants import track_directory
 from track.util import determine_format
 from pygdv.model import constants
 
 
 
-#extension = guess_file_format('/tmp/asdkljasdklj')
 def create_track(user_id, sequence_id, trackname=None, file=None):
     '''
     Create track from files :
@@ -64,14 +62,12 @@ def create_input(file, trackname):
         
        
          
-        input = Input()
-        input.sha1 = sha1
-        input.parameters = params
+      
         
         
         file_path = os.path.abspath(file.name)
         print 'Processing input %s' % file_path
-        out_dir = util.get_directory('tracks_dir', sha1)
+        out_dir = track_directory()
         print 'to %s : ' % out_dir
         
         
@@ -82,25 +78,31 @@ def create_input(file, trackname):
         datatype = constants.SIGNAL
         
         print 'gessing datatype %s' % datatype
-        input.datatype = datatype
        
-        print input
         
         dispatch = _process_dispatch.get(format,lambda *args, **kw : not_recognized(*args, **kw))
-        
+      
         print 'dispatch %s' % dispatch
         if trackname is None:
             trackname = file.name
             
         async_result = dispatch(datatype=datatype, path=file_path, sha1=sha1, name=trackname)
-        task = DBSession.query(Task).filter(Task.task_id == async_result.task_id).first()
-        
-        input.task_id = task.id
+        print 'get async_result : %s' % async_result
+
+        print 'building input'
+        input = Input()
+        input.sha1 = sha1
+        input.parameters = params
+        input.datatype = datatype
+       
+        input.task_id = async_result.task_id
         
         DBSession.add(input)
         print 'deleting temporary file'
-        os.remove(os.path.abspath(file.name))
-        
+        try:
+            os.remove(os.path.abspath(file.name))
+        except OSError :
+            pass
     DBSession.flush()
     return input   
 
@@ -114,8 +116,14 @@ def create_input(file, trackname):
 
 
 
+'''
+dicts that behave like a ``switch`` statement.
+_process_dispatch : will choose where the inputed file should go at first.
+_formats : to each format is associated a datatype.
+_sql_dispatch : will choose in which process the database will go, based on it's datatype 
 
-_process_dispatch = {'sql' : lambda *args, **kw : process_database(*args, **kw),
+'''
+_process_dispatch = {'sql' : lambda *args, **kw : move_database(*args, **kw),
                     'bed' : lambda *args, **kw : not_impl(*args, **kw),
                     'bigWig' : lambda *args, **kw : not_impl(*args, **kw),
                     'wig' : lambda *args, **kw : not_impl(*args, **kw),
@@ -129,6 +137,29 @@ _formats = {'sql' : constants.NOT_DETERMINED_DATATYPE,
                     'bedgraph' : lambda *args, **kw : not_impl(*args, **kw)
                     }
 
+_sql_dispatch = {'quantitative' : lambda *args, **kw : _signal(*args, **kw),
+                 constants.SIGNAL : lambda *args, **kw : _signal(*args, **kw),
+                 
+                 'qualitative' :  lambda *args, **kw : _features(*args, **kw),
+                 constants.FEATURES :  lambda *args, **kw : _features(*args, **kw),
+                 
+                 'extended' :  lambda *args, **kw : _relational(*args, **kw),
+                  constants.RELATIONAL :  lambda *args, **kw : _relational(*args, **kw)
+                 }
+
+
+
+
+def move_database(datatype, path, sha1, name):
+    '''
+    Move the database to the right directory.
+    Then process the database.
+    '''
+    out_name = '%s.%s' % (sha1, 'sql')
+    print track_directory()
+    dst = os.path.join(track_directory(), out_name)
+    shutil.move(path, dst)
+    return process_database(datatype, dst, sha1, name)
 
 
 def process_database(datatype, path, sha1, name):
@@ -145,15 +176,7 @@ def process_database(datatype, path, sha1, name):
     return _sql_dispatch.get(datatype, lambda *args, **kw : not_recognized(*args, **kw))(path,sha1)
 
 
-_sql_dispatch = {'quantitative' : lambda *args, **kw : _signal(*args, **kw),
-                 constants.SIGNAL : lambda *args, **kw : _signal(*args, **kw),
-                 
-                 'qualitative' :  lambda *args, **kw : _features(*args, **kw),
-                 constants.FEATURES :  lambda *args, **kw : _features(*args, **kw),
-                 
-                 'extended' :  lambda *args, **kw : _relationnal(*args, **kw),
-                  constants.RELATIONAL :  lambda *args, **kw : _relationnal(*args, **kw)
-                 }
+
 
 
 
@@ -162,7 +185,7 @@ def _signal(path, sha1):
     Process a ``signal`` database.
     @return the task associated
     '''
-    return tasks.process_signal.delay(path, sha1)
+    return tasks.process_signal(path, sha1)
 
 def _features(path, sha1, name):
     '''
@@ -171,9 +194,9 @@ def _features(path, sha1, name):
     '''
     tasks.process_features.delay(path, sha1, name, False)
 
-def _relationnal(path, sha1, name):
+def _relational(path, sha1, name):
     '''
-    Process a ``relationnal`` database
+    Process a ``relational`` database
     @return the task associated
     '''
     tasks.process_features.delay(path, sha1, name, True)

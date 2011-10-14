@@ -121,3 +121,15 @@ class TrackController(CrudRestController):
         raise redirect('./')
         return 'not implemented'
     
+    @expose()
+    def traceback(self, track_id):
+        user = handler.user.get_user_in_session(request)
+        print user
+        if not checker.user_own_track(user.id, track_id):
+            flash("You haven't the right to look at any tracks which is not yours")
+            raise redirect('./')
+        track = DBSession.query(Track).filter(Track.id == track_id).first()
+        print track
+        return track.traceback
+    
+    

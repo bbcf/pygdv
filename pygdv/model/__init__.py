@@ -66,4 +66,4 @@ from pygdv.model.database import *
 
 
 
-admin_models = ['User', 'Group', 'Permission', 'Sequence', 'Task']
+admin_models = ['User', 'Group', 'Permission', 'Sequence', 'Task', 'Input']
