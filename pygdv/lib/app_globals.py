@@ -7,7 +7,7 @@ __all__ = ['Globals']
 
 
 from bbcflib.genrep import GenRep
-
+from pygdv.lib import constants
 
 # CIRCLE & RIGHTS configuration
 
@@ -22,7 +22,7 @@ right_upload = 'Upload'
 right_download = 'Download'
 right_read = 'Read'
  
- 
+
  
 class Globals(object):
     """Container for objects available throughout the life of the application.
@@ -41,8 +41,8 @@ class Globals(object):
         self.tmp_user_name = 'tmp_user'
         self.public_dir = 'pygdv.public'
         self.data_dir = 'pygdv.data'
-        self.tracks_dir = 'pygdv.data.tracks'
-        self.json_dir = 'pygdv.data.json'
+        self.tracks_dir = constants.tracks_dir
+        self.json_dir = constants.json_dir
         
         '''
         Default groups and permissions
@@ -56,4 +56,8 @@ class Globals(object):
         self.right_read = right_read
         
         self.genrep = GenRep()
+        
+        
+        
+        
         

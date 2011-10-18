@@ -17,7 +17,6 @@ from pygdv.lib.helpers import get_delete_link, get_edit_link, get_project_right_
 from pygdv import handler
 from tg import app_globals as gl
 
-
 # TABLE
 class PTable(TableBase):
     __model__ = Project

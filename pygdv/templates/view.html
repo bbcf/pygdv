@@ -1,0 +1,25 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      py:strip="">
+<head>
+  <meta http-equiv="Author" content="Jarosz Yohan"/>
+  <meta http-equiv="Cache-control" content="public"/>
+  <meta http-equiv="Content-Style-Type" content="text/css" /> 
+  <meta http-equiv="Content-Script-Type" content="text/javascript" /> 
+  <meta name="Keywords" content="genome,browser,browsing" /> 
+  <title py:replace="page"></title>
+</head>
+<body>
+  <!-- <div id="gdv_menu" wicket:id="menu"/> -->
+  <div id="gdv_body_browser">
+    <div id="GenomeBrowser" style="height: 100%; width: 100%; padding: 0; border: 0;"></div>
+    <!-- some parameters -->
+    <span id="speciesName" style="display:none"/>
+    <span id="nr_assembly_id"  style="display:none"/>
+    <span id="gdv_project_id"  style="display:none"/>
+    <span id="isAdmin"  style="display:none"/>
+    <span id="init_jobs"  style="display:none"/>
+  </div>
+</body>
+</html>

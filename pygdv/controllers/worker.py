@@ -11,7 +11,7 @@ __all__ = ['WorkerController']
 
 
 class WorkerController(BaseController):
-    allow_only = has_permission(gl.perm_admin)
+    #allow_only = has_permission(gl.perm_admin)
     
     
     @expose('json')
@@ -19,5 +19,13 @@ class WorkerController(BaseController):
         t = tasks.add.delay(x,y)
         return 'task launched'
     
+    @expose('json')
+    def a(self):
+        t = tasks.hellochord.delay()
+        return 'task launched'
     
     
+    @expose('json')
+    def b(self):
+        t = tasks.hellotakset().delay()
+        return 'task launched'

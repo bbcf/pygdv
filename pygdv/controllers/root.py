@@ -13,6 +13,7 @@ from pygdv.controllers import ErrorController, LoginController, GroupController
 from pygdv.controllers import PermissionController, UserController, TrackController
 from pygdv.controllers import SequenceController, ProjectController, CircleController
 from pygdv.controllers import RightController, WorkerController, TaskController
+from pygdv.controllers import InputController
 
 import pygdv
 
@@ -64,6 +65,7 @@ class RootController(BaseController):
     sequences = SequenceController(DBSession, menu_items=models)
     #rights = RightController(DBSession, menu_items=models)
     tasks = TaskController(DBSession, menu_items=models)
+    inputs = InputController(DBSession, menu_items=models)
     # users controllers
     tracks = TrackController(DBSession)
     projects = ProjectController(DBSession)

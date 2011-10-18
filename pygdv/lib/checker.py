@@ -17,8 +17,8 @@ def user_own_track(user_id, track_id):
     Look if the user own the track 
     '''
     track = DBSession.query(Track).filter(Track.id == track_id).first()
-    return track.user_id == user_id
-
+    if track is not None : return track.user_id == user_id
+    return False
 
 def user_own_circle(user_id, circle_id):
     '''

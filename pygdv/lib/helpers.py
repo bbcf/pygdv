@@ -4,6 +4,9 @@
 
 from webhelpers import date, feedgenerator, html, number, misc, text
 
+import genshi
+from tg import url
+from pygdv.lib import constants
 
 def get_delete_link(obj_id):
     '''
@@ -103,7 +106,17 @@ def get_project_right_sharing_form(circle_right):
 
 
 
-
+def get_task_status(track=None):
+    '''
+    Get a output for the status of a task : a link to the traceback if the status is ``FAILURE``,
+    else the string representing the status.
+    @param track : the track to get the status from
+    '''
+    obj = track
+    if obj.status != constants.ERROR: return obj.status
+    return genshi.Markup('<a href="%s">%s</a>' % (url('./traceback', params={'track_id':obj.id}),
+                                                  constants.ERROR
+                                                  ))
 
 
 

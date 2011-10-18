@@ -5,6 +5,7 @@ import tempfile
 import urllib2
 import shutil
 import hashlib
+from tw.forms.fields import TextArea
 
 def to_datagrid(grid_type, grid_data, grid_title = None, grid_display = None):
     '''
@@ -47,7 +48,7 @@ def get_unique_tmp_directory():
 
 block_sz = 8192
 
-def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None):
+def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, **kw):
     '''
     Upload the file and make it temporary.
     @param file_upload : if the file is uploaded from a FileUpload HTML field.

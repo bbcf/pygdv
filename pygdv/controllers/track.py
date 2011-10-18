@@ -58,9 +58,13 @@ class TrackController(CrudRestController):
     def post(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
         files = util.upload(**kw)
+        print kw
+        print files
+        
         if files is not None:
             for filename, file in files:
-                handler.track.create_track(user.id, file=file, trackname=filename)
+                if 'nr_assembly' in kw:
+                    handler.track.create_track(user.id, kw['nr_assembly'], file=file, trackname=filename)
             transaction.commit()
             flash("Track(s) successfully uploaded.")
         else :
@@ -116,4 +120,16 @@ class TrackController(CrudRestController):
         
         raise redirect('./')
         return 'not implemented'
+    
+    @expose()
+    def traceback(self, track_id):
+        user = handler.user.get_user_in_session(request)
+        print user
+        if not checker.user_own_track(user.id, track_id):
+            flash("You haven't the right to look at any tracks which is not yours")
+            raise redirect('./')
+        track = DBSession.query(Track).filter(Track.id == track_id).first()
+        print track
+        return track.traceback
+    
     

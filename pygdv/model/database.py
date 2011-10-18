@@ -4,10 +4,16 @@ Database model
 '''
 
 
+<<<<<<< HEAD
 from sqlalchemy import Table, ForeignKey, Column, Sequence
 from sqlalchemy.types import Unicode, Integer, DateTime, Enum, Text, Boolean, VARCHAR, BLOB, Binary
+=======
+from sqlalchemy import Table, ForeignKey, Column
+from sqlalchemy.types import Unicode, Integer, DateTime, Enum, Text, Boolean, VARCHAR, Binary
+>>>>>>> 06108402b5f7800517dd30fcd6ad00dcf73b20da
 from sqlalchemy.orm import relationship, synonym
-
+from sqlalchemy import Sequence as Seq
+from pygdv.lib.celery import PickleType
 from pygdv.model import DeclarativeBase, metadata, DBSession
 import transaction
 
@@ -19,16 +25,16 @@ from sqlalchemy.engine.base import Transaction
 __all__ = ['Right', 'Circle', 'Project',
            'RightCircleAssociation','Sequence',
            'Species','InputParameters',
-           'Track','Input',
+           'Track', 'Task', 'Input',
            'Sequence',
            'Species',
-           'Job','JobParameters','Task']
+           'Job','JobParameters']
 
-from pygdv.model.constants import *
+from pygdv.model import constants
 
 statuses = Enum('SUCCESS', 'PENDING', 'ERROR', 'RUNNING', name='job_status')
 image_types = Enum('FeatureTrack', 'ImageTrack', name='image_type')
-datatypes = Enum(QUALITATIVE_DATATYPE, QUANTITATIVE_DATATYPE, QUALITATIVE_EXTENDED_DATATYPE, NOT_DETERMINED_DATATYPE ,name="datatype")
+datatypes = Enum(constants.FEATURES, constants.SIGNAL, constants.RELATIONAL, constants.NOT_DETERMINED_DATATYPE ,name="datatype")
 job_types = Enum('NEW_SELECTION', 'NEW_TRACK', 'GFEATMINER', 'NEW_PROJECT', name='job_type')
 job_outputs = Enum('RELOAD', 'IMAGE', name='job_output')
 
@@ -41,19 +47,24 @@ job_outputs = Enum('RELOAD', 'IMAGE', name='job_output')
 
 project_track_table = Table('project_track', metadata,
     Column('project_id', Integer, ForeignKey('Project.id',
-        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
+         ondelete="CASCADE"), primary_key=True),
     Column('track_id', Integer, ForeignKey('Track.id',
-        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
+         ondelete="CASCADE"), primary_key=True)
 )
 
 user_circle_table = Table('user_circle', metadata,
     Column('user_id', Integer, ForeignKey('User.id',
-        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
+         ondelete="CASCADE"), primary_key=True),
     Column('circle_id', Integer, ForeignKey('Circle.id',
-        onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
+         ondelete="CASCADE"), primary_key=True)
 )
 
-
+default_track_table = Table('default_tracks', metadata,
+        Column('track_id', Integer, ForeignKey('Track.id',
+         ondelete="CASCADE"), primary_key=True),
+        Column('sequence_id', Integer, ForeignKey('Sequence.id',
+         ondelete="CASCADE"), primary_key=True)
+)
 
 class Right(DeclarativeBase):
     '''
@@ -75,10 +86,10 @@ class Circle(DeclarativeBase):
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Unicode(255), nullable=False)
     description = Column(Text(), nullable=False)
-    creator_id = Column(Integer, ForeignKey('User.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=True)
+    creator_id = Column(Integer, ForeignKey('User.id',  ondelete="CASCADE"), nullable=True)
     admin = Column(Boolean, nullable= False, default = False)
     
-    users = relationship('User', secondary=user_circle_table, backref='circles')
+    users = relationship('User', secondary=user_circle_table, backref='circles',  cascade="all, delete, delete-orphan")
     
     @property
     def display(self):
@@ -87,13 +98,13 @@ class Circle(DeclarativeBase):
 class RightCircleAssociation(DeclarativeBase):
     __tablename__='RightCircleAssociation'
     
-    right = relationship('Right')
+    right = relationship('Right', cascade="all, delete, delete-orphan")
     right_id = Column(Integer,
-                       ForeignKey('Right.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False, primary_key=True)
-    circle =  relationship('Circle')
+                       ForeignKey('Right.id',  ondelete="CASCADE"), nullable=False, primary_key=True)
+    circle =  relationship('Circle',  cascade="all, delete, delete-orphan")
     circle_id = Column(Integer,
-                       ForeignKey('Circle.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False, primary_key=True)
-    project_id = Column(Integer, ForeignKey('Project.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=True)
+                       ForeignKey('Circle.id',  ondelete="CASCADE"), nullable=False, primary_key=True)
+    project_id = Column(Integer, ForeignKey('Project.id',  ondelete="CASCADE"), nullable=True)
 
     @property
     def circle_display(self):
@@ -129,22 +140,22 @@ class Project(DeclarativeBase):
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Unicode(255), nullable=False)
     _created = Column(DateTime, default=datetime.now, nullable=False)
-    sequence_id = Column(Integer, ForeignKey('Sequence.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
-    sequence = relationship("Sequence")
+    sequence_id = Column(Integer, ForeignKey('Sequence.id',  ondelete="CASCADE"), nullable=False)
+    sequence = relationship("Sequence",  cascade="all, delete, delete-orphan")
     #relations
-    user_id = Column(Integer, ForeignKey('User.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+    user_id = Column(Integer, ForeignKey('User.id',  ondelete="CASCADE"), nullable=False)
  
     tracks = relationship('Track', secondary=project_track_table, backref='projects')
     
     _circle_right = relationship('RightCircleAssociation', backref='project')
     
-    jobs = relationship('Job', backref='project')
+    jobs = relationship('Job', backref='project',  cascade="all, delete, delete-orphan")
     
     is_public = Column(Boolean, nullable=False)
     key = Column(Unicode(255), unique=True,default=setdefaultkey, nullable=False)
     
     def _get_date(self):
-        return self._created.strftime(date_format);
+        return self._created.strftime(constants.date_format);
         
     def _set_date(self,date):
         self._created=date
@@ -177,7 +188,7 @@ class Project(DeclarativeBase):
             result[cr.circle]=rights
         return result
     
-    @property
+    @property 
     def get_tracks(self):
         return ', '.join([track.name for track in self.tracks])
     @property
@@ -212,9 +223,9 @@ class Sequence(DeclarativeBase):
     # columns
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Unicode(255), nullable=False)
-    species_id = Column(Integer, ForeignKey('Species.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+    species_id = Column(Integer, ForeignKey('Species.id', ondelete="CASCADE"), nullable=False)
     
-    default_tracks = relationship('Track')
+    default_tracks = relationship('Track', secondary=default_track_table)
     
     def __repr__(self):
         return '<Sequence: id=%r, name=%r, species_id=%r>' % (self.id,self.name,self.species_id)
@@ -236,10 +247,26 @@ class Species(DeclarativeBase):
     def __str__(self):
         return self.name
     
+
+
+class Task(DeclarativeBase):
+    __tablename__ = "celery_taskmeta"
     
+    id = Column('id', Integer, Seq('task_id_sequence'), primary_key=True, autoincrement=True )
+    task_id = Column(VARCHAR(255), unique=True)
+    status = Column(VARCHAR(50), default='PENDING')
+    result = Column(PickleType, nullable=True)
+    date_done = Column(DateTime, default=datetime.now,
+                       onupdate=datetime.now, nullable=True)
+    traceback = Column(Text, nullable=True)
+
+    def __init__(self, task_id):
+        self.task_id = task_id
+
     
-    
-    
+from pygdv.lib.constants import track_directory
+import os
+
 class Input(DeclarativeBase):
     '''
     An unique input.
@@ -252,18 +279,27 @@ class Input(DeclarativeBase):
     id = Column(Integer, autoincrement=True, primary_key=True)
     sha1 = Column(Unicode(255), unique=True, nullable=False)
     _last_access = Column(DateTime, default=datetime.now, nullable=False)
-    tracks = relationship('Track', backref='input')
-    parameter_id = Column(Integer, ForeignKey('InputParameters.id', onupdate="CASCADE", ondelete="CASCADE"), 
+    tracks = relationship('Track', backref='input',  cascade="all, delete, delete-orphan")
+    parameter_id = Column(Integer, ForeignKey('InputParameters.id',  ondelete="CASCADE"), 
                            nullable=False)
+    task_id = Column(VARCHAR(255), nullable=False)
+    task = relationship('Task', uselist=False, primaryjoin='Input.task_id == Task.task_id', foreign_keys='Task.task_id')
+    
+    datatype = Column(datatypes, nullable=False, default=constants.NOT_DETERMINED_DATATYPE)
+    
+    @property
+    def path(self):
+        return os.path.join(track_directory(), '%s.%s' % (self.sha1, 'sql'))
+    
     
     # special methods
     def __repr__(self):
-        return '<Input: id=%r, sha1=%r>' % (self.input,self.sha1)
+        return '<Input: id=%r, sha1=%r>' % (self.id,self.sha1)
     def __unicode__(self):
         return self.sha1
     
     def _get_last_access(self):
-        return self._last_access.strftime(date_format);
+        return self._last_access.strftime(constants.date_format);
         
     def _set_last_access(self,date):
         self._last_access=date
@@ -277,11 +313,16 @@ class Input(DeclarativeBase):
         '''
         self._set_last_access(datetime.now())
 
+    @property
+    def status(self):
+        if self.task is None:
+            return 'PENDING'
+        return self.task.status
     
-
-    
-    
-    
+    @property
+    def traceback(self):
+        if self.task is None: return ''
+        return self.task.traceback
     
 class InputParameters(DeclarativeBase):
     '''
@@ -296,7 +337,7 @@ class InputParameters(DeclarativeBase):
     key = Column(Unicode(255), nullable=True)
     color = Column(Unicode(255), nullable=True)
     
-    input = relationship('Input', uselist=False, backref='parameters')
+    input = relationship('Input', uselist=False, backref='parameters',  cascade="all, delete, delete-orphan")
 
 
 class Track(DeclarativeBase):
@@ -311,33 +352,52 @@ class Track(DeclarativeBase):
     name = Column(Unicode(255), nullable=False)
     _created = Column(DateTime, nullable=False, default=datetime.now)
     _last_access = Column(DateTime, default=datetime.now, nullable=False)
-    visu = Column(datatypes, nullable=False)
     
-    input_id = Column(Integer, ForeignKey('Input.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
-    user_id = Column(Integer, ForeignKey('User.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+    input_id = Column(Integer, ForeignKey('Input.id', ondelete="CASCADE"), nullable=False)
+   
+    user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=False)
     
     
-    sequence_id = Column(Integer, ForeignKey('Sequence.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=True)
+    sequence_id = Column(Integer, ForeignKey('Sequence.id', ondelete="CASCADE"), nullable=False)
+    sequence = relationship("Sequence")
+    
+    
     # special methods
     def __repr__(self):
-        return '<Track: id=%r, name=%r, created=%r, visu=%r, user_id=%r>' % (self.id, self.name, self.created, self.visu, self.user_id)
+        return '<Track: id=%r, name=%r, created=%r, vizu=%r, user_id=%r>' % (self.id, self.name, self.created, self.vizu, self.user_id)
     def __unicode__(self):
         return self.name
     
     def _get_date(self):
-        return self._created.strftime(date_format);
+        return self._created.strftime(constants.date_format);
         
     def _set_date(self,date):
         self._created=date
         
     def _get_last_access(self):
-        return self._last_access.strftime(date_format);
+        return self._last_access.strftime(constants.date_format);
         
     def _set_last_access(self, date):
         self._last_access=date
 
+    @property
+    def status(self):
+        return self.input.status
     
-        
+    
+    @property
+    def task(self):
+        return self.input.task
+    
+    @property
+    def traceback(self):
+        return self.input.traceback
+
+    
+    @property
+    def vizu(self):
+        return self.input.datatype
+    
     created = synonym('_created', descriptor=property(_get_date, _set_date))
     last_access = synonym('_last_access', descriptor=property(_get_last_access, _set_last_access))
     
@@ -347,12 +407,6 @@ class Track(DeclarativeBase):
         Update the field 'last_access' by the current time
         '''
         self._set_last_access(datetime.now())
-    @property
-    def get_status(self):
-        '''
-        Get the status of the job processing the track.
-        '''
-        return 'not implemented'
 
 class JobParameters(DeclarativeBase):
     '''
@@ -364,7 +418,7 @@ class JobParameters(DeclarativeBase):
     type = Column(job_types, nullable=False)
     output = Column(job_outputs, nullable=False)
     data = Column(Text(), nullable=True)
-    job_id = Column(Integer, ForeignKey('Job.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+    job_id = Column(Integer, ForeignKey('Job.id',  ondelete="CASCADE"), nullable=False)
     
 class Job(DeclarativeBase):
     '''
@@ -380,14 +434,14 @@ class Job(DeclarativeBase):
     _created = Column(DateTime, nullable=False, default=datetime.now)
     status = Column(statuses, nullable=False)
     
-    user_id = Column(Integer, ForeignKey('User.id',onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+    user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=False)
     
-    project_id = Column(Integer, ForeignKey('Project.id',onupdate="CASCADE", ondelete="CASCADE"), nullable=True)
+    project_id = Column(Integer, ForeignKey('Project.id', ondelete="CASCADE"), nullable=True)
     
     parameters = relationship('JobParameters', uselist=False, backref='job')
     
     def _get_date(self):
-        return self._created.strftime(date_format);
+        return self._created.strftime(constants.date_format);
         
     def _set_date(self,date):
         self._created=date
@@ -397,6 +451,7 @@ class Job(DeclarativeBase):
     @property
     def get_type(self):
         return self.parameters.type
+<<<<<<< HEAD
     
     
     
@@ -410,26 +465,9 @@ class Task(DeclarativeBase):
     date_done = Column(DateTime)                                                                                          
     traceback = Column(Text)                                                                                              
      
+=======
+>>>>>>> 06108402b5f7800517dd30fcd6ad00dcf73b20da
 
-    
-    
-    
-    '''
-     CREATE TABLE celery_taskmeta (                                                                                       
-        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,                                                               
-        task_id VARCHAR(255),                                                                                        
-        status VARCHAR(50),                                                                                          
-        result BLOB,                                                                                                 
-        date_done DATETIME,                                                                                          
-        traceback TEXT,                                                                                              
-        UNIQUE (task_id)                                                                                             
-);                                                                                                                   
-CREATE TABLE celery_tasksetmeta (                                                                                    
-        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,                                                               
-        taskset_id VARCHAR(255),                                                                                     
-        result BLOB,                                                                                                 
-        date_done DATETIME,                                                                                          
-        UNIQUE (taskset_id)                                                                                          
-);                                 
-'''
-    
+
+
+

@@ -140,7 +140,10 @@ def pre_compute_sql_scores(database_path, sha1, output_dir):
     '''
     ## 'prepare output directory'
     out_path = os.path.join(output_dir, sha1)
-    os.mkdir(out_path)
+    try :
+        os.mkdir(out_path)
+    except :
+        pass
     
     ## 'prepare connection'
     conn = sqlite3.connect(database_path)
@@ -170,7 +173,7 @@ def pre_compute_sql_scores(database_path, sha1, output_dir):
             
     c.close()
     conn.close()
-
+    return 1
 
 
 
@@ -182,7 +185,6 @@ if __name__ == '__main__':
     sha1 = sys.argv[2]
     output_dir = sys.argv[3]
     pre_compute_sql_scores(database, sha1, output_dir)
-    
     
 
 

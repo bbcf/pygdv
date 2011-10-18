@@ -38,7 +38,6 @@ class GEditFiller(EditFormFiller):
 
 
 task_grid = twf.DataGrid(fields=[
-    ('Id', 'id'),
     ('Task id', 'task_id'),
     ('Status', 'status'),
     ('Date', 'date_done'),
