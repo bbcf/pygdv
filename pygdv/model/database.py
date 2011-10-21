@@ -4,13 +4,10 @@ Database model
 '''
 
 
-<<<<<<< HEAD
+
 from sqlalchemy import Table, ForeignKey, Column, Sequence
 from sqlalchemy.types import Unicode, Integer, DateTime, Enum, Text, Boolean, VARCHAR, BLOB, Binary
-=======
-from sqlalchemy import Table, ForeignKey, Column
-from sqlalchemy.types import Unicode, Integer, DateTime, Enum, Text, Boolean, VARCHAR, Binary
->>>>>>> 06108402b5f7800517dd30fcd6ad00dcf73b20da
+
 from sqlalchemy.orm import relationship, synonym
 from sqlalchemy import Sequence as Seq
 from pygdv.lib.celery import PickleType
@@ -475,22 +472,6 @@ class Job(DeclarativeBase):
     @property
     def get_type(self):
         return self.parameters.type
-<<<<<<< HEAD
-    
-    
-    
-class Task(DeclarativeBase):
-    __tablename__='celery_taskmeta'
-     
-    id = Column(Integer, primary_key=True)
-    task_id = Column(VARCHAR(255), Sequence('task_id_sequence'), unique=True)                                                                                        
-    status = Column(VARCHAR(50))                                                                                          
-    result = Column(Binary)                                                                                                 
-    date_done = Column(DateTime)                                                                                          
-    traceback = Column(Text)                                                                                              
-     
-=======
->>>>>>> 06108402b5f7800517dd30fcd6ad00dcf73b20da
 
 
 

@@ -29,26 +29,6 @@ def del_file_on_error(tasks, sha1, *args, **kw):
             raise id
 
 
-@task()
-def process_signal2(database, sha1):
-    '''
-    Process a ``signal`` SQL file and create the databases needed by JBrowse.
-    @param database : the database
-    @param sha1 : the sah1 of the file
-    '''
-    output_dir = json_directory()
-    callback = subtask(task=del_file_on_error, args=(sha1))
-    print 'process signal db : %s, sha1 : %s' % (database, sha1)
-    
-    
-    job = TaskSet(tasks=[
-        _compute_scores.subtask((database, sha1, output_dir)),
-        _jsonify_signal.subtask((sha1, output_dir, database))
-                         ])
-    
-    print job
-    return job
-
 
 
 
@@ -80,7 +60,7 @@ def process_features(database, sha1, name, extended = False):
     output_dir = json_directory()
     callback = subtask(task=del_file_on_error, args=(sha1, output_dir))
     job = chord(tasks = [
-            _jsonify_features.subtask((database, name, sha1, output_dir, '/data/public', '/data/jbrowse', extended))
+            _jsonify_features.subtask((database, name, sha1, output_dir, '/data/jbrowse', '/data/jbrowse', extended))
                    ])(callback)
     return job
 

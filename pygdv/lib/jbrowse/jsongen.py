@@ -77,7 +77,7 @@ _extended_subfeature_headers = ['start', 'end', 'strand', 'type']
 _basic_client_config = {'labelScale':5, 'subfeatureScale':10, 'featureCss':'"background-color: #0000FF;"'}
 
 _extended_client_config = {'labelScale':5, 'subfeatureScale':10, 
-        'featureCallback':'(function(feat, fields, div){if(fields.type){getFeatureStyle(feat[fields.type],div)}})'}
+        'featureCallback':'(function(feat, fields, div){if(fields.type){getFeatureStyle(feat[fields.type],div);}})'}
 
 def _prepare_array_param(length, chunck_size, url_template):
     data = {}
@@ -90,12 +90,12 @@ def _prepare_histogram_meta(bases_per_bin, array_param):
     data = {}
     data['basesPerBin'] = bases_per_bin
     data['arrayParams'] = array_param
-    return data
+    return [data]
 
-def _prepare_hist_stats(bases, min, max):
+def _prepare_hist_stats(bases, mean, max):
     data = {}
     data['bases'] = bases
-    data['min'] = min
+    data['mean'] = mean
     data['max'] = max
     return data
 
@@ -282,7 +282,7 @@ def _histogram_meta(chr_length, threshold, resource_url):
     length = int(math.ceil(chr_length/threshold)) 
     url_template = os.path.join(resource_url, 'hist-%s-{chunk}.json' % threshold)
     
-    array_param = _prepare_array_param(length, CHUNK_SIZE -1, url_template)
+    array_param = _prepare_array_param(length, CHUNK_SIZE - 1, url_template)
     
     return _prepare_histogram_meta(threshold, array_param)
 #######################################################################       
@@ -429,7 +429,7 @@ def _jsonify(connection, name, chr_length, chr_name, url_output, lazy_url, outpu
     NCList = []
     feature_count = 0
     for start, stop, chunk_number, buffer, nb_feats in lazy_feats:
-        NCList.append([start, stop,{'chunk' : chunk_number}])
+        NCList.append([start, stop,{'chunk' : str(chunk_number)}])
         last_chunk_number = chunk_number
         feature_count += nb_feats
         ##' write in output'

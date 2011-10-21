@@ -13,7 +13,7 @@ from tg import url, tmpl_context
 from sprox.dojo.formbase import DojoEditableForm
 from sprox.widgets.dojo import SproxDojoSelectShuttleField, SproxDojoSortedSelectShuttleField
 from pygdv.model import DBSession, Project, Species, Sequence, Track, User, Group
-from pygdv.lib.helpers import get_delete_link, get_edit_link, get_project_right_sharing_form
+from pygdv.lib.helpers import get_delete_link, get_edit_link, get_project_right_sharing_form, get_view_link, get_share_link
 from pygdv import handler
 from tg import app_globals as gl
 
@@ -198,15 +198,11 @@ project_grid = twf.DataGrid(fields=[
     ('Assembly', 'assembly'),
     ('Circles', 'get_circle_with_right_display'),
     ('Tracks', 'get_tracks'),
-    ('Action', lambda obj:genshi.Markup(
-        '<a href="%s">view</a> <a href="%s">share</a> <a href="%s">add track</a> '
-        % (
-           url('./view', params=dict(project_id=obj.id)),
-           url('./share', params=dict(project_id=obj.id)),
-           url('./add_track', params=dict(project_id=obj.id))
-           ) 
+    ('Action', lambda obj:genshi.Markup(get_view_link(obj.id) + get_share_link(obj.id) 
         + get_delete_link(obj.id) 
         + get_edit_link(obj.id)
+        + '<a href="%s">add track</a> '
+        % url('./add_track', params=dict(project_id=obj.id))
         ))
 ])
 

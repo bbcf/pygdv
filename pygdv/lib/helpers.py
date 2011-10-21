@@ -26,8 +26,18 @@ def get_delete_link(obj_id):
     </form>
         ''' % (obj_id)
         
-        
-        
+def get_view_link(obj_id):
+    '''
+    Return a HTML view link.
+    '''
+    return ''' <a class='view_link' href="%s"></a>''' % url('./view', params=dict(project_id=obj_id))
+
+def get_share_link(obj_id):
+    '''
+    Return a HTML share link.
+    '''
+    return ''' <a class='share_link' href="%s"></a>''' % url('./share', params=dict(project_id=obj_id))
+                                                                
 def get_edit_link(obj_id):
     return '''
     <a class="edit_link" href="%s/edit" style="text-decoration:none"></a>
