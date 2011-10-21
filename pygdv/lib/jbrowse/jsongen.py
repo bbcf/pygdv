@@ -1,5 +1,8 @@
+'''
+Contains method needed to build JSON files from SQLite files.
+'''
 import os, sqlite3, json, math
-from pygdv.lib.jbrowse import TYPE, zooms, JSON_HEIGHT, SUBLIST_INDEX, CHUNK_SIZE, LAZY_INDEX, ARROWHEAD_CLASS, CLASSNAME, HIST_CHUNK_SIZE
+from pygdv.lib.jbrowse import higher_zoom, TYPE, zooms, JSON_HEIGHT, SUBLIST_INDEX, CHUNK_SIZE, LAZY_INDEX, ARROWHEAD_CLASS, CLASSNAME, HIST_CHUNK_SIZE
 import numpy as np
 
 
@@ -28,7 +31,7 @@ def _prepare_zoom_levels(sha1, chromosome):
         data = {}
         data['urlPrefix'] = os.path.join(sha1, '%s_%s.db' % (chromosome, zoom)) 
         data['height'] = JSON_HEIGHT
-        data['basesPerTile'] = zoom*100
+        data['basesPerTile'] = str(zoom * 100)
         array.append(data)
     return array
     
@@ -204,9 +207,14 @@ def _count_features(cursor, loop, chr_length):
     '''
     Generate a big array, that will contains the count of all features. Each index of 
     the array corresponding to a loop interval.
+    The array length must be a multiple of the higher zoom level : 100000.
     '''        
     # build the big array
-    nb = math.ceil(chr_length/float(loop))
+    print 'count features => chr_len : %s, loop : %s' % (chr_length, loop)
+    tmp = math.ceil(chr_length/float(loop))
+    nb = higher_zoom - tmp % higher_zoom + tmp
+
+    #nb = math.ceil(chr_length/float(loop))
     array = np.zeros(nb)
     
     for row in cursor:
@@ -385,9 +393,10 @@ def jsonify_quantitative(sha1, output_root_directory, database_path):
         cur = conn.cursor()
         result = cur.execute('select min(score), max(score) from "%s" ;' % chr_name).fetchone()
         data = _prepare_quantitative_json(200, result[0], result[1], sha1, chr_name)
+        json_data = json.dumps(data)
         output = os.path.join(out, 'trackData.json')
         with open(output, 'w', -1) as file:
-            file.write(str(data))
+            file.write(json_data)
         cur.close()
     cursor.close()
     conn.close()
@@ -475,7 +484,6 @@ def _jsonify(connection, name, chr_length, chr_name, url_output, lazy_url, outpu
     
     ##' convert to json'
     json_data = json.dumps(data)
-    
     ##' write track data'
     track_data_output = os.path.join(output_directory, 'trackData.json')
     with open(track_data_output, 'w', -1) as file:

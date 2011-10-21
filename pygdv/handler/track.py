@@ -3,14 +3,14 @@ from __future__ import absolute_import
 Tracks handler.
 '''
 
-from pygdv.model import DBSession, Input, Track, InputParameters, Task
+from pygdv.model import DBSession, Input, Track, TrackParameters, Task
 import os, shutil
 from pygdv.model import constants
 from pygdv.lib import util
 from pygdv.celery import tasks
 from pygdv.lib.constants import track_directory
 from track.util import determine_format
-from pygdv.model import constants
+from pygdv.lib import constants
 
 
 
@@ -33,10 +33,21 @@ def create_track(user_id, sequence_id, trackname=None, file=None):
         track.sequence_id = sequence_id
         track.user_id = user_id
         track.input_id = input.id
+        
+        
+        params = TrackParameters()
+        DBSession.add(params)
+        DBSession.flush()
+        
+        track.parameters = params
+        
+        
         DBSession.add(track)
         DBSession.flush()
-   
-    
+        
+        params.build_parameters()
+        DBSession.add(params)
+        DBSession.flush()
     
     
     
@@ -56,9 +67,7 @@ def create_input(file, trackname):
     if input is not None: 
         print "file already exist"
     else :
-        params = InputParameters()
-        DBSession.add(params)
-        DBSession.flush()
+       
         
        
          
@@ -75,7 +84,7 @@ def create_input(file, trackname):
         print 'gessing format : %s' % format
         
         datatype = _formats.get(format, constants.NOT_DETERMINED_DATATYPE)
-        datatype = constants.SIGNAL
+        datatype = constants.RELATIONAL
         
         print 'gessing datatype %s' % datatype
        
@@ -92,7 +101,6 @@ def create_input(file, trackname):
         print 'building input'
         input = Input()
         input.sha1 = sha1
-        input.parameters = params
         input.datatype = datatype
        
         input.task_id = async_result.task_id
@@ -173,33 +181,33 @@ def process_database(datatype, path, sha1, name):
     '''
     
     
-    return _sql_dispatch.get(datatype, lambda *args, **kw : not_recognized(*args, **kw))(path,sha1)
+    return _sql_dispatch.get(datatype, lambda *args, **kw : not_recognized(*args, **kw))(path, sha1, name)
 
 
 
 
 
 
-def _signal(path, sha1):
+def _signal(path, sha1, name):
     '''
     Process a ``signal`` database.
     @return the task associated
     '''
-    return tasks.process_signal(path, sha1)
+    return tasks.process_signal(path, sha1, name)
 
 def _features(path, sha1, name):
     '''
     Process a ``feature`` database.
     @return the task associated
     '''
-    tasks.process_features.delay(path, sha1, name, False)
+    return tasks.process_features(path, sha1, name, False)
 
 def _relational(path, sha1, name):
     '''
     Process a ``relational`` database
     @return the task associated
     '''
-    tasks.process_features.delay(path, sha1, name, True)
+    return tasks.process_features(path, sha1, name, True)
     
 
 

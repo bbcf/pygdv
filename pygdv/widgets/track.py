@@ -90,7 +90,6 @@ help_text = 'Choose the assembly.'),
     def update_params(self, d):
         super(UploadFrom,self).update_params(d)
         species=get_species()
-        print species
         d['species']=species
         d['nr_assembly']=get_assemblies(species)
         return d

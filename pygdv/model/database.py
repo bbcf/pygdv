@@ -16,7 +16,8 @@ from sqlalchemy import Sequence as Seq
 from pygdv.lib.celery import PickleType
 from pygdv.model import DeclarativeBase, metadata, DBSession
 import transaction
-
+import os
+from pygdv.lib import constants
 from datetime import datetime
 
 import uuid
@@ -24,16 +25,15 @@ from sqlalchemy.engine.base import Transaction
 
 __all__ = ['Right', 'Circle', 'Project',
            'RightCircleAssociation','Sequence',
-           'Species','InputParameters',
+           'Species','TrackParameters',
            'Track', 'Task', 'Input',
            'Sequence',
            'Species',
            'Job','JobParameters']
 
-from pygdv.model import constants
 
 statuses = Enum('SUCCESS', 'PENDING', 'ERROR', 'RUNNING', name='job_status')
-image_types = Enum('FeatureTrack', 'ImageTrack', name='image_type')
+image_types = Enum(constants.FEATURE_TRACK, constants.IMAGE_TRACK, name='image_type')
 datatypes = Enum(constants.FEATURES, constants.SIGNAL, constants.RELATIONAL, constants.NOT_DETERMINED_DATATYPE ,name="datatype")
 job_types = Enum('NEW_SELECTION', 'NEW_TRACK', 'GFEATMINER', 'NEW_PROJECT', name='job_type')
 job_outputs = Enum('RELOAD', 'IMAGE', name='job_output')
@@ -264,8 +264,7 @@ class Task(DeclarativeBase):
         self.task_id = task_id
 
     
-from pygdv.lib.constants import track_directory
-import os
+
 
 class Input(DeclarativeBase):
     '''
@@ -280,8 +279,7 @@ class Input(DeclarativeBase):
     sha1 = Column(Unicode(255), unique=True, nullable=False)
     _last_access = Column(DateTime, default=datetime.now, nullable=False)
     tracks = relationship('Track', backref='input',  cascade="all, delete, delete-orphan")
-    parameter_id = Column(Integer, ForeignKey('InputParameters.id',  ondelete="CASCADE"), 
-                           nullable=False)
+  
     task_id = Column(VARCHAR(255), nullable=False)
     task = relationship('Task', uselist=False, primaryjoin='Input.task_id == Task.task_id', foreign_keys='Task.task_id')
     
@@ -289,7 +287,7 @@ class Input(DeclarativeBase):
     
     @property
     def path(self):
-        return os.path.join(track_directory(), '%s.%s' % (self.sha1, 'sql'))
+        return os.path.join(constants.track_directory(), '%s.%s' % (self.sha1, 'sql'))
     
     
     # special methods
@@ -324,20 +322,7 @@ class Input(DeclarativeBase):
         if self.task is None: return ''
         return self.task.traceback
     
-class InputParameters(DeclarativeBase):
-    '''
-    Track parameters.
-    Based on the type, parameters can be different.
-    '''
-    __tablename__='InputParameters'
-    id = Column(Integer, autoincrement=True, primary_key=True)
-    url = Column(Unicode(255), nullable=True)
-    label = Column(Unicode(255), nullable=True)
-    type = Column(image_types, nullable=True)
-    key = Column(Unicode(255), nullable=True)
-    color = Column(Unicode(255), nullable=True)
-    
-    input = relationship('Input', uselist=False, backref='parameters',  cascade="all, delete, delete-orphan")
+
 
 
 class Track(DeclarativeBase):
@@ -352,7 +337,8 @@ class Track(DeclarativeBase):
     name = Column(Unicode(255), nullable=False)
     _created = Column(DateTime, nullable=False, default=datetime.now)
     _last_access = Column(DateTime, default=datetime.now, nullable=False)
-    
+    parameter_id = Column(Integer, ForeignKey('TrackParameters.id',  ondelete="CASCADE"), 
+                           nullable=False)
     input_id = Column(Integer, ForeignKey('Input.id', ondelete="CASCADE"), nullable=False)
    
     user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=False)
@@ -360,7 +346,8 @@ class Track(DeclarativeBase):
     
     sequence_id = Column(Integer, ForeignKey('Sequence.id', ondelete="CASCADE"), nullable=False)
     sequence = relationship("Sequence")
-    
+    parameter_id = Column(Integer, ForeignKey('TrackParameters.id',  ondelete="CASCADE"), 
+                           nullable=False)
     
     # special methods
     def __repr__(self):
@@ -407,6 +394,43 @@ class Track(DeclarativeBase):
         Update the field 'last_access' by the current time
         '''
         self._set_last_access(datetime.now())
+
+class TrackParameters(DeclarativeBase):
+    '''
+    Track parameters.
+    Based on the type, parameters can be different.
+    '''
+    __tablename__='TrackParameters'
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    url = Column(Unicode(255), nullable=True)
+    label = Column(Unicode(255), nullable=True)
+    type = Column(image_types, nullable=True)
+    key = Column(Unicode(255), nullable=True)
+    color = Column(Unicode(255), nullable=True)
+    
+    track = relationship('Track', uselist=False, backref='parameters',  cascade="all, delete, delete-orphan")
+    
+    @property
+    def jb_dict(self):
+        '''
+        Get the representation dict for jbrowse
+        '''
+        return {'url' : self.url, 'label' : self.label, 'type' : self.type, 
+                'gdv_id' : self.id, 'key' : self.key}
+    
+    def build_parameters(self):
+        self.url = os.path.join(self.track.input.sha1, '{refseq}' ,constants.track_data)
+        self.label = self.track.name
+        self.key = self.track.name
+        '''
+        RELATIONAL = 'relational'
+SIGNAL = 'signal'
+FEATURES = 'features'
+        '''
+        if self.track.vizu == constants.RELATIONAL or self.track.vizu == constants.FEATURES :
+            self.type = constants.FEATURE_TRACK
+        else :
+            self.type = constants.IMAGE_TRACK
 
 class JobParameters(DeclarativeBase):
     '''

@@ -15,7 +15,7 @@ Zooms available in JBrowse.
 zooms = (1, 2, 5, 10, 20, 50, 100, 200, 500, 1000,
         2000, 5000, 10000, 20000, 50000, 100000)
 
-
+higher_zoom = 100000
 
 JSON_HEIGHT = '100'
 
@@ -32,3 +32,5 @@ TYPE = "FeatureTrack"
 CLASSNAME = "generic_parent"
 
 ARROWHEAD_CLASS = 'transcript-arrowhead'
+
+SEQUENCE_CHUNK_SIZE = 20000

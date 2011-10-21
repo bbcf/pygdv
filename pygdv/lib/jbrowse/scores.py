@@ -1,4 +1,6 @@
-
+'''
+Contains methods to pre-calculate scores for SQLite databases.
+'''
 import math, sqlite3, shutil, os
 import numpy as np
 from pygdv.lib.util import float_equals
@@ -67,7 +69,7 @@ def generate_array(cursor, max, max_zoom):
 def gen_tuples(array, max, zoom):
     '''
     Generate the features (number, pos, score) to write in the db
-    @param array : the array containning all scores
+    @param array : the array containing all scores
     @param max: the stop of the last feature
     @param zoom : the zoom level
     '''
@@ -80,6 +82,7 @@ def gen_tuples(array, max, zoom):
             index_start = get_position_start(i, t, zoom)
             index_end = get_position_end(i, t, zoom)
             if index_start > max :
+                yield i, t, 0
                 break
             ### 'i(%s), t(%s), z(%s), start %s, end %s' %(i, t, zoom, index_start, index_end)
             tmp = array[index_start:index_end+1]

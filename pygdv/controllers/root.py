@@ -13,7 +13,7 @@ from pygdv.controllers import ErrorController, LoginController, GroupController
 from pygdv.controllers import PermissionController, UserController, TrackController
 from pygdv.controllers import SequenceController, ProjectController, CircleController
 from pygdv.controllers import RightController, WorkerController, TaskController
-from pygdv.controllers import InputController
+from pygdv.controllers import InputController, DatabaseController
 
 import pygdv
 
@@ -66,13 +66,17 @@ class RootController(BaseController):
     #rights = RightController(DBSession, menu_items=models)
     tasks = TaskController(DBSession, menu_items=models)
     inputs = InputController(DBSession, menu_items=models)
+    
     # users controllers
     tracks = TrackController(DBSession)
     projects = ProjectController(DBSession)
     circles = CircleController(DBSession)
     
-    #tasks controller
+    # tasks controller
     workers = WorkerController()
+    
+    # database controller
+    database = DatabaseController()
     
     @expose('pygdv.templates.index')
     def index(self,*args,**kw):
@@ -102,12 +106,12 @@ class RootController(BaseController):
         """This method showcases TG's access to the wsgi environment."""
         return dict(page='environ',environment=request.environ)
 
-    @require(has_permission('admin', msg='Only for admins'))
-    @expose('pygdv.templates.data')
-    @expose('json')
-    def data(self, **kw):
-        """This method showcases how you can use the same controller for a data page and a display page"""
-        return dict(page='data',params=kw)
+#    @require(has_permission('admin', msg='Only for admins'))
+#    @expose('pygdv.templates.data')
+#    @expose('json')
+#    def data(self, **kw):
+#        """This method showcases how you can use the same controller for a data page and a display page"""
+#        return dict(page='data',params=kw)
     
 
     @expose()

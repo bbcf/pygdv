@@ -13,9 +13,11 @@ from pygdv.model import DBSession, Project, User, RightCircleAssociation
 from pygdv.widgets.project import project_table, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid,circles_available_form, tracks_available_form, project_sharing_grid
 from pygdv import handler
 from pygdv.lib import util
-import os
+import os, json
 import transaction
 from pygdv.lib import checker
+from pygdv.lib.jbrowse import util as jb
+from pygdv.lib import constants
 
 __all__ = ['ProjectController']
 
@@ -227,8 +229,40 @@ class ProjectController(CrudRestController):
 
 
     @expose('pygdv.templates.view')
-    def view(self, *args, **kw):
-        return dict(page='view')
+    def view(self, project_id, *args, **kw):
+        user = handler.user.get_user_in_session(request)
+        if not checker.user_own_project(user.id, project_id):
+            flash('You cannot view a project which is not yours')
+            raise redirect('/')
+        project = DBSession.query(Project).filter(Project.id == project_id).first()
+        tracks = project.tracks
+        refSeqs = 'refSeqs = %s' % json.dumps(jb.ref_seqs(project.sequence_id))
+        
+        trackInfo = 'trackInfo = %s' % json.dumps(jb.track_info(tracks))
+        parameters = 'var b = new Browser(%s)' % jb.browser_parameters(
+                        constants.DATA_ROOT, constants.STYLE_ROOT, constants.IMAGE_ROOT, ','.join([track.name for track in tracks]))
+        
+        style_control = '''function getFeatureStyle(type, div){
+        div.style.backgroundColor='#3333D7';div.className='basic';
+        switch(type){
+        %s
+        }};
+        ''' % jb.features_style(tracks)
+        
+        control = 'b.showTracks();initGDV(b)'
+        
+        
+        return dict(species_name=project.species.name, 
+                    nr_assembly_id=project.sequence_id, 
+                    project_id=project.id,
+                    is_admin=True,
+                    init_jobs='...',
+                    ref_seqs = refSeqs,
+                    track_info = trackInfo,
+                    parameters = parameters,
+                    style_control = style_control,
+                    control = control,
+                    page='view')
     
     
     

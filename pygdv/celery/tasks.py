@@ -1,7 +1,7 @@
 from celery.task import task, chord, subtask, TaskSet
 import shutil, os
 from pygdv.lib.jbrowse import jsongen, scores
-from pygdv.lib.constants import json_directory
+from pygdv.lib.constants import json_directory, track_directory
 from celery.result import AsyncResult
 
 success = 1
@@ -12,19 +12,20 @@ success = 1
 #############################################################################################################
 
 @task()
-def del_file_on_error(tasks, sha1, output_dir, *args, **kw):
-    print args
-    print kw
+def del_file_on_error(tasks, sha1, *args, **kw):
     '''
     Verify if the file are well processed.
     If no, it will erase the directory created in the
     tracks directory
     @param tasks : a list of return result. If one is different from 1, the directory is erased.
     '''
-    print 'del file on error tasks :%s, sha1 : %s, output_dir : %s' % (tasks, sha1, output_dir)
+    print 'del file on error tasks :%s, sha1 : %s in %s and %s' % (tasks, sha1, track_directory(), json_directory())
     for id in tasks:
         if not id == success :
-            shutil.rmtree(os.path.join(output_dir, sha1))
+            path1 = os.path.join(track_directory(), sha1)
+            path2 = os.path.join(json_directory(), sha1)
+            shutil.rmtree(path1, ignore_errors = True)
+            shutil.rmtree(path2, ignore_errors = True)
             raise id
 
 
@@ -36,7 +37,7 @@ def process_signal2(database, sha1):
     @param sha1 : the sah1 of the file
     '''
     output_dir = json_directory()
-    callback = subtask(task=del_file_on_error, args=(sha1, output_dir))
+    callback = subtask(task=del_file_on_error, args=(sha1))
     print 'process signal db : %s, sha1 : %s' % (database, sha1)
     
     
@@ -51,7 +52,7 @@ def process_signal2(database, sha1):
 
 
 
-def process_signal(database, sha1):
+def process_signal(database, sha1, name):
     '''
     Process a ``signal`` SQL file and create the databases needed by JBrowse.
     @param database : the database
@@ -67,7 +68,7 @@ def process_signal(database, sha1):
                          ])(callback)
     return job  
 
-@task()
+
 def process_features(database, sha1, name, extended = False): 
     '''
     Process a ``features`` SQL file and create the databases needed by JBrowse.
@@ -79,7 +80,7 @@ def process_features(database, sha1, name, extended = False):
     output_dir = json_directory()
     callback = subtask(task=del_file_on_error, args=(sha1, output_dir))
     job = chord(tasks = [
-            _jsonify_features.subtask(database, name, sha1, output_dir, 'public_url', 'browser_url', extended)
+            _jsonify_features.subtask((database, name, sha1, output_dir, '/data/public', '/data/jbrowse', extended))
                    ])(callback)
     return job
 
