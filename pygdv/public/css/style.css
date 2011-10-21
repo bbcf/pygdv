@@ -7,7 +7,7 @@ html {
 
 body {
 	text-align: left;
-	width: 960px;
+	width: 99%;
 	margin: 0 auto;
 	padding: 0;
 	font-size: 12px;
@@ -21,7 +21,7 @@ a {
 #header {
 	height: 132px;
 	margin: 10px 10px 0 10px;
-	background: url('../images/headerbg.png') top left no-repeat;
+	background: url('../images/bgred.jpg') top left;
 }
 
 #header h1 {
@@ -44,7 +44,7 @@ a {
 ul#mainmenu {
 	margin: 0;
 	padding: 0 10px;
-	background: url('../images/menubg.png') top left no-repeat;
+	/* background: url('../images/menubg.png') top left no-repeat; */
 	height: 38px;
 }
 
@@ -67,11 +67,11 @@ ul#mainmenu li a {
 	padding: 0 10px;
 	font-size: 12px;
 	text-decoration: none;
-	background: url('../images/menu-item-border.png') left top no-repeat;
+	/* background: url('../images/menu-item-border.png') left top no-repeat; */
 }
 
 ul#mainmenu li a:hover, ul#mainmenu li a.active {
-	background: url('../images/menu-item-actibg.png') left top no-repeat;
+	background: url('../images/red_active.png') left top;
 }
 
 ul#mainmenu li.first a {
@@ -79,7 +79,7 @@ ul#mainmenu li.first a {
 }
 
 ul#mainmenu li.first a:hover, ul#mainmenu li.first a.active {
-	background: url('../images/menu-item-actibg-first.png') left top no-repeat;
+    background: url('../images/red_active.png') left top;
 }
 
 ul#mainmenu li.loginlogout
@@ -90,7 +90,7 @@ ul#mainmenu li.loginlogout
 
 ul#mainmenu li.loginlogout a:hover
 {
-    background: url('../images/menu-item-border.png') left top no-repeat;
+    background: url('../images/red_active.png') left top;
 }
 
 #content {

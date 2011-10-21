@@ -1,7 +1,7 @@
 from pkg_resources import resource_filename
 import os
 
-data_dir = 'pygdv.data'
+data_dir = 'pygdv.public.data'
 json_dir = 'jbrowse'
 tracks_dir = 'tracks'
 
@@ -12,6 +12,11 @@ ERROR = 'FAILURE'
 RUNNING = 'RUNNING'
 
 
+# IMAGES TYPES IN GDV
+FEATURE_TRACK = 'FeatureTrack'
+IMAGE_TRACK = 'ImageTrack'
+
+# DATA DIRECTORIES
 def json_directory():
     return os.path.join(resource_filename(data_dir, json_dir))
 
@@ -19,3 +24,20 @@ def json_directory():
 def track_directory():
     return os.path.join(resource_filename(data_dir, tracks_dir))
 
+
+# URLS TO PUT IN JSON
+DATA_ROOT = '/data/jbrowse/'
+STYLE_ROOT = '/css/'
+IMAGE_ROOT = '/img/'
+
+track_data = 'trackData.json'
+
+
+# TRACKS TYPES
+NOT_DETERMINED_DATATYPE = 'not determined'
+RELATIONAL = 'relational'
+SIGNAL = 'signal'
+FEATURES = 'features'
+
+# DATA FORMAT
+date_format = "%A %d. %B %Y %H.%M.%S"

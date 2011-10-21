@@ -6,7 +6,7 @@ from pygdv.model import Input, DBSession
 from pygdv import handler
 from tg import expose, flash, request
 import shutil, os
-
+from pygdv.lib.constants import json_directory
 
 __all__ = ['InputController']
 
@@ -31,6 +31,7 @@ class InputController(CrudRestController):
         input = DBSession.query(Input).filter(Input.id == args[0]).first()
         try:
             os.remove(input.path)
+            shutil.rmtree(os.path.join(json_directory(), input.sha1))
         except OSError :
             pass
         return CrudRestController.post_delete(self, *args, **kw)

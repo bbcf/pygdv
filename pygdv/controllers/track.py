@@ -10,7 +10,7 @@ from tg import app_globals as gl
 from tg.controllers import redirect
 from tg.decorators import paginate,with_trailing_slash
 
-from pygdv.model import DBSession, Track, Input, InputParameters
+from pygdv.model import DBSession, Track, Input, TrackParameters
 from pygdv.widgets.track import track_table, track_table_filler, track_new_form, track_edit_filler, track_edit_form, track_grid
 from pygdv import handler
 from pygdv.lib import util
