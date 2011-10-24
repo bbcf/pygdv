@@ -86,7 +86,7 @@ class Circle(DeclarativeBase):
     creator_id = Column(Integer, ForeignKey('User.id',  ondelete="CASCADE"), nullable=True)
     admin = Column(Boolean, nullable= False, default = False)
     
-    users = relationship('User', secondary=user_circle_table, backref='circles',  cascade="all, delete, delete-orphan")
+    users = relationship('User', secondary=user_circle_table, backref='circles',  cascade="all, delete")
     
     @property
     def display(self):
@@ -95,10 +95,10 @@ class Circle(DeclarativeBase):
 class RightCircleAssociation(DeclarativeBase):
     __tablename__='RightCircleAssociation'
     
-    right = relationship('Right', cascade="all, delete, delete-orphan")
+    right = relationship('Right', cascade="all, delete")
     right_id = Column(Integer,
                        ForeignKey('Right.id',  ondelete="CASCADE"), nullable=False, primary_key=True)
-    circle =  relationship('Circle',  cascade="all, delete, delete-orphan")
+    circle =  relationship('Circle',  cascade="all, delete")
     circle_id = Column(Integer,
                        ForeignKey('Circle.id',  ondelete="CASCADE"), nullable=False, primary_key=True)
     project_id = Column(Integer, ForeignKey('Project.id',  ondelete="CASCADE"), nullable=True)
@@ -138,7 +138,7 @@ class Project(DeclarativeBase):
     name = Column(Unicode(255), nullable=False)
     _created = Column(DateTime, default=datetime.now, nullable=False)
     sequence_id = Column(Integer, ForeignKey('Sequence.id',  ondelete="CASCADE"), nullable=False)
-    sequence = relationship("Sequence",  cascade="all, delete, delete-orphan")
+    sequence = relationship("Sequence",  cascade="all, delete")
     #relations
     user_id = Column(Integer, ForeignKey('User.id',  ondelete="CASCADE"), nullable=False)
  

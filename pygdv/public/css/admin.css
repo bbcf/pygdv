@@ -76,6 +76,7 @@ a.edit_link{
     background-image: url('/images/delete.png');
     cursor: pointer;
 }
+
 a.view_link{
     background-repeat: no-repeat;
     padding: 1px;    

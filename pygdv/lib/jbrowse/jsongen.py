@@ -47,6 +47,8 @@ def _prepare_track_data(headers, subfeature_headers, sublist_index, lazy_index,
     '''
     Prepare the track data for qualitative tracks.
     '''
+    print feature_NCList
+    print json.dumps(feature_NCList)
     data = {}
     data['headers'] = headers
     data['subfeatureHeaders'] = subfeature_headers
@@ -438,7 +440,6 @@ def _jsonify(connection, name, chr_length, chr_name, url_output, lazy_url, outpu
             file.write(buffer)
              
     cursor.close()
-    feature_NCList = str(NCList)
     
     if feature_count == 0 : feature_count = 1
     
@@ -469,7 +470,7 @@ def _jsonify(connection, name, chr_length, chr_name, url_output, lazy_url, outpu
                                histogram_meta, 
                                hist_stats, 
                                'subfeatureClasses', 
-                               feature_NCList,
+                               NCList,
                                client_config,
                                feature_count, 
                                name, 
