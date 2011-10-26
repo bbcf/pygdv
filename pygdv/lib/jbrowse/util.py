@@ -47,7 +47,7 @@ def features_style(tracks):
     :param: tracks . the tracks
     '''
     #toDO
-    return '''case exon: case intron:div.style.height='10px';div.style.marginTop='-4px';div.style.zIndex='30';break'''
+    return '''case 'exon': case 'intron': default: div.style.height='10px';div.style.marginTop='-4px';div.style.zIndex='30';break'''
     
 def _chromosome_output(chromosome):
     '''

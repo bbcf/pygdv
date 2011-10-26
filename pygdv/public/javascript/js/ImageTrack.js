@@ -143,13 +143,7 @@ ImageTrack.prototype.fillBlock = function(blockIndex, block,
     im = images[i];
     if (!(im.parentNode && im.parentNode.parentNode)) {
             im.style.position = "absolute";
-	console.log('=>');
-	console.log(im.startBase);
-	console.log(leftBase);
-	console.log(blockWidth);
-	console.log(im.startBase - leftBase);
-	console.log((im.startBase - leftBase) / blockWidth);
-	console.log('scale ' + scale);
+	
         im.style.left = (100 * ((im.startBase - leftBase) / blockWidth)) + "%";
         im.style.width = '100%';
 //(100 * (im.baseWidth / blockWidth)) + "%";

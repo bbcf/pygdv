@@ -84,7 +84,7 @@ def create_input(file, trackname):
         print 'gessing format : %s' % format
         
         datatype = _formats.get(format, constants.NOT_DETERMINED_DATATYPE)
-        datatype = constants.FEATURES
+        datatype = constants.RELATIONAL
         
         print 'gessing datatype %s' % datatype
        

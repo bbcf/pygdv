@@ -15,17 +15,7 @@ class WorkerController(BaseController):
     
     
     @expose('json')
-    def add(self, x, y, *args, **kw):
-        t = tasks.add.delay(x,y)
+    def test(self, *args, **kw):
+        t = tasks.test.delay(callback=tasks.cb)
         return 'task launched'
     
-    @expose('json')
-    def a(self):
-        t = tasks.hellochord.delay()
-        return 'task launched'
-    
-    
-    @expose('json')
-    def b(self):
-        t = tasks.hellotakset().delay()
-        return 'task launched'

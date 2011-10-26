@@ -52,7 +52,7 @@ class LoginController(BaseController):
         # get user
         principal = tequila.validate_key(key,'tequila.epfl.ch')
         if principal is None:
-            redirect('/login/go')
+            redirect('/login')
         tmp_user = self.build_user(principal)
         mail = tmp_user.email
         # log or create him

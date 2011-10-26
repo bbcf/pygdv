@@ -105,7 +105,7 @@ FeatureTrack.prototype.loadSuccess = function(trackInfo) {
             var feat = elem.feature;
         //make link for the feature (it call a GDV javascript)
 
-        showLinkPanel(this,dojo.byId("nr_assembly_id").innerHTML,feat[fields["name"]],feat[fields["start"]],feat[fields["end"]]);
+        showPanelInfo(this,dojo.byId("nr_assembly_id").innerHTML,feat[fields["name"]],feat[fields["start"]],feat[fields["end"]]);
         // alert("clicked on feature\nstart: " + feat[fields["start"]] +
         // ", end: " + feat[fields["end"]] +
         // ", strand: " + feat[fields["strand"]] +
@@ -341,8 +341,7 @@ FeatureTrack.prototype.fillFeatures = function(blockIndex, block,
 
     var startBase = goLeft ? rightBase : leftBase;
     var endBase = goLeft ? leftBase : rightBase;
-
-
+    
     this.features.iterate(startBase, endBase, featCallback,
                           function () {
                               block.style.backgroundColor = "";
@@ -525,7 +524,6 @@ FeatureTrack.prototype.renderFeature = function(feature, uniqueId, block, scale,
         labelDiv.feature = feature;
         block.appendChild(labelDiv);
     }
-
     if (fields["subfeatures"]
         && (scale > this.subfeatureScale)
         && feature[fields["subfeatures"]]

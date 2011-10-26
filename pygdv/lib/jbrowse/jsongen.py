@@ -47,8 +47,6 @@ def _prepare_track_data(headers, subfeature_headers, sublist_index, lazy_index,
     '''
     Prepare the track data for qualitative tracks.
     '''
-    print feature_NCList
-    print json.dumps(feature_NCList)
     data = {}
     data['headers'] = headers
     data['subfeatureHeaders'] = subfeature_headers
@@ -69,14 +67,14 @@ def _prepare_track_data(headers, subfeature_headers, sublist_index, lazy_index,
     return data
     
 _basic_headers = ['start', 'end', 'score', 'name', 'strand', 'attributes']
-
-_extended_headers = ['start', 'end', 'name', 'strand', 'subfeatures']
-
-_basic_subfeature_headers = ['start', 'end']
-
-_extended_subfeature_headers = ['start', 'end', 'strand', 'type']
-    
 _basic_client_config = {'labelScale':5, 'subfeatureScale':10, 'featureCss':'"background-color: #0000FF;"'}
+_basic_subfeature_headers = ['start', 'end']
+_basic_fields = ('start', 'end', 'score', 'name', 'strand', 'attributes')
+
+
+_extended_headers = ('start', 'end', 'name', 'strand', 'subfeatures')
+_subfeature_headers = ('start', 'end', 'score', 'name', 'strand', 'type', 'attributes')
+_extended_fields = ('start', 'end', 'score', 'name', 'strand', 'type', 'attributes', 'id')
 
 _extended_client_config = {'labelScale':5, 'subfeatureScale':10, 
         'featureCallback':'(function(feat, fields, div){if(fields.type){getFeatureStyle(feat[fields.type],div);}})'}
@@ -110,67 +108,87 @@ def _prepare_hist_stats(bases, mean, max):
 
 
 
-_basic_fields = ('start', 'end', 'score', 'name', 'strand', 'attributes')
 
-_extended_fields = ('start', 'end', 'score', 'name', 'strand', 'attributes', 'type', 'id')
 
-def _get_basic_features(connection, chromosome):
+
+
+#def _get_basic_features(connection, chromosome):
+#    '''
+#    Get the features on a chromosome.
+#    @param chromosome : the chromosome
+#    @return a Cursor Object
+#    '''
+#    cursor = connection.cursor()
+#    cursor.execute('pragma table_info(?)', chromosome)
+#    fields = [row[1] for row in cursor]
+#    cursor.close()
+#    
+#    
+#    select_fields = []
+#    for f in _basic_fields:
+#        if f in fields:
+#            select_fields.append(f)
+#        else :
+#            select_fields.append('')
+#            
+#            cursor = connection.cursor()
+#    return cursor.execute('select %s from ? order by start, end;' % (', '.join([field for field in select_fields])) , chromosome)
+
+
+def _get_cursor(connection, chromosome, fields_needed, order_by = 'start, end'):
     '''
-    Get the features on a chromosome.
-    @param chromosome : the chromosome
-    @return a Cursor Object
+    Get the cursor.
     '''
     cursor = connection.cursor()
-    cursor.execute('pragma table_info(?)', chromosome)
+    cursor.execute('pragma table_info("%s");' % (chromosome))
     fields = [row[1] for row in cursor]
     cursor.close()
     
     
     select_fields = []
-    for f in _basic_fields:
+    for f in fields_needed:
         if f in fields:
             select_fields.append(f)
         else :
             select_fields.append('')
             
-            cursor = connection.cursor()
-    return cursor.execute('select %s from ? order by start, end;' % (', '.join([field for field in select_fields])) , chromosome)
-
-
-def _get_extended_features(connection, chromosome):
-    '''
-    Get the features on a chromosome.
-    @param chromosome : the chromosome
-    @return a Cursor Object
-    '''
     cursor = connection.cursor()
-    cursor.execute('pragma table_info(?)', chromosome)
-    fields = [row[1] for row in cursor]
-    cursor.close()
-    
-    
-    select_fields = []
-    for f in _extended_fields:
-        if f in fields:
-            select_fields.append(f)
-        else :
-            select_fields.append('')
-            
-            cursor = connection.cursor()
-    return cursor.execute('select %s from ? order by id, start, end;' % (', '.join([field for field in select_fields])) , chromosome)
-    
+    return cursor.execute('select %s from "%s" order by %s;' % (', '.join([field for field in select_fields]), chromosome, order_by))
+
+#def _get_extended_features(connection, chromosome):
+#    '''
+#    Get the features on a chromosome.
+#    @param chromosome : the chromosome
+#    @return a Cursor Object
+#    '''
+#    cursor = connection.cursor()
+#    cursor.execute('pragma table_info(?)', chromosome)
+#    fields = [row[1] for row in cursor]
+#    cursor.close()
+#    
+#    
+#    select_fields = []
+#    for f in _extended_fields:
+#        if f in fields:
+#            select_fields.append(f)
+#        else :
+#            select_fields.append('')
+#            
+#            cursor = connection.cursor()
+#    return cursor.execute('select %s from ? order by id, start, end;' % (', '.join([field for field in select_fields])) , chromosome)
+#    
 
 
 #########################################################################
 
 
-def _generate_nested_features(cursor, field_number):
+def _generate_nested_features2(cursor, field_number):
     '''
     Generate features that has to be written in JSON
     '''
     stack = []
     prev_feature = None
-    nb_feature = 1
+    nb_feature = 0
     
     for row in cursor:
         feature = [row[i] for i in range(field_number)]
@@ -182,20 +200,61 @@ def _generate_nested_features(cursor, field_number):
                 while stack :
                     tmp_feature = stack.pop()
                     _nest(tmp_feature, prev_feature)
-                    nb_feature+=1
+                    nb_feature += 1
                     prev_feature = tmp_feature
                     if feature[1] < prev_feature[1]:
                         stack.append(prev_feature)
                         break
                 else:
                     yield prev_feature, nb_feature
+                    nb_feature = 0
                     #result.append(prev_feature)
       
         prev_feature = feature
     yield prev_feature, nb_feature
         
 
-
+def _generate_nested_features(cursor, field_needed, keep_field, 
+                              group_number = None, start_index = 0, end_index = 1, strand_index = 2):
+    '''
+    Generate features that has to be written in JSON
+    :param: cursor - the SQL cursor
+    :param: field_needed - the number of fields needed to build the feature
+    :param: keep_field - the number of fields (it will take the firsts ``field number`` from the feature)
+    :param: group_number - the parameter to regroup the features (place in the list) 
+    '''
+    stack = []
+    prev_feature = None
+    nb_feature = 1
+    first_start = None
+    for row in cursor:
+        feature = [row[i] for i in range(field_needed)]
+        print feature
+        
+        if group_number is not None:
+            if prev_feature is not None :
+                if first_start is None : first_start = prev_feature[start_index]
+                if prev_feature[group_number] == feature[group_number]:
+                    nb_feature += 1
+                    stack.append(prev_feature)
+                    print 'append'
+                else :
+                    print 'nest'
+                    tmp_feat = [first_start, prev_feature[end_index], prev_feature[group_number], prev_feature[strand_index]]
+                    _nests(tmp_feat, stack, keep_field)
+                    print 'out : %s ' % tmp_feat
+                    stack = []
+                    first_start = None
+                    yield tmp_feat, nb_feature
+                    nb_feature = 1
+                    
+            prev_feature = feature
+            
+    tmp_feat = [first_start, prev_feature[end_index], prev_feature[group_number], prev_feature[strand_index]]
+    _nests(tmp_feat, stack, keep_field)
+    print 'out : %s ' % tmp_feat
+    yield tmp_feat, nb_feature
+        
         
 ########################################################################
       
@@ -212,7 +271,6 @@ def _count_features(cursor, loop, chr_length):
     The array length must be a multiple of the higher zoom level : 100000.
     '''        
     # build the big array
-    print 'count features => chr_len : %s, loop : %s' % (chr_length, loop)
     tmp = math.ceil(chr_length/float(loop))
     nb = higher_zoom - tmp % higher_zoom + tmp
 
@@ -225,10 +283,17 @@ def _count_features(cursor, loop, chr_length):
         end = row[1]
         end_pos = _get_array_index(end, loop)
         array[start_pos:end_pos+1]+=1
+        print 'start pos (%s) to end_pos (%s) +1' % (start_pos, end_pos)
+    print array
     return array
 
 ###########################################################################
-       
+def _nests (feature, stack, keep_field):
+    '''
+    Nest a stack of feature into one.
+    '''
+    feature.append([feat[0:keep_field] for feat in stack])
+    
 def _nest(feature, to_nest):
     '''
     Nest a feature into another one.
@@ -256,20 +321,18 @@ def _generate_lazy_output(feature_generator):
     start = 0
     buffer_list = []
     for feat, nb in feature_generator:
-        if start == 0:
-            start=feat[0]
+        start = feat[0]
         stop = feat[1]
-        
         chunk_size+= nb
-        buffer_list.append(str(feat))
+        buffer_list.append(feat)
         if chunk_size >= CHUNK_SIZE :
             nb_feature = chunk_size
             chunk_size = 0
             chunk_number += 1
-            buf = ','.join(buffer_list)
+            yield start, stop, chunk_number, buffer_list, nb_feature
             buffer_list = []
-            yield start, stop, chunk_number, buf, nb_feature
-    yield start, stop, chunk_number, ','.join(buffer_list), chunk_size
+            
+    yield start, stop, chunk_number, buffer_list, chunk_size
         
         
 #########################################################################
@@ -293,12 +356,12 @@ def _write_histo_stats(generator, threshold, output):
     '''
     Write the files hist-{threshold}-{chunk}.json
     '''
-     # write
-    chunk_nb = 0
+    # write
+    chunk_nb = -1
     for array in generator:
         chunk_nb += 1
         with open(os.path.join(output, 'hist-%s-%s.json' % (threshold, chunk_nb)), 'w', -1) as file:
-             file.write(str(array))
+            file.write(json.dumps(array.tolist()))
              
      
     
@@ -318,13 +381,13 @@ def _calculate_histo_stats(array, threshold, chr_length):
             data.append(stats)
     return data
 
-def _generate_hist_outputs(array, chr_length):
+
+def _generate_hist_outputs(array, chr_length, coef=1):
     '''
     Generate the hist-output. 
     '''
-    for i in range(1, chr_length, HIST_CHUNK_SIZE):
-        yield array[i:i+HIST_CHUNK_SIZE]
-    
+    for i in xrange(1, chr_length, HIST_CHUNK_SIZE * coef):
+        yield array[i:i+HIST_CHUNK_SIZE * 100]      
     
     
 def _threshold(chr_length, feature_count):
@@ -334,9 +397,11 @@ def _threshold(chr_length, feature_count):
     @param feature_count : the total number of features
     @return the threshold
     '''
-    t = (chr_length *2.5 ) / feature_count;
+    t = (chr_length * 2.5 ) / feature_count;
     for zoom in zooms :
-        if zoom>t : return zoom
+        t = zoom
+        if zoom > t : break;
+    return t
 
 
 
@@ -353,6 +418,7 @@ def jsonify(database_path, name, sha1, output_root_directory, public_url, browse
     @param output_root_directory : the base system path where to write the output
     @param extended : if the format is ``basic`` or ``extended``
     '''
+    print 'jsonify'
     # configure outputs
     output_path = os.path.join(output_root_directory, sha1)
     out_public_url = os.path.join(public_url, sha1)
@@ -367,6 +433,7 @@ def jsonify(database_path, name, sha1, output_root_directory, public_url, browse
     for row in cursor:
         chr_name = row[0]
         chr_length = row[1]
+        print 'doing %s ' % chr_name
         out = os.path.join(output_path, chr_name)
         os.mkdir(out)
         lazy_url = os.path.join(out_browser_url, chr_name, 'lazyfeatures-{chunk}.json')
@@ -412,55 +479,73 @@ def _jsonify(connection, name, chr_length, chr_name, url_output, lazy_url, outpu
     @param url_output : url access to the ressources
     '''
     
-    ##' init standard fields'
+    print ' init standard fields'
     if extended :
-        field_number = 7
+        field_number = 8
+        keep_field = 7
         headers = _extended_headers
-        subfeature_headers = _extended_subfeature_headers
+        subfeature_headers = _subfeature_headers
         client_config = _extended_client_config
+        fields_needed = _extended_fields
+        ob = 'id, start, end'
+        group_feature_index = 7
+        start_index = 0
+        end_index = 1
+        strand_index = 4
     else :
-        field_number = 5
+        field_number = keep_field = 5
         headers = _basic_headers
         subfeature_headers = _basic_subfeature_headers
         client_config = _basic_client_config
+        fields_needed = _basic_fields
+        start_index = 0
+        end_index = 1
+        strand_index = 4
+        ob = 'start, end'
+        group_feature_index = None
 
-    ##' calculate lazy features'
-    cursor = connection.cursor()
-    cursor.execute("select * from '%s' ;" % chr_name)
-    lazy_feats = _generate_lazy_output(_generate_nested_features(cursor, field_number))
+    print ' calculate lazy features'
+   
+    
+    cursor = _get_cursor(connection, chr_name, fields_needed, order_by=ob)
+    
+    lazy_feats = _generate_lazy_output(
+                            _generate_nested_features(cursor, field_number, keep_field, 
+                                   group_number=group_feature_index, start_index = start_index, 
+                                   end_index = end_index, strand_index = strand_index))
     NCList = []
     feature_count = 0
-    for start, stop, chunk_number, buffer, nb_feats in lazy_feats:
+    for start, stop, chunk_number, buff, nb_feats in lazy_feats:
         NCList.append([start, stop,{'chunk' : str(chunk_number)}])
-        last_chunk_number = chunk_number
         feature_count += nb_feats
-        ##' write in output'
+        print feature_count
         output_chunk = os.path.join(output_directory, 'lazyfeatures-%s.json' % chunk_number)
-        with open(output_chunk, 'w', -1) as file:
-            file.write(buffer)
+        with open(output_chunk, 'w', -1) as fil:
+            fil.write(json.dumps(buff))
              
     cursor.close()
     
     if feature_count == 0 : feature_count = 1
     
-    ##' threshold'
+    print ' threshold %s, %s ' % (chr_length, feature_count)
     threshold = _threshold(chr_length, feature_count)
     
-    ##' histogram meta'
+    print ' histogram meta %s, %s, %s' % (chr_length, threshold, url_output)
     histogram_meta = _histogram_meta(chr_length, threshold, url_output)
     
-    ##' count array'
+    print ' count array'
     cursor = connection.cursor()
     cursor.execute("select * from '%s' ;" % (chr_name))
     array = _count_features(cursor, threshold, chr_length)
     cursor.close()
     
-    ##' hists stats'
+    print ' hists stats'
     hist_stats = _calculate_histo_stats(array, threshold, chr_length)
     
-    ##' write hist in output' 
+    print ' write hist in output' 
     _write_histo_stats(_generate_hist_outputs(array, chr_length), threshold, output_directory)
-    
+    print ' write hist in output' 
+    _write_histo_stats(_generate_hist_outputs(array, chr_length, 100), threshold * 100, output_directory)
     
     data = _prepare_track_data(
                                headers, 
@@ -483,9 +568,9 @@ def _jsonify(connection, name, chr_length, chr_name, url_output, lazy_url, outpu
     
     
     
-    ##' convert to json'
+    print ' convert to json'
     json_data = json.dumps(data)
-    ##' write track data'
+    print ' write track data'
     track_data_output = os.path.join(output_directory, 'trackData.json')
     with open(track_data_output, 'w', -1) as file:
             file.write(json_data)
