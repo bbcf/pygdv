@@ -1192,7 +1192,7 @@ GenomeView.prototype.addTrack = function(track) {
     labelDiv.style.left = tmp + "px";
     trackDiv.appendChild(labelDiv);
     dojo.connect(trackDiv,"click",function(e){
-        console.log("##??##");
+	    //console.log("##??##");
 
     });
     //creating the scale and the zoom buttons
