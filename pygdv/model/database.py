@@ -343,8 +343,6 @@ class Track(DeclarativeBase):
     
     sequence_id = Column(Integer, ForeignKey('Sequence.id', ondelete="CASCADE"), nullable=False)
     sequence = relationship("Sequence")
-    parameter_id = Column(Integer, ForeignKey('TrackParameters.id',  ondelete="CASCADE"), 
-                           nullable=False)
     
     # special methods
     def __repr__(self):

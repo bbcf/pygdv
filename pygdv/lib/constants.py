@@ -38,6 +38,7 @@ NOT_DETERMINED_DATATYPE = 'not determined'
 RELATIONAL = 'relational'
 SIGNAL = 'signal'
 FEATURES = 'features'
+NOT_SUPPORTED_DATATYPE = 'format not supported'
 
 # DATA FORMAT
 date_format = "%A %d. %B %Y %H.%M.%S"

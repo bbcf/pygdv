@@ -62,9 +62,12 @@ class TrackController(CrudRestController):
         print files
         
         if files is not None:
-            for filename, file in files:
+            for filename, f in files:
                 if 'nr_assembly' in kw:
-                    handler.track.create_track(user.id, kw['nr_assembly'], file=file, trackname=filename)
+                    ret = handler.track.create_track(user.id, kw['nr_assembly'], f=f, trackname=filename)
+                    if ret is not None :
+                        flash(ret)
+                        raise redirect('./') 
             transaction.commit()
             flash("Track(s) successfully uploaded.")
         else :

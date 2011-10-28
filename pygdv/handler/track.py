@@ -14,7 +14,7 @@ from pygdv.lib import constants
 
 
 
-def create_track(user_id, sequence_id, trackname=None, file=None):
+def create_track(user_id, sequence_id, trackname=None, f=None):
     '''
     Create track from files :
     
@@ -25,14 +25,21 @@ def create_track(user_id, sequence_id, trackname=None, file=None):
     @param file : the file
     '''
     print 'creating track'
-    if file is not None:
-        input = create_input(file,trackname)
+    if f is not None:
+        _input = create_input(f,trackname)
+        if _input == constants.NOT_SUPPORTED_DATATYPE :
+            print 'deleting temporary file'
+            try:
+                os.remove(os.path.abspath(f.name))
+            except OSError :
+                pass
+            return constants.NOT_SUPPORTED_DATATYPE
         track = Track()
         if trackname is not None:
             track.name = trackname
         track.sequence_id = sequence_id
         track.user_id = user_id
-        track.input_id = input.id
+        track.input_id = _input.id
         
         
         params = TrackParameters()
@@ -53,7 +60,7 @@ def create_track(user_id, sequence_id, trackname=None, file=None):
     
     
 
-def create_input(file, trackname):
+def create_input(f, trackname):
     
     '''
     Create an input if it's new, or simply return the id of an already inputed file 
@@ -61,61 +68,62 @@ def create_input(file, trackname):
     @return : an Input
     '''
     print 'creating input'
-    sha1 = util.get_file_sha1(os.path.abspath(file.name))
+    sha1 = util.get_file_sha1(os.path.abspath(f.name))
     print "getting sha1 %s" % sha1
-    input = DBSession.query(Input).filter(Input.sha1 == sha1).first()
-    if input is not None: 
+    _input = DBSession.query(Input).filter(Input.sha1 == sha1).first()
+    if _input is not None: 
         print "file already exist"
     else :
-       
-        
-       
-         
-      
-        
-        
-        file_path = os.path.abspath(file.name)
+        file_path = os.path.abspath(f.name)
         print 'Processing input %s' % file_path
         out_dir = track_directory()
         print 'to %s : ' % out_dir
         
         
-        format = determine_format(file_path)
-        print 'gessing format : %s' % format
+        fo = determine_format(file_path)
+        print 'gessing format : %s' % fo
         
-        datatype = _formats.get(format, constants.NOT_DETERMINED_DATATYPE)
-        datatype = constants.RELATIONAL
-        
+        datatype = _formats.get(fo, constants.NOT_SUPPORTED_DATATYPE)
         print 'gessing datatype %s' % datatype
+        
+        if datatype == constants.NOT_SUPPORTED_DATATYPE:
+            return datatype
+        
+        
+        
+       
        
         
-        dispatch = _process_dispatch.get(format,lambda *args, **kw : not_recognized(*args, **kw))
+        dispatch = _process_dispatch.get(fo, constants.NOT_SUPPORTED_DATATYPE)
+        
+        
+        if  dispatch == constants.NOT_SUPPORTED_DATATYPE:
+            return dispatch
       
         print 'dispatch %s' % dispatch
         if trackname is None:
-            trackname = file.name
+            trackname = f.name
             
+        datatype = constants.FEATURES
+        
         async_result = dispatch(datatype=datatype, path=file_path, sha1=sha1, name=trackname)
         print 'get async_result : %s' % async_result
 
         print 'building input'
-        input = Input()
-        input.sha1 = sha1
-        input.datatype = datatype
+        _input = Input()
+        _input.sha1 = sha1
+        _input.datatype = datatype
        
-        input.task_id = async_result.task_id
+        _input.task_id = async_result.task_id
         
-        DBSession.add(input)
-        print 'deleting temporary file'
-        try:
-            os.remove(os.path.abspath(file.name))
-        except OSError :
-            pass
+        DBSession.add(_input)
+    print 'deleting temporary file'
+    try:
+        os.remove(os.path.abspath(f.name))
+    except OSError :
+        pass
     DBSession.flush()
-    return input   
-
-
-
+    return _input   
 
 
 
@@ -139,10 +147,11 @@ _process_dispatch = {'sql' : lambda *args, **kw : move_database(*args, **kw),
 
 
 _formats = {'sql' : constants.NOT_DETERMINED_DATATYPE,
-                    'bed' : constants,
-                    'bigWig' : lambda *args, **kw : not_impl(*args, **kw),
-                    'wig' : lambda *args, **kw : not_impl(*args, **kw),
-                    'bedgraph' : lambda *args, **kw : not_impl(*args, **kw)
+                    'bed' : constants.FEATURES,
+                    'gff' : constants.RELATIONAL,
+                    'bigWig' : constants.SIGNAL,
+                    'wig' : constants.SIGNAL,
+                    'bedgraph' : constants.SIGNAL
                     }
 
 _sql_dispatch = {'quantitative' : lambda *args, **kw : _signal(*args, **kw),

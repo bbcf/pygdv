@@ -26,6 +26,9 @@ HIST_CHUNK_SIZE = 10001
 SUBLIST_INDEX = 5
 
 LAZY_INDEX = 2
+'''
+index of the {'chunk':nb} parameter in the list
+'''
 
 TYPE = "FeatureTrack"
 
