@@ -249,7 +249,7 @@ class ProjectController(CrudRestController):
         }};
         ''' % jb.features_style(tracks)
         
-        control = 'b.showTracks();initGDV(b)'
+        control = 'b.showTracks();initGDV(b, %s)' % project.id
         
         
         return dict(species_name=project.species.name, 

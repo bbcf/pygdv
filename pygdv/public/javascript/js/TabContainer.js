@@ -15,6 +15,22 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
         this.elements_types = ['radio_choice','boolean','drop_container','number']
     },
     /**
+     * Show th tab referenced by this id
+     */
+    show_tab : function(id){
+	this.container.selectChild(id);
+    },
+
+    selections : function (){
+	this.show_tab('tab_selections');
+    },
+    tracks : function(){
+	this.show_tab('tab_tracks');
+    },
+    jobs : function(){
+	this.show_tab('tab_jobs');
+    },
+    /**
      * Initialize the tabs :
      * - tracks tabs (already loaded)
      * - selection tabs
@@ -145,9 +161,7 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
 			});
 			selname+='.db';
 			var selections_json = dojo.toJson(sels);
-			_jh.new_selection(dojo.byId('gdv_project_id').innerHTML,
-					  dojo.byId('nr_assembly_id').innerHTML
-					  ,selections_json,selname);
+			_jh.new_selection(sels);
                     } else {
 			alert('Make a selection first.\nUse selection icon on top left.');
                     }

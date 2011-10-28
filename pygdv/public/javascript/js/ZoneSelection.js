@@ -67,6 +67,7 @@ ZoneSelection.prototype.enableSel = function(event) {
     dojo.byId("disableSel").style.backgroundImage = "url('" + window.picsPathRoot + "bkgnd_light.png')";
     this.gv.disconnectMouse();
     this.handler.position();
+    if (_tc) _tc.selections();
 };
 
 /**

@@ -11,23 +11,31 @@ var _GDV_URL=_GDV_PROXY;
 var _GDV_URL_DB = _GDV_URL + '/database';
 var _GDV_URL_SCORES = _GDV_URL_DB + '/scores'
 
-var _POST_URL = _GDV_URL+"/gdv_queries";
+
 var _POST_URL_NAMES = _GDV_URL+"/gdv_names";
-var _POST_URL_GDV = _GDV_URL+"/post";
+var _GDV_WORKER_URL = '/workers'
 
 var _GDV_JOB_STATUS_WAIT = 8000
 var _gdvls;//the live search
-var _gfm;
 var _tc;//the tab container
 var _jh;//the job handler
 var _menub;//the menubar
 
+var _gdv_info = {};
+
 /**
 * Initialization function for the browser
 * @param{browser} the reference of the browser
+* @param{project_id} the project id
 * @param{readonly} true if the user cannot launch jobs
 */
-function initGDV(browser,readonly){
+function initGDV(browser, project_id, readonly){
+    dojo.require("dijit.form.CheckBox");
+    dojo.require("dijit.form.Textarea");
+    dojo.require("dijit.form.Form");
+    
+    /* init global parameters */
+    _gdv_info.project_id = project_id;
     
     dojo.addOnLoad(function(){
 	/* the menu on the left */
@@ -48,10 +56,10 @@ function initGDV(browser,readonly){
 	
 	/* a handler for the jobs */
 	try {
-	    _jh = new ch.epfl.bbcf.gdv.JobHandler();
+	    _jh = new ch.epfl.bbcf.gdv.JobHandler({});
 	} catch(err) {console.error(err);}
-
-
+	
+	
 	if(!_menub) console.error('menu bar failed');
 	if(!_gdvls) console.error('tab container failed');
 	if(!_gdvls) console.error('search field initialization failed');
@@ -70,3 +78,12 @@ var gminer = {'gfm_el_42': {'gfm_el_26': {'name': 'Base Coverage', 'parameters':
 /* THE nav BUTTONS */
 var menu_nav = ['Home', 'Projects', 'Preferences']
 
+
+
+
+var gdv_notifier = []
+
+function notify(mess){
+    gdv_notifier.push(mess);
+    console.log(mess);
+}

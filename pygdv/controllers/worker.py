@@ -14,8 +14,10 @@ class WorkerController(BaseController):
     #allow_only = has_permission(gl.perm_admin)
     
     
-    @expose('json')
-    def test(self, *args, **kw):
-        t = tasks.test.delay(callback=tasks.cb)
-        return 'task launched'
     
+    def index(self, *args, **kw):
+        print 'worker received : args : %s, kw : %s' % (args, kw)
+        pass
+    
+    def new_selection(self, *args, **kw):
+        pass

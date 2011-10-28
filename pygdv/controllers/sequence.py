@@ -2,7 +2,7 @@
 from tgext.crud import CrudRestController
 from tgext.crud.decorators import registered_validate
 
-from repoze.what.predicates import not_anonymous, has_permission
+from repoze.what.predicates import not_anonymous, has_any_permission, has_permission
 
 from tg import expose, flash, require, request, tmpl_context, validate
 from tg import app_globals as gl
@@ -20,7 +20,7 @@ __all__ = ['SequenceController']
 
 
 class SequenceController(CrudRestController):
-    allow_only = has_permission(gl.perm_admin)
+    allow_only = has_any_permission(gl.perm_user, gl.perm_admin)
     model = Sequence
     table = sequence_table
     table_filler = sequence_table_filler
@@ -98,11 +98,13 @@ class SequenceController(CrudRestController):
 #  
 #  
     @without_trailing_slash
+    @require(has_permission('admin', msg='Only for admins'))
     @expose('tgext.crud.templates.new')
     def new(self, *args, **kw):
         return CrudRestController.new(self, *args, **kw)
     
     @expose()
+    @require(has_permission('admin', msg='Only for admins'))
     @validate(sequence_new_form, error_handler=new)
     def post(self, *args, **kw):
         species_id = kw['species']
