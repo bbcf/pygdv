@@ -1,43 +1,44 @@
-var _POST_URL_NAMES = _GDV_URL+"/gdv_names";
-var gdvls;
+/**
+ * Contains definition and methods about the search field in the Browser.
+ *
+ */
 
-function initGDVLiveSearch(){
-    dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
-        constructor: function(args){
+dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
+    constructor: function(args){
         dojo.mixin(this, args);
         this.timing;//the timer
         this.field;// the field in location box
         this.refSeq; // the refSeq in the browser
-        },
-        /**
-         * Delay after onKeyUp to wait for user stop typing
-         * and send the request
-         */
-        delay : 1,
-
-        /**
-         * Start the timing
-         */
-        startTiming : function(){
+    },
+    /**
+     * Delay after onKeyUp to wait for user stop typing
+     * and send the request
+     */
+    delay : 1,
+    
+    /**
+     * Start the timing
+     */
+    startTiming : function(){
         _this = this;
         this.timing = setTimeout("_this.sendSearchPOST()",_this.delay);
-        },
-        /**
-         * Restart the timing
-         */
-        restartTiming : function(){
+    },
+    /**
+     * Restart the timing
+     */
+    restartTiming : function(){
         clearTimeout(this.timing);
         this.startTiming();
-        },
-        /**
-         * If the user is typing
-         */
-        isTyping : false,
-
-        /**
-         * Send the POST request 'search name'
-         */
-        sendSearchPOST : function(){
+    },
+    /**
+     * If the user is typing
+     */
+    isTyping : false,
+    
+    /**
+     * Send the POST request 'search name'
+     */
+    sendSearchPOST : function(){
         this.isTyping = false;
         var tracks="";
         dojo.forEach(trackInfo, function(entry, i){
@@ -47,21 +48,21 @@ function initGDVLiveSearch(){
                 var url = entry.url;
                 var matches=String(url).match(/^(\.\.\/)(.*\..*)(\/\{refseq\}\.json)$/i);
                 if(matches && matches[2]){
-                tracks+=matches[2]+",";
+                    tracks+=matches[2]+",";
                 }
             }
-            });
+        });
         if(tracks!=""){
             this.makePOST(tracks,this.field,this.refSeq);
         }
-        },
-        /**
-         * Build the POST query & send it
-         * @param{tracks} the databases to search in
-         * @param{name} the name to search
-         * @param{chr} the current chromosome
-         */
-        makePOST : function(tracks,name,chr){
+    },
+    /**
+     * Build the POST query & send it
+     * @param{tracks} the databases to search in
+     * @param{name} the name to search
+     * @param{chr} the current chromosome
+     */
+    makePOST : function(tracks,name,chr){
         var _this = this;
         var pData="id=search_name&tracks="+tracks+"&name="+name+"&chr="+chr;
         var xhrArgs = {
@@ -69,26 +70,26 @@ function initGDVLiveSearch(){
             postData: pData,
             handleAs: "json",
             load: function(data) {
-            _this.handleSearchNames(data);
+		_this.handleSearchNames(data);
             },
             error: function(data){
-            _this.error(data);
+		_this.error(data);
             }
         }
         dojo.xhrPost(xhrArgs);
-        },
-
-        /**
-         * Error handler
-         */
-        error : function(data){
+    },
+    
+    /**
+     * Error handler
+     */
+    error : function(data){
         console.error("LOADING ERROR : "+data);
-        },
-        /**
-         * handle the result of the POST 'search name'
-         * @param{data} the result of the connection
-         */
-        handleSearchNames : function(data){
+    },
+    /**
+     * handle the result of the POST 'search name'
+     * @param{data} the result of the connection
+     */
+    handleSearchNames : function(data){
         var suggest_field = dojo.byId("suggest_field");
         suggest_field.style.display="inline";
         suggest_field.innerHTML="";
@@ -98,7 +99,7 @@ function initGDVLiveSearch(){
         dojo.connect(closeSuggest,"onclick",function(event){
             suggest_field.style.display="none";
             dojo.stopEvent(event);
-            });
+        });
         suggest_field.appendChild(closeSuggest);
         var hasResult = false;
         for(track in data){//iterate throught tracks
@@ -106,74 +107,74 @@ function initGDVLiveSearch(){
             //console.log(track);
             var chrs = data[track];
             for(chr_ in chrs){//iterate throught chromosomes
-            //console.log("CHROMOSOME");
-            //console.log(chr_);
-            var suggests = chrs[chr_];
-            var hasSuggestions=false;
-            var htmlchr=document.createElement("div");
-            htmlchr.className="chr_livesearch";
-            htmlchr.innerHTML=chr_;
-            var res=document.createElement("div");
-            htmlchr.appendChild(res);
-            for (field in suggests){//iterate throught results
-                hasSuggestions=true;
-                var positions = suggests[field];
-                var lin = document.createElement("a");
-                lin.innerHTML=field;
-                var start = parseInt(positions[0]);
-                var end = parseInt(positions[1]);
-                var interval = end-start;
-                start=start-interval;
-                end=end+interval;
-                var goTo = chr_+":"+start+".."+end;
-                //console.log("goto :"+goTo);
-                lin.goTo = goTo;
-                lin.className="field_livesearch"
-                res.appendChild(lin);
-                dojo.connect(lin, "onclick",lin, function(event) {
-                    //console.log("click ");
-                    //console.log(this.goTo);
-                    gb=dojo.byId("GenomeBrowser").genomeBrowser;
-                    gb.navigateTo(this.goTo,false);
-                    suggest_field.style.display="none";
-                    dojo.byId("location").value = this.goTo;
-                    dojo.stopEvent(event);
-                    dojo.disconnect(this);
-                });
+		//console.log("CHROMOSOME");
+		//console.log(chr_);
+		var suggests = chrs[chr_];
+		var hasSuggestions=false;
+		var htmlchr=document.createElement("div");
+		htmlchr.className="chr_livesearch";
+		htmlchr.innerHTML=chr_;
+		var res=document.createElement("div");
+		htmlchr.appendChild(res);
+		for (field in suggests){//iterate throught results
+                    hasSuggestions=true;
+                    var positions = suggests[field];
+                    var lin = document.createElement("a");
+                    lin.innerHTML=field;
+                    var start = parseInt(positions[0]);
+                    var end = parseInt(positions[1]);
+                    var interval = end-start;
+                    start=start-interval;
+                    end=end+interval;
+                    var goTo = chr_+":"+start+".."+end;
+                    //console.log("goto :"+goTo);
+                    lin.goTo = goTo;
+                    lin.className="field_livesearch"
+                    res.appendChild(lin);
+                    dojo.connect(lin, "onclick",lin, function(event) {
+			//console.log("click ");
+			//console.log(this.goTo);
+			gb=dojo.byId("GenomeBrowser").genomeBrowser;
+			gb.navigateTo(this.goTo,false);
+			suggest_field.style.display="none";
+			dojo.byId("location").value = this.goTo;
+			dojo.stopEvent(event);
+			dojo.disconnect(this);
+                    });
+		}
+		if(hasSuggestions==true){
+                    suggest_field.appendChild(htmlchr);
+		}
             }
-            if(hasSuggestions==true){
-                suggest_field.appendChild(htmlchr);
-            }
-            }
-
-
+	    
+	    
         }
-        },
-        /**
-         * Function binded to the location box 'onKeyUp'
-         */
-        search : function(field,refSeq){
-            var suggest_field = dojo.byId("suggest_field");
-            var browser = dojo.byId("GenomeBrowser").genomeBrowser;
-            suggest_field.style.display="inline";
-            suggest_field.innerHTML="";
-            var loader = document.createElement("img");
-            loader.src = browser.imageRoot + "ajax-loader.gif";
-            suggest_field.appendChild(loader);
-            this.field = field;
-            this.refSeq = refSeq;
-            if(this.isTyping==true){
-		this.restartTiming();
-            } else {
-		this.startTiming();
-		this.isTyping=true;
-            }
+    },
+    /**
+     * Function binded to the location box 'onKeyUp'
+     */
+    search : function(field,refSeq){
+        var suggest_field = dojo.byId("suggest_field");
+        var browser = dojo.byId("GenomeBrowser").genomeBrowser;
+        suggest_field.style.display="inline";
+        suggest_field.innerHTML="";
+        var loader = document.createElement("img");
+        loader.src = browser.imageRoot + "ajax-loader.gif";
+        suggest_field.appendChild(loader);
+        this.field = field;
+        this.refSeq = refSeq;
+        if(this.isTyping==true){
+	    this.restartTiming();
+        } else {
+	    this.startTiming();
+	    this.isTyping=true;
         }
+    }
+    
+});
 
-    });
-    _gdvls = new ch.epfl.bbcf.gdv.Livesearch();
 
-}
+
 
 
 
@@ -193,17 +194,17 @@ function lookupGeneNames_exactMatch(name,chr){
     var tracks="";
     dojo.forEach(trackInfo, function(entry, i){
         if(entry.type=="FeatureTrack"){
-        var url = entry.url;
-        var matches=String(url).match(/^(\.\.\/)(.*\..*)(\/\{refseq\}\.json)$/i);
-        if(matches && matches[2]){
-            tracks+=matches[2]+",";
-        }
+            var url = entry.url;
+            var matches=String(url).match(/^(\.\.\/)(.*\..*)(\/\{refseq\}\.json)$/i);
+            if(matches && matches[2]){
+		tracks+=matches[2]+",";
+            }
         }
     });
-
+    
     var geneFetcher = new GeneNameFetcher();
     geneFetcher.lookupInGDV_exactMatch(tracks,name,chr);
-
+    
 };
 
 /**
@@ -216,15 +217,15 @@ function lookupGeneNames_exactMatch(name,chr){
 function lookupGeneNames_searchNames(name,chr){
     var tracks="";
     dojo.forEach(trackInfo, function(entry, i){
-            if(entry.type=="FeatureTrack"){
-                var url = entry.url;
-                var matches=String(url).match(/^(\.\.\/)(.*\..*)(\/\{refseq\}\.json)$/i);
-                if(matches && matches[2]){
-                    tracks+=matches[2]+",";
-                }
+        if(entry.type=="FeatureTrack"){
+            var url = entry.url;
+            var matches=String(url).match(/^(\.\.\/)(.*\..*)(\/\{refseq\}\.json)$/i);
+            if(matches && matches[2]){
+                tracks+=matches[2]+",";
             }
-        });
-
+        }
+    });
+    
     var geneFetcher = new GeneNameFetcher();
     geneFetcher.lookupInGDV_searchMatch(tracks,name,chr);
 };
@@ -293,15 +294,15 @@ GeneNameFetcher.prototype.lookupInGDV_exactMatch = function(tracks,name,chr){
 GeneNameFetcher.prototype.handleExactMatch = function(data){
     //if perfect match, jump to location
     if(data.perfect){
-    pos=data.perfect;
-    var start = parseInt(pos[0]);
+	pos=data.perfect;
+	var start = parseInt(pos[0]);
         //var end = parseInt(pos[1]);
-    var end = parseInt(pos[pos.length-1]);
-    var interval = end-start;
-    start=start-interval;
+	var end = parseInt(pos[pos.length-1]);
+	var interval = end-start;
+	start=start-interval;
         end=end+interval;
-    gb=dojo.byId("GenomeBrowser").genomeBrowser;
-    gb.navigateTo(start+".."+end,false);
+	gb=dojo.byId("GenomeBrowser").genomeBrowser;
+	gb.navigateTo(start+".."+end,false);
     }
 };
 
@@ -318,32 +319,32 @@ GeneNameFetcher.prototype.handleSearchNames = function(data){
     suggest_field.style.display="inline";
     suggest_field.innerHTML="";
     var hasResult = false;
-
+    
     for(db in data){
-    var tmp = data[db];
-    if(tmp.suggest && tmp.pos){
-        var names = tmp.suggest;
-        dojo.forEach(names,function(entry,i){
-            hasResult=true;
-                    var link = document.createElement("a");
-                    link.innerHTML=entry;
-                    suggest_field.appendChild(link);
-                    //connect the links
-                    dojo.connect(link, "onclick", function(event) {
-                            var array = tmp.pos[entry];
-                            var jsonData = dojo.fromJson("{perfect:["+array+"]}");
-                //var toto = dojo.fromJson("{perfect:["+array+"]}");
-                            geneFetcher.handleExactMatch(jsonData);
-                            suggest_field.style.display="none";
-                            dojo.byId("location").value = entry;
-                            dojo.stopEvent(event);
-                            dojo.disconnect(this);
-                        });
+	var tmp = data[db];
+	if(tmp.suggest && tmp.pos){
+            var names = tmp.suggest;
+            dojo.forEach(names,function(entry,i){
+		hasResult=true;
+                var link = document.createElement("a");
+                link.innerHTML=entry;
+                suggest_field.appendChild(link);
+                //connect the links
+                dojo.connect(link, "onclick", function(event) {
+                    var array = tmp.pos[entry];
+                    var jsonData = dojo.fromJson("{perfect:["+array+"]}");
+                    //var toto = dojo.fromJson("{perfect:["+array+"]}");
+                    geneFetcher.handleExactMatch(jsonData);
+                    suggest_field.style.display="none";
+                    dojo.byId("location").value = entry;
+                    dojo.stopEvent(event);
+                    dojo.disconnect(this);
                 });
-    }
+            });
+	}
     }
     if(hasResult==false){
-    suggest_field.innerHTML="no suggestions";
+	suggest_field.innerHTML="no suggestions";
     }
 };
 

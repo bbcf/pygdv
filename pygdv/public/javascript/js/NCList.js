@@ -27,6 +27,7 @@ NCList.prototype.fill = function(intervals, sublistIndex) {
     //              in the NCList seems like a waste (TODO: measure that waste).
     //half-open?
     this.sublistIndex = sublistIndex;
+    console.log('sublist index : ' + sublistIndex);
     var myIntervals = intervals;//.concat();
     //sort by OL
     myIntervals.sort(function(a, b) {

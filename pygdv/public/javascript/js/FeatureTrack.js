@@ -287,7 +287,6 @@ FeatureTrack.prototype.fillFeatures = function(blockIndex, block,
                                                leftBlock, rightBlock,
                                                leftBase, rightBase, scale,
                                                containerStart, containerEnd) {
-    console.log('fill');
     //arguments:
     //block: div to be filled with info
     //leftBlock: div to the left of the block to be filled
@@ -323,13 +322,12 @@ FeatureTrack.prototype.fillFeatures = function(blockIndex, block,
     }
 
     var curTrack = this;
-    console.log('bfc');
     var featCallback = function(feature, path) {
 	//uniqueId is a stringification of the path in the NCList where
         //the feature lives; it's unique across the top-level NCList
         //(the top-level NCList covers a track/chromosome combination)
         var uniqueId = path.join(",");
-        console.log("ID " + uniqueId + (layouter.hasSeen(uniqueId) ? " (seen)" : " (new)"));
+        //console.log("ID " + uniqueId + (layouter.hasSeen(uniqueId) ? " (seen)" : " (new)"));
         if (layouter.hasSeen(uniqueId)) {
             //console.log("this layouter has seen " + uniqueId);
             return;
@@ -397,8 +395,7 @@ FeatureTrack.prototype.measureStyles = function() {
 
 FeatureTrack.prototype.renderFeature = function(feature, uniqueId, block, scale,
                                                 containerStart, containerEnd) {
-    console.log('render feature');
-    console.log(feature);
+    
     var fields = this.fields;
     //featureStart and featureEnd indicate how far left or right
     //the feature extends in bp space, including labels
@@ -413,7 +410,7 @@ FeatureTrack.prototype.renderFeature = function(feature, uniqueId, block, scale,
             featureStart -= (this.minusArrowWidth / scale); break;
         }
     }
-
+    
     // if the label extends beyond the feature, use the
     // label end position as the end position for layout
     if (scale > this.labelScale) {
@@ -501,7 +498,7 @@ FeatureTrack.prototype.renderFeature = function(feature, uniqueId, block, scale,
             break;
         }
     }
-
+    
     if ((scale > this.labelScale)
         && fields["name"]
         && feature[fields["name"]]) {
@@ -527,6 +524,11 @@ FeatureTrack.prototype.renderFeature = function(feature, uniqueId, block, scale,
         labelDiv.feature = feature;
         block.appendChild(labelDiv);
     }
+    // console.log(scale);
+    // console.log(this.subfeatureScale);
+    // console.log(feature);
+    // console.log(fields["subfeatures"]);
+    // console.log(feature[fields["subfeatures"]]);
     if (fields["subfeatures"]
         && (scale > this.subfeatureScale)
         && feature[fields["subfeatures"]]
@@ -576,6 +578,7 @@ FeatureTrack.prototype.featureUrl = function(feature) {
 
 FeatureTrack.prototype.renderSubfeature = function(feature, featDiv, subfeature,
                                                    displayStart, displayEnd) {
+    
     //var featStart = feature[this.fields["start"]];
     var subStart = subfeature[this.subFields["start"]];
     var subEnd = subfeature[this.subFields["end"]];
