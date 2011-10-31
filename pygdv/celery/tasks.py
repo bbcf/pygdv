@@ -22,6 +22,7 @@ def del_file_on_error(tasks, sha1, *args, **kw):
     print 'del file on error tasks :%s, sha1 : %s in %s and %s' % (tasks, sha1, track_directory(), json_directory())
     for theid in tasks:
         if not theid == success :
+            print 'sha1 : ' + sha1
             path1 = os.path.join(track_directory(), sha1)
             path2 = os.path.join(json_directory(), sha1)
             shutil.rmtree(path1, ignore_errors = True)

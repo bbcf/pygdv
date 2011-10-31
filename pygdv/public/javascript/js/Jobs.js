@@ -24,14 +24,6 @@ dojo.declare("ch.epfl.bbcf.gdv.JobHandler",null,{
         }
     },
 
-    /**
-     * get the status of a job
-     * and the result if there is success
-     */
-    get_job_status : function(job_id){
-        var body = "id=job&action=status&job_id="+job_id;
-        this.post_to_gdv(body);
-    },
     
     /**
      * send a new selection job
@@ -41,10 +33,12 @@ dojo.declare("ch.epfl.bbcf.gdv.JobHandler",null,{
         /* build description */
 	var desc = '';
 	dojo.forEach(selections, function(entry, index){
-	    desc += '( ' + entry.get() + ' )';
+	    desc += '( ' + entry.display() + ' )';
 	});
 	/* build job */
-	this.new_job('selection', desc, 'project_id=' + _gdv_info.project_id + '&s='+ dojo.toJson(selections));
+	//console.log('new sel');
+	this.new_job('selection', desc, '/new_selection', 
+		     'project_id=' + _gdv_info.project_id + '&s='+ dojo.toJson(selections));
     },
 
     /**
@@ -53,7 +47,8 @@ dojo.declare("ch.epfl.bbcf.gdv.JobHandler",null,{
      * @param{data} the data from the form
      */
     new_gfeatminer_job: function(project_id,data){
-        var body = "id=job&action=gfeatminer&project_id="+project_id+"&data="+dojo.toJson(data);
+        //console.log('new gm');
+	var body = "id=job&action=gfeatminer&project_id="+project_id+"&data="+dojo.toJson(data);
         _tc.container.selectChild("tab_jobs");
         //console.log(data);
         this.post_to_gdv(body);
@@ -65,13 +60,14 @@ dojo.declare("ch.epfl.bbcf.gdv.JobHandler",null,{
      * @param{body} - the body to post
      */
     post_to_gdv : function(url, body){
-        console.log(body);
+	//console.log('ptgdv');
+	var ctx = this;
         var xhrArgs = {
-            url: _POST_URL_GDV + '/url',
+            url: _GDV_WORKER_URL + url,
             postData: body,
             handleAs: "json",
             load: function(data) {
-		this.update_job(data);
+		ctx.update_job(data);
 	    },
             error: function(data){
 		console.error('failed : ');
@@ -87,26 +83,25 @@ dojo.declare("ch.epfl.bbcf.gdv.JobHandler",null,{
      * Response send by GDV back to the view
      */
     update_job : function(data){
+	//console.log('update job');
+	//console.log(data);
 	/* get job or create it */
-	var job_id = data['job_id'];
-	var job = this.get_job(job_id);
-	if (job){
-	    job.name = data['name'];
-	    job.description = data['description'];
-	    job.status = data['status'];
-	} else {
-	    job = new GDVJob(
-		job_id,
-		data['name'], 
-		data['description'],
-		data['status'],
-		'/status', 
-		'job_id=' + data['job_id'], false)
+	if(data && 'job_id' in data){
+	    var job_id = data['job_id'];
+	    var job = this.get_job(job_id);
+	    
+	    if (job){
+		/* update fields */
+		dojo.mixin(job, data)
+	    } else {
+		/* create new */
+		data['url'] = '/status',
+		job = new GDVJob(data, false)
+	    }
+	    this.to_buffer(job);
+	    this.check_job(job);
+	    
 	}
-	
-	this.put_job(job);
-	
-	this.check_job(job);
     },
 
     /**
@@ -118,16 +113,17 @@ dojo.declare("ch.epfl.bbcf.gdv.JobHandler",null,{
     /**
      * Put the job in the buffer
      */
-    put_job : function(job){
-	this.jobs[job.id] = job;
+    to_buffer : function(job){
+	this.jobs[job.job_id] = job;
     },
     /**
      * Will create and send a new job on GDV
      */
     new_job : function(name, description, url, body){
-	body += '&job_name=' +name + 'job_description= ' + description;
+	//console.log('new_job');
+	body += '&job_name=' + name + '&job_description= ' + description;
 	this.post_to_gdv(url, body);
-	notify('job ' + job.name + ' launched (' + description +').');
+	notify('job ' + name + ' launched (' + description +').');
     }, 
     
 
@@ -136,79 +132,31 @@ dojo.declare("ch.epfl.bbcf.gdv.JobHandler",null,{
      * TODO : check if the job has to be updated relaunch it or just display it - how - ???
      */
     check_job : function(job){
-
-    }
-    /**
-     * Display the jobs on the tab container
-     * & start updating jobs that are running
-     */
-    display_jobs : function(){
-        var jobs = this.jobs;
-        var update=false;
-        var ctx = this;
-        dojo.forEach(jobs, function(job, i){
-            if(job.failed){
-		console.log(job);
-		console.error(job.data);
-            }
-            else if(job.status == 'running'){
-                update = true;
-                ctx.get_job_status(job.job_id);
-            }
-            _tc.addJob(job);
-        });
-        if(update){
-            var ctx = this;
-            this.displayTimeout = setTimeout(function(){
-		ctx.display_jobs()
-            },_GDV_JOB_STATUS_WAIT);
-        }
-    },
-    /**
-     * Stop the update of the job display
-     */
-    stop_display : function(){
-        clearTimeout(this.displayTimeout);
+	//console.log('check job');
+	//console.log(job);
+	var ctx = this;
+	if (job.status == 'RUNNING' || job.status == 'running' || 
+	    job.status == 'pending' || job.status == 'PENDING'){
+	    var ctx = this;
+	    setTimeout(function(){
+		ctx.post_to_gdv(job.url, job.body);
+	    }, _GDV_JOB_STATUS_WAIT);
+	}
+	/* add the job to the tab_container */
+	_tc.addJob(job);
     }
 });
-
-
-
-
-/**
- * Add a method to array object, that it
- * could search & compare containing jobs
- * @return the index of the same job if contains, else -1
- */
-Array.prototype.containsJob = function (job){
-    var i;
-    for (i = 0; i < this.length; i += 1){
-	if(job.job_id===this[i].job_id){
-            return i;
-	}
-    }
-    return -1;
-};
-
-
-
-
 
 
 
 
 dojo.declare("GDVJob", null, {
-    constructor: function(id, name, description, url, body_params, flag){
-        this.launched = false;
-	this.id = id;
-	this.name = name;
-	this.description = description;
-	this.url = url;
-	this.statue = 'running';
+    constructor: function(args, flag){
+        dojo.mixin(this, args)
+	this.launched = false;
 	if (flag){
-	    this.body = body_params += '&job_name=' +name + 'job_description= ' + description;
-	} else {
-	    this.body = body_params;
-	}
+	    this.body = this.body += '&job_name=' +name + '&job_description= ' + description;
+	} 
     }
 });
+

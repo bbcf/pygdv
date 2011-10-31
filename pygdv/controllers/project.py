@@ -127,7 +127,6 @@ class ProjectController(CrudRestController):
 
 
 
-
     @expose('pygdv.templates.project_sharing')
     def share(self, project_id, *args, **kw):
         if project_id is None:

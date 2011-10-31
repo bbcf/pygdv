@@ -22,7 +22,7 @@ def create_track(user_id, sequence_id, trackname=None, f=None):
         create track from input
     
     @param trackname : name to give to the track
-    @param file : the file
+    @param file : the file name
     '''
     print 'creating track'
     if f is not None:
@@ -34,6 +34,7 @@ def create_track(user_id, sequence_id, trackname=None, f=None):
             except OSError :
                 pass
             return constants.NOT_SUPPORTED_DATATYPE
+        
         track = Track()
         if trackname is not None:
             track.name = trackname
@@ -55,6 +56,7 @@ def create_track(user_id, sequence_id, trackname=None, f=None):
         params.build_parameters()
         DBSession.add(params)
         DBSession.flush()
+        return _input.task_id
     
     
     
@@ -64,17 +66,17 @@ def create_input(f, trackname):
     
     '''
     Create an input if it's new, or simply return the id of an already inputed file 
-    @param file : the file
+    @param file : the file name
     @return : an Input
     '''
     print 'creating input'
-    sha1 = util.get_file_sha1(os.path.abspath(f.name))
+    sha1 = util.get_file_sha1(os.path.abspath(f))
     print "getting sha1 %s" % sha1
     _input = DBSession.query(Input).filter(Input.sha1 == sha1).first()
     if _input is not None: 
         print "file already exist"
     else :
-        file_path = os.path.abspath(f.name)
+        file_path = os.path.abspath(f)
         print 'Processing input %s' % file_path
         out_dir = track_directory()
         print 'to %s : ' % out_dir
@@ -102,7 +104,7 @@ def create_input(f, trackname):
       
         print 'dispatch %s' % dispatch
         if trackname is None:
-            trackname = f.name
+            trackname = f
             
         datatype = constants.FEATURES
         
@@ -119,7 +121,7 @@ def create_input(f, trackname):
         DBSession.add(_input)
     print 'deleting temporary file'
     try:
-        os.remove(os.path.abspath(f.name))
+        os.remove(os.path.abspath(f))
     except OSError :
         pass
     DBSession.flush()

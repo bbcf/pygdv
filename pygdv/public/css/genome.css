@@ -801,4 +801,31 @@ input#disableSel {
     text-decoration:none;
 }
 
+#gdv_notifier{
+    top: 20px;
+    position: relative;
+    height: 40%;
+}
 
+.job {
+    font-family: sans-serif;
+    z-index: 20;
+    border: 1px #2b434c solid;
+    color: #2b434c;
+    cursor: pointer;
+    padding: 3px;
+    display:inline-block;
+    margin:1px;
+}
+
+.job_running{
+    background-color: #E8E86C;
+}
+
+.job_success{
+    background-color: #99FF66;
+}
+
+.job_error{
+    background-color: #C14C4C;
+}

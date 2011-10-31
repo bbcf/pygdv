@@ -124,6 +124,13 @@ Marquee.prototype.order = function() {
 };
 
 /**
+ * Return a String representation of a Marquee
+ */
+Marquee.prototype.display = function() {
+    return this.chr + '(' + this.start + ', ' + this.end + ')';
+
+};
+/**
  * Changes alpha and finds base pairs
  */
 Marquee.prototype.fixate = function(gv) {
@@ -136,8 +143,8 @@ Marquee.prototype.fixate = function(gv) {
     // What are the coordinates of the selection
     factor = gv.pxPerBp
     leftbase = gv.minVisible()
-    this.start = Math.round(leftbase + (this.x1/factor))
-    this.end   = Math.round(leftbase + (this.x2/factor))
+    this.start = Math.round(leftbase + (this.x1 / factor))
+    this.end   = Math.round(leftbase + (this.x2 / factor))
     // Save the chromosome
     this.chr = gv.ref.name
 };

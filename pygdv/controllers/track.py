@@ -13,7 +13,7 @@ from tg.decorators import paginate,with_trailing_slash
 from pygdv.model import DBSession, Track, Input, TrackParameters
 from pygdv.widgets.track import track_table, track_table_filler, track_new_form, track_edit_filler, track_edit_form, track_grid
 from pygdv import handler
-from pygdv.lib import util
+from pygdv.lib import util, constants
 import os
 import transaction
 from pygdv.lib import checker
@@ -64,8 +64,8 @@ class TrackController(CrudRestController):
         if files is not None:
             for filename, f in files:
                 if 'nr_assembly' in kw:
-                    ret = handler.track.create_track(user.id, kw['nr_assembly'], f=f, trackname=filename)
-                    if ret is not None :
+                    ret = handler.track.create_track(user.id, kw['nr_assembly'], f=f.name, trackname=filename)
+                    if ret == constants.NOT_SUPPORTED_DATATYPE :
                         flash(ret)
                         raise redirect('./') 
             transaction.commit()

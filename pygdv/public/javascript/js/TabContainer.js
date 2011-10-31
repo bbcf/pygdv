@@ -66,52 +66,59 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
     /**
      * add a job to the jobs tab
      *@param{job} the job
-     *@param{status} status of the job
-     *@param{output} type of the job : e.g : a link to an image, to relaod the page,...
      */
     addJob : function(job){
-        var name = job.job_id;
-        var status = job.status;
-        var output = job.output;
-        var type = job.type;
+        var job_id = job.job_id;
+	var name = job.name;
+	var desc = job.description;
+	var status = job.status;
 	
-        var div = dojo.byId('job_'+name);
-        if(!div){
-            div = document.createElement("DIV");
-            div.id='job_'+name;
+	//console.log('add job');
+	//console.log(job);
+	/* get the job div */
+        var job_div = dojo.byId('job_' + job_id);
+	if(!job_div){
+            job_div = document.createElement("DIV");
+            job_div.id = 'job_' + job_id;
         }
 	
 	
-        if(status=='success'){
-            div.innerHTML='job : '+name+"  ("+type+")   ";
-            div.className="job_success";
-            if(output=='reload'){
-		var d = document.createElement('span');
-		var link = document.createElement('a');
-		link.innerHTML='reload the page';
-		link.className='hl';
-		link.href=_GDV_URL+'/browser?id='+dojo.byId('gdv_project_id').innerHTML;
-		d.appendChild(link);
-		div.appendChild(d);
-            } else if(output=='image'){
-		var d = document.createElement('span');
-                var link = document.createElement('a');
-                link.innerHTML='image';
-                link.className='hl';
-                link.href=_GDV_URL+'/image?id='+job.job_id;
-                d.appendChild(link);
-                div.appendChild(d);
-            }
-        } else if(status == 'running'){
-            div.innerHTML='job : '+name+"  ("+type+")   ";
-            div.className="job_running";
-        } else if(status == 'error'){
-            div.innerHTML='job : '+name+"  ("+job.data+")   ";
-            div.className="job_error";
+	/* customize the display */
+	job_div.innerHTML='job : ' + name + '  (' + desc + ')';
+	
+        if(status == 'success' || status == 'SUCCESS'){
+            job_div.className="job job_success";
+            var output = job.output;
+	    if(output){
+		if(output == 'reload'){
+		    var d = document.createElement('span');
+		    var link = document.createElement('a');
+		    link.innerHTML = 'reload the page';
+		    link.className = 'hl';
+		    link.href = _GDV_PROJECT_VIEW + '?project_id=' + _gdv_info.project_id;
+		    d.appendChild(link);
+		    job_div.appendChild(d);
+		    
+		} else if(output == 'image'){
+		    var d = document.createElement('span');
+                    var link = document.createElement('a');
+                    link.innerHTML = 'image';
+                    link.className = 'hl';
+                    link.href = _GDV_URL + '/image?id=' + job.job_id;
+                    d.appendChild(link);
+                    job_div.appendChild(d);
+		}
+	    }
+	    
+        } else if(status == 'running' || status == 'RUNNING'){
+            job_div.className="job job_running";
+	    
+        } else if(status == 'error' || status == 'ERROR'){
+            job_div.className="job job_error";
         }
 	
 	
-        this.tab_jobs.domNode.appendChild(div);
+        this.tab_jobs.domNode.appendChild(job_div);
     },
     /**
      * This will update the status of the jobs when the jobs tab is selected
@@ -389,7 +396,7 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
         case "radio_choice":
             el = document.createElement("div");
             el.className='gm_cb';
-            console.log(item);
+            //console.log(item);
             var values = item['radio_values'];
             var _name = item['name'];
             var len = values.length;

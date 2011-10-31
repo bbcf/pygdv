@@ -12,11 +12,20 @@ dojo.declare("ch.epfl.bbcf.gdv.GDVMenuBar",null,{
         if(this.toolbar && this.menu_navigation){
 	    this.build_navigation(this.menu_navigation);
 	    this.build_gminer();
+	    this.build_notifier();
 	} else {
 	    console.warn('cannot build toolbar, no json specified');
         }
     },
-    
+    /**
+     * Build the ``notifier``
+     */
+    build_notifier : function(){
+	var container = dojo.byId('gdv_menu');
+	var ta = document.createElement('div');
+	ta.id = 'gdv_notifier';
+	container.appendChild(ta);
+    },
     /**
      * Build the ``Navigation`` menu
      *@param{item_list} : the menu items

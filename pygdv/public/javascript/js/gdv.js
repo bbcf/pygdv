@@ -10,7 +10,7 @@ var _GDV_URL=_GDV_PROXY;
 //GLOBAL VARIABLES
 var _GDV_URL_DB = _GDV_URL + '/database';
 var _GDV_URL_SCORES = _GDV_URL_DB + '/scores'
-
+var _GDV_PROJECT_VIEW = '/projects/view'
 
 var _POST_URL_NAMES = _GDV_URL+"/gdv_names";
 var _GDV_WORKER_URL = '/workers'
@@ -82,8 +82,14 @@ var menu_nav = ['Home', 'Projects', 'Preferences']
 
 
 var gdv_notifier = []
-
+var koopa;
 function notify(mess){
     gdv_notifier.push(mess);
-    console.log(mess);
+    str = '';
+    dojo.forEach(gdv_notifier, function(entry, i){
+	str += entry + '\n';
+    });
+
+    dojo.byId('gdv_notifier').innerHTML = str;
+    
 }
