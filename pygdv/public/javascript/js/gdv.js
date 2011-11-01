@@ -14,6 +14,7 @@ var _GDV_PROJECT_VIEW = '/projects/view'
 
 var _POST_URL_NAMES = _GDV_URL+"/gdv_names";
 var _GDV_WORKER_URL = '/workers'
+var _GDV_FORM_URL = '/forms'
 
 var _GDV_JOB_STATUS_WAIT = 8000
 var _gdvls;//the live search

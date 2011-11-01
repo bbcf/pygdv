@@ -30,6 +30,9 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
     jobs : function(){
 	this.show_tab('tab_jobs');
     },
+    form : function(){
+	this.show_tab('tab_form');
+    },
     /**
      * Initialize the tabs :
      * - tracks tabs (already loaded)
@@ -49,8 +52,8 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
             //jobs tab
             var cp3 = new dijit.layout.ContentPane({title: "Jobs",id:'tab_jobs'});
             tc.addChild(cp3);
-            this.tab_jobs=cp3;
-            this.connectJobUpdateEvents();
+            this.tab_jobs = cp3;
+            //this.connectJobUpdateEvents();
         }
     },
     /**
@@ -350,8 +353,9 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
 		for(k in adds){
 		    jsonform[k]=adds[k];
 		}
-		var project_id=dojo.byId('gdv_project_id').innerHTML;
-		_jh.new_gfeatminer_job(project_id,jsonform);
+
+		/* launch the new job */
+		_jh.new_gfeatminer_job(jsonform);
             }
         });
 	
@@ -362,7 +366,7 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
      * @param{object} the object coming from a dnd.Source
      * @param{json} the JSON Object representing the values in the form
      */
-    addTrackParameter : function(object,json){
+    addTrackParameter : function(object, json){
         var map = object.map;
         var len=map.length;
         var array = [];
@@ -371,10 +375,10 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
             var j={};
             var track = map[i]['data'];
             var url = track.url
-            var db = url.substring(3,url.length-14);//get the db name from the url
+	    var db = url.substring(0,url.length-24);//get the db name from the url
             j['path']=db;
             j['name']=track.label;
-            array.push(j);
+	    array.push(j);
         }
         json[object.drop_type]=array;
     },

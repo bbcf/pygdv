@@ -147,7 +147,11 @@ dojo.declare("ch.epfl.bbcf.gdv.GDVMenuBar",null,{
         var o = new dijit.MenuItem({
 	    label:item.name,
 	    onClick: function(event) {
-		ctx.displayForm(item);
+		/** for the moment get form from dojo but perhaps 
+		 * we could take it from turbogears
+		 */
+		//ctx.get_form('id=test%supl=koopa', '/test');
+		ctx.display_form(item);
 		dojo.stopEvent(event);
 	    }});
         return o;
@@ -156,8 +160,34 @@ dojo.declare("ch.epfl.bbcf.gdv.GDVMenuBar",null,{
     /**
      * Display the form corresponding to the item clicked
      */
-    displayForm : function(item){
+    display_form : function(item){
         _tc.addFormTab(item);
-        _tc.container.selectChild("tab_form");
+        _tc.form();
+    },
+
+    get_form : function(body, url){
+        //console.log('ptgdv');                                                                                      
+        var ctx = this;
+        var xhrArgs = {
+            url: _GDV_FORM_URL + url,
+            postData: body,
+            handleAs: "xml",
+            load: function(data) {
+                ctx.tooo(data);
+            },
+            error: function(data){
+                console.error('failed : ');
+                console.log(data);
+            }
+        }
+        dojo.xhrPost(xhrArgs);
+    },
+    tooo : function(data){
+	console.log('test');
+	console.log(data);
     }
+
+
+
+
 });

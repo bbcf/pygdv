@@ -26,6 +26,9 @@ class WorkerController(BaseController):
     
     @expose('json')
     def new_selection(self, project_id, s, job_name, job_description, *args, **kw):
+        '''
+        Called by the browser. Transform a selection to a new track;
+        '''
         user = handler.user.get_user_in_session(request)
         sels = json.loads(s)
         print sels
@@ -34,27 +37,34 @@ class WorkerController(BaseController):
         if project is None :
             return {'error' : "project id %s doesn't exist" % project_id}
         path = track.common.temporary_path()
-        _id = 1;
-#        with track.new(path, 'sql') as t:
-#            t.fields = ['start', 'end', 'name']
-#            for selection in sels:
-#                print 'selection : %s' % selection
-#                print type(selection)
-#                t.write(selection['chr'], ( (selection['start'], selection['end'], str(_id)), ))
-#                _id += 1;
-#            t.assembly = project.sequence.name
-#            
-#        ret = handler.track.create_track(user.id, project.sequence_id, f=path, trackname='%s %s' % (job_name, job_description))
-        ret = 36
-        if ret  == constants.NOT_SUPPORTED_DATATYPE :
+        
+        with track.new(path, 'sql') as t:
+            t.fields = ['start', 'end']
+            for chromosome in sels:
+                t.write(chromosome, [(marquee['start'], marquee['end']) for marquee in sels[chromosome]]);
+            t.assembly = project.sequence.name
+            
+        rev = handler.track.create_track(user.id, project.sequence_id, f=path, trackname='%s %s' 
+                                         % (job_name, job_description))
+        if rev  == constants.NOT_SUPPORTED_DATATYPE :
             return {'error' : "not supported datatype" % project_id}
         return {'name' : job_name,
                 'description' : job_description,
                 'status' : 'running',
-                'job_id' : ret}
+                'job_id' : rev}
 
     @expose('json')
     def status(self, *args, **kw):
         return {'job_id' : 36, 'status' : constants.SUCCESS, 'output' : 'reload',
                 }
+    
+    
+    
+    
+    
+    @expose('json')
+    def new_gfeatminer_job(self, project_id, data):
+        pass
+    
+    
     

@@ -829,3 +829,48 @@ input#disableSel {
 .job_error{
     background-color: #C14C4C;
 }
+
+
+/* SUBMIT JOBS FORM */
+#gm_form_title{font-size:140%;font-weight:bold;padding:1em;};
+.gfm_radio{color:red;}
+.gm_cb{float:left;padding:1em;font-size:120%;}
+.gm_ta{padding:1em;float:left;font-size:120%;}
+.error{color:red;font-size:130%;}
+p .homepage{color:red;}
+.gm_drop_container{padding:0em;float:left;width:20em;height:6em;border:medium inset;border-color:slateGrey;overflow:scrol\
+l;}
+.gm_drop_trash{
+background: url("/images/trash.png") no-repeat 0 0 transparent;
+float: left;
+height: 4em;
+padding: 0;
+width: 3em;
+}
+.gm_container{padding:1em;float:left;font-size:120%;}
+.error{color:red;font-size:130%;}
+
+
+.track-filter{
+    font-family: sans-serif;
+    z-index: 20;
+    background-color: #C0C0C0;
+    border: 1px #2b434c solid;
+    color: #2b434c;
+    cursor: pointer;
+    padding: 3px;
+    display:inline-block;
+    margin:1px;
+}
+
+.track-selection{
+    font-family: sans-serif;
+    z-index: 20;
+    background-color: #C0C0C0;
+    border: 1px #2b434c solid;
+    color: #2b434c;
+    cursor: pointer;
+    padding: 3px;
+    display:inline-block;
+    margin:1px;
+}

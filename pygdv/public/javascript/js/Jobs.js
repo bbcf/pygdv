@@ -30,15 +30,22 @@ dojo.declare("ch.epfl.bbcf.gdv.JobHandler",null,{
      * @param {selection} - the selections
      */
     new_selection : function(selections){
-        /* build description */
+	var sorted = {};
+        /* build description & sort the marquees like {chr : [marquees]}*/
 	var desc = '';
+	var cur_chr;
 	dojo.forEach(selections, function(entry, index){
+	    console.debug(entry);
+	    cur_chr = entry['chr'];
+	    console.debug(cur_chr);
+	    if (!(cur_chr in sorted)) sorted[cur_chr] = [];
+	    sorted[cur_chr].push({'start' : entry.start, 'end' : entry.end});
 	    desc += '( ' + entry.display() + ' )';
 	});
 	/* build job */
 	//console.log('new sel');
 	this.new_job('selection', desc, '/new_selection', 
-		     'project_id=' + _gdv_info.project_id + '&s='+ dojo.toJson(selections));
+		     'project_id=' + _gdv_info.project_id + '&s='+ dojo.toJson(sorted));
     },
 
     /**
@@ -46,13 +53,17 @@ dojo.declare("ch.epfl.bbcf.gdv.JobHandler",null,{
      * @param{project_id} the project id
      * @param{data} the data from the form
      */
-    new_gfeatminer_job: function(project_id,data){
-        //console.log('new gm');
-	var body = "id=job&action=gfeatminer&project_id="+project_id+"&data="+dojo.toJson(data);
-        _tc.container.selectChild("tab_jobs");
-        //console.log(data);
-        this.post_to_gdv(body);
+    new_gfeatminer_job: function(data){
+        console.debug('new gm');
+	console.debug(data);
+	var name = 'new';
+	var desc = 'job'
+	if('characteristic' in data) desc = data['characteristic'];
+	if('operation_type' in data) name = data['operation_type'];
 	
+	this.new_job(name, desc, '/new_gfeatminer_job',
+		     'project_id=' + _gdv_info.project_id + '&data='+ dojo.toJson(data));
+        	
     },
     
     /**
