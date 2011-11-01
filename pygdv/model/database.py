@@ -101,16 +101,16 @@ class RightCircleAssociation(DeclarativeBase):
     circle =  relationship('Circle',  cascade="all, delete")
     circle_id = Column(Integer,
                        ForeignKey('Circle.id',  ondelete="CASCADE"), nullable=False, primary_key=True)
-    project_id = Column(Integer, ForeignKey('Project.id',  ondelete="CASCADE"), nullable=True)
+    project_id = Column(Integer, ForeignKey('Project.id',  ondelete="CASCADE"), nullable=False, primary_key=True)
 
     @property
     def circle_display(self):
         return '%s (%s)' %(self.circle.name, self.circle.description)
     
+    def __repr__(self):
+        return '<RightCircleAssociation : right : %s, circle : %s, project : %s>' % (self.right_id, self.circle_id, self.project_id)
     
-    def hello(self, x):
-        return x
-
+    
 class CircleRights(object):
     '''
     Represent a circle with the rights associated

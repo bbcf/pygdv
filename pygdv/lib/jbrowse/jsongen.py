@@ -380,8 +380,6 @@ def jsonify_quantitative(sha1, output_root_directory, database_path):
     try :
         os.mkdir(output_path)
     except OSError: 
-
-        
         pass
     conn = sqlite3.connect(database_path)
     cursor = conn.cursor()

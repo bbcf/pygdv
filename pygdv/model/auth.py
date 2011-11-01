@@ -123,6 +123,8 @@ class User(DeclarativeBase):
     projects = relationship('Project', backref='user')
     jobs = relationship('Job', backref='user')
     
+    
+    
     def _get_date(self):
         return self._created.strftime(date_format);
         
@@ -131,7 +133,9 @@ class User(DeclarativeBase):
 
     created = synonym('_created', descriptor=property(_get_date, _set_date))
  
-    
+    @property
+    def projects_(self):
+        pass
     # email and user_name properties
     def _get_email(self):
         return self._email

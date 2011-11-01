@@ -26,3 +26,5 @@ def user_own_circle(user_id, circle_id):
     '''
     circle = DBSession.query(Circle).filter(Circle.id == circle_id).first()
     return circle.creator_id == user_id
+
+

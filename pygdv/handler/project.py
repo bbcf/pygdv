@@ -1,4 +1,4 @@
-from pygdv.model import DBSession, Project, Track, Right, RightCircleAssociation
+from pygdv.model import DBSession, Project, Track, Right, RightCircleAssociation, User
 from tg import app_globals as gl
 from sqlalchemy.sql import and_
 
@@ -33,7 +33,7 @@ def edit(project, name, sequence_id, user_id, tracks=None, isPublic=False, circl
     
     project._circle_right = []
     if circles is not None: # adding circle with the read permission by default
-        _add_read_right(project, circle_id)
+        for circle in circles : _add_read_right(project, circle.id)
         
     DBSession.add(project)
     DBSession.flush()
@@ -50,18 +50,22 @@ def change_rights(project_id, circle_id, rights=None):
     '''
     project = DBSession.query(Project).filter(Project.id == project_id).first()
     rc_assocs = get_circle_right_assocs(circle_id, project_id)
+    
+    
     for rc in rc_assocs:
-        project._circle_right.remove(rc)
+        if rc.circle.id == int(circle_id) :
+            project._circle_right.remove(rc)
+   
+    
     if rights is not None:
         _add_read_right(project, circle_id)
         for right_name in rights:
             if right_name != gl.right_read :
                 right = DBSession.query(Right).filter(Right.name == right_name).first()
-                cr_assoc = _get_circle_right_assoc(right, circle_id)
+                cr_assoc = _get_circle_right_assoc(right, circle_id, project_id)
                 project._circle_right.append(cr_assoc)
     DBSession.add(project)
     DBSession.flush()
-    
     
 def add_read_right_to_circles_ids(project, ids):
     '''
@@ -85,22 +89,25 @@ def _add_read_right(project, circle_id):
     Add the ``read`` right to the project % circle specified without flushing
     '''
     read_right = DBSession.query(Right).filter(Right.name == gl.right_read).first()
-    cr_assoc = _get_circle_right_assoc(read_right, circle_id)
+    cr_assoc = _get_circle_right_assoc(read_right, circle_id, project.id)
     project._circle_right.append(cr_assoc)
     
     
-def _get_circle_right_assoc(right, circle_id):
+def _get_circle_right_assoc(right, circle_id, project_id):
     '''
     Get the ``RightCircleAssociation`` corresponding
-    to the right and circle_id given
+    to the right and circle_id and project_id given
     '''
     cr_assoc = DBSession.query(RightCircleAssociation).filter(
                                     and_(RightCircleAssociation.right_id == right.id,
-                                         RightCircleAssociation.circle_id == circle_id)).first()
+                                         RightCircleAssociation.circle_id == circle_id,
+                                         RightCircleAssociation.project_id == project_id
+                                         )).first()
     if cr_assoc is None :
         cr_assoc = RightCircleAssociation()
         cr_assoc.circle_id = circle_id
         cr_assoc.right = right
+        cr_assoc.project_id = project_id
         DBSession.add(cr_assoc)
     return cr_assoc
 
@@ -126,6 +133,9 @@ def add_tracks(project, track_ids):
     
     
     
-    
-    
+def get_projects_with_permission(user_id, right_name):
+    right = DBSession.query(Right).filter(Right.name == right_name).first()
+    return DBSession.query(Project).join(Project._circle_right).join(User.circles).filter(
+                and_(User.id == user_id, Right.id == right.id)
+                     ).all()
     

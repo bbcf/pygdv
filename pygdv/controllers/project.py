@@ -42,12 +42,12 @@ class ProjectController(CrudRestController):
         user = handler.user.get_user_in_session(request)
 
         # user project
-        data = [util.to_datagrid(project_grid, user.projects, "Project Listing", len(user.projects)>0)]
+        user_projects = [util.to_datagrid(project_grid, user.projects, "Project Listing", len(user.projects)>0)]
 
         # shared projects
         #TODO check with permissions
-
-        return dict(page='projects', model='project', form_title="new project",items=data,value=kw)
+        
+        return dict(page='projects', model='project', form_title="new project", items=user_projects, value=kw)
 
 
 
@@ -158,6 +158,9 @@ class ProjectController(CrudRestController):
         if not checker.user_own_project(user.id, project_id):
             flash('You cannot modify a project which is not yours')
             raise redirect('/')
+        
+        print '[x] post_share [x] project_id %s, circle_id %s, args : %s, kw : %s' % (project_id, circle_id, args, kw)
+        
         if 'rights_checkboxes' in kw:
             rights_checkboxes = kw['rights_checkboxes']
             if not isinstance(rights_checkboxes,list):
@@ -177,6 +180,9 @@ class ProjectController(CrudRestController):
         if not checker.user_own_project(user.id, project_id):
             flash('You cannot modify a project which is not yours')
             raise redirect('/')
+        print 'ddfddffd'
+        print args
+        print kw
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         if 'circles' in kw:
             if isinstance(kw['circles'], list):
@@ -186,13 +192,11 @@ class ProjectController(CrudRestController):
         raise redirect(url('/projects/share', {'project_id':project_id}))
 
     @expose()
-    def test(self):
-
+    def test(self, n):
         user = handler.user.get_user_in_session(request)
-        print DBSession.query(Project).all()
-
-        print checker.user_own_project(user.id, 1)
-
+        p = handler.project.get_projects_with_permission(user.id, n)
+        print p
+        raise redirect('./');
 
     @expose('pygdv.templates.add_track')
     def add_track(self, project_id, *args, **kw):
