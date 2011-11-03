@@ -45,7 +45,15 @@ user_group_table = Table('UserGroup', metadata,
     Column('group_id', Integer, ForeignKey('Group.id',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
- 
+
+user_circle_table = Table('user_circle', metadata,
+    Column('user_id', Integer, ForeignKey('User.id',
+         ondelete="CASCADE"), primary_key=True),
+    Column('circle_id', Integer, ForeignKey('Circle.id',
+         ondelete="CASCADE"), primary_key=True)
+)
+
+
 #
 # *The auth* model itself
 #
@@ -122,7 +130,7 @@ class User(DeclarativeBase):
     tracks = relationship('Track', backref='user')
     projects = relationship('Project', backref='user')
     jobs = relationship('Job', backref='user')
-    
+    circles = relationship('Circle', secondary=user_circle_table, backref='users')
     
     
     def _get_date(self):

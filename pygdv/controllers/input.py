@@ -6,6 +6,7 @@ from pygdv.model import Input, DBSession
 from pygdv import handler
 from tg import expose, flash, request
 import shutil, os
+from tg.decorators import with_trailing_slash, paginate
 from pygdv.lib.constants import json_directory
 
 __all__ = ['InputController']
@@ -23,7 +24,12 @@ class InputController(CrudRestController):
     
     
     
-    
+    @with_trailing_slash
+    @expose('tgext.crud.templates.get_all')
+    @expose('json')
+    @paginate('value_list', items_per_page=10)
+    def get_all(self, *args, **kw):
+        return CrudRestController.get_all(self, *args, **kw)
     
     
     @expose('genshi:tgext.crud.templates.post_delete')

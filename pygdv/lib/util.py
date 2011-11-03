@@ -61,11 +61,11 @@ def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, **k
     if file_upload is not None:
         filename = file_upload.filename
         file_value = file_upload.value
-        tmp_file = tempfile.NamedTemporaryFile(delete=False)
+        tmp_file = tempfile.NamedTemporaryFile(suffix=filename, delete=False)
         tmp_file.write(file_value)
         tmp_file.close()
         files.append((filename, tmp_file))
-    
+
     if urls is not None: 
         for u in urls.split():
             files.append(_download_from_url(u))
@@ -74,16 +74,15 @@ def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, **k
         files.append(_download_from_url(url))
     
     if fsys is not None:
-        tmp_file = tempfile.NamedTemporaryFile(delete=False)
+        tmp_file = tempfile.NamedTemporaryFile(suffix=filename, delete=False)
         shutil.copyfile(fsys, tmp_file)
         files.append((fsys.split('/')[-1], tmp_file))
     
     if fsys_list is not None: 
         for f in fsys_list :
-            tmp_file = tempfile.NamedTemporaryFile(delete=False)
+            tmp_file = tempfile.NamedTemporaryFile(suffix=filename, delete=False)
             shutil.copyfile(f, tmp_file)
             files.append((f.split('/')[-1], tmp_file))
-        
     return files
         
 def _download_from_url(url):

@@ -1,4 +1,5 @@
 """Track Controller"""
+
 from pygdv.lib.base import BaseController
 from tgext.crud import CrudRestController
 from tgext.crud.decorators import registered_validate
@@ -10,7 +11,7 @@ from tg import app_globals as gl
 from tg.controllers import redirect
 from tg.decorators import paginate,with_trailing_slash
 
-from pygdv.model import DBSession, Track, Input, TrackParameters
+from pygdv.model import DBSession, Track, Input, TrackParameters, Sequence
 from pygdv.widgets.track import track_table, track_table_filler, track_new_form, track_edit_filler, track_edit_form, track_grid
 from pygdv import handler
 from pygdv.lib import util, constants
@@ -36,6 +37,9 @@ class TrackController(CrudRestController):
         user=handler.user.get_user_in_session(request)
         return dict(tracks=user.tracks)
 
+
+    
+    
     @with_trailing_slash
     @expose('pygdv.templates.list')
     @expose('json')
@@ -64,7 +68,8 @@ class TrackController(CrudRestController):
         if files is not None:
             for filename, f in files:
                 if 'nr_assembly' in kw:
-                    ret = handler.track.create_track(user.id, kw['nr_assembly'], f=f.name, trackname=filename)
+                    sequence = DBSession.query(Sequence).filter(Sequence.id == kw['nr_assembly']).first()
+                    ret = handler.track.create_track(user.id, sequence, f=f.name, trackname=filename)
                     if ret == constants.NOT_SUPPORTED_DATATYPE :
                         flash(ret)
                         raise redirect('./') 

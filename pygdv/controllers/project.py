@@ -48,7 +48,7 @@ class ProjectController(CrudRestController):
         #TODO check with permissions
         
         return dict(page='projects', model='project', form_title="new project", items=user_projects, value=kw)
-
+    
 
 
     @require(not_anonymous())
@@ -68,8 +68,6 @@ class ProjectController(CrudRestController):
         handler.project.create(kw['name'], kw['nr_assembly'], user.id, tracks=kw['tracks'])
         transaction.commit()
         raise redirect('./')
-
-
 
 
 

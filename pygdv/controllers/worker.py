@@ -44,7 +44,7 @@ class WorkerController(BaseController):
                 t.write(chromosome, [(marquee['start'], marquee['end']) for marquee in sels[chromosome]]);
             t.assembly = project.sequence.name
             
-        rev = handler.track.create_track(user.id, project.sequence_id, f=path, trackname='%s %s' 
+        rev = handler.track.create_track(user.id, project.sequence, f=path, trackname='%s %s' 
                                          % (job_name, job_description))
         if rev  == constants.NOT_SUPPORTED_DATATYPE :
             return {'error' : "not supported datatype" % project_id}

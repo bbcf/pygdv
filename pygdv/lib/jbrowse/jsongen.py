@@ -1,10 +1,11 @@
 '''
 Contains method needed to build JSON files from SQLite files.
 '''
+from __future__ import absolute_import
 import os, sqlite3, json, math
 from pygdv.lib.jbrowse import higher_zoom, TYPE, zooms, JSON_HEIGHT, SUBLIST_INDEX, CHUNK_SIZE, LAZY_INDEX, ARROWHEAD_CLASS, CLASSNAME, HIST_CHUNK_SIZE
 import numpy as np
-
+import track
 
 #####################################################################
 #    QUANTITATIVE DATA
@@ -148,8 +149,8 @@ def _generate_nested_extended_features(cursor, keep_field, count_index, subfeatu
                     nb_feature = 1
       
         prev_feature = feature
-        
-    yield prev_feature, nb_feature
+    if prev_feature is not None:    
+        yield prev_feature, nb_feature
     
     
 def _generate_nested_features(cursor, keep_field, start_index, end_index):
@@ -158,7 +159,7 @@ def _generate_nested_features(cursor, keep_field, start_index, end_index):
     '''
     stack = []
     prev_feature = None
-    nb_feature = 0
+    nb_feature = 1
     field_number_list = range(keep_field)
     for row in cursor:
         feature = [row[i] for i in field_number_list]
@@ -177,10 +178,11 @@ def _generate_nested_features(cursor, keep_field, start_index, end_index):
                         break
                 else:
                     yield prev_feature, nb_feature
-                    nb_feature = 0
+                    nb_feature = 1
                     
         prev_feature = feature
-    yield prev_feature, nb_feature
+    if prev_feature is not None:
+            yield prev_feature, nb_feature
         
 
         
@@ -260,12 +262,11 @@ def _generate_lazy_output(feature_generator):
             nb_feature = chunk_size
             chunk_size = 0
             chunk_number += 1
-            print 'yield start : ' + str(first)
             yield first, stop, chunk_number, buffer_list, nb_feature
             buffer_list = []
             first = None
-            
-    yield first, stop, chunk_number, buffer_list, chunk_size
+    if first :
+        yield first, stop, chunk_number, buffer_list, chunk_size
         
         
 #########################################################################
@@ -358,21 +359,19 @@ def jsonify(database_path, name, sha1, output_root_directory, public_url, browse
     out_browser_url = os.path.join(browser_url, sha1)
     os.mkdir(output_path)
     
-    
-    conn = sqlite3.connect(database_path)
-    cursor = conn.cursor()
-    cursor.execute('select * from chrNames;')
-    
-    for row in cursor:
-        chr_name = row[0]
-        chr_length = row[1]
-        print 'doing %s ' % chr_name
-        out = os.path.join(output_path, chr_name)
-        os.mkdir(out)
-        lazy_url = os.path.join(out_browser_url, chr_name, 'lazyfeatures-{chunk}.json')
-        _jsonify(conn, name, chr_length, chr_name, os.path.join(out_public_url, chr_name), lazy_url, out, extended)
-    cursor.close()
-    conn.close()
+    with track.load(database_path, 'sql', readonly=False) as t :
+        for chr_name in t:
+#    conn = sqlite3.connect(database_path)
+#    cursor = conn.cursor()
+#    cursor.execute('select * from chrNames;')
+#    
+#    for row in cursor:
+            chr_length = t.chrmeta[chr_name]['length']
+            print 'doing %s ' % chr_name
+            out = os.path.join(output_path, chr_name)
+            os.mkdir(out)
+            lazy_url = os.path.join(out_browser_url, chr_name, 'lazyfeatures-{chunk}.json')
+            _jsonify(t, name, chr_length, chr_name, os.path.join(out_public_url, chr_name), lazy_url, out, extended)
     return 1
 
 def jsonify_quantitative(sha1, output_root_directory, database_path):
@@ -403,37 +402,35 @@ def jsonify_quantitative(sha1, output_root_directory, database_path):
     conn.close()
     return 1
 
-def _prepare_database(connection, chr_name):
+def _gen_gen(t, chr_name):
+    prev_id = None
+    l = []
+    for row in t.read(chr_name, ['start', 'end', 'score', 'name', 'strand', 'type', 'attributes', 'id'], cursor=True):
+        idi = row[7]
+        if prev_id is not None:
+            if prev_id == idi :
+                l.append(row[0:6])
+            else :
+                yield prev_id, json.dumps(l)
+                l = []
+        prev_id = idi
+
+def _prepare_database(t, chr_name):
     '''
     Add a table that will reference all sub-features for a feature.
     :return: the table name to erase after
     '''
     table_name = 'tmp_%s' % chr_name
-    read_cursor = connection.cursor()
-    write_cursor = connection.cursor()
-
+    t.cursor.execute('create table "%s"(id text, subs text, foreign key(id) references "%s"(id));' % (table_name, chr_name))
+    t.write(table_name, _gen_gen(t, chr_name) , ('id', 'subs'))
     
-    write_cursor.execute('create table "%s"(id text, subs text, foreign key(id) references "%s"(id));' % (table_name, chr_name))
-    write_cursor = connection.cursor()
     
-    read_cursor.execute('select start, end, score, name, strand, type, attributes, id from "%s";' % chr_name)
-    prev_id = None
-    l = []
-    for row in read_cursor:
-        idi = row[7]
-        if prev_id is not None:
-            if prev_id == idi :
-                l.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6]])
-            else :
-                write_cursor.execute('insert into "%s" values (?, ?);' % table_name, (prev_id, json.dumps(l),))
-                l = []
-        prev_id = idi
-    write_cursor.close()
-    read_cursor.close()
+    
+    
     return table_name
     
     
-def _jsonify(connection, name, chr_length, chr_name, url_output, lazy_url, output_directory, extended):
+def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directory, extended):
     '''
     Make a JSON representation of the chromosome.
     @param connection : the connection to the sqlite database
@@ -449,12 +446,12 @@ def _jsonify(connection, name, chr_length, chr_name, url_output, lazy_url, outpu
         
         client_config = _extended_client_config
         print 'preparedb'
-        table_name = _prepare_database(connection, chr_name)
-        cursor = connection.cursor()
-        cursor = cursor.execute('select min(t1.start), max(t1.end), t1.score, t1.name, t1.strand, t1.type, t1.attributes, t1.id, count(t1.id), t2.subs from "%s" as t1 inner join "%s" as t2 on t1.id = t2.id group by t1.id order by t1.start asc, t1.end asc ;' % (chr_name, table_name))
+        table_name = _prepare_database(t, chr_name)
+        
+        t.cursor.execute('select min(t1.start), max(t1.end), t1.score, t1.name, t1.strand, t1.type, t1.attributes, t1.id, count(t1.id), t2.subs from "%s" as t1 inner join "%s" as t2 on t1.id = t2.id group by t1.id order by t1.start asc, t1.end asc ;' % (chr_name, table_name))
         print ' calculate lazy features'
         lazy_feats = _generate_lazy_output(
-                    _generate_nested_extended_features(cursor, keep_field=7, count_index=8, 
+                    _generate_nested_extended_features(t.cursor, keep_field=7, count_index=8, 
                                     subfeatures_index=9, start_index=0, end_index=1, name_index=3, strand_index=4))
         
         
@@ -463,10 +460,11 @@ def _jsonify(connection, name, chr_length, chr_name, url_output, lazy_url, outpu
         subfeature_headers = _basic_subfeature_headers
         client_config = _basic_client_config
         print ' calculate lazy features'
-        cursor = connection.cursor()
-        cursor = cursor.execute('select t1.start, t1.end, t1.score, t1.name, t1.strand, t1.attributes from "%s" as t1 order by t1.start asc, t1.end asc ;' % chr_name )
+        
+        t.cursor.execute('select t1.start, t1.end, t1.score, t1.name, t1.strand, t1.attributes from "%s" as t1 order by t1.start asc, t1.end asc ;' % chr_name )
+        
         lazy_feats = _generate_lazy_output(
-                            _generate_nested_features(cursor, keep_field=6, start_index=0, end_index=1))
+                            _generate_nested_features(t.cursor, keep_field=6, start_index=0, end_index=1))
    
    
     #cursor = _get_cursor(connection, chr_name, fields_needed, order_by=ob)
@@ -482,20 +480,17 @@ def _jsonify(connection, name, chr_length, chr_name, url_output, lazy_url, outpu
     for start, stop, chunk_number, buff, nb_feats in lazy_feats:
         NCList.append([start, stop,{'chunk' : str(chunk_number)}])
         feature_count += nb_feats
-        print feature_count
         output_chunk = os.path.join(output_directory, 'lazyfeatures-%s.json' % chunk_number)
         with open(output_chunk, 'w', -1) as fil:
             fil.write(json.dumps(buff))
         
     if extended :    
         print 'erase table'
-        cursor = connection.cursor()
-        cursor.execute('drop table "%s";' % table_name)
-        cursor = connection.cursor()
-        cursor.execute('vacuum')
+        t.cursor.execute('drop table "%s";' % table_name)
+        t.vacuum()
+        #t.cursor.execute('vacuum')
         print 'dropped'
             
-    cursor.close()
     if feature_count == 0 : feature_count = 1
     
     print ' threshold %s, %s ' % (chr_length, feature_count)
@@ -505,10 +500,8 @@ def _jsonify(connection, name, chr_length, chr_name, url_output, lazy_url, outpu
     histogram_meta = _histogram_meta(chr_length, threshold, url_output)
     
     print ' count array'
-    cursor = connection.cursor()
-    cursor.execute("select * from '%s' ;" % (chr_name))
+    cursor = t.cursor.execute("select * from '%s' ;" % (chr_name))
     array = _count_features(cursor, threshold, chr_length)
-    cursor.close()
     
     print ' hists stats'
     hist_stats = _calculate_histo_stats(array, threshold, chr_length)

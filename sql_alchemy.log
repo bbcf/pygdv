@@ -1,19 +1,886 @@
-16:27:09,406    INFO  [sqlalchemy.engine.base.Engine] {'name': u'sequence'}
-16:27:09,408    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:27:09,408    INFO  [sqlalchemy.engine.base.Engine] {'name': u'usergroup'}
-16:27:09,409    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:27:09,410    INFO  [sqlalchemy.engine.base.Engine] {'name': u'user_circle'}
-16:27:09,411    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:27:09,411    INFO  [sqlalchemy.engine.base.Engine] {'name': u'project'}
-16:27:09,412    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:27:09,412    INFO  [sqlalchemy.engine.base.Engine] {'name': u'track'}
-16:27:09,414    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:27:09,414    INFO  [sqlalchemy.engine.base.Engine] {'name': u'project_track'}
-16:27:09,415    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:27:09,415    INFO  [sqlalchemy.engine.base.Engine] {'name': u'rightcircleassociation'}
-16:27:09,416    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:27:09,416    INFO  [sqlalchemy.engine.base.Engine] {'name': u'job'}
-16:27:09,418    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:27:09,418    INFO  [sqlalchemy.engine.base.Engine] {'name': u'default_tracks'}
-16:27:09,419    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
-16:27:09,419    INFO  [sqlalchemy.engine.base.Engine] {'name': u'jobparameters'}
+08:35:57,594    INFO  [sqlalchemy.engine.base.Engine] select version()
+08:35:57,594    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:57,595    DEBUG [sqlalchemy.engine.base.Engine] Col ('version',)
+08:35:57,596    DEBUG [sqlalchemy.engine.base.Engine] Row (u'PostgreSQL 9.0.4 on x86_64-redhat-linux-gnu, compiled by GCC gcc (GCC) 4.6.0 20110530 (Red Hat 4.6.0-9), 64-bit',)
+08:35:57,597    INFO  [sqlalchemy.engine.base.Engine] select current_schema()
+08:35:57,597    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:57,598    DEBUG [sqlalchemy.engine.base.Engine] Col ('current_schema',)
+08:35:57,598    DEBUG [sqlalchemy.engine.base.Engine] Row (u'public',)
+08:35:57,602    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:35:57,602    INFO  [sqlalchemy.engine.base.Engine] {'name': u'permission'}
+08:35:57,605    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:35:57,606    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:35:57,606    INFO  [sqlalchemy.engine.base.Engine] {'name': u'trackparameters'}
+08:35:57,608    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:35:57,608    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:35:57,609    INFO  [sqlalchemy.engine.base.Engine] {'name': u'user'}
+08:35:57,610    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:35:57,610    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:35:57,611    INFO  [sqlalchemy.engine.base.Engine] {'name': u'species'}
+08:35:57,611    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:35:57,612    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:35:57,612    INFO  [sqlalchemy.engine.base.Engine] {'name': u'right'}
+08:35:57,613    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:35:57,613    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:35:57,614    INFO  [sqlalchemy.engine.base.Engine] {'name': u'input'}
+08:35:57,614    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:35:57,615    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:35:57,615    INFO  [sqlalchemy.engine.base.Engine] {'name': u'celery_taskmeta'}
+08:35:57,616    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:35:57,616    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:35:57,616    INFO  [sqlalchemy.engine.base.Engine] {'name': u'group'}
+08:35:57,617    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:35:57,618    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:35:57,618    INFO  [sqlalchemy.engine.base.Engine] {'name': u'usergroup'}
+08:35:57,619    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:35:57,619    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:35:57,619    INFO  [sqlalchemy.engine.base.Engine] {'name': u'grouppermissions'}
+08:35:57,620    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:35:57,621    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:35:57,621    INFO  [sqlalchemy.engine.base.Engine] {'name': u'sequence'}
+08:35:57,622    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:35:57,622    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:35:57,622    INFO  [sqlalchemy.engine.base.Engine] {'name': u'circle'}
+08:35:57,623    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:35:57,624    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:35:57,624    INFO  [sqlalchemy.engine.base.Engine] {'name': u'user_circle'}
+08:35:57,625    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:35:57,625    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:35:57,625    INFO  [sqlalchemy.engine.base.Engine] {'name': u'track'}
+08:35:57,626    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:35:57,627    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:35:57,627    INFO  [sqlalchemy.engine.base.Engine] {'name': u'project'}
+08:35:57,628    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:35:57,628    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:35:57,628    INFO  [sqlalchemy.engine.base.Engine] {'name': u'job'}
+08:35:57,629    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:35:57,629    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:35:57,630    INFO  [sqlalchemy.engine.base.Engine] {'name': u'default_tracks'}
+08:35:57,630    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:35:57,631    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:35:57,631    INFO  [sqlalchemy.engine.base.Engine] {'name': u'rightcircleassociation'}
+08:35:57,632    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:35:57,632    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:35:57,633    INFO  [sqlalchemy.engine.base.Engine] {'name': u'project_track'}
+08:35:57,633    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:35:57,634    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:35:57,634    INFO  [sqlalchemy.engine.base.Engine] {'name': u'jobparameters'}
+08:35:57,635    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:35:57,636    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Permission" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(63) NOT NULL, 
+	description VARCHAR(255) NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (name)
+)
+
+
+08:35:57,636    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:57,680    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:57,692    INFO  [sqlalchemy.engine.base.Engine] 
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+08:35:57,692    INFO  [sqlalchemy.engine.base.Engine] {'typname': u'image_type'}
+08:35:57,694    DEBUG [sqlalchemy.engine.base.Engine] Col ('?column?',)
+08:35:57,694    DEBUG [sqlalchemy.engine.base.Engine] Row (False,)
+08:35:57,695    INFO  [sqlalchemy.engine.base.Engine] CREATE TYPE image_type AS ENUM ('FeatureTrack','ImageTrack')
+08:35:57,695    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:57,696    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:57,723    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "TrackParameters" (
+	id SERIAL NOT NULL, 
+	url VARCHAR(255), 
+	label VARCHAR(255), 
+	type image_type, 
+	key VARCHAR(255), 
+	color VARCHAR(255), 
+	PRIMARY KEY (id)
+)
+
+
+08:35:57,724    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:57,779    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:57,789    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "User" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	firstname VARCHAR(255) NOT NULL, 
+	_email VARCHAR(255) NOT NULL, 
+	_created TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	key VARCHAR(255) NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (_email), 
+	UNIQUE (key)
+)
+
+
+08:35:57,790    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:57,882    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:57,900    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Species" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	PRIMARY KEY (id)
+)
+
+
+08:35:57,900    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:57,940    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:57,958    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Right" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	description TEXT NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (name)
+)
+
+
+08:35:57,959    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:58,040    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:58,049    INFO  [sqlalchemy.engine.base.Engine] 
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+08:35:58,049    INFO  [sqlalchemy.engine.base.Engine] {'typname': u'datatype'}
+08:35:58,050    DEBUG [sqlalchemy.engine.base.Engine] Col ('?column?',)
+08:35:58,050    DEBUG [sqlalchemy.engine.base.Engine] Row (False,)
+08:35:58,050    INFO  [sqlalchemy.engine.base.Engine] CREATE TYPE datatype AS ENUM ('features','signal','relational','not determined')
+08:35:58,051    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:58,051    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:58,082    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Input" (
+	id SERIAL NOT NULL, 
+	sha1 VARCHAR(255) NOT NULL, 
+	_last_access TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	task_id VARCHAR(255) NOT NULL, 
+	datatype datatype NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (sha1)
+)
+
+
+08:35:58,082    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:58,157    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:58,175    INFO  [sqlalchemy.engine.base.Engine] SELECT relname FROM pg_class c join pg_namespace n on n.oid=c.relnamespace where relkind='S' and n.nspname=current_schema() and lower(relname)=%(name)s
+08:35:58,175    INFO  [sqlalchemy.engine.base.Engine] {'name': u'task_id_sequence'}
+08:35:58,177    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:35:58,177    INFO  [sqlalchemy.engine.base.Engine] CREATE SEQUENCE task_id_sequence
+08:35:58,177    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:58,179    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:58,209    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE celery_taskmeta (
+	id INTEGER NOT NULL, 
+	task_id VARCHAR(255), 
+	status VARCHAR(50), 
+	result BYTEA, 
+	date_done TIMESTAMP WITHOUT TIME ZONE, 
+	traceback TEXT, 
+	PRIMARY KEY (id), 
+	UNIQUE (task_id)
+)
+
+
+08:35:58,209    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:58,319    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:58,329    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Group" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	_created TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (name)
+)
+
+
+08:35:58,329    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:58,380    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:58,390    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "UserGroup" (
+	user_id INTEGER NOT NULL, 
+	group_id INTEGER NOT NULL, 
+	PRIMARY KEY (user_id, group_id), 
+	FOREIGN KEY(user_id) REFERENCES "User" (id) ON DELETE CASCADE ON UPDATE CASCADE, 
+	FOREIGN KEY(group_id) REFERENCES "Group" (id) ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+
+08:35:58,390    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:58,418    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:58,468    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "GroupPermissions" (
+	group_id INTEGER NOT NULL, 
+	permission_id INTEGER NOT NULL, 
+	PRIMARY KEY (group_id, permission_id), 
+	FOREIGN KEY(group_id) REFERENCES "Group" (id) ON DELETE CASCADE ON UPDATE CASCADE, 
+	FOREIGN KEY(permission_id) REFERENCES "Permission" (id) ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+
+08:35:58,468    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:58,487    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:58,495    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Sequence" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	species_id INTEGER NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(species_id) REFERENCES "Species" (id) ON DELETE CASCADE
+)
+
+
+08:35:58,495    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:58,530    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:58,547    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Circle" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	description TEXT NOT NULL, 
+	creator_id INTEGER, 
+	admin BOOLEAN NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(creator_id) REFERENCES "User" (id) ON DELETE CASCADE
+)
+
+
+08:35:58,548    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:58,613    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:58,622    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE user_circle (
+	user_id INTEGER NOT NULL, 
+	circle_id INTEGER NOT NULL, 
+	PRIMARY KEY (user_id, circle_id), 
+	FOREIGN KEY(user_id) REFERENCES "User" (id) ON DELETE CASCADE, 
+	FOREIGN KEY(circle_id) REFERENCES "Circle" (id) ON DELETE CASCADE
+)
+
+
+08:35:58,622    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:58,655    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:58,664    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Track" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	_created TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	_last_access TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	parameter_id INTEGER NOT NULL, 
+	input_id INTEGER NOT NULL, 
+	user_id INTEGER NOT NULL, 
+	sequence_id INTEGER NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(parameter_id) REFERENCES "TrackParameters" (id) ON DELETE CASCADE, 
+	FOREIGN KEY(input_id) REFERENCES "Input" (id) ON DELETE CASCADE, 
+	FOREIGN KEY(user_id) REFERENCES "User" (id) ON DELETE CASCADE, 
+	FOREIGN KEY(sequence_id) REFERENCES "Sequence" (id) ON DELETE CASCADE
+)
+
+
+08:35:58,665    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:58,699    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:58,729    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Project" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	_created TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	sequence_id INTEGER NOT NULL, 
+	user_id INTEGER NOT NULL, 
+	is_public BOOLEAN NOT NULL, 
+	key VARCHAR(255) NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(sequence_id) REFERENCES "Sequence" (id) ON DELETE CASCADE, 
+	FOREIGN KEY(user_id) REFERENCES "User" (id) ON DELETE CASCADE, 
+	UNIQUE (key)
+)
+
+
+08:35:58,729    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:58,799    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:58,816    INFO  [sqlalchemy.engine.base.Engine] 
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+08:35:58,816    INFO  [sqlalchemy.engine.base.Engine] {'typname': u'job_status'}
+08:35:58,817    DEBUG [sqlalchemy.engine.base.Engine] Col ('?column?',)
+08:35:58,818    DEBUG [sqlalchemy.engine.base.Engine] Row (False,)
+08:35:58,818    INFO  [sqlalchemy.engine.base.Engine] CREATE TYPE job_status AS ENUM ('SUCCESS','PENDING','ERROR','RUNNING')
+08:35:58,818    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:58,819    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:58,847    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Job" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	description TEXT NOT NULL, 
+	_created TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	status job_status NOT NULL, 
+	user_id INTEGER NOT NULL, 
+	project_id INTEGER, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(user_id) REFERENCES "User" (id) ON DELETE CASCADE, 
+	FOREIGN KEY(project_id) REFERENCES "Project" (id) ON DELETE CASCADE
+)
+
+
+08:35:58,848    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:58,917    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:58,984    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE default_tracks (
+	track_id INTEGER NOT NULL, 
+	sequence_id INTEGER NOT NULL, 
+	PRIMARY KEY (track_id, sequence_id), 
+	FOREIGN KEY(track_id) REFERENCES "Track" (id) ON DELETE CASCADE, 
+	FOREIGN KEY(sequence_id) REFERENCES "Sequence" (id) ON DELETE CASCADE
+)
+
+
+08:35:58,984    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:59,003    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:59,011    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "RightCircleAssociation" (
+	right_id INTEGER NOT NULL, 
+	circle_id INTEGER NOT NULL, 
+	project_id INTEGER NOT NULL, 
+	PRIMARY KEY (right_id, circle_id, project_id), 
+	FOREIGN KEY(right_id) REFERENCES "Right" (id) ON DELETE CASCADE, 
+	FOREIGN KEY(circle_id) REFERENCES "Circle" (id) ON DELETE CASCADE, 
+	FOREIGN KEY(project_id) REFERENCES "Project" (id) ON DELETE CASCADE
+)
+
+
+08:35:59,011    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:59,046    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:59,054    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE project_track (
+	project_id INTEGER NOT NULL, 
+	track_id INTEGER NOT NULL, 
+	PRIMARY KEY (project_id, track_id), 
+	FOREIGN KEY(project_id) REFERENCES "Project" (id) ON DELETE CASCADE, 
+	FOREIGN KEY(track_id) REFERENCES "Track" (id) ON DELETE CASCADE
+)
+
+
+08:35:59,054    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:59,073    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:59,080    INFO  [sqlalchemy.engine.base.Engine] 
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+08:35:59,080    INFO  [sqlalchemy.engine.base.Engine] {'typname': u'job_type'}
+08:35:59,081    DEBUG [sqlalchemy.engine.base.Engine] Col ('?column?',)
+08:35:59,081    DEBUG [sqlalchemy.engine.base.Engine] Row (False,)
+08:35:59,082    INFO  [sqlalchemy.engine.base.Engine] CREATE TYPE job_type AS ENUM ('NEW_SELECTION','NEW_TRACK','GFEATMINER','NEW_PROJECT')
+08:35:59,082    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:59,083    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:59,113    INFO  [sqlalchemy.engine.base.Engine] 
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+08:35:59,113    INFO  [sqlalchemy.engine.base.Engine] {'typname': u'job_output'}
+08:35:59,114    DEBUG [sqlalchemy.engine.base.Engine] Col ('?column?',)
+08:35:59,114    DEBUG [sqlalchemy.engine.base.Engine] Row (False,)
+08:35:59,115    INFO  [sqlalchemy.engine.base.Engine] CREATE TYPE job_output AS ENUM ('RELOAD','IMAGE')
+08:35:59,115    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:59,116    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:59,152    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "JobParameters" (
+	id SERIAL NOT NULL, 
+	type job_type NOT NULL, 
+	output job_output NOT NULL, 
+	data TEXT, 
+	job_id INTEGER NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(job_id) REFERENCES "Job" (id) ON DELETE CASCADE
+)
+
+
+08:35:59,152    INFO  [sqlalchemy.engine.base.Engine] {}
+08:35:59,213    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:35:59,257    INFO  [sqlalchemy.engine.base.Engine] BEGIN (implicit)
+08:35:59,259    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User".firstname AS "User_firstname", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key" 
+FROM "User" 
+WHERE "User"._email = %(_email_1)s 
+ LIMIT %(param_1)s OFFSET %(param_2)s
+08:35:59,259    INFO  [sqlalchemy.engine.base.Engine] {'_email_1': 'yohan.jarosz@epfl.ch', 'param_1': 1, 'param_2': 0}
+08:35:59,261    DEBUG [sqlalchemy.engine.base.Engine] Col ('User_id', 'User_name', 'User_firstname', 'User__email', 'User__created', 'User_key')
+08:35:59,263    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Right" (name, description) VALUES (%(name)s, %(description)s) RETURNING "Right".id
+08:35:59,263    INFO  [sqlalchemy.engine.base.Engine] {'name': 'Upload', 'description': u'A group with this permission can upload tracks to the project and execute jobs on the web interface.'}
+08:35:59,264    DEBUG [sqlalchemy.engine.base.Engine] Col ('id',)
+08:35:59,265    DEBUG [sqlalchemy.engine.base.Engine] Row (1,)
+08:35:59,265    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Right" (name, description) VALUES (%(name)s, %(description)s) RETURNING "Right".id
+08:35:59,265    INFO  [sqlalchemy.engine.base.Engine] {'name': 'Download', 'description': u'A group with this permission can download files on a project.'}
+08:35:59,266    DEBUG [sqlalchemy.engine.base.Engine] Col ('id',)
+08:35:59,266    DEBUG [sqlalchemy.engine.base.Engine] Row (2,)
+08:35:59,266    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Right" (name, description) VALUES (%(name)s, %(description)s) RETURNING "Right".id
+08:35:59,266    INFO  [sqlalchemy.engine.base.Engine] {'name': 'Read', 'description': u'A group with this permission can view the project.'}
+08:35:59,267    DEBUG [sqlalchemy.engine.base.Engine] Col ('id',)
+08:35:59,267    DEBUG [sqlalchemy.engine.base.Engine] Row (3,)
+08:35:59,268    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Group" (name, _created) VALUES (%(name)s, %(_created)s) RETURNING "Group".id
+08:35:59,268    INFO  [sqlalchemy.engine.base.Engine] {'_created': datetime.datetime(2011, 11, 2, 8, 35, 59, 268344), 'name': 'Users'}
+08:35:59,269    DEBUG [sqlalchemy.engine.base.Engine] Col ('id',)
+08:35:59,269    DEBUG [sqlalchemy.engine.base.Engine] Row (1,)
+08:35:59,270    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Permission" (name, description) VALUES (%(name)s, %(description)s) RETURNING "Permission".id
+08:35:59,270    INFO  [sqlalchemy.engine.base.Engine] {'name': 'user', 'description': u'This permission give "read" right to the bearer.'}
+08:35:59,271    DEBUG [sqlalchemy.engine.base.Engine] Col ('id',)
+08:35:59,271    DEBUG [sqlalchemy.engine.base.Engine] Row (1,)
+08:35:59,272    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "GroupPermissions" (group_id, permission_id) VALUES (%(group_id)s, %(permission_id)s)
+08:35:59,272    INFO  [sqlalchemy.engine.base.Engine] {'permission_id': 1, 'group_id': 1}
+08:35:59,274    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:53,965    INFO  [sqlalchemy.engine.base.Engine] select version()
+08:47:53,965    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:53,986    DEBUG [sqlalchemy.engine.base.Engine] Col ('version',)
+08:47:54,008    DEBUG [sqlalchemy.engine.base.Engine] Row (u'PostgreSQL 9.0.4 on x86_64-redhat-linux-gnu, compiled by GCC gcc (GCC) 4.6.0 20110530 (Red Hat 4.6.0-9), 64-bit',)
+08:47:54,017    INFO  [sqlalchemy.engine.base.Engine] select current_schema()
+08:47:54,017    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:54,018    DEBUG [sqlalchemy.engine.base.Engine] Col ('current_schema',)
+08:47:54,018    DEBUG [sqlalchemy.engine.base.Engine] Row (u'public',)
+08:47:54,042    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:47:54,042    INFO  [sqlalchemy.engine.base.Engine] {'name': u'permission'}
+08:47:54,055    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:47:54,056    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:47:54,056    INFO  [sqlalchemy.engine.base.Engine] {'name': u'trackparameters'}
+08:47:54,057    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:47:54,058    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:47:54,058    INFO  [sqlalchemy.engine.base.Engine] {'name': u'user'}
+08:47:54,059    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:47:54,059    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:47:54,060    INFO  [sqlalchemy.engine.base.Engine] {'name': u'species'}
+08:47:54,060    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:47:54,061    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:47:54,061    INFO  [sqlalchemy.engine.base.Engine] {'name': u'right'}
+08:47:54,062    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:47:54,063    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:47:54,063    INFO  [sqlalchemy.engine.base.Engine] {'name': u'input'}
+08:47:54,064    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:47:54,064    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:47:54,064    INFO  [sqlalchemy.engine.base.Engine] {'name': u'celery_taskmeta'}
+08:47:54,065    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:47:54,065    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:47:54,066    INFO  [sqlalchemy.engine.base.Engine] {'name': u'group'}
+08:47:54,066    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:47:54,067    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:47:54,067    INFO  [sqlalchemy.engine.base.Engine] {'name': u'usergroup'}
+08:47:54,068    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:47:54,068    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:47:54,069    INFO  [sqlalchemy.engine.base.Engine] {'name': u'grouppermissions'}
+08:47:54,069    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:47:54,070    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:47:54,070    INFO  [sqlalchemy.engine.base.Engine] {'name': u'sequence'}
+08:47:54,071    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:47:54,071    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:47:54,071    INFO  [sqlalchemy.engine.base.Engine] {'name': u'circle'}
+08:47:54,072    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:47:54,073    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:47:54,073    INFO  [sqlalchemy.engine.base.Engine] {'name': u'user_circle'}
+08:47:54,074    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:47:54,074    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:47:54,074    INFO  [sqlalchemy.engine.base.Engine] {'name': u'track'}
+08:47:54,075    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:47:54,076    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:47:54,076    INFO  [sqlalchemy.engine.base.Engine] {'name': u'project'}
+08:47:54,077    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:47:54,077    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:47:54,077    INFO  [sqlalchemy.engine.base.Engine] {'name': u'job'}
+08:47:54,078    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:47:54,079    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:47:54,079    INFO  [sqlalchemy.engine.base.Engine] {'name': u'default_tracks'}
+08:47:54,080    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:47:54,080    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:47:54,080    INFO  [sqlalchemy.engine.base.Engine] {'name': u'rightcircleassociation'}
+08:47:54,081    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:47:54,082    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:47:54,082    INFO  [sqlalchemy.engine.base.Engine] {'name': u'project_track'}
+08:47:54,083    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:47:54,083    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+08:47:54,083    INFO  [sqlalchemy.engine.base.Engine] {'name': u'jobparameters'}
+08:47:54,084    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:47:54,085    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Permission" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(63) NOT NULL, 
+	description VARCHAR(255) NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (name)
+)
+
+
+08:47:54,085    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:54,290    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:54,310    INFO  [sqlalchemy.engine.base.Engine] 
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+08:47:54,310    INFO  [sqlalchemy.engine.base.Engine] {'typname': u'image_type'}
+08:47:54,311    DEBUG [sqlalchemy.engine.base.Engine] Col ('?column?',)
+08:47:54,312    DEBUG [sqlalchemy.engine.base.Engine] Row (False,)
+08:47:54,312    INFO  [sqlalchemy.engine.base.Engine] CREATE TYPE image_type AS ENUM ('FeatureTrack','ImageTrack')
+08:47:54,312    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:54,313    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:54,335    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "TrackParameters" (
+	id SERIAL NOT NULL, 
+	url VARCHAR(255), 
+	label VARCHAR(255), 
+	type image_type, 
+	key VARCHAR(255), 
+	color VARCHAR(255), 
+	PRIMARY KEY (id)
+)
+
+
+08:47:54,336    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:54,376    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:54,386    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "User" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	firstname VARCHAR(255) NOT NULL, 
+	_email VARCHAR(255) NOT NULL, 
+	_created TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	key VARCHAR(255) NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (_email), 
+	UNIQUE (key)
+)
+
+
+08:47:54,387    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:54,480    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:54,549    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Species" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	PRIMARY KEY (id)
+)
+
+
+08:47:54,549    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:54,566    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:54,575    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Right" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	description TEXT NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (name)
+)
+
+
+08:47:54,576    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:54,652    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:54,661    INFO  [sqlalchemy.engine.base.Engine] 
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+08:47:54,662    INFO  [sqlalchemy.engine.base.Engine] {'typname': u'datatype'}
+08:47:54,662    DEBUG [sqlalchemy.engine.base.Engine] Col ('?column?',)
+08:47:54,663    DEBUG [sqlalchemy.engine.base.Engine] Row (False,)
+08:47:54,663    INFO  [sqlalchemy.engine.base.Engine] CREATE TYPE datatype AS ENUM ('features','signal','relational','not determined')
+08:47:54,663    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:54,664    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:54,694    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Input" (
+	id SERIAL NOT NULL, 
+	sha1 VARCHAR(255) NOT NULL, 
+	_last_access TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	task_id VARCHAR(255) NOT NULL, 
+	datatype datatype NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (sha1)
+)
+
+
+08:47:54,695    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:54,778    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:54,787    INFO  [sqlalchemy.engine.base.Engine] SELECT relname FROM pg_class c join pg_namespace n on n.oid=c.relnamespace where relkind='S' and n.nspname=current_schema() and lower(relname)=%(name)s
+08:47:54,787    INFO  [sqlalchemy.engine.base.Engine] {'name': u'task_id_sequence'}
+08:47:54,788    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+08:47:54,789    INFO  [sqlalchemy.engine.base.Engine] CREATE SEQUENCE task_id_sequence
+08:47:54,789    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:54,790    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:54,820    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE celery_taskmeta (
+	id INTEGER NOT NULL, 
+	task_id VARCHAR(255), 
+	status VARCHAR(50), 
+	result BYTEA, 
+	date_done TIMESTAMP WITHOUT TIME ZONE, 
+	traceback TEXT, 
+	PRIMARY KEY (id), 
+	UNIQUE (task_id)
+)
+
+
+08:47:54,820    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:54,948    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:54,972    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Group" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	_created TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (name)
+)
+
+
+08:47:54,972    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:55,017    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:55,027    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "UserGroup" (
+	user_id INTEGER NOT NULL, 
+	group_id INTEGER NOT NULL, 
+	PRIMARY KEY (user_id, group_id), 
+	FOREIGN KEY(user_id) REFERENCES "User" (id) ON DELETE CASCADE ON UPDATE CASCADE, 
+	FOREIGN KEY(group_id) REFERENCES "Group" (id) ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+
+08:47:55,027    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:55,062    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:55,086    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "GroupPermissions" (
+	group_id INTEGER NOT NULL, 
+	permission_id INTEGER NOT NULL, 
+	PRIMARY KEY (group_id, permission_id), 
+	FOREIGN KEY(group_id) REFERENCES "Group" (id) ON DELETE CASCADE ON UPDATE CASCADE, 
+	FOREIGN KEY(permission_id) REFERENCES "Permission" (id) ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+
+08:47:55,086    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:55,121    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:55,138    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Sequence" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	species_id INTEGER NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(species_id) REFERENCES "Species" (id) ON DELETE CASCADE
+)
+
+
+08:47:55,138    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:55,180    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:55,206    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Circle" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	description TEXT NOT NULL, 
+	creator_id INTEGER, 
+	admin BOOLEAN NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(creator_id) REFERENCES "User" (id) ON DELETE CASCADE
+)
+
+
+08:47:55,206    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:55,316    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:55,325    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE user_circle (
+	user_id INTEGER NOT NULL, 
+	circle_id INTEGER NOT NULL, 
+	PRIMARY KEY (user_id, circle_id), 
+	FOREIGN KEY(user_id) REFERENCES "User" (id) ON DELETE CASCADE, 
+	FOREIGN KEY(circle_id) REFERENCES "Circle" (id) ON DELETE CASCADE
+)
+
+
+08:47:55,325    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:55,344    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:55,353    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Track" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	_created TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	_last_access TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	parameter_id INTEGER NOT NULL, 
+	input_id INTEGER NOT NULL, 
+	user_id INTEGER NOT NULL, 
+	sequence_id INTEGER NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(parameter_id) REFERENCES "TrackParameters" (id) ON DELETE CASCADE, 
+	FOREIGN KEY(input_id) REFERENCES "Input" (id) ON DELETE CASCADE, 
+	FOREIGN KEY(user_id) REFERENCES "User" (id) ON DELETE CASCADE, 
+	FOREIGN KEY(sequence_id) REFERENCES "Sequence" (id) ON DELETE CASCADE
+)
+
+
+08:47:55,353    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:55,388    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:55,420    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Project" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	_created TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	sequence_id INTEGER NOT NULL, 
+	user_id INTEGER NOT NULL, 
+	is_public BOOLEAN NOT NULL, 
+	key VARCHAR(255) NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(sequence_id) REFERENCES "Sequence" (id) ON DELETE CASCADE, 
+	FOREIGN KEY(user_id) REFERENCES "User" (id) ON DELETE CASCADE, 
+	UNIQUE (key)
+)
+
+
+08:47:55,420    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:55,489    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:55,556    INFO  [sqlalchemy.engine.base.Engine] 
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+08:47:55,557    INFO  [sqlalchemy.engine.base.Engine] {'typname': u'job_status'}
+08:47:55,558    DEBUG [sqlalchemy.engine.base.Engine] Col ('?column?',)
+08:47:55,558    DEBUG [sqlalchemy.engine.base.Engine] Row (False,)
+08:47:55,558    INFO  [sqlalchemy.engine.base.Engine] CREATE TYPE job_status AS ENUM ('SUCCESS','PENDING','ERROR','RUNNING')
+08:47:55,558    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:55,559    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:55,576    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Job" (
+	id SERIAL NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	description TEXT NOT NULL, 
+	_created TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	status job_status NOT NULL, 
+	user_id INTEGER NOT NULL, 
+	project_id INTEGER, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(user_id) REFERENCES "User" (id) ON DELETE CASCADE, 
+	FOREIGN KEY(project_id) REFERENCES "Project" (id) ON DELETE CASCADE
+)
+
+
+08:47:55,576    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:55,618    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:55,635    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE default_tracks (
+	track_id INTEGER NOT NULL, 
+	sequence_id INTEGER NOT NULL, 
+	PRIMARY KEY (track_id, sequence_id), 
+	FOREIGN KEY(track_id) REFERENCES "Track" (id) ON DELETE CASCADE, 
+	FOREIGN KEY(sequence_id) REFERENCES "Sequence" (id) ON DELETE CASCADE
+)
+
+
+08:47:55,636    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:55,670    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:55,678    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "RightCircleAssociation" (
+	right_id INTEGER NOT NULL, 
+	circle_id INTEGER NOT NULL, 
+	project_id INTEGER NOT NULL, 
+	PRIMARY KEY (right_id, circle_id, project_id), 
+	FOREIGN KEY(right_id) REFERENCES "Right" (id) ON DELETE CASCADE, 
+	FOREIGN KEY(circle_id) REFERENCES "Circle" (id) ON DELETE CASCADE, 
+	FOREIGN KEY(project_id) REFERENCES "Project" (id) ON DELETE CASCADE
+)
+
+
+08:47:55,678    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:55,705    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:55,721    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE project_track (
+	project_id INTEGER NOT NULL, 
+	track_id INTEGER NOT NULL, 
+	PRIMARY KEY (project_id, track_id), 
+	FOREIGN KEY(project_id) REFERENCES "Project" (id) ON DELETE CASCADE, 
+	FOREIGN KEY(track_id) REFERENCES "Track" (id) ON DELETE CASCADE
+)
+
+
+08:47:55,722    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:55,763    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:55,779    INFO  [sqlalchemy.engine.base.Engine] 
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+08:47:55,780    INFO  [sqlalchemy.engine.base.Engine] {'typname': u'job_type'}
+08:47:55,781    DEBUG [sqlalchemy.engine.base.Engine] Col ('?column?',)
+08:47:55,781    DEBUG [sqlalchemy.engine.base.Engine] Row (False,)
+08:47:55,781    INFO  [sqlalchemy.engine.base.Engine] CREATE TYPE job_type AS ENUM ('NEW_SELECTION','NEW_TRACK','GFEATMINER','NEW_PROJECT')
+08:47:55,781    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:55,782    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:55,812    INFO  [sqlalchemy.engine.base.Engine] 
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+08:47:55,812    INFO  [sqlalchemy.engine.base.Engine] {'typname': u'job_output'}
+08:47:55,813    DEBUG [sqlalchemy.engine.base.Engine] Col ('?column?',)
+08:47:55,814    DEBUG [sqlalchemy.engine.base.Engine] Row (False,)
+08:47:55,814    INFO  [sqlalchemy.engine.base.Engine] CREATE TYPE job_output AS ENUM ('RELOAD','IMAGE')
+08:47:55,814    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:55,815    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:55,849    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "JobParameters" (
+	id SERIAL NOT NULL, 
+	type job_type NOT NULL, 
+	output job_output NOT NULL, 
+	data TEXT, 
+	job_id INTEGER NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(job_id) REFERENCES "Job" (id) ON DELETE CASCADE
+)
+
+
+08:47:55,850    INFO  [sqlalchemy.engine.base.Engine] {}
+08:47:55,902    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+08:47:55,948    INFO  [sqlalchemy.engine.base.Engine] BEGIN (implicit)
+08:47:55,965    INFO  [sqlalchemy.engine.base.Engine] SELECT "User".id AS "User_id", "User".name AS "User_name", "User".firstname AS "User_firstname", "User"._email AS "User__email", "User"._created AS "User__created", "User".key AS "User_key" 
+FROM "User" 
+WHERE "User"._email = %(_email_1)s 
+ LIMIT %(param_1)s OFFSET %(param_2)s
+08:47:55,966    INFO  [sqlalchemy.engine.base.Engine] {'_email_1': 'yohan.jarosz@epfl.ch', 'param_1': 1, 'param_2': 0}
+08:47:55,968    DEBUG [sqlalchemy.engine.base.Engine] Col ('User_id', 'User_name', 'User_firstname', 'User__email', 'User__created', 'User_key')
+08:47:55,970    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Right" (name, description) VALUES (%(name)s, %(description)s) RETURNING "Right".id
+08:47:55,971    INFO  [sqlalchemy.engine.base.Engine] {'name': 'Upload', 'description': u'A group with this permission can upload tracks to the project and execute jobs on the web interface.'}
+08:47:55,972    DEBUG [sqlalchemy.engine.base.Engine] Col ('id',)
+08:47:55,972    DEBUG [sqlalchemy.engine.base.Engine] Row (1,)
+08:47:55,972    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Right" (name, description) VALUES (%(name)s, %(description)s) RETURNING "Right".id
+08:47:55,973    INFO  [sqlalchemy.engine.base.Engine] {'name': 'Download', 'description': u'A group with this permission can download files on a project.'}
+08:47:55,973    DEBUG [sqlalchemy.engine.base.Engine] Col ('id',)
+08:47:55,973    DEBUG [sqlalchemy.engine.base.Engine] Row (2,)
+08:47:55,974    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Right" (name, description) VALUES (%(name)s, %(description)s) RETURNING "Right".id
+08:47:55,974    INFO  [sqlalchemy.engine.base.Engine] {'name': 'Read', 'description': u'A group with this permission can view the project.'}
+08:47:55,974    DEBUG [sqlalchemy.engine.base.Engine] Col ('id',)
+08:47:55,974    DEBUG [sqlalchemy.engine.base.Engine] Row (3,)
+08:47:55,975    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Group" (name, _created) VALUES (%(name)s, %(_created)s) RETURNING "Group".id
+08:47:55,976    INFO  [sqlalchemy.engine.base.Engine] {'_created': datetime.datetime(2011, 11, 2, 8, 47, 55, 975723), 'name': 'Users'}
+08:47:55,977    DEBUG [sqlalchemy.engine.base.Engine] Col ('id',)
+08:47:55,977    DEBUG [sqlalchemy.engine.base.Engine] Row (1,)
+08:47:55,978    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Permission" (name, description) VALUES (%(name)s, %(description)s) RETURNING "Permission".id
+08:47:55,978    INFO  [sqlalchemy.engine.base.Engine] {'name': 'user', 'description': u'This permission give "read" right to the bearer.'}
+08:47:55,979    DEBUG [sqlalchemy.engine.base.Engine] Col ('id',)
+08:47:55,979    DEBUG [sqlalchemy.engine.base.Engine] Row (1,)
+08:47:55,980    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "GroupPermissions" (group_id, permission_id) VALUES (%(group_id)s, %(permission_id)s)
+08:47:55,980    INFO  [sqlalchemy.engine.base.Engine] {'permission_id': 1, 'group_id': 1}
+08:47:55,982    INFO  [sqlalchemy.engine.base.Engine] COMMIT
