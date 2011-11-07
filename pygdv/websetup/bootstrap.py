@@ -6,8 +6,8 @@ from sqlalchemy.exc import IntegrityError
 import transaction
 
 
-from pygdv.lib.app_globals import right_upload, right_download, right_read, group_admins, perm_admin, group_users, perm_user
 
+from pygdv.lib.constants import right_upload, right_download, right_read, group_admins, perm_admin, group_users, perm_user
 def bootstrap(command, conf, vars):
     """Place any commands to setup turbotequila here.
     Note that you will have to log in the application one before launching the bootstrap."""

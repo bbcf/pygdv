@@ -13,10 +13,10 @@ from tg import url, tmpl_context
 from sprox.dojo.formbase import DojoEditableForm
 from sprox.widgets.dojo import SproxDojoSelectShuttleField, SproxDojoSortedSelectShuttleField
 from pygdv.model import DBSession, Project, Species, Sequence, Track, User, Group
-from pygdv.lib.helpers import get_delete_link, get_edit_link, get_project_right_sharing_form, get_view_link, get_share_link
+from pygdv.lib.helpers import get_delete_link, get_detail_link, get_edit_link, get_project_right_sharing_form, get_view_link, get_share_link
 from pygdv import handler
 from tg import app_globals as gl
-
+from pygdv.lib import constants
 # TABLE
 class PTable(TableBase):
     __model__ = Project
@@ -172,9 +172,11 @@ project_grid = twf.DataGrid(fields=[
     ('Assembly', 'assembly'),
     ('Circles', 'get_circle_with_right_display'),
     ('Tracks', 'get_tracks'),
-    ('Action', lambda obj:genshi.Markup(get_view_link(obj.id) + get_share_link(obj.id) 
-        + get_delete_link(obj.id) 
-        + get_edit_link(obj.id)
+    ('Action', lambda obj:genshi.Markup(
+        get_view_link(obj.id, 'project_id', constants.full_rights)
+        + get_share_link(obj.id, 'project_id', constants.full_rights) 
+        + get_delete_link(obj.id, constants.full_rights) 
+        + get_edit_link(obj.id, constants.full_rights)
         + '<a href="%s">detail</a> '
         % url('./detail', params=dict(project_id=obj.id))
         ))
@@ -196,7 +198,26 @@ project_grid_sharing = twf.DataGrid(fields=[
         % url('./add_track', params=dict(project_id=obj.id))
         ))
 ])
-    
+
+
+
+project_with_right = twf.DataGrid(fields = [
+    ('Name', 'dec.name'),
+    ('Created', 'dec.created'),
+    ('Assembly', 'dec.assembly'),
+    ('Tracks', 'dec.get_tracks'),
+    ('Action', lambda obj:genshi.Markup(
+        get_view_link(obj.dec.id, 'project_id', obj.rights) 
+        + get_share_link(obj.dec.id, 'project_id', obj.rights) 
+        + get_delete_link(obj.dec.id, obj.rights) 
+        + get_edit_link(obj.dec.id, obj.rights)
+        + get_detail_link(obj.dec.id, 'project_id', obj.rights)
+        ))             
+                                            
+                                            
+                                            ])
+
+  
 class ProjectSharingDataGrid(twf.DataGrid):
     sharing_project_js = tw.api.JSLink(modname='pygdv', filename='public/js/helpers.js')
     javascript=[sharing_project_js]

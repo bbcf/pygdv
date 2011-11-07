@@ -10,8 +10,9 @@ from tg.controllers import redirect
 from tg.decorators import paginate, with_trailing_slash,without_trailing_slash
 
 from pygdv.model import DBSession, Project, User, RightCircleAssociation, Track
-from pygdv.widgets.project import project_table, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid,circles_available_form, tracks_available_form, project_sharing_grid, project_grid_sharing
+from pygdv.widgets.project import project_table, project_with_right, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid,circles_available_form, tracks_available_form, project_sharing_grid, project_grid_sharing
 from pygdv.widgets.track import track_in_project_grid
+from pygdv.widgets import ModelWithRight
 from pygdv import handler
 from pygdv.lib import util
 import os, json
@@ -45,10 +46,15 @@ class ProjectController(CrudRestController):
 
         # user project
         user_projects = [util.to_datagrid(project_grid, user.projects, "Project Listing", len(user.projects)>0)]
-
         # shared projects
-        sp = handler.project.get_shared_projects(user)
-        shared_projects = [util.to_datagrid(project_grid_sharing, sp, "Shared projects", len(sp)>0)]
+        project_with_rights = handler.project.get_shared_projects(user)
+        sp = []
+        for project, rights in project_with_rights.iteritems():
+            sp.append(ModelWithRight(project, {constants.right_read : constants.right_read in rights, 
+                                               constants.right_download : constants.right_download in rights,
+                                               constants.right_upload : constants.right_upload in rights}))
+        
+        shared_projects = [util.to_datagrid(project_with_right, sp, "Shared projects", len(sp)>0)]
         #TODO check with permissions
         
         return dict(page='projects', model='project', form_title="new project", user_projects=user_projects, shared_projects=shared_projects, value=kw)

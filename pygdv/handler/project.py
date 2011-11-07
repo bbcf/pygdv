@@ -1,6 +1,9 @@
-from pygdv.model import DBSession, Project, Track, Right, RightCircleAssociation, User
+from pygdv.model import DBSession, Project, Track, Right, RightCircleAssociation, User, Circle
 from tg import app_globals as gl
 from sqlalchemy.sql import and_, or_, not_
+from sqlalchemy.orm import aliased
+from pygdv.lib import constants
+from sqlalchemy.types import Boolean
 
 def create(name, sequence_id, user_id, tracks=None, isPublic=False, circles=None):
     '''
@@ -60,7 +63,7 @@ def change_rights(project_id, circle_id, rights=None):
     if rights is not None:
         _add_read_right(project, circle_id)
         for right_name in rights:
-            if right_name != gl.right_read :
+            if right_name != constants.right_read :
                 right = DBSession.query(Right).filter(Right.name == right_name).first()
                 cr_assoc = _get_circle_right_assoc(right, circle_id, project_id)
                 project._circle_right.append(cr_assoc)
@@ -140,12 +143,31 @@ def get_projects_with_permission(user_id, right_name):
                      ).all()
     
     
-    
+
 def get_shared_projects(user):
-    return DBSession.query(Project).join(Project._circle_right).join(User.circles).filter(
-                and_(User.id == user.id, or_(Right.name == gl.right_read, Right.name == gl.right_upload, Right.name == gl.right_download),
+    '''
+    Get the shared projects with rights associated which are not in the user projects.
+    :return: {project: [rights,]}
+    '''
+    
+    
+    
+    projects = DBSession.query(Project).distinct().join(
+                                Project._circle_right).join(User.circles).filter(
+                and_(User.id == user.id, or_(Right.id == constants.right_read_id, 
+                                             Right.id == constants.right_upload_id, 
+                                             Right.id == constants.right_download_id),
                      not_(Project.id.in_([p.id for p in user.projects])))
                      ).all()
+    
+    data = {}
+    for project in projects:
+        for circle, rights in project.circles_with_rights.iteritems():
+            if circle in user.circles:
+                if project not in data:
+                    data[project] = []
+                data[project]+= [right.name for right in rights if right.name not in data[project]]
+    return data
     
     
     

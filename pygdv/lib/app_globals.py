@@ -11,16 +11,7 @@ from pygdv.lib import constants
 
 # CIRCLE & RIGHTS configuration
 
-group_admins = 'Admins'
-perm_admin = 'admin'
 
-group_users = 'Users'
-perm_user = 'user'
-
-
-right_upload = 'Upload'
-right_download = 'Download'
-right_read = 'Read'
  
 
  
@@ -47,13 +38,13 @@ class Globals(object):
         '''
         Default groups and permissions
         '''
-        self.group_admins = group_admins
-        self.group_users = group_users
-        self.perm_user = perm_user
-        self.perm_admin = perm_admin
-        self.right_upload = right_upload
-        self.right_download = right_download
-        self.right_read = right_read
+        self.group_admins = constants.group_admins
+        self.group_users = constants.group_users
+        self.perm_user = constants.perm_user
+        self.perm_admin = constants.perm_admin
+        self.right_upload = constants.right_upload
+        self.right_download = constants.right_download
+        self.right_read = constants.right_read
         
         self.genrep = GenRep()
         

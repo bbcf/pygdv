@@ -42,3 +42,25 @@ NOT_SUPPORTED_DATATYPE = 'format not supported'
 
 # DATA FORMAT
 date_format = "%A %d. %B %Y %H.%M.%S"
+
+
+
+
+
+right_upload = 'Upload'
+right_download = 'Download'
+right_read = 'Read'
+
+right_upload_id = 3
+right_download_id = 2
+right_read_id = 1
+
+group_admins = 'Admins'
+perm_admin = 'admin'
+
+group_users = 'Users'
+perm_user = 'user'
+
+
+
+full_rights = {right_read : True, right_download : True, right_upload : True}

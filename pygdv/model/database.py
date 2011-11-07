@@ -86,6 +86,9 @@ class Circle(DeclarativeBase):
     def display(self):
         return '%s (%s)' % (self.name, self.description)
 
+    def __repr__(self):
+        return '<Circle : name : %s, desc : %s>' % (self.name, self.description)
+    
 class RightCircleAssociation(DeclarativeBase):
     __tablename__='RightCircleAssociation'
     
@@ -179,6 +182,7 @@ class Project(DeclarativeBase):
             result[cr.circle]=rights
         return result
     
+    
     @property 
     def get_tracks(self):
         return ', '.join([track.name for track in self.tracks])
@@ -204,7 +208,9 @@ class Project(DeclarativeBase):
     def circles_rights(self):
         data = self.circles_with_rights
         return [CircleRights(self.id, circle, rights) for circle, rights in data.iteritems()]
-            
+    
+    
+    
     
 class Sequence(DeclarativeBase):
     '''

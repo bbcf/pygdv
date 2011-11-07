@@ -94,6 +94,14 @@ a.share_link{
     background-image: url('/images/share.png');
 }
 
+a.detail_link{
+    background-repeat: no-repeat;
+    padding-left: 20px;
+}
+a.detail_link{
+    background-image: url('/images/share.png');
+}
+
 
 
 
