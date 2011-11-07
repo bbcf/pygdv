@@ -9,8 +9,9 @@ from tg import app_globals as gl
 from tg.controllers import redirect
 from tg.decorators import paginate, with_trailing_slash,without_trailing_slash
 
-from pygdv.model import DBSession, Project, User, RightCircleAssociation
-from pygdv.widgets.project import project_table, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid,circles_available_form, tracks_available_form, project_sharing_grid
+from pygdv.model import DBSession, Project, User, RightCircleAssociation, Track
+from pygdv.widgets.project import project_table, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid,circles_available_form, tracks_available_form, project_sharing_grid, project_grid_sharing
+from pygdv.widgets.track import track_in_project_grid
 from pygdv import handler
 from pygdv.lib import util
 import os, json
@@ -18,6 +19,7 @@ import transaction
 from pygdv.lib import checker
 from pygdv.lib.jbrowse import util as jb
 from pygdv.lib import constants
+from sqlalchemy.sql import and_
 
 __all__ = ['ProjectController']
 
@@ -35,7 +37,7 @@ class ProjectController(CrudRestController):
 
 
     @with_trailing_slash
-    @expose('pygdv.templates.list')
+    @expose('pygdv.templates.project')
     @expose('json')
     #@paginate('items', items_per_page=10)
     def get_all(self, *args, **kw):
@@ -45,9 +47,11 @@ class ProjectController(CrudRestController):
         user_projects = [util.to_datagrid(project_grid, user.projects, "Project Listing", len(user.projects)>0)]
 
         # shared projects
+        sp = handler.project.get_shared_projects(user)
+        shared_projects = [util.to_datagrid(project_grid_sharing, sp, "Shared projects", len(sp)>0)]
         #TODO check with permissions
         
-        return dict(page='projects', model='project', form_title="new project", items=user_projects, value=kw)
+        return dict(page='projects', model='project', form_title="new project", user_projects=user_projects, shared_projects=shared_projects, value=kw)
     
 
 
@@ -82,9 +86,25 @@ class ProjectController(CrudRestController):
 
 
 
+    @expose('pygdv.templates.project_detail')
+    def detail(self, project_id):
+        if project_id is None:
+            raise redirect('./')
+        user = handler.user.get_user_in_session(request)
+        if not checker.user_own_project(user.id, project_id):
+            flash('You cannot view a project which is not yours')
+            raise redirect('./')
 
+        # project info
+        project = DBSession.query(Project).filter(Project.id == project_id).first()
+        data = util.to_datagrid(project_grid, [project])
 
+        # track list
+        track_list = [util.to_datagrid(track_in_project_grid, project.tracks, "Tracks associated", len(project.tracks)>0)]
 
+        
+        return dict(page='projects', model='Project', info=data,
+                    track_list=track_list)
 
 
     @expose('pygdv.templates.form')
@@ -98,8 +118,8 @@ class ProjectController(CrudRestController):
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         tmpl_context.widget = project_edit_form
         tmpl_context.project = project
-        tmpl_context.tracks=user.tracks
-        #tmpl_context.circles=user.circles
+        tmpl_context.tracks= DBSession.query(Track).join(User.tracks).filter(
+                            and_(User.id == user.id, Track.sequence_id == project.sequence_id)).all()
 
         kw['_method']='PUT'
         return dict(page='projects', value=kw, title='edit Project')
@@ -143,7 +163,7 @@ class ProjectController(CrudRestController):
         tmpl_context.circles = user.circles
 
         # circles with rights
-        cr_data = [util.to_datagrid(project_sharing_grid, project.circles_rights, "sharing", len(project.circles_rights)>0)]
+        cr_data = [util.to_datagrid(project_sharing_grid, project.circles_rights, "Sharing", len(project.circles_rights)>0)]
 
         kw['project_id'] = project_id
         return dict(page='projects', model='Project', info=data,

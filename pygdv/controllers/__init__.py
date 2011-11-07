@@ -15,6 +15,6 @@ from pygdv.controllers.worker import WorkerController
 from pygdv.controllers.task import TaskController
 from pygdv.controllers.input import InputController
 from pygdv.controllers.database import DatabaseController
-from pygdv.controllers.form import FormController
+
 
 from pygdv.controllers.root import RootController

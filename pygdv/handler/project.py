@@ -1,6 +1,6 @@
 from pygdv.model import DBSession, Project, Track, Right, RightCircleAssociation, User
 from tg import app_globals as gl
-from sqlalchemy.sql import and_
+from sqlalchemy.sql import and_, or_, not_
 
 def create(name, sequence_id, user_id, tracks=None, isPublic=False, circles=None):
     '''
@@ -138,4 +138,14 @@ def get_projects_with_permission(user_id, right_name):
     return DBSession.query(Project).join(Project._circle_right).join(User.circles).filter(
                 and_(User.id == user_id, Right.id == right.id)
                      ).all()
+    
+    
+    
+def get_shared_projects(user):
+    return DBSession.query(Project).join(Project._circle_right).join(User.circles).filter(
+                and_(User.id == user.id, or_(Right.name == gl.right_read, Right.name == gl.right_upload, Right.name == gl.right_download),
+                     not_(Project.id.in_([p.id for p in user.projects])))
+                     ).all()
+    
+    
     

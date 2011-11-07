@@ -153,33 +153,7 @@ class CircleSelectField(SproxDojoSelectShuttleField):
         d['options']=get_circles()
         return d
 
-class EditProjectForm2(DojoEditableForm):
-    __model__ = Project
-    __base_widget_args__ = {'hover_help': True,'submit_text':'Edit project','show_errors':True}
-    __limit_fields__ = ['name', 'species', 'assembly']
-    __field_order__ = ['name', 'species', 'assembly']
-    __require_fields__ = ['name', 'species', 'assembly']
-    
-    twf.HiddenField('_method')
-    name = twf.TextField(label_text='Name',id='name',
-                            help_text = 'Give a name to your project', validator=NotEmpty, default=get_project_name)
-    species = twd.CascadingSingleSelectField(id='species', label_text='Species : ',options=get_project_species,
-            help_text = 'Choose the species',cascadeurl='/sequences/get_nr_assemblies_from_species_id')
-    assembly = twf.SingleSelectField(id='nr_assembly', label_text='Assembly : ',options=get_project_nr_assemblies,
-            help_text = 'Choose the assembly.')
-    tracks = twf.MultipleSelectField(id='tracks', label_text='Tracks : ',options=get_tracks,
-              help_text = 'Add tracks to the project')
-    #tracks = TracksSelectField
-    #_circle_right = CircleSelectField
-    
-    def _my_update_params(self, d, nullable=False):
-        super(EditProjectForm,self).update_params(d)
-        species=get_species()
-        d['species']=species
-        d['nr_assembly']=get_assemblies(species)
-        return d
-    
-    
+
     
 
 # EDIT
@@ -201,12 +175,27 @@ project_grid = twf.DataGrid(fields=[
     ('Action', lambda obj:genshi.Markup(get_view_link(obj.id) + get_share_link(obj.id) 
         + get_delete_link(obj.id) 
         + get_edit_link(obj.id)
-        + '<a href="%s">add track</a> '
-        % url('./add_track', params=dict(project_id=obj.id))
+        + '<a href="%s">detail</a> '
+        % url('./detail', params=dict(project_id=obj.id))
         ))
 ])
 
 
+
+
+project_grid_sharing = twf.DataGrid(fields=[
+    ('Name', 'name'),
+    ('Created', 'created'),
+    ('Assembly', 'assembly'),
+    ('Circles', 'get_circle_with_right_display'),
+    ('Tracks', 'get_tracks'),
+    ('Action', lambda obj:genshi.Markup(get_view_link(obj.id) + get_share_link(obj.id) 
+        + get_delete_link(obj.id) 
+        + get_edit_link(obj.id)
+        + '<a href="%s">add track</a> '
+        % url('./add_track', params=dict(project_id=obj.id))
+        ))
+])
     
 class ProjectSharingDataGrid(twf.DataGrid):
     sharing_project_js = tw.api.JSLink(modname='pygdv', filename='public/js/helpers.js')
@@ -256,7 +245,34 @@ class AvailableTracksForm(twf.TableForm):
                 help_text="Add track(s) to the project by selecting them. You can select more the one by holding the Ctrl button.")
               ]         
     
+class EditProjectForm2(DojoEditableForm):
+    __model__ = Project
+    __base_widget_args__ = {'hover_help': True,'submit_text':'Edit project','show_errors':True}
+    __limit_fields__ = ['name', 'species', 'assembly']
+    __field_order__ = ['name', 'species', 'assembly']
+    __require_fields__ = ['name', 'species', 'assembly']
     
+    twf.HiddenField('_method')
+    id = twf.HiddenField('Id')
+    name = twf.TextField(label_text='Name',id='name',
+                            help_text = 'Give a name to your project', validator=NotEmpty, default=get_project_name)
+#    species = twd.CascadingSingleSelectField(id='species', label_text='Species : ',options=get_project_species,
+#            help_text = 'Choose the species',cascadeurl='/sequences/get_nr_assemblies_from_species_id')
+#    assembly = twf.SingleSelectField(id='nr_assembly', label_text='Assembly : ',options=get_project_nr_assemblies,
+#            help_text = 'Choose the assembly.')
+    tracks = twf.MultipleSelectField(id='tracks', label_text='Tracks : ',options=get_tracks,
+             help_text="Add track(s) to the project by selecting them. You can select more the one by holding the Ctrl/Cmd button.")
+    #tracks = TracksSelectField
+    #_circle_right = CircleSelectField
+    
+    def _my_update_params(self, d, nullable=False):
+        super(EditProjectForm,self).update_params(d)
+        species=get_species()
+        d['species']=species
+        d['nr_assembly']=get_assemblies(species)
+        return d
+    
+       
 
 project_table = PTable(DBSession)
 project_table_filler = PTableFiller(DBSession)

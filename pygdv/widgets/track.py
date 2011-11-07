@@ -55,6 +55,25 @@ track_grid = twf.DataGrid(fields=[
         + get_edit_link(obj.id)
         ))
 ])
+track_in_project_grid = twf.DataGrid(fields=[
+    ('Name', 'name'),
+    ('Created', 'created'),
+    ('Last access', 'last_access'),
+    ('Type', 'vizu'),
+    ('Status', lambda obj: get_task_status(obj)),
+    ('Action', lambda obj:genshi.Markup(
+        '<a href="%s">export</a> <a href="%s">link</a> '
+        % (
+           url('./export', params=dict(track_id=obj.id)),
+           url('./link', params=dict(track_id=obj.id))
+           ) 
+#        + get_remove_link(obj.id) 
+#        + get_copy_link(obj.id)
+        ))
+])
+
+
+
 
 def get_species():
         species = DBSession.query(Species).all()

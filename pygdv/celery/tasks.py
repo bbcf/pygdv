@@ -159,7 +159,8 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, pr
             with track.load(tmp_dst, 'sql', readonly=True) as t:
                 with track.new(dst, 'sql') as t2:
                     for chrom in t:
-                        t2.write(chrom, t.read(chrom, signal_fields))
+                        ## TODO
+                        t2.write(chrom, t.read(chrom, fields=signal_fields), fields=signal_fields)
                     t2.assembly = assembly_name
                     
         elif datatype == constants.FEATURES:

@@ -160,7 +160,7 @@ class Project(DeclarativeBase):
         return self.name
     @property
     def assembly(self):
-        return self.sequence_id
+        return self.sequence.name
     @property
     def species(self):
         return self.sequence.species
