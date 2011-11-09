@@ -15,14 +15,15 @@ def create(name, sequence_id, user_id, tracks=None, isPublic=False, circles=None
     @param isPublic : if the project is public
     @param circles : a list of circles with 'read' permission
     '''
-    edit(Project(), name, sequence_id, user_id, tracks, isPublic, circles)
+    edit(Project(), name, user_id, sequence_id=sequence_id, tracks=tracks, isPublic=isPublic, circles=circles)
     
-def edit(project, name, sequence_id, user_id, tracks=None, isPublic=False, circles=None):
+def edit(project, name, user_id, sequence_id=None, tracks=None, isPublic=False, circles=None):
     '''
     Like create but edit an existing project.
     '''
     project.name=name
-    project.sequence_id = sequence_id
+    if sequence_id is not None:
+        project.sequence_id = sequence_id
     project.user_id = user_id
     project.is_public = isPublic
     DBSession.add(project)
@@ -34,8 +35,9 @@ def edit(project, name, sequence_id, user_id, tracks=None, isPublic=False, circl
             t = DBSession.query(Track).filter(Track.id == track_id).first()
             project.tracks.append(t)
     
-    project._circle_right = []
+   
     if circles is not None: # adding circle with the read permission by default
+        project._circle_right = []
         for circle in circles : _add_read_right(project, circle.id)
         
     DBSession.add(project)
@@ -166,7 +168,7 @@ def get_shared_projects(user):
             if circle in user.circles:
                 if project not in data:
                     data[project] = []
-                data[project]+= [right.name for right in rights if right.name not in data[project]]
+                data[project] += [right.name for right in rights if right.name not in data[project]]
     return data
     
     

@@ -272,16 +272,15 @@ ImageDrawer.prototype.drawScores = function(node,jsonText,color){
 		ctx.fillStyle = color;
 		ctx.beginPath();
 		var p;
-		ctx.fillStyle = 'green';
 		for(var i in data){
 		    if(p){
 			var width = (i - p) * baseWidth;
 			var real_score = data[p];
 			var trans_score = - ( real_score * cnvs_height / d * inZoom );
-			console.log(real_score);
-			console.log(trans_score);
-			console.log('z = ' + Z);
-			console.log('');
+			//console.log(real_score);
+			//console.log(trans_score);
+			//console.log('z = ' + Z);
+			//console.log('');
 			ctx.rect(p * baseWidth, Z , width, trans_score);
 			//ctx.rect(p * baseWidth,drawer.getScoreForCanvas(min,max,data[p],cnvs_height,inZoom),width,cnvs_height);
 		    }

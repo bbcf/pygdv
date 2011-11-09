@@ -112,11 +112,13 @@ class TrackController(CrudRestController):
     
     @expose()
     def export(self, track_id, format=None, *args, **kw):
+        print track_id
         user = handler.user.get_user_in_session(request)
-        if not checker.user_own_track(user.id, track_id):
+        
+        if not checker.can_download_track(user.id, track_id):
             flash("You haven't the right to export any tracks which is not yours")
-        if format is None :
-            return 'specify the format sql, gff, bed, wig, tsv'
+            raise redirect('../')
+
         
         return 'not implemented'
     

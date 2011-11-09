@@ -2,7 +2,7 @@
 from tgext.crud import CrudRestController
 from tg import expose, flash, request
 from repoze.what.predicates import has_permission
-from tg.decorators import with_trailing_slash
+from tg.decorators import with_trailing_slash, paginate
 from tg.controllers import redirect
 from pygdv.widgets.tasks import celerytask_table, celerytask_table_filler, celerytask_new_form, celerytask_edit_filler, celerytask_edit_form, task_grid
 from pygdv.model import DBSession, Task
@@ -25,6 +25,7 @@ class TaskController(CrudRestController):
 
     @with_trailing_slash
     @expose('pygdv.templates.list')
+    @paginate('items', items_per_page=10)
     @expose('json')
     def get_all(self, *args, **kw):
         user = handler.user.get_user_in_session(request)

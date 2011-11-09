@@ -44,21 +44,7 @@ def del_tmp_file(f):
         pass
     return 1
 
-def process_signal(database, sha1, name):
-    '''
-    Process a ``signal`` SQL file and create the databases needed by JBrowse.
-    @param database : the database
-    @param sha1 : the sah1 of the file
-    '''
-    print '[t] starting task ``process signal`` : db (%s), sha1(%s), name(%s).' % (database, sha1, name)
-    output_dir = json_directory()
-    callback = subtask(task=del_file_on_error, args=(sha1, output_dir))
-    
-    t1 = _compute_scores.subtask((database, sha1, output_dir))
-    t2 = _jsonify_signal.subtask((sha1, output_dir, database))
-    
-    job = chord(tasks=[t1,t2])(callback)
-    return job  
+
 
 
 def process_features(database, sha1, name, extended = False): 
@@ -93,15 +79,16 @@ def _compute_scores(database, sha1, output_dir, callback=None, callback_on_error
     print '[t] starting task ``compute scores`` : db (%s), sha1(%s)' % (database, sha1)
     try :
         scores.pre_compute_sql_scores(database, sha1, output_dir)
-        if callback : 
+        if callback :
             output_dir = json_directory()
             return subtask(callback).delay(sha1, output_dir, database, callback_on_error=callback_on_error)
     except Exception as e:
         etype, value, tb = sys.exc_info()
         traceback.print_exception(etype, value, tb)
         if callback_on_error :
-            subtask(callback).delay([e], sha1)
+            subtask(callback_on_error).delay([e], sha1)
         raise e
+    return 1
 
 
 @task()
@@ -208,8 +195,12 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, pr
 def process_database(datatype, assembly_name, path, sha1, name, format):
     
     dispatch = _sql_dispatch.get(datatype, lambda *args, **kw : cannot_process(*args, **kw))
-    return dispatch(path, sha1, name)
-    
+    try :
+        return dispatch(path, sha1, name)
+    except Exception as e:
+        etype, value, tb = sys.exc_info()
+        traceback.print_exception(etype, value, tb)
+        raise e
     
 
 
@@ -231,8 +222,15 @@ def _signal(path, sha1, name):
     '''
     output_dir = json_directory()
     callback_on_error = subtask(task=del_file_on_error, args=(sha1,))
-    t1 = _compute_scores.delay(path, sha1, output_dir, callback=subtask(_jsonify_signal), 
+    try :
+        t1 = _compute_scores.delay(path, sha1, output_dir, callback=subtask(_jsonify_signal), 
                                      callback_on_error=callback_on_error)
+    except Exception as e:
+        etype, value, tb = sys.exc_info()
+        traceback.print_exception(etype, value, tb)
+        if callback_on_error :
+            subtask(callback_on_error).delay([e], sha1)
+        raise e
     return t1
 
 def _features(path, sha1, name):

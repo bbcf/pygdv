@@ -1,5 +1,6 @@
-from pygdv.model import DBSession, Project, User, Track, Circle
-from sqlalchemy.sql import and_
+from pygdv.model import DBSession, Project, User, Track, Circle, Right
+from pygdv.lib import constants
+from sqlalchemy.sql import and_, or_
 
 
 
@@ -26,5 +27,25 @@ def user_own_circle(user_id, circle_id):
     '''
     circle = DBSession.query(Circle).filter(Circle.id == circle_id).first()
     return circle.creator_id == user_id
+
+def check_permission_project(user_id, project_id, right_id):
+    if not user_own_project(user_id, project_id):
+        p = DBSession.query(Project).join(
+                                Project._circle_right).join(Right).join(User.circles).filter(
+                and_(User.id == user_id, Project.id == project_id, Right.id == right_id)
+                ).first()
+        return p != None
+    return True
+
+def can_download_track(user_id, track_id):
+    if not user_own_track(user_id, track_id):
+        t = DBSession.query(Track).join(Project.tracks).filter(
+            and_(Track.id == track_id, User.id == user_id)
+            
+             ).first()
+        print t
+        return t != None
+    return True
+    
 
 

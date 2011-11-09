@@ -99,7 +99,14 @@ a.detail_link{
     padding-left: 20px;
 }
 a.detail_link{
-    background-image: url('/images/share.png');
+    background-image: url('/images/plus.png');
+}
+a.export_link{
+    background-repeat: no-repeat;
+    padding-left: 20px;
+}
+a.export_link{
+    background-image: url('/images/export.png');
 }
 
 
@@ -142,3 +149,9 @@ table.grid td.col_0 .delete-button, .crud_table .grid .button-to .delete-button{
     cursor: pointer;
 }
 
+div.actions {
+    margin:3px;
+}
+a.action {
+    margin:1px;
+}

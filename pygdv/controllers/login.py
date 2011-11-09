@@ -81,7 +81,7 @@ class LoginController(BaseController):
             DBSession.flush()
             #transaction.commit()
         else :
-            flash( '''Welcome back: %s'''%( user, ))
+            flash( '''Welcome back: %s'''%( user, ), 'notice')
         
         # create the authentication ticket
         user = DBSession.query(User).filter(User.email == mail).first()

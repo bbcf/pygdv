@@ -17,6 +17,7 @@ from pygdv.lib.helpers import get_delete_link, get_detail_link, get_edit_link, g
 from pygdv import handler
 from tg import app_globals as gl
 from pygdv.lib import constants
+from pygdv.widgets import SortableColumn
 # TABLE
 class PTable(TableBase):
     __model__ = Project
@@ -66,15 +67,12 @@ class NewProjectFrom(twf.TableForm):
               twf.TextField(label_text='Name',id='name',
                             help_text = 'Give a name to your project', validator=NotEmpty),
               twd.CascadingSingleSelectField(id='species', label_text='Species : ',options=get_species,
-            help_text = 'Choose the species',cascadeurl='/sequences/get_nr_assemblies_from_species_id'),
+            help_text = 'Choose the species', cascadeurl='/sequences/get_nr_assemblies_from_species_id'),
               twf.Spacer(),
                 twf.SingleSelectField(id='nr_assembly', label_text='Assembly : ',options=nr_assemblies,
             help_text = 'Choose the assembly.'),
-              twf.Spacer(),
-            twf.MultipleSelectField(id='tracks', label_text='Tracks : ',options=get_tracks,
-              help_text = 'Add tracks to the project'),
-             #twf.MultipleSelectField(id='circles', label_text="Circles : ",options=get_circles,
-              #                        help_text="Add Circles to share with. Circle(s) selected will automatically see your project.")
+              
+             
               
               
 ]              
@@ -173,12 +171,13 @@ project_grid = twf.DataGrid(fields=[
     ('Circles', 'get_circle_with_right_display'),
     ('Tracks', 'get_tracks'),
     ('Action', lambda obj:genshi.Markup(
-        get_view_link(obj.id, 'project_id', constants.full_rights)
+          '<div class="actions">'                              
+        + get_view_link(obj.id, 'project_id', constants.full_rights)
         + get_share_link(obj.id, 'project_id', constants.full_rights) 
         + get_delete_link(obj.id, constants.full_rights) 
         + get_edit_link(obj.id, constants.full_rights)
-        + '<a href="%s">detail</a> '
-        % url('./detail', params=dict(project_id=obj.id))
+        + get_detail_link(obj.id, 'project_id', constants.full_rights)
+        + '</div>'
         ))
 ])
 
@@ -206,12 +205,26 @@ project_with_right = twf.DataGrid(fields = [
     ('Created', 'dec.created'),
     ('Assembly', 'dec.assembly'),
     ('Tracks', 'dec.get_tracks'),
+    #('Rights', lambda obj : ', '.join([right for right in obj.rights if obj.rights[right]])),
+#    ('Read', lambda obj:genshi.Markup(
+#        get_view_link(obj.dec.id, 'project_id', obj.rights) )),
+#    ('Download', lambda obj:genshi.Markup(
+#                                          get_detail_link(obj.dec.id, 'project_id', obj.rights)
+#                                          )),
+#    ('Upload', lambda obj:genshi.Markup(
+#                                    get_share_link(obj.dec.id, 'project_id', obj.rights)
+#                                    + get_edit_link(obj.dec.id, obj.rights)
+#                                    + get_delete_link(obj.dec.id, obj.rights) 
+#                                         
+#                                        ))
     ('Action', lambda obj:genshi.Markup(
-        get_view_link(obj.dec.id, 'project_id', obj.rights) 
+        '<div class="actions">'
+        + get_view_link(obj.dec.id, 'project_id', obj.rights) 
         + get_share_link(obj.dec.id, 'project_id', obj.rights) 
         + get_delete_link(obj.dec.id, obj.rights) 
         + get_edit_link(obj.dec.id, obj.rights)
         + get_detail_link(obj.dec.id, 'project_id', obj.rights)
+        + '</div>'
         ))             
                                             
                                             

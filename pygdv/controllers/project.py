@@ -4,7 +4,7 @@ from tgext.crud.decorators import registered_validate
 
 from repoze.what.predicates import not_anonymous, has_any_permission
 
-from tg import expose, flash, require, request, tmpl_context, validate, url
+from tg import expose, flash, require, error, request, tmpl_context, validate, url
 from tg import app_globals as gl
 from tg.controllers import redirect
 from tg.decorators import paginate, with_trailing_slash,without_trailing_slash
@@ -21,6 +21,7 @@ from pygdv.lib import checker
 from pygdv.lib.jbrowse import util as jb
 from pygdv.lib import constants
 from sqlalchemy.sql import and_
+import re
 
 __all__ = ['ProjectController']
 
@@ -43,11 +44,16 @@ class ProjectController(CrudRestController):
     #@paginate('items', items_per_page=10)
     def get_all(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-
+        
         # user project
         user_projects = [util.to_datagrid(project_grid, user.projects, "Project Listing", len(user.projects)>0)]
         # shared projects
         project_with_rights = handler.project.get_shared_projects(user)
+        
+        if 'ordercol' in kw:
+            util.order_data(kw['ordercol'], up)
+        
+        
         sp = []
         for project, rights in project_with_rights.iteritems():
             sp.append(ModelWithRight(project, {constants.right_read : constants.right_read in rights, 
@@ -64,10 +70,8 @@ class ProjectController(CrudRestController):
     @require(not_anonymous())
     @expose('pygdv.templates.form')
     def new(self, *args, **kw):
-        print 'new'
         tmpl_context.widget = project_new_form
         user = handler.user.get_user_in_session(request)
-        tmpl_context.tracks=user.tracks
         #tmpl_context.circles=user.circles
         return dict(page='projects', value=kw, title='new Project')
 
@@ -75,7 +79,7 @@ class ProjectController(CrudRestController):
     @validate(project_new_form, error_handler=new)
     def post(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        handler.project.create(kw['name'], kw['nr_assembly'], user.id, tracks=kw['tracks'])
+        handler.project.create(kw['name'], kw['nr_assembly'], user.id)
         transaction.commit()
         raise redirect('./')
 
@@ -85,8 +89,8 @@ class ProjectController(CrudRestController):
     def post_delete(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
         id = args[0]
-        if not checker.user_own_project(user.id, id):
-            flash("You haven't the right to delete any project which is not yours")
+        if not checker.check_permission_project(user.id, id, constants.right_upload_id):
+            flash('You must have %s permission to view the project.' % constants.right_upload, 'error')
             raise redirect('./')
         return CrudRestController.post_delete(self, *args, **kw)
 
@@ -97,8 +101,8 @@ class ProjectController(CrudRestController):
         if project_id is None:
             raise redirect('./')
         user = handler.user.get_user_in_session(request)
-        if not checker.user_own_project(user.id, project_id):
-            flash('You cannot view a project which is not yours')
+        if not checker.check_permission_project(user.id, project_id, constants.right_download_id):
+            flash('You must have %s permission to view the project.' % constants.right_download, 'error')
             raise redirect('./')
 
         # project info
@@ -114,17 +118,16 @@ class ProjectController(CrudRestController):
 
 
     @expose('pygdv.templates.form')
-    def edit(self, *args, **kw):
+    def edit(self, project_id, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        project_id = args[0]
-        if not checker.user_own_project(user.id, project_id):
-            flash("You haven't the right to edit any project which is not yours")
+        if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
+            flash('You must have %s permission to view the project.' % constants.right_upload, 'error')
             raise redirect('/projects')
 
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         tmpl_context.widget = project_edit_form
         tmpl_context.project = project
-        tmpl_context.tracks= DBSession.query(Track).join(User.tracks).filter(
+        tmpl_context.tracks = DBSession.query(Track).join(User.tracks).filter(
                             and_(User.id == user.id, Track.sequence_id == project.sequence_id)).all()
 
         kw['_method']='PUT'
@@ -134,15 +137,15 @@ class ProjectController(CrudRestController):
     @validate(project_edit_form, error_handler=edit)
     def put(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        id = args[0]
-        for project in user.projects :
-            if int(id) == project.id:
-                handler.project.edit(project, kw['name'], kw['nr_assembly'],
+        print kw
+        project_id = args[0]
+        if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
+            flash('You must have %s permission to view the project.' % constants.right_upload, 'error')
+            raise redirect('/projects')
+        project = DBSession.query(Project).filter(Project.id == project_id).first()
+        handler.project.edit(project, kw['name'],
                                      user.id, tracks=kw['tracks'])
-                raise redirect('../')
-        flash("You haven't the right to edit any project which is not yours")
-        raise redirect('../')
-
+        raise redirect('/projects')
 
 
 
@@ -258,8 +261,8 @@ class ProjectController(CrudRestController):
     @expose('pygdv.templates.view')
     def view(self, project_id, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        if not checker.user_own_project(user.id, project_id):
-            flash('You cannot view a project which is not yours')
+        if not checker.check_permission_project(user.id, project_id, constants.right_read_id):
+            flash('You must have %s permission to view the project.' % constants.right_read, 'error')
             raise redirect('/')
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         tracks = project.tracks

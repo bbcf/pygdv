@@ -157,6 +157,8 @@ def pre_compute_sql_scores(database_path, sha1, output_dir):
         chromosome = row[0]
         ## 'getting max'
         max = get_last_feature_stop(conn, chromosome)
+        if max is None:
+            return
         ## 'getting features'
         features = get_features(conn, chromosome)
         ## 'generating score array'

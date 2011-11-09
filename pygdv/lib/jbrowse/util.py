@@ -54,6 +54,7 @@ def _chromosome_output(chromosome):
     Get the chromosome output for the browser.
     :param: chromosome : the chromosome
     '''
+    print '[WARNING] : here is used the chromosome "name" & not the "chr_name"'
     return {"length" : chromosome.length,
             "name" : chromosome.name,
             "seqDir": 'TODO',

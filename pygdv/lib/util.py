@@ -152,3 +152,19 @@ def float_equals(a, b, epsilon=0.0000001):
     Look if two float are equals or not, with an epsilon error 
     '''
     return abs(a - b) < epsilon
+
+
+import re
+from sqlalchemy import asc, desc
+
+def order_data(ordering, data):
+    args = re.findall('(\+|\-){1}(\w+)+', ordering)
+    od = {'+':[], '-':[]}
+    for i in range(len(args)):
+        tmp = args[i]
+        sign = tmp[0]
+        word = tmp[1]
+        od[sign].append(word)
+    data.order_by(asc(od['+']), desc(od['-']))
+
+

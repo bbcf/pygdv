@@ -10,7 +10,7 @@ import genshi
 from tg import url
 
 from pygdv.model import DBSession, Track, Species, Sequence
-from pygdv.lib.helpers import get_delete_link, get_edit_link, get_task_status
+from pygdv.lib.helpers import get_delete_link, get_edit_link, get_task_status, get_export_link
 from pygdv.lib import constants
 
 
@@ -42,35 +42,33 @@ class TEditFiller(EditFormFiller):
 track_grid = twf.DataGrid(fields=[
     ('Name', 'name'),
     ('Created', 'created'),
-    ('Last access', 'last_access'),
+    ('Assembly', 'sequence'),
     ('Type', 'vizu'),
     ('Status', lambda obj: get_task_status(obj)),
     ('Action', lambda obj:genshi.Markup(
-        '<a href="%s">export</a> <a href="%s">link</a> '
-        % (
-           url('./export', params=dict(track_id=obj.id)),
-           url('./link', params=dict(track_id=obj.id))
-           ) 
+        '<div class=actions>'
+        + get_export_link(obj.id, rights = constants.full_rights)                               
         + get_delete_link(obj.id) 
         + get_edit_link(obj.id)
+        + '</div>'
         ))
 ])
-track_in_project_grid = twf.DataGrid(fields=[
-    ('Name', 'name'),
-    ('Created', 'created'),
-    ('Last access', 'last_access'),
-    ('Type', 'vizu'),
-    ('Status', lambda obj: get_task_status(obj)),
-    ('Action', lambda obj:genshi.Markup(
-        '<a href="%s">export</a> <a href="%s">link</a> '
-        % (
-           url('./export', params=dict(track_id=obj.id)),
-           url('./link', params=dict(track_id=obj.id))
-           ) 
-#        + get_remove_link(obj.id) 
-#        + get_copy_link(obj.id)
-        ))
-])
+track_in_project_grid = track_grid
+
+
+#twf.DataGrid(fields=[
+#    ('Name', 'name'),
+#    ('Type', 'vizu'),
+#    ('Action', lambda obj:genshi.Markup(
+#     '<a href="%s">download</a> <a href="%s">link</a> '
+#        % (
+#           url('/tracks/download', params=dict(track_id=obj.id)),
+#           url('./link', params=dict(track_id=obj.id))
+#           ) 
+##        + get_remove_link(obj.id) 
+##        + get_copy_link(obj.id)
+#        ))
+#])
 
 
 
