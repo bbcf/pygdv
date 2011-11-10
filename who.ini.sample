@@ -1,0 +1,48 @@
+# who.ini file which configure authentication in the project
+ 
+[plugin:ticket]
+# Cookie-based session identification storage
+use = pygdv.lib.auth_plugin:make_plugin
+secret = '975caff3876fdd38214a9cff43484cf8bc712915'
+cookie_name = 'auth_ticket'
+serv_url = 'http://127.0.0.1:8080'
+
+[plugin:auth]
+use = pygdv.lib.auth_plugin:make_plugin_auth
+
+[plugin:cl]
+# Command-line-based identification plugin                                                                                                                                                                                         
+use = pygdv.lib.auth_plugin:make_plugin_cl
+
+
+
+[general]
+request_classifier = pygdv.lib.auth_plugin:request_classifier
+challenge_decider = repoze.who.classifiers:default_challenge_decider
+remote_user_key = REMOTE_USER
+
+ 
+[identifiers]
+# We can decide who the user is trying to identify as using either
+# a fresh form-post, or the session identifier cookie
+plugins =
+    cl;command_line
+    ticket;browser
+
+[authenticators]
+plugins =
+    auth
+ 
+[challengers]
+plugins =
+    cl;post
+    ticket;browser
+ 
+
+[mdproviders]
+# Metadata providers are the things that actually look up a user's credentials
+# here we have a plugin that provides "user" information (user) and another,
+# which acts as an adapter to the first, to provide group/permission information.
+plugins =
+    pygdv.lib.auth:user
+    pygdv.lib.auth:group

@@ -352,7 +352,7 @@ def jsonify(database_path, name, sha1, output_root_directory, public_url, browse
     @param output_root_directory : the base system path where to write the output
     @param extended : if the format is ``basic`` or ``extended``
     '''
-    print 'jsonify'
+    ## 'jsonify'
     # configure outputs
     output_path = os.path.join(output_root_directory, sha1)
     out_public_url = os.path.join(public_url, sha1)
@@ -367,7 +367,7 @@ def jsonify(database_path, name, sha1, output_root_directory, public_url, browse
 #    
 #    for row in cursor:
             chr_length = t.chrmeta[chr_name]['length']
-            print 'doing %s ' % chr_name
+            ## 'doing %s ' % chr_name
             out = os.path.join(output_path, chr_name)
             os.mkdir(out)
             lazy_url = os.path.join(out_browser_url, chr_name, 'lazyfeatures-{chunk}.json')
@@ -438,18 +438,18 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
     @param url_output : url access to the ressources
     '''
     
-    print ' init standard fields'
+    ## ' init standard fields'
     if extended :
         headers = _extended_headers
         subfeature_headers = _subfeature_headers
 
         
         client_config = _extended_client_config
-        print 'preparedb'
+        ## 'preparedb'
         table_name = _prepare_database(t, chr_name)
         
         t.cursor.execute('select min(t1.start), max(t1.end), t1.score, t1.name, t1.strand, t1.type, t1.attributes, t1.id, count(t1.id), t2.subs from "%s" as t1 inner join "%s" as t2 on t1.id = t2.id group by t1.id order by t1.start asc, t1.end asc ;' % (chr_name, table_name))
-        print ' calculate lazy features'
+        ## ' calculate lazy features'
         lazy_feats = _generate_lazy_output(
                     _generate_nested_extended_features(t.cursor, keep_field=7, count_index=8, 
                                     subfeatures_index=9, start_index=0, end_index=1, name_index=3, strand_index=4))
@@ -459,7 +459,7 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
         headers = _basic_headers
         subfeature_headers = _basic_subfeature_headers
         client_config = _basic_client_config
-        print ' calculate lazy features'
+        ## ' calculate lazy features'
         
         t.cursor.execute('select t1.start, t1.end, t1.score, t1.name, t1.strand, t1.attributes from "%s" as t1 order by t1.start asc, t1.end asc ;' % chr_name )
         
@@ -472,7 +472,7 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
     
     
     
-    print 'NCLIST'
+    ## 'NCLIST'
     
     
     NCList = []
@@ -485,30 +485,30 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
             fil.write(json.dumps(buff))
         
     if extended :    
-        print 'erase table'
+        ## 'erase table'
         t.cursor.execute('drop table "%s";' % table_name)
         t.vacuum()
         #t.cursor.execute('vacuum')
-        print 'dropped'
+        ## 'dropped'
             
     if feature_count == 0 : feature_count = 1
     
-    print ' threshold %s, %s ' % (chr_length, feature_count)
+    ## ' threshold %s, %s ' % (chr_length, feature_count)
     threshold = _threshold(chr_length, feature_count)
     
-    print ' histogram meta %s, %s, %s' % (chr_length, threshold, url_output)
+    ## ' histogram meta %s, %s, %s' % (chr_length, threshold, url_output)
     histogram_meta = _histogram_meta(chr_length, threshold, url_output)
     
-    print ' count array'
+    ## ' count array'
     cursor = t.cursor.execute("select * from '%s' ;" % (chr_name))
     array = _count_features(cursor, threshold, chr_length)
     
-    print ' hists stats'
+    ## ' hists stats'
     hist_stats = _calculate_histo_stats(array, threshold, chr_length)
     
-    print ' write hist in output' 
+    ## ' write hist in output' 
     _write_histo_stats(_generate_hist_outputs(array, chr_length), threshold, output_directory)
-    print ' write hist in output' 
+    ## ' write hist in output' 
     _write_histo_stats(_generate_hist_outputs(array, chr_length, 100), threshold * 100, output_directory)
     
     data = _prepare_track_data(
@@ -532,9 +532,9 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
     
     
     
-    print ' convert to json'
+    ## ' convert to json'
     json_data = json.dumps(data)
-    print ' write track data'
+    ## ' write track data'
     track_data_output = os.path.join(output_directory, 'trackData.json')
     with open(track_data_output, 'w', -1) as f:
             f.write(json_data)
