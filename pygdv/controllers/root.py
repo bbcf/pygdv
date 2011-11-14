@@ -117,6 +117,10 @@ class RootController(BaseController):
 
     @expose()
     def test(self, **kw):
+        import tg
+        admins = tg.config.get('admin.mail')
+        print admins
+        
         return dict(kw)
     
     

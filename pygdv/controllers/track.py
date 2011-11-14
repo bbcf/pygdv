@@ -12,7 +12,7 @@ from tg.controllers import redirect
 from tg.decorators import paginate,with_trailing_slash
 
 from pygdv.model import DBSession, Track, Input, TrackParameters, Sequence
-from pygdv.widgets.track import track_table, track_table_filler, track_new_form, track_edit_filler, track_edit_form, track_grid
+from pygdv.widgets.track import track_table, track_export, track_table_filler, track_new_form, track_edit_filler, track_edit_form, track_grid
 from pygdv import handler
 from pygdv.lib import util, constants
 import os
@@ -110,17 +110,23 @@ class TrackController(CrudRestController):
         flash("You haven't the right to edit any tracks which is not yours")
         raise redirect('../')
     
-    @expose()
-    def export(self, track_id, format=None, *args, **kw):
-        print track_id
+    @expose('pygdv.templates.track_export')
+    def export(self, track_id, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        
         if not checker.can_download_track(user.id, track_id):
             flash("You haven't the right to export any tracks which is not yours")
             raise redirect('../')
-
+        track = DBSession.query(Track).filter(Track.id == track_id).first()
         
-        return 'not implemented'
+        data = util.to_datagrid(track_grid, [track])
+        tmpl_context.form = track_export
+        return dict(page='tracks', model='Track', info=data, form_title='', value=kw)
+    
+    @expose()
+    def dump(self, *args, **kw):
+        print args
+        print kw
+        pass
     
     @expose()
     def link(self, track_id, *args, **kw):

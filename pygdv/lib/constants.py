@@ -61,6 +61,13 @@ perm_admin = 'admin'
 group_users = 'Users'
 perm_user = 'user'
 
+tmp_user_name = 'tmp_user'
+
 
 
 full_rights = {right_read : True, right_download : True, right_upload : True}
+
+
+formats_export = ('tsv', 'sql', 'bed')
+
+

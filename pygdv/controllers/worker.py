@@ -63,8 +63,13 @@ class WorkerController(BaseController):
     
     
     @expose('json')
-    def new_gfeatminer_job(self, project_id, data):
-        pass
+    def new_gfeatminer_job(self, project_id, job_description, job_name, data, *args, **kw):
+        print 'new_gfeatminer_job pid : %s, data : %s, args : %s, kw : %s' % (project_id, data, args, kw)
+        handler.job.parse_args(data)
+        handler.job.new_job(project_id, job_name, job_description, data, *args, **kw)
+        
+        
+        return '{}'
     
     
     

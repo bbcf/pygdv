@@ -191,6 +191,8 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, pr
     return 1
 
 
+#### DATABASE PROCESS ####
+
 @task()
 def process_database(datatype, assembly_name, path, sha1, name, format):
     
@@ -274,4 +276,23 @@ _sql_dispatch = {'quantitative' : lambda *args, **kw : _signal(*args, **kw),
                  'extended' :  lambda *args, **kw : _relational(*args, **kw),
                   constants.RELATIONAL :  lambda *args, **kw : _relational(*args, **kw)
                  }
+    
+    
+
+
+
+#### GFEATMINER ####
+import gMiner
+
+@task()
+def gfeatminer_request(**kw):
+    try :
+        return  gMiner.run(kw)
+    except Exception as e:
+        etype, value, tb = sys.exc_info()
+        traceback.print_exception(etype, value, tb)
+        raise e
+   
+    
+    
     

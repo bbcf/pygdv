@@ -2,7 +2,7 @@
 """Login controller."""
 
 from pygdv.lib.base import BaseController
-from pygdv.lib import tequila
+from pygdv.lib import tequila, constants
 from tg import expose,url,flash,request,response
 from tg.controllers import redirect
 from pygdv.model import User, Group, DBSession
@@ -12,6 +12,7 @@ from paste.request import resolve_relative_url
 import transaction
 import datetime
 from tg import app_globals as gl
+import tg
 from pygdv import handler
 
 __all__ = ['LoginController']
@@ -58,7 +59,7 @@ class LoginController(BaseController):
         # log or create him
         user = DBSession.query(User).filter(User.email == tmp_user.email).first()
         if user is None:
-            user_group = DBSession.query(Group).filter(Group.name == gl.group_users).first()
+            user_group = DBSession.query(Group).filter(Group.name == constants.group_users).first()
             user_group.users.append(tmp_user)
             DBSession.add(tmp_user)
             DBSession.flush()
@@ -69,10 +70,10 @@ class LoginController(BaseController):
             self.build_circles_with_user(tmp_user, principal)
             DBSession.flush()
             #transaction.commit()
-        elif user.name == gl.tmp_user_name:
+        elif user.name == constants.tmp_user_name:
             user.name = tmp_user.name
             user._set_date(datetime.datetime.now())
-            user_group = DBSession.query(Group).filter(Group.name == gl.group_users).first()
+            user_group = DBSession.query(Group).filter(Group.name == constants.group_users).first()
             user_group.users.append(tmp_user)
             flash( '''Your account has been created: %s'''%( user, ))
             DBSession.add(user)
@@ -83,6 +84,14 @@ class LoginController(BaseController):
         else :
             flash( '''Welcome back: %s'''%( user, ), 'notice')
         
+        # look if an user is admin or not
+        admins = tg.config.get('admin.mails')
+        group_admins = DBSession.query(Group).filter(Group.name == constants.group_admins).first()
+        if user.email in admins:
+            user not in group_admins.users and group_admins.users.append(user)
+        else :
+            user in group_admins.users and group_admins.users.remove(user)
+        DBSession.flush()
         # create the authentication ticket
         user = DBSession.query(User).filter(User.email == mail).first()
         userdata=str(user.id)

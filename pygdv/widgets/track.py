@@ -118,10 +118,17 @@ help_text = 'Choose the assembly.'),
 #
 #
 #import_file_form = ImportFile('import_file_form',action='upload')
-
-
+class TrackExport(twf.TableForm):
+    submit_text = 'Download'
+    hover_help = True
+    show_errors = True
+    action='dump'
+    fields = [
+            twf.HiddenField('track_id'),
+            twf.SingleSelectField(id='format', label_text='Format : ', help_text='select the output format', options=constants.formats_export)
+              ]
     
-
+track_export = TrackExport()
 track_table = TTable(DBSession)
 track_table_filler = TTableFiller(DBSession)
 track_new_form = UploadFrom('upload_form',action='post')
