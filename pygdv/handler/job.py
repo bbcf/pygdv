@@ -1,32 +1,27 @@
-from pygdv.lib.constants import track_directory
-from pygdv.model import DBSession, Job, JobParameters
+from pygdv.lib import constants
+from pygdv.model import DBSession, Job
+from pygdv.celery import tasks
 import os
 
 
-def new_job(project_id, job_description, job_name, data, *args, **kw):
+def new_job(user_id, project_id, job_description, job_name, data, *args, **kw):
     job = Job()
     
     job.name = job_name
     job.description = job_description
+    job.project_id = project_id
+    job.user_id = user_id
     
-    
-#    _created = Column(DateTime, nullable=False, default=datetime.now)
-#    status = Column(statuses, nullable=False)
-#    
-#    user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=False)
-#    
-#    project_id = Column(Integer, ForeignKey('Project.id', ondelete="CASCADE"), nullable=True)
-#    
-#    #task_id = Column(Integer, ForeignKey('celery_taskmeta.id', ondelete="CASCADE"), nullable=False)
-#    #task = relationship('Task', uselist=False, backref='job')
-#    task_id = Column(VARCHAR(255), nullable=False)
-#    task = relationship('Task', uselist=False, primaryjoin='Job.task_id == Task.task_id', foreign_keys='Task.task_id')
-#    parameters = relationship('JobParameters', uselist=False, backref='job')
-#    
-    
-    
-    pass
+    DBSession.add(job)
+    DBSession.flush()
 
+    data['output_location'] = os.path.join(constants.gfeatminer_directory(), job.id)
+    
+    task_id = tasks.gfeatminer_request.delay(data)
+    job.task_id = task_id
+    
+    
+    return job.id
 
 
 
@@ -43,12 +38,12 @@ def parse_args(data):
     
     
     # format track paths
-    if data.has_key('filter'):
-        data['selected_regions'] = os.path.join(track_directory(), data['filter'][0]['path'])
+    if data.has_key('filter') and data['filter']:
+        data['selected_regions'] = os.path.join(constants.track_directory(), data['filter'][0]['path'])
         data.pop('filter')
         
     if data.has_key('ntracks'):
-        data.update(dict([('track' + str(i+1), os.path.join(track_directory(), v['path'])) for i, v in enumerate(data['ntracks'])]))
+        data.update(dict([('track' + str(i+1), os.path.join(constants.track_directory(), v['path'])) for i, v in enumerate(data['ntracks'])]))
         data.update(dict([('track' + str(i+1) + '_name', v.get('name', 'Unamed')) for i,v in enumerate(data['ntracks'])]))
         data.pop('ntracks')
     # Unicode filtering #

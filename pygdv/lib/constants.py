@@ -4,6 +4,7 @@ import os
 data_dir = 'pygdv.public.data'
 json_dir = 'jbrowse'
 tracks_dir = 'tracks'
+gfeatminer_dir = 'gfeatminer'
 
 # STATUSES
 PENDING = 'PENDING'
@@ -24,6 +25,8 @@ def json_directory():
 def track_directory():
     return os.path.join(resource_filename(data_dir, tracks_dir))
 
+def gfeatminer_directory():
+    return os.path.join(resource_filename(data_dir, gfeatminer_dir))
 
 # URLS TO PUT IN JSON
 DATA_ROOT = '/data/jbrowse/'
@@ -69,5 +72,9 @@ full_rights = {right_read : True, right_download : True, right_upload : True}
 
 
 formats_export = ('tsv', 'sql', 'bed')
+
+
+
+
 
 

@@ -68,15 +68,6 @@ def bootstrap(command, conf, vars):
             model.DBSession.add(read)
             
             transaction.commit()
-            print '''
-                    
-                    Change email value in " pygdv.websetup.bootstrap.py ".
-                    Launch " paster serve --reload development.ini ".
-                    Log in the application.
-                    Re-run "python setup-app development.ini". 
-                    It will gives you admin rights.
-                    
-                  '''
            
     except IntegrityError:
         print 'Warning, there was a problem adding your auth data, it may have already been added:'

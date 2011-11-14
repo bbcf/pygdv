@@ -366,6 +366,10 @@ def jsonify(database_path, name, sha1, output_root_directory, public_url, browse
 #    cursor.execute('select * from chrNames;')
 #    
 #    for row in cursor:
+            print t.chrmeta
+            print list(t)
+            print chr_name
+            
             chr_length = t.chrmeta[chr_name]['length']
             ## 'doing %s ' % chr_name
             out = os.path.join(output_path, chr_name)

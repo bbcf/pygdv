@@ -26,7 +26,7 @@ __all__ = ['Right', 'Circle', 'Project',
            'Track', 'Task', 'Input',
            'Sequence',
            'Species',
-           'Job','JobParameters']
+           'Job']
 
 
 statuses = Enum('SUCCESS', 'PENDING', 'ERROR', 'RUNNING', name='job_status')
@@ -430,17 +430,7 @@ FEATURES = 'features'
         else :
             self.type = constants.IMAGE_TRACK
 
-class JobParameters(DeclarativeBase):
-    '''
-    Jobs parameters.
-    '''
-    __tablename__='JobParameters'
-    #column
-    id = Column(Integer, autoincrement=True, primary_key=True)
-    type = Column(job_types, nullable=False)
-    output = Column(job_outputs, nullable=False)
-    data = Column(Text(), nullable=True)
-    job_id = Column(Integer, ForeignKey('Job.id',  ondelete="CASCADE"), nullable=False)
+
     
 class Job(DeclarativeBase):
     '''
@@ -454,7 +444,6 @@ class Job(DeclarativeBase):
     description = Column(Text(), nullable=False)
     
     _created = Column(DateTime, nullable=False, default=datetime.now)
-    status = Column(statuses, nullable=False)
     
     user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=False)
     
@@ -462,10 +451,11 @@ class Job(DeclarativeBase):
     
     #task_id = Column(Integer, ForeignKey('celery_taskmeta.id', ondelete="CASCADE"), nullable=False)
     #task = relationship('Task', uselist=False, backref='job')
-    task_id = Column(VARCHAR(255), nullable=False)
+    task_id = Column(VARCHAR(255))
     task = relationship('Task', uselist=False, primaryjoin='Job.task_id == Task.task_id', foreign_keys='Task.task_id')
-    parameters = relationship('JobParameters', uselist=False, backref='job')
-    
+
+    data = Column(Text())
+        
     def _get_date(self):
         return self._created.strftime(constants.date_format);
         
@@ -477,7 +467,10 @@ class Job(DeclarativeBase):
     @property
     def get_type(self):
         return self.parameters.type
-
-
-
+    
+    @property
+    def status(self):
+        if self.task is None:
+            return 'PENDING'
+        return self.task.status
 

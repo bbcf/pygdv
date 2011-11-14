@@ -10,6 +10,7 @@ from pygdv import handler
 from pygdv.model import DBSession, Project
 import track, json
 from pygdv.lib import util, constants
+import sys, traceback
 
 __all__ = ['WorkerController']
 
@@ -65,11 +66,31 @@ class WorkerController(BaseController):
     @expose('json')
     def new_gfeatminer_job(self, project_id, job_description, job_name, data, *args, **kw):
         print 'new_gfeatminer_job pid : %s, data : %s, args : %s, kw : %s' % (project_id, data, args, kw)
-        handler.job.parse_args(data)
-        handler.job.new_job(project_id, job_name, job_description, data, *args, **kw)
+        user = handler.user.get_user_in_session(request)
+        try:
+            data = json.loads(data)
+        except Exception as e:
+            return {'error': 'error when loading job in GDV', 'trace' : e.message}
         
+        try:
+            handler.job.parse_args(data)
+        except IndexError as e:
+            return {'error': 'you did not specified a requested parameter'}
+        except Exception as e:
+            return {'error': 'error when parsing job in GDV', 'trace' : e.message}
+       
+       
         
-        return '{}'
+        try :
+            job_id = handler.job.new_job(user.id, project_id, job_name, job_description, data, *args, **kw)
+        except Exception as e:
+            etype, value, tb = sys.exc_info()
+            traceback.print_exception(etype, value, tb)
+            return {'error': 'error when launching job in GDV', 'trace' : e.message}
+        
+        return {'job_id' : job_id,
+                'job_name' : job_name,
+                'job_description' : job_description}
     
     
     

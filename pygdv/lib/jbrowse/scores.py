@@ -5,7 +5,7 @@ import math, sqlite3, shutil, os
 import numpy as np
 from pygdv.lib.util import float_equals
 from pygdv.lib.jbrowse import TAB_WIDTH, zooms
-
+import track
 
 
 
@@ -76,7 +76,7 @@ def gen_tuples(array, max, zoom):
     max_images = get_image_nb(max, zoom)
     tab_list = range(TAB_WIDTH)
     prev_score = None
-    ## 'm im : %s' % max_images
+    print 'm im : %s' % max_images
     for i in range(1, max_images+1):
         for t in tab_list:
             index_start = get_position_start(i, t, zoom)
@@ -84,7 +84,7 @@ def gen_tuples(array, max, zoom):
             if index_start > max :
                 yield i, t, 0
                 break
-            ### 'i(%s), t(%s), z(%s), start %s, end %s' %(i, t, zoom, index_start, index_end)
+            #print 'i(%s), t(%s), z(%s), start %s, end %s' %(i, t, zoom, index_start, index_end)
             tmp = array[index_start:index_end+1]
             max_score = tmp.max()
             min_score = tmp.min()
@@ -125,13 +125,11 @@ def write_tuples(conn, generator):
     conn.commit()
     cursor.close()
     
-def get_last_feature_stop(conn, chromosome):
+def get_last_feature_stop(t, chromosome):
     '''
     Get the stop of the last feature.
     '''
-    cursor = conn.cursor()
-    max = cursor.execute('select max(end) from "%s";' % chromosome).fetchone()[0]
-    cursor.close()
+    max = t.cursor.execute('select max(end) from "%s";' % chromosome).fetchone()[0]
     return max
            
 def pre_compute_sql_scores(database_path, sha1, output_dir):
@@ -141,43 +139,41 @@ def pre_compute_sql_scores(database_path, sha1, output_dir):
     @param sha1 : the sha1 sun hexdigest of the database
     @param output_dir : where files will be write
     '''
-    ## 'prepare output directory'
+    print 'prepare output directory'
     out_path = os.path.join(output_dir, sha1)
     try :
         os.mkdir(out_path)
     except :
         pass
     
-    ## 'prepare connection'
-    conn = sqlite3.connect(database_path)
+    print 'prepare connection'
     
-    c = get_chromosomes(conn)
+    #conn = sqlite3.connect(database_path)
+    with track.load(database_path, format='sql', readonly=True) as t:
+        for chromosome in t:
+    #c = get_chromosomes(conn)
     
-    for row in c:
-        chromosome = row[0]
-        ## 'getting max'
-        max = get_last_feature_stop(conn, chromosome)
-        if max is None:
-            return
-        ## 'getting features'
-        features = get_features(conn, chromosome)
-        ## 'generating score array'
-        array = generate_array(features, max, 100000)
-        features.close()
-        
-        for zoom in zooms:
-            ## 'compute : zoom = %s' % zoom
-            gen = gen_tuples(array, max, zoom)
+    #for row in c:
+        #chromosome = row[0]
+            print 'getting max'
+            max = get_last_feature_stop(t, chromosome)
+            if max is None:
+                return
+            print 'getting features'
+            #features = get_features(t.re, chromosome)
+            print 'generating score array'
+            array = generate_array(t.read(chromosome, ('start', 'end', 'score')), max, 100000)
             
-            ## 'prepare output'
-            output = os.path.join(out_path, '%s_%s.db' % (chromosome, zoom))
-            out_connection = sqlite3.connect(output)
-            
-            ## 'write'
-            write_tuples(out_connection, gen)
-            
-    c.close()
-    conn.close()
+            for zoom in zooms:
+                print 'compute : zoom = %s' % zoom
+                gen = gen_tuples(array, max, zoom)
+                
+                print 'prepare output'
+                output = os.path.join(out_path, '%s_%s.db' % (chromosome, zoom))
+                out_connection = sqlite3.connect(output)
+                
+                print 'write'
+                write_tuples(out_connection, gen)
     return 1
 
 

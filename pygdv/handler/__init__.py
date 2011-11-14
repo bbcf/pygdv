@@ -2,4 +2,4 @@
 '''
 Package handlers. Contains all model handlers.
 '''
-import permission, user , track, genrep, sequence, circle, project
+import permission, user , track, genrep, sequence, circle, project, job

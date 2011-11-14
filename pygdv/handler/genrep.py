@@ -44,3 +44,6 @@ def get_nr_assemblies_not_created_from_species_id(species_id):
                 if not DBSession.query(Sequence).filter(Sequence.id == nr_assembly.id).first():
                     result.append(nr_assembly)
     return result
+
+
+
