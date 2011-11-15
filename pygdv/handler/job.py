@@ -21,6 +21,7 @@ def new_job(user_id, project_id, job_description, job_name, data, *args, **kw):
     
     # prepare gfeatminer directory to receive the result of the job
     path = os.path.join(constants.gfeatminer_directory(), str(job.id))
+
     data['output_location'] = path
     os.mkdir(path)
     
