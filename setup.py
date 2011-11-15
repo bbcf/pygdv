@@ -60,8 +60,14 @@ setup(
     test_suite='nose.collector',
     tests_require=testpkgs,
     package_data={'pygdv': ['i18n/*/LC_MESSAGES/*.mo',
-                                 'templates/*/*',
-                                 'public/*/*']},
+                            'templates/*/*',
+                            'public/css/*',
+                            'public/data/*',
+                            'public/images/*',
+                            'public/img/*',
+                            'public/javascript/js/*',
+                            
+                            ]},
     message_extractors={'pygdv': [
             ('**.py', 'python', None),
             ('templates/**.html', 'genshi', None),
