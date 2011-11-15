@@ -62,7 +62,6 @@ setup(
     package_data={'pygdv': ['i18n/*/LC_MESSAGES/*.mo',
                             'templates/*/*',
                             'public/css/*',
-                            'public/data/*',
                             'public/images/*',
                             'public/img/*',
                             'public/javascript/js/*',
