@@ -455,7 +455,9 @@ class Job(DeclarativeBase):
     task = relationship('Task', uselist=False, primaryjoin='Job.task_id == Task.task_id', foreign_keys='Task.task_id')
 
     data = Column(Text())
-        
+    
+    output = Column(VARCHAR(255))
+    
     def _get_date(self):
         return self._created.strftime(constants.date_format);
         
@@ -463,7 +465,12 @@ class Job(DeclarativeBase):
         self._created=date
     
     created = synonym('_created', descriptor=property(_get_date, _set_date))
-
+    
+    @property
+    def traceback(self):
+        if self.task is None: return ''
+        return self.task.traceback
+    
     @property
     def get_type(self):
         return self.parameters.type
@@ -473,4 +480,10 @@ class Job(DeclarativeBase):
         if self.task is None:
             return 'PENDING'
         return self.task.status
-
+    
+    def __repr__(self):
+        return 'Job < id : %s, name %s, desc: %s, data : %s , task_id : %s, output : %s>' % (
+                        self.id, self.name, self.description, self.data, self.task_id, self.output)
+        
+        
+        

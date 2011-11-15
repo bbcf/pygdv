@@ -11,14 +11,21 @@ def new_job(user_id, project_id, job_description, job_name, data, *args, **kw):
     job.description = job_description
     job.project_id = project_id
     job.user_id = user_id
-    
+    if job.description == 'desc_stat' :
+        job.output = constants.job_output_image
+    else :
+        job.output = constants.job_output_reload
+
     DBSession.add(job)
     DBSession.flush()
-
-    data['output_location'] = os.path.join(constants.gfeatminer_directory(), job.id)
     
-    task_id = tasks.gfeatminer_request.delay(data)
-    job.task_id = task_id
+    # prepare gfeatminer directory to receive the result of the job
+    path = os.path.join(constants.gfeatminer_directory(), str(job.id))
+    data['output_location'] = path
+    os.mkdir(path)
+    
+    task = tasks.gfeatminer_request.delay(data)
+    job.task_id = task.task_id
     
     
     return job.id
@@ -30,7 +37,6 @@ def parse_args(data):
     Parse the arguments coming from the browser to give a suitable
     request to gFeatMiner
     '''
-    print 'parse args %s' % data
     
     # format booleans
     if data.has_key('compare_parents' ): data['compare_parents' ] = bool(data['compare_parents'  ])
@@ -43,9 +49,11 @@ def parse_args(data):
         data.pop('filter')
         
     if data.has_key('ntracks'):
-        data.update(dict([('track' + str(i+1), os.path.join(constants.track_directory(), v['path'])) for i, v in enumerate(data['ntracks'])]))
+        data.update(dict([('track' + str(i+1), os.path.join(constants.track_directory(), v['path'] + '.sql')) for i, v in enumerate(data['ntracks'])]))
         data.update(dict([('track' + str(i+1) + '_name', v.get('name', 'Unamed')) for i,v in enumerate(data['ntracks'])]))
         data.pop('ntracks')
     # Unicode filtering #
     
     data = dict([(k.encode('ascii'),v) for k,v in data.items()])
+    
+    

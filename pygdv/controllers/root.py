@@ -13,7 +13,7 @@ from pygdv.controllers import ErrorController, LoginController, GroupController
 from pygdv.controllers import PermissionController, UserController, TrackController
 from pygdv.controllers import SequenceController, ProjectController, CircleController
 from pygdv.controllers import RightController, WorkerController, TaskController
-from pygdv.controllers import InputController, DatabaseController
+from pygdv.controllers import InputController, DatabaseController, JobController
 
 import pygdv
 
@@ -71,6 +71,7 @@ class RootController(BaseController):
     tracks = TrackController(DBSession)
     projects = ProjectController(DBSession)
     circles = CircleController(DBSession)
+    jobs = JobController()
     
     # tasks controller
     workers = WorkerController()

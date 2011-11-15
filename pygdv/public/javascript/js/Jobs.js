@@ -9,17 +9,18 @@ dojo.declare("ch.epfl.bbcf.gdv.JobHandler",null,{
     constructor: function(args){
         dojo.mixin(this, args);
         this.jobs = {};
-	//this.init_old_jobs();
+	this.init_old_jobs();
     },
     
     
     init_old_jobs : function(){
         var jobs = dojo.byId('init_jobs').innerHTML;
         if(jobs){
-            var json_jobs = dojo.fromJson(jobs);
+            //console.log(jobs);
+	    var json_jobs = dojo.fromJson(jobs);
             var ctx=this;
             dojo.forEach(json_jobs, function(entry, i){
-                ctx.add_job(entry);
+                ctx.update_job(entry);
             });
         }
     },
@@ -54,9 +55,7 @@ dojo.declare("ch.epfl.bbcf.gdv.JobHandler",null,{
      * @param{data} the data from the form
      */
     new_gfeatminer_job: function(data){
-        console.debug('new gm');
-	console.debug(data);
-	var name = 'new';
+      	var name = 'gfeatminer';
 	var desc = 'job'
 	if('characteristic' in data) desc = data['characteristic'];
 	if('operation_type' in data) name = data['operation_type'];
@@ -94,20 +93,21 @@ dojo.declare("ch.epfl.bbcf.gdv.JobHandler",null,{
      * Response send by GDV back to the view
      */
     update_job : function(data){
-	//console.log('update job');
+	//console.log('update jobs');
 	//console.log(data);
-	/* get job or create it */
+	/* Get job or create it */
 	if(data && 'job_id' in data){
 	    var job_id = data['job_id'];
 	    var job = this.get_job(job_id);
 	    
 	    if (job){
 		/* update fields */
-		dojo.mixin(job, data)
+		dojo.mixin(job, data);
 	    } else {
 		/* create new */
-		data['url'] = '/status',
-		job = new GDVJob(data, false)
+		data['url'] = '/status';
+		data['body'] = 'job_id=' + data['job_id'];
+		job = new GDVJob(data, false);
 	    }
 	    this.to_buffer(job);
 	    this.check_job(job);
@@ -134,7 +134,7 @@ dojo.declare("ch.epfl.bbcf.gdv.JobHandler",null,{
 	//console.log('new_job');
 	body += '&job_name=' + name + '&job_description= ' + description;
 	this.post_to_gdv(url, body);
-	notify('job ' + name + ' launched (' + description +').');
+	//notify('job ' + name + ' launched (' + description +').');
     }, 
     
 
@@ -143,8 +143,6 @@ dojo.declare("ch.epfl.bbcf.gdv.JobHandler",null,{
      * TODO : check if the job has to be updated relaunch it or just display it - how - ???
      */
     check_job : function(job){
-	//console.log('check job');
-	//console.log(job);
 	var ctx = this;
 	if (job.status == 'RUNNING' || job.status == 'running' || 
 	    job.status == 'pending' || job.status == 'PENDING'){
@@ -166,7 +164,7 @@ dojo.declare("GDVJob", null, {
         dojo.mixin(this, args)
 	this.launched = false;
 	if (flag){
-	    this.body = this.body += '&job_name=' +name + '&job_description= ' + description;
+	    this.body = this.body += '&job_name=' + name + '&job_description= ' + description;
 	} 
     }
 });

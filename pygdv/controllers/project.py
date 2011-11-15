@@ -9,7 +9,7 @@ from tg import app_globals as gl
 from tg.controllers import redirect
 from tg.decorators import paginate, with_trailing_slash,without_trailing_slash
 
-from pygdv.model import DBSession, Project, User, RightCircleAssociation, Track
+from pygdv.model import DBSession, Project, User, RightCircleAssociation, Track, Job
 from pygdv.widgets.project import project_table, project_with_right, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid,circles_available_form, tracks_available_form, project_sharing_grid, project_grid_sharing
 from pygdv.widgets.track import track_in_project_grid
 from pygdv.widgets import ModelWithRight
@@ -281,12 +281,22 @@ class ProjectController(CrudRestController):
         
         control = 'b.showTracks();initGDV(b, %s)' % project.id
         
+        jobs = DBSession.query(Job).filter(Job.project_id == project.id).all()
+        
+        jobs_output = [{'job_id' : job.id, 
+                       'status' : job.status, 
+                       'job_name' : job.name,
+                       'job_description' : job.description,
+                       'output' : job.output, 
+                       'error' : job.traceback}
+                      for job in jobs
+                      ]
         
         return dict(species_name=project.species.name, 
                     nr_assembly_id=project.sequence_id, 
                     project_id=project.id,
                     is_admin=True,
-                    init_jobs='...',
+                    init_jobs=json.dumps(jobs_output),
                     ref_seqs = refSeqs,
                     track_info = trackInfo,
                     parameters = parameters,

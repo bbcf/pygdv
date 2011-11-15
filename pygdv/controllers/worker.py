@@ -7,7 +7,7 @@ from tg import app_globals as gl
 from pygdv.celery import tasks
 from celery.task import chord
 from pygdv import handler
-from pygdv.model import DBSession, Project
+from pygdv.model import DBSession, Project, Job
 import track, json
 from pygdv.lib import util, constants
 import sys, traceback
@@ -55,9 +55,11 @@ class WorkerController(BaseController):
                 'job_id' : rev}
 
     @expose('json')
-    def status(self, *args, **kw):
-        return {'job_id' : 36, 'status' : constants.SUCCESS, 'output' : 'reload',
-                }
+    def status(self, job_id, *args, **kw):
+        print 'status request %s : ' % (job_id)
+        job = DBSession.query(Job).filter(Job.id == job_id).first()
+        print job
+        return {'job_id' : job.id, 'status' : job.status, 'output' : job.output, 'error' : job.traceback}
     
     
     
@@ -90,7 +92,8 @@ class WorkerController(BaseController):
         
         return {'job_id' : job_id,
                 'job_name' : job_name,
-                'job_description' : job_description}
+                'job_description' : job_description,
+                'status' : 'RUNNING'}
     
-    
+  
     

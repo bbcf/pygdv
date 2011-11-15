@@ -72,12 +72,12 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
      */
     addJob : function(job){
         var job_id = job.job_id;
-	var name = job.name;
-	var desc = job.description;
+	var name = job.job_name;
+	var desc = job.job_description;
 	var status = job.status;
 	
-	//console.log('add job');
-	//console.log(job);
+	console.log('add job');
+	console.log(job);
 	/* get the job div */
         var job_div = dojo.byId('job_' + job_id);
 	if(!job_div){
@@ -91,9 +91,11 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
 	
         if(status == 'success' || status == 'SUCCESS'){
             job_div.className="job job_success";
-            var output = job.output;
+            console.log('joob');
+	    console.log(job);
+	    var output = job.output;
 	    if(output){
-		if(output == 'reload'){
+		if(output == 'reload' || output == 'RELOAD'){
 		    var d = document.createElement('span');
 		    var link = document.createElement('a');
 		    link.innerHTML = 'reload the page';
@@ -102,12 +104,12 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
 		    d.appendChild(link);
 		    job_div.appendChild(d);
 		    
-		} else if(output == 'image'){
+		} else if(output == 'image' || output == 'IMAGE'){
 		    var d = document.createElement('span');
                     var link = document.createElement('a');
                     link.innerHTML = 'image';
                     link.className = 'hl';
-                    link.href = _GDV_URL + '/image?id=' + job.job_id;
+                    link.href = _GDV_JOB_URL + '/result?id=' + job.job_id;
                     d.appendChild(link);
                     job_div.appendChild(d);
 		}
@@ -116,8 +118,19 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
         } else if(status == 'running' || status == 'RUNNING'){
             job_div.className="job job_running";
 	    
-        } else if(status == 'error' || status == 'ERROR'){
+        } else if(status == 'failure' || status == 'FAILURE' || status == 'error' || status == 'ERROR'){
             job_div.className="job job_error";
+	    var err = job.error;
+	    if(err){
+		var d = document.createElement('span');
+                var link = document.createElement('a');
+                link.innerHTML = 'error';
+                link.className = 'hl';
+                link.href = _GDV_JOB_URL + '/traceback?id=' + job.job_id;
+                d.appendChild(link);
+                job_div.appendChild(d);
+
+	    }
         }
 	
 	
@@ -356,6 +369,8 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
 
 		/* launch the new job */
 		_jh.new_gfeatminer_job(jsonform);
+		ctx.destroyForm();
+		ctx.jobs();
             }
         });
 	

@@ -283,10 +283,13 @@ _sql_dispatch = {'quantitative' : lambda *args, **kw : _signal(*args, **kw),
 import gMiner
 
 @task()
-def gfeatminer_request(**kw):
-    print 'gfeatminer request %s : ' % kw
+def gfeatminer_request(req):
+    print 'gfeatminer request %s : ' % req
     try :
-        return  gMiner.run(kw)
+        
+        data = gMiner.run(**req)
+        print 'gMiner ended with %s ' % data
+        
     except Exception as e:
         etype, value, tb = sys.exc_info()
         traceback.print_exception(etype, value, tb)
