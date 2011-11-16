@@ -15,7 +15,7 @@ from webob import Request, Response
 from repoze.who.utils import resolveDotted
 from zope.interface import implements
 from pygdv import handler
-
+from tg import url
 
 from repoze.who.interfaces import IIdentifier, IChallenger, IAuthenticator, IRequestClassifier
 import zope.interface
@@ -278,7 +278,7 @@ class CustomCookiePlugin(object):
             # redirect to login_form
             res = Response()
             res.status = 302
-            res.location = '/login_needed'
+            res.location = url('/login_needed')
             return res
             
 

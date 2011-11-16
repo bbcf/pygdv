@@ -11,7 +11,7 @@ from sqlite3 import OperationalError
 class DatabaseController(BaseController):
     allow_only = has_any_permission(gl.perm_user, gl.perm_admin)
 
-
+    
     @expose('json')
     def scores(self,  sha1, chr_zoom, imgs, **kw):
         '''

@@ -6,6 +6,7 @@ from tg.controllers import redirect
 from pygdv.widgets.group import group_table, group_table_filler, new_group_form, group_edit_filler, group_edit_form
 from pygdv.model import DBSession, Group
 from tg import app_globals as gl
+from tg import url
 __all__ = ['GroupController']
 
 
@@ -25,9 +26,9 @@ class GroupController(CrudRestController):
             group = DBSession.query(Group).filter(Group.id == id).first()
             if group.name == gl.group_admins:
                 flash('Cannot delete admin group')
-                redirect('/groups')
+                redirect(url('/groups'))
             if group.name == gl.group_users:
                 flash('Cannot delete users group')
-                redirect('/groups')
+                redirect(url('/groups'))
         return CrudRestController.post_delete(self, *args, **kw)
     

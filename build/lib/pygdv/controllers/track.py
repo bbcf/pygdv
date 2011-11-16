@@ -4,7 +4,7 @@ from tgext.crud.decorators import registered_validate
 
 from repoze.what.predicates import not_anonymous, has_any_permission
 
-from tg import expose, flash, require, request, tmpl_context
+from tg import expose, flash, require, request, tmpl_context, url
 from tg import app_globals as gl
 from tg.controllers import redirect
 from tg.decorators import paginate,with_trailing_slash
@@ -42,14 +42,14 @@ class TrackController(CrudRestController):
     @expose('genshi:tgext.crud.templates.post_delete')
     def post_delete(self, *args, **kw):
         flash("You haven't the right to delete any tracks")
-        redirect('/tracks')
+        raise redirect(url('/tracks'))
     
     
     
     @expose('tgext.crud.templates.edit')
     def edit(self, *args, **kw):
         flash("You haven't the right to edit any tracks")
-        redirect('/tracks')
+        raise redirect(url('/tracks'))
     
     
     

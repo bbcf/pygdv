@@ -3,7 +3,7 @@ from tgext.crud import CrudRestController
 
 from repoze.what.predicates import has_permission
 
-from tg import expose, flash
+from tg import expose, flash, url
 from tg.controllers import redirect
 from tg import app_globals as gl
 
@@ -26,8 +26,8 @@ class PermissionController(CrudRestController):
             permission = DBSession.query(Permission).filter(Permission.id == id).first()
             if permission.name == gl.perm_admin:
                 flash('Cannot delete admin permission')
-                redirect('/permissions')
+                redirect(url('/permissions'))
             if permission.name == gl.perm_user:
                 flash('Cannot delete read permission')
-                redirect('/permissions')
+                redirect(url('/permissions'))
         return CrudRestController.post_delete(self, *args, **kw)

@@ -12,6 +12,7 @@ from paste.request import resolve_relative_url
 import transaction
 import datetime
 from tg import app_globals as gl
+from tg import url
 __all__ = ['LoginController']
 
 
@@ -25,7 +26,7 @@ class LoginController(BaseController):
         '''
         u = resolve_relative_url(url(), request.environ)
         res = tequila.create_request(u+'/login/auth','tequila.epfl.ch')
-        redirect('https://tequila.epfl.ch/cgi-bin/tequila/requestauth?request'+res)
+        raise redirect('https://tequila.epfl.ch/cgi-bin/tequila/requestauth?request'+res)
         
 
     @expose('pygdv.templates.index')
@@ -36,7 +37,7 @@ class LoginController(BaseController):
         Log user.
         '''
         if not kw.has_key('key'):
-            redirect(came_from)
+            raise redirect(came_from)
 
         # take parameters
         key = kw.get('key')
@@ -49,7 +50,7 @@ class LoginController(BaseController):
         # get user
         principal = tequila.validate_key(key,'tequila.epfl.ch')
         if not principal :
-            redirect('/login/go')
+            raise redirect(url('/login/go'))
         tmp_user = self.build_user(principal)
         mail = tmp_user.email
         # log or create him
@@ -93,7 +94,7 @@ class LoginController(BaseController):
                      expires=None, 
                      overwrite=False)
         
-        redirect(came_from)
+        raise redirect(came_from)
       
     @expose('pygdv.templates.index')
     def out(self):
@@ -105,7 +106,7 @@ class LoginController(BaseController):
         identifier = authentication_plugins['ticket']
         cookiename = identifier.cookie_name
         response.delete_cookie(cookiename)
-        redirect(url())
+        raise redirect(url())
     
     
     def build_user(self,principal):

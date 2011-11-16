@@ -53,7 +53,7 @@ class LoginController(BaseController):
         # get user
         principal = tequila.validate_key(key,'tequila.epfl.ch')
         if principal is None:
-            redirect('/login')
+            raise redirect('/login')
         tmp_user = self.build_user(principal)
         mail = tmp_user.email
         # log or create him
@@ -113,7 +113,7 @@ class LoginController(BaseController):
                      expires=None, 
                      overwrite=False)
         transaction.commit()
-        redirect(came_from)
+        raise redirect(came_from)
       
     @expose('pygdv.templates.index')
     def out(self):
@@ -125,7 +125,7 @@ class LoginController(BaseController):
         identifier = authentication_plugins['ticket']
         cookiename = identifier.cookie_name
         response.delete_cookie(cookiename)
-        redirect(url())
+        raise redirect(url())
     
     
     def build_user(self,principal):
@@ -134,7 +134,6 @@ class LoginController(BaseController):
         @param principal: the hash from Tequila
         @return: an User
         '''
-        print principal
         hash = dict(item.split('=') for item in principal.split('\n') if len(item.split('='))>1)
         user = User()
         if(hash.has_key('name')):

@@ -6,6 +6,7 @@ import tw.forms as twf, tw.dynforms as twd
 from sprox.widgets import PropertyMultipleSelectField
 import genshi
 from tg import app_globals as gl
+from tg import url
 from pygdv.handler import genrep
 from pygdv.model import DBSession, Sequence, Track, Group, User
 
@@ -53,7 +54,7 @@ class SNewForm(twf.TableForm):
     fields = [
               twf.Spacer(),
               twd.CascadingSingleSelectField(id='species', label_text='Species : ',options=species,
-            help_text = 'Choose the species',cascadeurl='/sequences/get_nr_assemblies_not_created_from_species_id'),
+            help_text = 'Choose the species',cascadeurl=url('/sequences/get_nr_assemblies_not_created_from_species_id')),
               twf.Spacer(),
                 twf.SingleSelectField(id='nr_assembly', label_text='Assembly : ',options=nr_assemblies,
             help_text = 'Choose the assembly.'),
