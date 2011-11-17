@@ -278,7 +278,13 @@ class CustomCookiePlugin(object):
             # redirect to login_form
             res = Response()
             res.status = 302
-            res.location = '/login_needed'
+            addon = None
+            if 'SCRIPT_NAME' in environ:
+                addon = environ['SCRIPT_NAME']
+            if addon is not None:
+                res.location = addon + '/login_needed'
+            else :
+                res.location = 'login_needed'
             return res
             
 
