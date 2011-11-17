@@ -1,67 +1,119 @@
 Description
-====================
-TurboTequila is a Turbogears application with Tequila enabled.
+================================================================
+GDV is a fast and easy to use genome browser. 
+The main goal is to provide a tool for biologist and bioanalysts 
+who wants to VISUALIZE and ANALYSE their data in an interactive and responding way.
 
-First use
-=====================
-Download the project :
-
-    $ git clone git://github.com/bbcf/pygdv.git.
-
-(It will create a directory named 'pygdv')
-
-You want to use another one for your installation, so choose a name for your project (myCoolProject)
-and run the following commands :
-
-    $ find . -depth -name '*pygdv*' -execdir rename turbotequila mycoolproject {} \;
-
-(will rename all files with 'pygdv' by 'myCoolProject')
-
-then
-
-    $ find . -type 'f' -name '*' -exec sed -i 's/pygdv/mycoolproject/' {} \;
-
-(will rename all occurances of 'pygdv' in all files by 'myCoolProject')
-
-``WARNING`` : Avoid using upper case with naming your project. Just use lower case and it will be fine.
-
-In the future, we plan to avoid this by directly provide a plugin for Turbogears and a Tequila project will
-be created by a simple command like 'paster quickstart tequila'.
+Use
+================================================================
+A production version is running on [bbcf](http://gdv.epfl.ch/pygdv). 
+You can log in if you have an account on [tequila](https://tequila.epfl.ch/) which is automatic if
+you have a university account in Switzerland. If not, we will provide soon a demo version 
+available for everybody. If you really wan't to test GDV, please sent a email at [bbcf_webmaster](mailto:webmaster.bbcf@epfl.ch).
 
 
-Installation and Setup (example is given with a Fedora 15 (Lovelock))
-======================
+Installation
+================================================================
+pyGDV is written in python, so the recommended way of installing it (as all python modules)
+is throught a virtual environment.
+Here we put notes on installing [virtualenv](http://pypi.python.org/pypi/virtualenv) (will build your virtual environment)
+& [virtualenvwrapper](http://pypi.python.org/pypi/virtualenvwrapper) (will make it easier to work with virtualenv).
 
-Install ``postgresql`` on your system::
-su -c 'yum install postgresql postgresql-server'
-see http://www.postgresql.org/docs/ for more.
+Please refers to the official documentation if something goes wrong.
 
-Install the ``dev packages`` for postgresql, and the ``python bindings``::
-    
-    $ su -c 'yum install postgresql-devel python-psycopg2'
+Virtualenv
+----------------------------------------------------------------
+1. Install devellopers packages (already done usually).
+    * Xcode (MacOS)
+    * python-dev & build-essential (Debian, Ubuntu)
+    * python-devel (Fedor)
 
-Create the database and change the adress in ``pygdv/development.ini`` under ``sqlalchemy.url``.
-
-Install ``pygdv`` using the setup.py script::
-
-    $ cd pygdv
-    $ python setup.py install
-
-Create the project database for any model classes defined::
-
-    $ paster setup-app development.ini
-
-Follow the instructions given.
-
-While developing you may want the server to reload after changes in package files (or its dependencies) are saved. This can be achieved easily by adding the --reload option::
-
-    $ paster serve --reload development.ini
-
-Then you are ready to go.
+2. Install virtualenv
+    sudo easy_install virtualenv
 
 
+Virtualenvwrapper
+----------------------------------------------------------------
 
- This code was written by the BBCF
- http://bbcf.epfl.ch/              
- webmaster.bbcf@epfl.ch            
+1. Install python [pip](http://www.pip-installer.org/en/latest/index.html) (package manager)
+
+2. Install vitualenvwrapper:
+    pip install virtualenvwrapper
+
+3. Define the directory that will contains your environements
+    export WORKON_HOME=/usr/local/env (add in .bashrc)
+    mkdir $WORKON_HOME
+
+4. Execute virtualenwrapper.sh then source it
+    source /usr/local/bin/virtualenvwrapper.sh (add in .bashrc)
+
+
+5. Create the virtual environement that will contains GDV
+    mkvirtualenv --no-site-packages -p python2.6 pygdv
+
+You can now enter the virtual env with ``workon pygdv`` and exit with ``deactivate``
+
+
+pyGDV
+-----------------------------------------------------------------
+It's not mandatory to install pyGDV on a virtualenv but it's recommended.
+
+
+-- DRAFT --
+
+1. Install git (do it throught your package manager)
+
+2. Go to the directory where you want to install pyGDV.
+
+3. Execute : ``git clone https://github.com/yjarosz/pygdv
+   	       cd pygdv
+	       python setup.py install
+	       easy_install celery
+	       easy_install webob==1.1.1
+	       easy_install numpy
+	       easy_install matplotlib
+	       pip install -U kombu-sqlalchemy
+	       ``
+
+4. Install bbcflibs
+   clone libraries bbcflib (git), bein (git), track (git), gMiner (git)
+   a script will soon be provided to install them at once
+   
+5. Add them to the virtualenv
+    ``add2virtualenv bbcflib
+    add2virtualenv track
+    add2virtualenv bein
+    add2virtualenv gMiner``
+
+6. copy developement ini file to make it for production
+   ``cp development.ini production.ini``
+
+7. enter info needed in production.ini
+
+8. cp ``who.ini.sample who.ini``
+
+9. fill who.ini
+
+10. ``paster setup-app production.ini``
+
+11. prefix your application if needed
+
+12. enter the ip of the proxy if needed
+
+13. run ``paster serve production.ini`
+
+14. configure worker in ``celeryconfig.py``
+
+15. run workers : ``celeryd``
+
+
+Useful startup scripts are ``pygdv_ctl``& ``celery_ctl``. You should look at them.
+
+
+Licence
+================================================================
+Copyright BBCF.
+ 
+http://bbcf.epfl.ch/              
+webmaster.bbcf@epfl.ch            
 

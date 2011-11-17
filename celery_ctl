@@ -20,8 +20,9 @@
 
 #set -e
 
-DEFAULT_PID_FILE="/var/run/celeryd@%n.pid"
-DEFAULT_LOG_FILE="/var/log/celeryd@%n.log"
+PYGDV_HOME='/home/yo/git/pygdv'
+DEFAULT_PID_FILE=$PYGDV_HOME"/celeryd@%n.pid"
+DEFAULT_LOG_FILE=$PYGDV_HOME"/celeryd@%n.log"
 DEFAULT_LOG_LEVEL="INFO"
 DEFAULT_NODES="celery"
 DEFAULT_CELERYD="-m celery.bin.celeryd_detach"
