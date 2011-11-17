@@ -9,7 +9,7 @@ Use
 A production version is running on [bbcf](http://gdv.epfl.ch/pygdv). 
 You can log in if you have an account on [tequila](https://tequila.epfl.ch/) which is automatic if
 you have a university account in Switzerland. If not, we will provide soon a demo version 
-available for everybody. If you really wan't to test GDV, please sent a email at [bbcf_webmaster](mailto:webmaster.bbcf@epfl.ch).
+available for everybody. If you really wan't to test GDV, please sent a email to [bbcf webmaster](mailto:webmaster.bbcf@epfl.ch).
 
 
 Installation
@@ -66,12 +66,19 @@ It's not mandatory to install pyGDV on a virtualenv but it's recommended.
 2. Go to the directory where you want to install pyGDV.
 
 3. Execute : ``git clone https://github.com/yjarosz/pygdv
-   	       cd pygdv
+   	       
+	       cd pygdv
+	       
 	       python setup.py install
+	       
 	       easy_install celery
+	       
 	       easy_install webob==1.1.1
+	       
 	       easy_install numpy
+	       
 	       easy_install matplotlib
+	       
 	       pip install -U kombu-sqlalchemy
 	       ``
 
