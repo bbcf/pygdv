@@ -7,6 +7,7 @@ from codecs import utf_8_decode
 from codecs import utf_8_encode
 import os
 import time
+import tg
 
 from paste.httpheaders import REQUEST_METHOD
 from paste.request import get_cookies
@@ -121,6 +122,12 @@ class CustomCookiePlugin(object):
         '''
         Identify the user
         '''
+
+        if tg.config.get('proxy-ip'):
+            remotes = environ['REMOTE_ADDR'].split(', ')
+            remotes.remove(tg.config.get('proxy-ip'))
+            environ['REMOTE_ADDR'] = remotes[0]
+
         environ['auth'] = False
         cookies = get_cookies(environ)
         cookie = cookies.get(self.cookie_name)
