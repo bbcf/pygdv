@@ -1,15 +1,20 @@
 #!/bin/sh -e
-PYGDV_HOME=/data/pygdv
+
+if [ -z $PYGDV_HOME ]; then
+    echo 'PYGDV_HOME variable is missing : please add ``export PYGDV_HOME="path/to/pyGDV/project"`` in your environment.'
+    exit 1
+fi
+
 
 case "$1" in
   start)
-    paster serve --daemon --pid-file=$PYGDV_HOME/paster.pid --log-file=$PYGDV_HOME/paster.log $PYGDV_HOME/production.ini start
+    paster serve --daemon --pid-file=$PYGDV_HOME/daemon/paster.pid --log-file=$PYGDV_HOME/log/paster.log $PYGDV_HOME/production.ini start
     ;;
   stop)
-    paster serve --daemon --pid-file=$PYGDV_HOME/paster.pid --log-file=$PYGDV_HOME/paster.log  $PYGDV_HOME/production.ini stop
+    paster serve --daemon --pid-file=$PYGDV_HOME/daemon/paster.pid --log-file=$PYGDV_HOME/log/paster.log  $PYGDV_HOME/production.ini stop
     ;;
   restart)
-    paster serve  --daemon --pid-file=$PYGDV_HOME/paster.pid --log-file=$PYGDV_HOME/paster.log $PYGDV_HOME/production.ini restart
+    paster serve  --daemon --pid-file=$PYGDV_HOME/daemon/paster.pid --log-file=$PYGDV_HOME/log/paster.log $PYGDV_HOME/production.ini restart
     ;;
   *)
     echo $"Usage: $0 {start|stop|restart}"

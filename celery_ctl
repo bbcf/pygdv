@@ -20,9 +20,13 @@
 
 #set -e
 
-PYGDV_HOME='/home/yo/git/pygdv'
-DEFAULT_PID_FILE=$PYGDV_HOME"/celeryd@%n.pid"
-DEFAULT_LOG_FILE=$PYGDV_HOME"/celeryd@%n.log"
+if [ -z $PYGDV_HOME ]; then
+    echo 'PYGDV_HOME variable is missing : please add ``export PYGDV_HOME="path/to/pyGDV/project"`` in your environment.'
+    exit 1
+fi
+
+DEFAULT_PID_FILE=$PYGDV_HOME"/daemon/celeryd@%n.pid"
+DEFAULT_LOG_FILE=$PYGDV_HOME"/log/celeryd@%n.log"
 DEFAULT_LOG_LEVEL="INFO"
 DEFAULT_NODES="celery"
 DEFAULT_CELERYD="-m celery.bin.celeryd_detach"
