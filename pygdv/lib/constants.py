@@ -1,5 +1,6 @@
 from pkg_resources import resource_filename
 import os
+from tg import url
 
 data_dir = 'pygdv.public.data'
 json_dir = 'jbrowse'
@@ -27,6 +28,9 @@ def track_directory():
 
 def gfeatminer_directory():
     return os.path.join(resource_filename(data_dir, gfeatminer_dir))
+
+def gfeatminer_url():
+    return url('/data/gfeatminer')
 
 # URLS TO PUT IN JSON
 DATA_ROOT = '/data/jbrowse/'

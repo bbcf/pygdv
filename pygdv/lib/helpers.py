@@ -55,12 +55,12 @@ def get_share_link(obj_id, param, rights = None):
             return ''' <a class='action share_link' href="%s"></a>''' % url('./share', params={param:obj_id})
     return ''
                                                         
-def get_edit_link(obj_id, rights = None):
+def get_edit_link(obj_id, rights = None, link=''):
     if rights is not None and constants.right_upload in rights :
         if rights[constants.right_upload]:
             return '''
-    <a class="action edit_link" href="%s/edit" style="text-decoration:none"></a>
-           ''' % (obj_id)
+    <a class="action edit_link" href="%s%s/edit" style="text-decoration:none"></a>
+           ''' % (link, obj_id)
     return ''
 
 def get_detail_link(obj_id, param, rights = None):

@@ -49,7 +49,7 @@ track_grid = twf.DataGrid(fields=[
         '<div class=actions>'
         + get_export_link(obj.id, rights = constants.full_rights)                               
         + get_delete_link(obj.id, rights = constants.full_rights)
-        + get_edit_link(obj.id, rights = constants.full_rights)
+        + get_edit_link(obj.id, rights = constants.full_rights, link='tracks/')
         + '</div>'
         ))
 ])
@@ -98,7 +98,7 @@ class UploadFrom(twf.TableForm):
     twf.TextArea(id='urls',label_text='Or enter url(s) to access your file(s)',
                           help_text = 'You can enter multiple urls separated by space or "enter".'),
    twd.CascadingSingleSelectField(id='species', label_text='Species : ',options=get_species,
-help_text = 'Choose the species',cascadeurl='/sequences/get_nr_assemblies_from_species_id'),
+help_text = 'Choose the species',cascadeurl=url('/sequences/get_nr_assemblies_from_species_id')),
   twf.Spacer(),
     twf.SingleSelectField(id='nr_assembly', label_text='Assembly : ',options=nr_assemblies,
 help_text = 'Choose the assembly.'),
@@ -125,7 +125,9 @@ class TrackExport(twf.TableForm):
     action='dump'
     fields = [
             twf.HiddenField('track_id'),
-            twf.SingleSelectField(id='format', label_text='Format : ', help_text='select the output format', options=constants.formats_export)
+            twf.SingleSelectField(id='format', label_text='Format : ', 
+                                  help_text='select the output format', 
+                                  options=constants.formats_export)
               ]
     
 track_export = TrackExport()

@@ -15,7 +15,7 @@ import track
 from celery.task import task, chord, subtask, TaskSet
 from pygdv.lib.constants import json_directory, track_directory
 
-def create_track(user_id, sequence, trackname=None, f=None):
+def create_track(user_id, sequence, trackname=None, f=None, project=None):
     '''
     Create track from files :
     
@@ -24,17 +24,18 @@ def create_track(user_id, sequence, trackname=None, f=None):
     
     @param trackname : name to give to the track
     @param file : the file name
+    @param project : if given, the track created has to be added to the project 
     '''
     print 'creating track'
     if f is not None:
         _input = create_input(f,trackname, sequence.name)
-        if _input == constants.NOT_SUPPORTED_DATATYPE :
+        if _input == constants.NOT_SUPPORTED_DATATYPE or _input == constants.NOT_DETERMINED_DATATYPE:
             print 'deleting temporary file'
             try:
                 os.remove(os.path.abspath(f.name))
             except OSError :
                 pass
-            return constants.NOT_SUPPORTED_DATATYPE
+            return _input
         
         track = Track()
         if trackname is not None:
@@ -45,13 +46,20 @@ def create_track(user_id, sequence, trackname=None, f=None):
         DBSession.add(track)
         DBSession.flush()
         
+        
         params = TrackParameters()
         params.track = track        
         
         params.build_parameters()
         DBSession.add(params)
         DBSession.add(track)
+        
+        
+        if project is not None:
+            project.tracks.append(track)
+        DBSession.add(project)
         DBSession.flush()
+        
         return _input.task_id
     
     
@@ -92,11 +100,13 @@ def create_input(f, trackname, sequence_name):
             return datatype
         
         elif datatype == constants.NOT_DETERMINED_DATATYPE:
-            # this is an sql
-            #make a track and guess datatype
-            pass
+            with track.load(file_path) as t:
+                if t.datatype is not None:
+                    datatype = _datatypes.get(t.datatype, constants.NOT_DETERMINED_DATATYPE)
        
-      
+        if datatype == constants.NOT_DETERMINED_DATATYPE:
+            return datatype     
+        
         print 'dispatch %s' % dispatch
         if trackname is None:
             trackname = f
@@ -147,6 +157,16 @@ _formats = {'sql' : constants.NOT_DETERMINED_DATATYPE,
                     'bedgraph' : constants.SIGNAL
                     }
 
+_datatypes = {      constants.FEATURES : constants.FEATURES,
+                    'qualitative' : constants.FEATURES,
+                    'QUALITATIVE' : constants.FEATURES,
+                    constants.SIGNAL : constants.SIGNAL,
+                    'quantitative' : constants.SIGNAL,
+                    'QUANTITATIVE' : constants.SIGNAL,
+                    constants.RELATIONAL : constants.RELATIONAL,
+                    'qualitative_extended' : constants.RELATIONAL,
+                    'QUALITATIVE_EXTENDED' : constants.RELATIONAL,
+                    }
 #_sql_dispatch = {'quantitative' : lambda *args, **kw : _signal2(*args, **kw),
 #                 constants.SIGNAL : lambda *args, **kw : _signal2(*args, **kw),
 #                 
@@ -168,7 +188,7 @@ _formats = {'sql' : constants.NOT_DETERMINED_DATATYPE,
 #                  constants.RELATIONAL :  lambda *args, **kw : _relational2(*args, **kw)
 #                 }
 
-def move_database(datatype, assembly_id, path, sha1, name, tmp_file, format):
+def move_database(datatype, assembly_name, path, sha1, name, tmp_file, format):
     '''
     Move the database to the right directory.
     Then process the database.
@@ -176,7 +196,7 @@ def move_database(datatype, assembly_id, path, sha1, name, tmp_file, format):
     out_name = '%s.%s' % (sha1, 'sql')
     dst = os.path.join(track_directory(), out_name)
     shutil.move(path, dst)
-    return tasks.process_database.delay(datatype, assembly_id, dst, sha1, name, format);
+    return tasks.process_database.delay(datatype, assembly_name, dst, sha1, name, format);
 
 def convert_file(datatype, assembly_name, path, sha1, name, tmp_file, format):
     '''

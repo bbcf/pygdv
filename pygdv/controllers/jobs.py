@@ -13,7 +13,7 @@ import datetime
 from tg import app_globals as gl
 import tg, os
 from pygdv import handler
-from pygdv.lib import util
+from pygdv.lib import util, constants
 from pygdv.widgets.job import job_grid
 
 __all__ = ['JobController']
@@ -28,10 +28,12 @@ class JobController(BaseController):
         if job is not None:
             data = util.to_datagrid(job_grid, [job])
         
-        path = path = os.path.join('/data', 'gfeatminer', str(job.id))
-        filename = os.listdir(path)
+        path = path = os.path.join(constants.gfeatminer_directory(), str(job.id))
         
-        final = os.path.join(path, filename)
+        filename = os.listdir(path)[0]
+        print filename
+        
+        final = os.path.join(constants.gfeatminer_url(),  str(job.id), filename)
         
         tmpl_context.src = url(final)
 
@@ -45,3 +47,9 @@ class JobController(BaseController):
     def traceback(self, id):
         job = DBSession.query(Job).filter(Job.id == id).first()
         return job.traceback
+    
+    
+    
+    
+    
+    

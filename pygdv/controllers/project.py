@@ -20,7 +20,7 @@ import transaction
 from pygdv.lib import checker
 from pygdv.lib.jbrowse import util as jb
 from pygdv.lib import constants
-from sqlalchemy.sql import and_
+from sqlalchemy.sql import and_, or_, not_
 import re
 
 __all__ = ['ProjectController']
@@ -281,7 +281,7 @@ class ProjectController(CrudRestController):
         
         control = 'b.showTracks();initGDV(b, %s)' % project.id
         
-        jobs = DBSession.query(Job).filter(Job.project_id == project.id).all()
+        jobs = DBSession.query(Job).filter(and_(Job.project_id == project.id, not_(Job.output == constants.job_output_reload))).all()
         
         jobs_output = [{'job_id' : job.id, 
                        'status' : job.status, 

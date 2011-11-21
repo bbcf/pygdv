@@ -6,6 +6,7 @@ from pygdv.lib.constants import json_directory, track_directory
 from celery.result import AsyncResult
 from pygdv.lib import constants
 import track
+import pygdv
 import tempfile
 
 success = 1
@@ -148,8 +149,9 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, pr
                     for chrom in t:
                         ## TODO
                         t2.write(chrom, t.read(chrom, fields=signal_fields), fields=signal_fields)
+                    t2.datatype = constants.SIGNAL
                     t2.assembly = assembly_name
-
+                    
         elif datatype == constants.FEATURES:
             f = simple_fields
             with track.load(tmp_dst, 'sql', readonly=True) as t:
@@ -157,6 +159,7 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, pr
                     for chrom in t:
                         gen = t.aggregated_read(f)
                         t2.write(chrom, gen, fields=f + (agg_field,))
+                    t2.datatype = constants.FEATURES
                     t2.assembly = assembly_name
 
 
@@ -167,6 +170,7 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, pr
                     for chrom in t:
                         gen = t.aggregated_read(f)
                         t2.write(chrom, gen, fields=f + (agg_field,))
+                    t2.datatype = constants.RELATIONAL
                     t2.assembly = assembly_name
 
         try:
@@ -283,13 +287,16 @@ _sql_dispatch = {'quantitative' : lambda *args, **kw : _signal(*args, **kw),
 import gMiner
 
 @task()
-def gfeatminer_request(req):
+def gfeatminer_request(user_id, project_id, req, job_description, job_name):
+    '''
+    Launch a gFeatMiner request.
+    '''
     print 'gfeatminer request %s : ' % req
     try :
         
         data = gMiner.run(**req)
         print 'gMiner ended with %s ' % data
-        
+        pygdv.handler.job.parse_response(user_id, project_id, data, job_description, job_name)
     except Exception as e:
         etype, value, tb = sys.exc_info()
         traceback.print_exception(etype, value, tb)

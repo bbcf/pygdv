@@ -1,15 +1,16 @@
 #!/bin/sh -e
-PYGDV_HOME=/data/pygdv
+PYGDV_HOME=/home/yo/git/pygdv
+PYGDV_CONFIG_FILE=development.ini
 
 case "$1" in
   start)
-    paster serve --daemon --pid-file=$PYGDV_HOME/paster.pid --log-file=$PYGDV_HOME/paster.log $PYGDV_HOME/production.ini start
+    paster serve --daemon --pid-file=$PYGDV_HOME/paster.pid --log-file=$PYGDV_HOME/paster.log $PYGDV_HOME/$PYGDV_CONFIG_FILE start
     ;;
   stop)
-    paster serve --daemon --pid-file=$PYGDV_HOME/paster.pid --log-file=$PYGDV_HOME/paster.log  $PYGDV_HOME/production.ini stop
+    paster serve --daemon --pid-file=$PYGDV_HOME/paster.pid --log-file=$PYGDV_HOME/paster.log  $PYGDV_HOME/$PYGDV_CONFIG_FILE stop
     ;;
   restart)
-    paster serve  --daemon --pid-file=$PYGDV_HOME/paster.pid --log-file=$PYGDV_HOME/paster.log $PYGDV_HOME/production.ini restart
+    paster serve  --daemon --pid-file=$PYGDV_HOME/paster.pid --log-file=$PYGDV_HOME/paster.log $PYGDV_HOME/$PYGDV_CONFIG_FILE restart
     ;;
   *)
     echo $"Usage: $0 {start|stop|restart}"

@@ -14,7 +14,7 @@ import sys, traceback
 
 __all__ = ['WorkerController']
 
-
+simple_fields = ('start', 'end', 'score', 'name', 'strand', 'attributes')
 
 class WorkerController(BaseController):
     allow_only = has_any_permission(gl.perm_admin, gl.perm_user)
@@ -40,26 +40,33 @@ class WorkerController(BaseController):
         path = track.common.temporary_path()
         
         with track.new(path, 'sql') as t:
-            t.fields = ['start', 'end']
+            t.fields = simple_fields
             for chromosome in sels:
-                t.write(chromosome, [(marquee['start'], marquee['end']) for marquee in sels[chromosome]]);
+                t.write(chromosome, ((marquee['start'], marquee['end'], 0, '', 0 , '') for marquee in sels[chromosome]));
+            t.datatype = constants.FEATURES
             t.assembly = project.sequence.name
             
         rev = handler.track.create_track(user.id, project.sequence, f=path, trackname='%s %s' 
-                                         % (job_name, job_description))
+                                         % (job_name, job_description), project=project)
         if rev  == constants.NOT_SUPPORTED_DATATYPE :
             return {'error' : "not supported datatype" % project_id}
-        return {'name' : job_name,
-                'description' : job_description,
-                'status' : 'running',
-                'job_id' : rev}
+        
+        job_id = handler.job.new_sel(user.id, project.id, job_description, job_name, task_id=rev)
+        return {'job_id' : job_id,
+                'job_name' : job_name,
+                'job_description' : job_description,
+                'status' : 'RUNNING'}
+    
 
     @expose('json')
     def status(self, job_id, *args, **kw):
-        print 'status request %s : ' % (job_id)
-        job = DBSession.query(Job).filter(Job.id == job_id).first()
-        print job
-        return {'job_id' : job.id, 'status' : job.status, 'output' : job.output, 'error' : job.traceback}
+        try :
+            job_id = int(job_id)
+            job = DBSession.query(Job).filter(Job.id == job_id).first()
+            return {'job_id' : job.id, 'status' : job.status, 'output' : job.output, 'error' : job.traceback}
+        except ValueError:
+            pass
+        return {}
     
     
     
