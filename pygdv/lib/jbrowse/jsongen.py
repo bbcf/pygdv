@@ -320,7 +320,7 @@ def _generate_hist_outputs(array, chr_length, coef=1):
     '''
     Generate the hist-output. 
     '''
-    for i in xrange(1, chr_length, HIST_CHUNK_SIZE * coef):
+    for i in xrange(1, int(math.ceil(chr_length/HIST_CHUNK_SIZE)), HIST_CHUNK_SIZE * coef):
         yield array[i:i+HIST_CHUNK_SIZE * 100]      
     
     

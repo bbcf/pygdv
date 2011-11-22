@@ -32,7 +32,6 @@ class WorkerController(BaseController):
         '''
         user = handler.user.get_user_in_session(request)
         sels = json.loads(s)
-        print sels
         
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         if project is None :
@@ -74,7 +73,7 @@ class WorkerController(BaseController):
     
     @expose('json')
     def new_gfeatminer_job(self, project_id, job_description, job_name, data, *args, **kw):
-        print 'new_gfeatminer_job pid : %s, data : %s, args : %s, kw : %s' % (project_id, data, args, kw)
+        print 'new_gfeatminer_job pid : %s, data : %s, args : %s, kw : %s, job_name : %s, job_description : %s' % (project_id, data, args, kw, job_name, job_description)
         user = handler.user.get_user_in_session(request)
         try:
             data = json.loads(data)

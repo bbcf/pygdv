@@ -4,12 +4,25 @@ import shutil, os, sys, traceback
 from pygdv.lib.jbrowse import jsongen, scores
 from pygdv.lib.constants import json_directory, track_directory
 from celery.result import AsyncResult
+from celery.signals import worker_init
+
 from pygdv.lib import constants
 import track
-import pygdv
-import tempfile
-
+import tempfile, transaction
+from pygdv.celery import model
 success = 1
+
+
+
+
+def session_connection(*args, **kw):
+    print 'init of sessions args : %s, kw : %s' %(args, kw)
+    import pygdv.celery.model
+   
+    
+    
+worker_init.connect(session_connection)
+
 
 
 #############################################################################################################
@@ -296,7 +309,20 @@ def gfeatminer_request(user_id, project_id, req, job_description, job_name):
         
         data = gMiner.run(**req)
         print 'gMiner ended with %s ' % data
-        pygdv.handler.job.parse_response(user_id, project_id, data, job_description, job_name)
+        for path in data:
+            print path
+            print os.path.splitext(path)
+            if os.path.splitext(path)[1] == '.sql':
+                print 'sql'
+                session = model.DBSession()
+                project = session.query(model.Project).filter(model.Project.id == project_id).first()
+                from pygdv.handler.track import create_track
+                rev = create_track(user_id, project.sequence, f=path, trackname='%s %s' 
+                                             % (job_name, job_description), project=project, session = session)
+                import transaction
+                transaction.commit()
+                session.close()
+        
     except Exception as e:
         etype, value, tb = sys.exc_info()
         traceback.print_exception(etype, value, tb)

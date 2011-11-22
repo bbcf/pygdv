@@ -15,7 +15,9 @@ import track
 from celery.task import task, chord, subtask, TaskSet
 from pygdv.lib.constants import json_directory, track_directory
 
-def create_track(user_id, sequence, trackname=None, f=None, project=None):
+def create_track(user_id, sequence, trackname=None, f=None, project=None, session=None):
+    if session is None:
+        session = DBSession
     '''
     Create track from files :
     
@@ -26,9 +28,9 @@ def create_track(user_id, sequence, trackname=None, f=None, project=None):
     @param file : the file name
     @param project : if given, the track created has to be added to the project 
     '''
-    print 'creating track'
+    print 'creating track '
     if f is not None:
-        _input = create_input(f,trackname, sequence.name)
+        _input = create_input(f,trackname, sequence.name, session)
         if _input == constants.NOT_SUPPORTED_DATATYPE or _input == constants.NOT_DETERMINED_DATATYPE:
             print 'deleting temporary file'
             try:
@@ -36,29 +38,30 @@ def create_track(user_id, sequence, trackname=None, f=None, project=None):
             except OSError :
                 pass
             return _input
-        
+        print 'continue'
         track = Track()
         if trackname is not None:
             track.name = trackname
         track.sequence_id = sequence.id
         track.user_id = user_id
         track.input_id = _input.id
-        DBSession.add(track)
-        DBSession.flush()
+        session.add(track)
+        session.flush()
         
         
         params = TrackParameters()
         params.track = track        
         
         params.build_parameters()
-        DBSession.add(params)
-        DBSession.add(track)
-        
-        
+        session.add(params)
+        session.add(track)
+        print track
+        print 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
         if project is not None:
+            print 'adding to the project %s' % project
             project.tracks.append(track)
-        DBSession.add(project)
-        DBSession.flush()
+        session.add(project)
+        session.flush()
         
         return _input.task_id
     
@@ -66,7 +69,7 @@ def create_track(user_id, sequence, trackname=None, f=None, project=None):
     
     
 
-def create_input(f, trackname, sequence_name):
+def create_input(f, trackname, sequence_name, session):
     '''
     Create an input if it's new, or simply return the id of an already inputed file 
     @param file : the file name
@@ -75,7 +78,8 @@ def create_input(f, trackname, sequence_name):
     print 'creating input'
     sha1 = util.get_file_sha1(os.path.abspath(f))
     print "getting sha1 %s" % sha1
-    _input = DBSession.query(Input).filter(Input.sha1 == sha1).first()
+    _input = session.query(Input).filter(Input.sha1 == sha1).first()
+    print _input
     if _input is not None: 
         print "file already exist"
     else :
@@ -123,10 +127,10 @@ def create_input(f, trackname, sequence_name):
        
         _input.task_id = async_result.task_id
         
-        DBSession.add(_input)
+        session.add(_input)
         
     
-    DBSession.flush()
+    session.flush()
     return _input   
 
 

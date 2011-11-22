@@ -2,7 +2,7 @@ from pygdv.lib import constants
 from pygdv.model import DBSession, Job, Project
 from pygdv.celery import tasks
 import os
-import pygdv
+from pygdv.handler.track import create_track
 
 
 
@@ -75,14 +75,6 @@ def parse_args(data):
     
     data = dict([(k.encode('ascii'),v) for k,v in data.items()])
     
-    
-def parse_response(user_id, project_id, data, job_description, job_name):
-    for path in data:
-        if os.path.splitext(path) == '.sql':
-            project = DBSession.query(Project).filter(Project.id == project_id).first()
-            rev = pygdv.handler.track.create_track(user_id, project.sequence, f=path, trackname='%s %s' 
-                                         % (job_name, job_description), project=project)
-    
-    
+ 
     
     
