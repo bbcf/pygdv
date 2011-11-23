@@ -5,6 +5,7 @@ def add_new_sequence(sequence):
     It should import fast from JBrowsoR
     '''
     print 'TODO creating sequence %s ' % sequence
+    
     pass
 
 

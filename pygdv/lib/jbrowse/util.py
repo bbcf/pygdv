@@ -25,9 +25,8 @@ def ref_seqs(sequence_id):
     Build the ``refSeqs`` variable.
     @param sequence_id : the assembly_id in GenRep.
     '''
-    gl = GenRep()
-    chromosomes = gl.get_chromosomes_from_assembly_id(sequence_id)
-    return [_chromosome_output(chr) for chr in chromosomes]
+    ass = gl.genrep.assembly(sequence_id)
+    return [_chromosome_output(chr) for chr in ass.chromosomes]
     
     
     
