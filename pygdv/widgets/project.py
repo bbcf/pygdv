@@ -43,8 +43,8 @@ def get_species():
 
 def get_assemblies(species):
     if species and species[0] and species[0]:
-        nr_assemblies = DBSession.query(Sequence).join(Species).filter(Sequence.species_id == species[0][0]).all()
-        return [(nr.id,nr.name) for nr in nr_assemblies]
+        assemblies = DBSession.query(Sequence).join(Species).filter(Sequence.species_id == species[0][0]).all()
+        return [(nr.id,nr.name) for nr in assemblies]
     return []
     
 def get_tracks():
@@ -62,14 +62,14 @@ class NewProjectFrom(twf.TableForm):
     show_errors = True
     action='post'
     species = get_species()
-    nr_assemblies = get_assemblies(species)
+    assemblies = get_assemblies(species)
     fields = [
               twf.TextField(label_text='Name',id='name',
                             help_text = 'Give a name to your project', validator=NotEmpty),
               twd.CascadingSingleSelectField(id='species', label_text='Species : ',options=get_species,
-            help_text = 'Choose the species', cascadeurl=url('/sequences/get_nr_assemblies_from_species_id')),
+            help_text = 'Choose the species', cascadeurl=url('/sequences/get_assemblies_from_species_id')),
               twf.Spacer(),
-                twf.SingleSelectField(id='nr_assembly', label_text='Assembly : ',options=nr_assemblies,
+                twf.SingleSelectField(id='assembly', label_text='Assembly : ',options=assemblies,
             help_text = 'Choose the assembly.'),
               
              
@@ -81,7 +81,7 @@ class NewProjectFrom(twf.TableForm):
         species=get_species()
         print species
         d['species']=species
-        d['nr_assembly']=get_assemblies(species)
+        d['assembly']=get_assemblies(species)
         return d
 
 def get_project_tracks():
@@ -99,14 +99,14 @@ def get_project_species():
     species.insert(0, sp)
     return [(sp.id,sp.name) for sp in species]
 
-def get_project_nr_assemblies():
+def get_project_assemblies():
     sp = tmpl_context.project.species
     seq = tmpl_context.project.sequence
-    nr_assemblies = DBSession.query(Sequence).join(Species).filter(
+    assemblies = DBSession.query(Sequence).join(Species).filter(
                                 and_(Sequence.species_id == sp.id,
                                      Sequence.id != seq.id)).all()
-    nr_assemblies.insert(0, seq)
-    return [(nr.id,nr.name) for nr in nr_assemblies]
+    assemblies.insert(0, seq)
+    return [(nr.id,nr.name) for nr in assemblies]
     
 class EditProjectForm(twf.TableForm):
     submit_text = 'Edit project'
@@ -114,15 +114,15 @@ class EditProjectForm(twf.TableForm):
     show_errors = True
     action=url('./?_method=PUT')
     #action='../put'
-#    nr_assemblies = get_assemblies(species)
+#    assemblies = get_assemblies(species)
     fields = [
              # twf.HiddenField(id='_method'),
               twf.TextField(label_text='Name',id='name',
                             help_text = 'Give a name to your project', validator=NotEmpty, default=get_project_name),
               twd.CascadingSingleSelectField(id='species', label_text='Species : ',options=get_project_species,
-            help_text = 'Choose the species',cascadeurl=url('/sequences/get_nr_assemblies_from_species_id')),
+            help_text = 'Choose the species',cascadeurl=url('/sequences/get_assemblies_from_species_id')),
               twf.Spacer(),
-                twf.SingleSelectField(id='nr_assembly', label_text='Assembly : ',options=get_project_nr_assemblies,
+                twf.SingleSelectField(id='assembly', label_text='Assembly : ',options=get_project_assemblies,
             help_text = 'Choose the assembly.'),
               twf.Spacer(),
             twf.MultipleSelectField(id='tracks', label_text='Tracks : ',options=get_tracks,
@@ -136,7 +136,7 @@ class EditProjectForm(twf.TableForm):
         super(EditProjectForm,self).update_params(d)
         species=get_species()
         d['species']=species
-        d['nr_assembly']=get_assemblies(species)
+        d['assembly']=get_assemblies(species)
         return d
     
     
@@ -239,7 +239,7 @@ class ProjectSharingDataGrid(twf.DataGrid):
     
 class RightSharingForm(twf.TableForm):
     submit_text = 'change rights'
-    action='post_share'
+    action=url('post_share')
     fields = [
               twf.HiddenField(id='circle_id'),
               twf.CheckBoxTable(id='rights_checkboxes', num_cols=3, options=['Read','Download','Upload'])
@@ -259,7 +259,7 @@ class AvailableCirclesForm(twf.TableForm):
     submit_text = 'Add a circle to share with'
     hover_help = True
     show_errors = True
-    action='./post_share_add'
+    action=url('./post_share_add')
 
     fields = [
               twf.HiddenField('project_id'),
@@ -271,7 +271,7 @@ class AvailableTracksForm(twf.TableForm):
     submit_text = 'Add track(s) to the project'
     hover_help = True
     show_errors = True
-    action='./add'
+    action=url('./add')
 
     fields = [
               twf.HiddenField('project_id'),
@@ -291,8 +291,8 @@ class EditProjectForm2(DojoEditableForm):
     name = twf.TextField(label_text='Name',id='name',
                             help_text = 'Give a name to your project', validator=NotEmpty, default=get_project_name)
 #    species = twd.CascadingSingleSelectField(id='species', label_text='Species : ',options=get_project_species,
-#            help_text = 'Choose the species',cascadeurl='/sequences/get_nr_assemblies_from_species_id')
-#    assembly = twf.SingleSelectField(id='nr_assembly', label_text='Assembly : ',options=get_project_nr_assemblies,
+#            help_text = 'Choose the species',cascadeurl='/sequences/getassemblies_from_species_id')
+#    assembly = twf.SingleSelectField(id='assembly', label_text='Assembly : ',options=get_project_assemblies,
 #            help_text = 'Choose the assembly.')
     tracks = twf.MultipleSelectField(id='tracks', label_text='Tracks : ',options=get_tracks,
              help_text="Add track(s) to the project by selecting them. You can select more the one by holding the Ctrl/Cmd button.")
@@ -303,7 +303,7 @@ class EditProjectForm2(DojoEditableForm):
         super(EditProjectForm,self).update_params(d)
         species=get_species()
         d['species']=species
-        d['nr_assembly']=get_assemblies(species)
+        d['assembly']=get_assemblies(species)
         return d
     
        

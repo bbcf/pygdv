@@ -67,8 +67,8 @@ class TrackController(CrudRestController):
         
         if files is not None:
             for filename, f in files:
-                if 'nr_assembly' in kw:
-                    sequence = DBSession.query(Sequence).filter(Sequence.id == kw['nr_assembly']).first()
+                if 'assembly' in kw:
+                    sequence = DBSession.query(Sequence).filter(Sequence.id == kw['assembly']).first()
                     ret = handler.track.create_track(user.id, sequence, f=f.name, trackname=filename)
                     if ret == constants.NOT_SUPPORTED_DATATYPE or ret == constants.NOT_DETERMINED_DATATYPE:
                         flash(ret)

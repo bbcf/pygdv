@@ -33,23 +33,23 @@ class SequenceController(CrudRestController):
    
    
     @expose("json") 
-    def get_nr_assemblies_not_created_from_species_id(self, value):
+    def get_assemblies_not_created_from_species_id(self, value):
         '''
         Get the assemblies not created in GDV that are in Genrep
         '''
-        nr_assemblies = handler.genrep.get_nr_assemblies_not_created_from_species_id(value)
-        nr_assemblies = [(nr.id, nr.name) for nr in nr_assemblies]
-        return {'nr_assembly':nr_assemblies}
+        assemblies = handler.genrep.get_assemblies_not_created_from_species_id(value)
+        assemblies = [(nr.id, nr.name) for nr in assemblies]
+        return {'assembly':assemblies}
     
     
     @expose("json") 
-    def get_nr_assemblies_from_species_id(self, value):
+    def get_assemblies_from_species_id(self, value):
         '''
         Get the assemblies created in GDV
         '''
-        nr_assemblies = DBSession.query(Sequence).filter(Sequence.species_id == value).all()
-        nr_assemblies = [(nr.id, nr.name) for nr in nr_assemblies]
-        return {'nr_assembly':nr_assemblies}
+        assemblies = DBSession.query(Sequence).filter(Sequence.species_id == value).all()
+        assemblies = [(nr.id, nr.name) for nr in assemblies]
+        return {'assembly' : assemblies}
     
     
     
@@ -108,7 +108,7 @@ class SequenceController(CrudRestController):
     @validate(sequence_new_form, error_handler=new)
     def post(self, *args, **kw):
         species_id = kw['species']
-        nr_assembly_id = kw['nr_assembly']
+        assembly_id = kw['assembly']
         # look if the species already exist in GDV, else create it
         species = DBSession.query(Species).filter(Species.id == species_id).first()
         if not species:
@@ -122,15 +122,15 @@ class SequenceController(CrudRestController):
             flash( '''Species created: %s'''%( current_sp ))
         
         # look if the assembly not already created, else create it
-        if not DBSession.query(Sequence).filter(Sequence.id == nr_assembly_id).first():
-            nr_assembly = handler.genrep.get_nr_assembly_by_id(nr_assembly_id)
+        if not DBSession.query(Sequence).filter(Sequence.id == assembly_id).first():
+            assembly = handler.genrep.get_assembly_by_id(assembly_id)
             seq = Sequence()
-            seq.id = nr_assembly_id
-            seq.name = nr_assembly.name
+            seq.id = assembly_id
+            seq.name = assembly.name
             seq.species_id = species_id
             DBSession.add(seq)
             DBSession.flush()
-            seq = DBSession.query(Sequence).filter(Sequence.id == nr_assembly_id).first()
+            seq = DBSession.query(Sequence).filter(Sequence.id == assembly_id).first()
             handler.sequence.add_new_sequence(seq)
             flash( '''Sequence created: %s'''%( seq ))
         transaction.commit()

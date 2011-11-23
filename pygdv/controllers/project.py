@@ -79,7 +79,7 @@ class ProjectController(CrudRestController):
     @validate(project_new_form, error_handler=new)
     def post(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        handler.project.create(kw['name'], kw['nr_assembly'], user.id)
+        handler.project.create(kw['name'], kw['assembly'], user.id)
         transaction.commit()
         raise redirect('./')
 

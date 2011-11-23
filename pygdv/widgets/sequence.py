@@ -40,8 +40,8 @@ def get_species():
 
 def get_assemblies(species):
         if species and species[0] and species[0][0]:
-            nr_assemblies = genrep.get_nr_assemblies_not_created_from_species_id(species[0][0])
-            return [(nr.id, nr.name) for nr in nr_assemblies]
+            assemblies = genrep.get_assemblies_not_created_from_species_id(species[0][0])
+            return [(nr.id, nr.name) for nr in assemblies]
         return []
     
 
@@ -50,13 +50,13 @@ class SNewForm(twf.TableForm):
     hover_help = True
     show_errors = True
     species = get_species()
-    nr_assemblies = get_assemblies(species)
+    assemblies = get_assemblies(species)
     fields = [
               twf.Spacer(),
               twd.CascadingSingleSelectField(id='species', label_text='Species : ',options=species,
-            help_text = 'Choose the species',cascadeurl=url('/sequences/get_nr_assemblies_not_created_from_species_id')),
+            help_text = 'Choose the species',cascadeurl=url('/sequences/get_assemblies_not_created_from_species_id')),
               twf.Spacer(),
-                twf.SingleSelectField(id='nr_assembly', label_text='Assembly : ',options=nr_assemblies,
+                twf.SingleSelectField(id='assembly', label_text='Assembly : ',options=assemblies,
             help_text = 'Choose the assembly.'),
               twf.Spacer()
               ]
@@ -65,7 +65,7 @@ class SNewForm(twf.TableForm):
         super(SNewForm,self).update_params(d)
         species=get_species()
         d['species']=species
-        d['nr_assembly']=get_assemblies(species)
+        d['assembly']=get_assemblies(species)
         return d
     
     

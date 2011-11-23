@@ -79,8 +79,8 @@ def get_species():
 
 def get_assemblies(species):
     if species and species[0] and species[0]:
-        nr_assemblies = DBSession.query(Sequence).join(Species).filter(Sequence.species_id == species[0][0]).all()
-        return [(nr.id,nr.name) for nr in nr_assemblies]
+        assemblies = DBSession.query(Sequence).join(Species).filter(Sequence.species_id == species[0][0]).all()
+        return [(nr.id,nr.name) for nr in assemblies]
     return []
 
 class UploadFrom(twf.TableForm):
@@ -90,7 +90,7 @@ class UploadFrom(twf.TableForm):
     show_errors = True
     action='post'
     species = get_species()
-    nr_assemblies = get_assemblies(species)
+    assemblies = get_assemblies(species)
     fields = [
               
     twf.FileField(label_text='Select a file in your computer ',id='file_upload',
@@ -98,9 +98,9 @@ class UploadFrom(twf.TableForm):
     twf.TextArea(id='urls',label_text='Or enter url(s) to access your file(s)',
                           help_text = 'You can enter multiple urls separated by space or "enter".'),
    twd.CascadingSingleSelectField(id='species', label_text='Species : ',options=get_species,
-help_text = 'Choose the species',cascadeurl=url('/sequences/get_nr_assemblies_from_species_id')),
+help_text = 'Choose the species',cascadeurl=url('/sequences/get_assemblies_from_species_id')),
   twf.Spacer(),
-    twf.SingleSelectField(id='nr_assembly', label_text='Assembly : ',options=nr_assemblies,
+    twf.SingleSelectField(id='assembly', label_text='Assembly : ',options=assemblies,
 help_text = 'Choose the assembly.'),
   twf.Spacer(),
               ]
@@ -108,7 +108,7 @@ help_text = 'Choose the assembly.'),
         super(UploadFrom,self).update_params(d)
         species=get_species()
         d['species']=species
-        d['nr_assembly']=get_assemblies(species)
+        d['assembly']=get_assemblies(species)
         return d
 
 
