@@ -191,7 +191,7 @@ class User(DeclarativeBase):
         return self.__str__()
   
     def __str__(self):
-        return '%s %s (%s)' % (self.name, self.firstname, self.obsfuscated_email)
+        return self.short()
  
     def short(self):
         return '%s %s' % (self.name, self.firstname)

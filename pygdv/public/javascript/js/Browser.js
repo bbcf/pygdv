@@ -579,6 +579,7 @@ Browser.prototype.navigateTo = function(loc,tag) {
  * information dictionaries
  */
 Browser.prototype.showTracks = function(trackNameList) {
+    console.debug(trackNameList);
     var brwsr = this;
     if (!this.isInitialized) {
         this.deferredFunctions.push(function() {brwsr.showTracks(trackNameList);});
@@ -590,16 +591,16 @@ Browser.prototype.showTracks = function(trackNameList) {
     for (var n = 0; n < trackNames.length; n++) {
         this.trackListWidget.forInItems(function(obj, id, map) {
             if (trackNames[n] == obj.data.label) {
-                brwsr.viewDndWidget.insertNodes(false, [obj.data]);
+		brwsr.viewDndWidget.insertNodes(false, [obj.data]);
                 removeFromList.push(id);
             }
         });
     }
     var movedNode;
     for (var i = 0; i < removeFromList.length; i++) {
-    this.trackListWidget.delItem(removeFromList[i]);
-    movedNode = dojo.byId(removeFromList[i]);
-    movedNode.parentNode.removeChild(movedNode);
+	this.trackListWidget.delItem(removeFromList[i]);
+	movedNode = dojo.byId(removeFromList[i]);
+	if (movedNode) movedNode.parentNode.removeChild(movedNode);
     }
     this.onVisibleTracksChanged();
 };
