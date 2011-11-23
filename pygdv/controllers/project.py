@@ -266,6 +266,27 @@ class ProjectController(CrudRestController):
             raise redirect(url('/'))
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         tracks = project.tracks
+        
+        trackNames = []
+        for t in tracks:
+            print 'track %s' % t
+            while t.name in trackNames:
+                print 'name %s' % t.name
+                ind = 0
+                while(t.name[-(ind + 1)].isdigit()):
+                    ind += 1
+                cpt = t.name[-ind:]
+                try : 
+                    cpt = int(cpt)
+                except ValueError:
+                    cpt = 0
+                cpt += 1
+                t.name += str(cpt)
+                     
+            DBSession.add(t)
+            DBSession.flush()
+            trackNames.append(t.name)
+        
         refSeqs = 'refSeqs = %s' % json.dumps(jb.ref_seqs(project.sequence_id))
         
         trackInfo = 'trackInfo = %s' % json.dumps(jb.track_info(tracks))

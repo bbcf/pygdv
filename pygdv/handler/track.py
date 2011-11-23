@@ -28,17 +28,14 @@ def create_track(user_id, sequence, trackname=None, f=None, project=None, sessio
     @param file : the file name
     @param project : if given, the track created has to be added to the project 
     '''
-    print 'creating track '
     if f is not None:
         _input = create_input(f,trackname, sequence.name, session)
         if _input == constants.NOT_SUPPORTED_DATATYPE or _input == constants.NOT_DETERMINED_DATATYPE:
-            print 'deleting temporary file'
             try:
                 os.remove(os.path.abspath(f.name))
             except OSError :
                 pass
             return _input
-        print 'continue'
         track = Track()
         if trackname is not None:
             track.name = trackname
@@ -55,10 +52,7 @@ def create_track(user_id, sequence, trackname=None, f=None, project=None, sessio
         params.build_parameters()
         session.add(params)
         session.add(track)
-        print track
-        print 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
         if project is not None:
-            print 'adding to the project %s' % project
             project.tracks.append(track)
         session.add(project)
         session.flush()
