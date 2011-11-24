@@ -338,7 +338,7 @@ class Track(DeclarativeBase):
     
     input_id = Column(Integer, ForeignKey('Input.id', ondelete="CASCADE"), nullable=False)
    
-    user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=False)
+    user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=True)
     
     
     sequence_id = Column(Integer, ForeignKey('Sequence.id', ondelete="CASCADE"), nullable=False)
@@ -370,8 +370,9 @@ class Track(DeclarativeBase):
         return self._name
     
     def _set_name(self, value):
-        self.parameters.key = value
-        self.parameters.label = value
+        if self.parameters is not None :
+            self.parameters.key = value
+            self.parameters.label = value
         self._name = value
         
     @property
@@ -402,6 +403,10 @@ class Track(DeclarativeBase):
         '''
         self._set_last_access(datetime.now())
 
+    @property
+    def path(self):
+        return self.input.path
+    
 class TrackParameters(DeclarativeBase):
     '''
     Track parameters.

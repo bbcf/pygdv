@@ -170,7 +170,7 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, pr
             with track.load(tmp_dst, 'sql', readonly=True) as t:
                 with track.new(dst, 'sql') as t2:
                     for chrom in t:
-                        gen = t.aggregated_read(f)
+                        gen = t.aggregated_read(chrom, f)
                         t2.write(chrom, gen, fields=f + (agg_field,))
                     t2.datatype = constants.FEATURES
                     t2.assembly = assembly_name
@@ -181,7 +181,7 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, pr
             with track.load(tmp_dst, 'sql', readonly=True) as t:
                 with track.new(dst, 'sql') as t2:
                     for chrom in t:
-                        gen = t.aggregated_read(f)
+                        gen = t.aggregated_read(chrom, f)
                         t2.write(chrom, gen, fields=f + (agg_field,))
                     t2.datatype = constants.RELATIONAL
                     t2.assembly = assembly_name
@@ -212,6 +212,9 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, pr
 
 @task()
 def process_database(datatype, assembly_name, path, sha1, name, format):
+    '''
+    Entry point of the sqlite file
+    '''
 
     dispatch = _sql_dispatch.get(datatype, lambda *args, **kw : cannot_process(*args, **kw))
     try :

@@ -1,12 +1,15 @@
+from __future__ import absolute_import
+
 from tg import expose, flash, require, request
 
 from pygdv.lib.base import BaseController
-from pygdv.model import DBSession
+from pygdv.model import DBSession, Project, Track, Sequence
 from repoze.what.predicates import has_any_permission
 from tg import app_globals as gl
 import sqlite3, os
-from pygdv.lib.constants import json_directory
+from pygdv.lib import constants
 from sqlite3 import OperationalError
+import track
 
 class DatabaseController(BaseController):
     allow_only = has_any_permission(gl.perm_user, gl.perm_admin)
@@ -25,7 +28,7 @@ class DatabaseController(BaseController):
         '''
         name = '%s/%s' % (sha1, chr_zoom)
         
-        conn = sqlite3.connect(os.path.join(json_directory(), sha1, chr_zoom))
+        conn = sqlite3.connect(os.path.join(constants.json_directory(), sha1, chr_zoom))
 
         data = {}
         db_data = {}
@@ -55,4 +58,12 @@ class DatabaseController(BaseController):
         return data
             
             
-            
+    @expose('json')
+    def search(self, project_id, term, *args, **kw):
+        project = DBSession.query(Project).filter(Project.id == project_id).first()
+        sequence = project.sequence
+        t = sequence.default_tracks[0]
+        with track.load(t.path, 'sql', readonly=True) as t:
+            data = [row for row in t.search({'gene_name' : term})]
+        return data
+    

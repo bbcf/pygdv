@@ -15,7 +15,7 @@ import track
 from celery.task import task, chord, subtask, TaskSet
 from pygdv.lib.constants import json_directory, track_directory
 
-def create_track(user_id, sequence, trackname=None, f=None, project=None, session=None):
+def create_track(user_id, sequence, trackname=None, f=None, project=None, session=None, admin=False):
     if session is None:
         session = DBSession
     '''
@@ -40,7 +40,8 @@ def create_track(user_id, sequence, trackname=None, f=None, project=None, sessio
         if trackname is not None:
             track.name = trackname
         track.sequence_id = sequence.id
-        track.user_id = user_id
+        if not admin:
+            track.user_id = user_id
         track.input_id = _input.id
         session.add(track)
         session.flush()
@@ -54,7 +55,12 @@ def create_track(user_id, sequence, trackname=None, f=None, project=None, sessio
         session.add(track)
         if project is not None:
             project.tracks.append(track)
-        session.add(project)
+            session.add(project)
+            
+        if admin :
+            sequence.default_tracks.append(track)    
+            session.add(sequence)
+       
         session.flush()
         
         return _input.task_id
@@ -99,12 +105,14 @@ def create_input(f, trackname, sequence_name, session):
         
         elif datatype == constants.NOT_DETERMINED_DATATYPE:
             with track.load(file_path) as t:
+                print t.datatype
                 if t.datatype is not None:
                     datatype = _datatypes.get(t.datatype, constants.NOT_DETERMINED_DATATYPE)
-       
+        
+        
         if datatype == constants.NOT_DETERMINED_DATATYPE:
             return datatype     
-        
+
         print 'dispatch %s' % dispatch
         if trackname is None:
             trackname = f

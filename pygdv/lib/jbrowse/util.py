@@ -26,8 +26,9 @@ def ref_seqs(sequence_id):
     @param sequence_id : the assembly_id in GenRep.
     '''
     ass = gl.genrep.assembly(sequence_id)
-    return [_chromosome_output(chr) for chr in ass.chromosomes]
-    
+    l = [_chromosome_output(chr) for id, chr in ass.chromosomes.iteritems()]
+    l.sort(key=lambda obj : obj['num'])
+    return l
     
     
 def browser_parameters(data_root, style_root, image_root, tracks_names):
@@ -54,11 +55,12 @@ def _chromosome_output(chromosome):
     :param: chromosome : the chromosome
     '''
     #print '[WARNING] : here is used the chromosome "name" & not the "chr_name"'
-    return {"length" : chromosome.length,
-            "name" : chromosome.chr_name,
+    return {"length" : chromosome['length'],
+            "name" : chromosome['name'],
             "seqDir": 'TODO',
             "start": 0,
-            "end": chromosome.length,
+            "end": chromosome['length'],
+            "num" : chromosome['num'],
             "seqChunkSize" : SEQUENCE_CHUNK_SIZE}
 
     

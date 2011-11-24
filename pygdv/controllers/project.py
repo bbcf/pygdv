@@ -267,6 +267,11 @@ class ProjectController(CrudRestController):
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         tracks = project.tracks
         
+        seq = project.sequence
+        default_tracks = seq.default_tracks
+        tracks += default_tracks
+        
+        
         trackNames = []
         for t in tracks:
             print 'track %s' % t

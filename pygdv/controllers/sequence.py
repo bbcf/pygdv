@@ -107,6 +107,7 @@ class SequenceController(CrudRestController):
     @require(has_permission('admin', msg='Only for admins'))
     @validate(sequence_new_form, error_handler=new)
     def post(self, *args, **kw):
+        user = handler.user.get_user_in_session(request)
         species_id = kw['species']
         assembly_id = kw['assembly']
         # look if the species already exist in GDV, else create it
@@ -131,7 +132,7 @@ class SequenceController(CrudRestController):
             DBSession.add(seq)
             DBSession.flush()
             seq = DBSession.query(Sequence).filter(Sequence.id == assembly_id).first()
-            handler.sequence.add_new_sequence(seq)
+            handler.sequence.add_new_sequence(user.id, seq)
             flash( '''Sequence created: %s'''%( seq ))
         transaction.commit()
         raise redirect("./")
