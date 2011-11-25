@@ -6,6 +6,7 @@ import numpy as np
 from pygdv.lib.util import float_equals
 from pygdv.lib.jbrowse import TAB_WIDTH, zooms
 import track
+from ConfigParser import ParsingError
 
 
 
@@ -155,25 +156,23 @@ def pre_compute_sql_scores(database_path, sha1, output_dir):
     
     #for row in c:
         #chromosome = row[0]
-            print 'getting max'
             max = get_last_feature_stop(t, chromosome)
-            if max is None:
-                return
-            print 'getting features'
-            #features = get_features(t.re, chromosome)
-            print 'generating score array'
-            array = generate_array(t.read(chromosome, ('start', 'end', 'score')), max, 100000)
-            
-            for zoom in zooms:
-                print 'compute : zoom = %s' % zoom
-                gen = gen_tuples(array, max, zoom)
+            if max is not None:
+                print 'getting features'
+                #features = get_features(t.re, chromosome)
+                print 'generating score array'
+                array = generate_array(t.read(chromosome, ('start', 'end', 'score')), max, 100000)
                 
-                print 'prepare output'
-                output = os.path.join(out_path, '%s_%s.db' % (chromosome, zoom))
-                out_connection = sqlite3.connect(output)
-                
-                print 'write'
-                write_tuples(out_connection, gen)
+                for zoom in zooms:
+                    print 'compute : zoom = %s' % zoom
+                    gen = gen_tuples(array, max, zoom)
+                    
+                    print 'prepare output'
+                    output = os.path.join(out_path, '%s_%s.db' % (chromosome, zoom))
+                    out_connection = sqlite3.connect(output)
+                    
+                    print 'write'
+                    write_tuples(out_connection, gen)
     return 1
 
 

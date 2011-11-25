@@ -12,7 +12,7 @@ var _GDV_URL_DB = _GDV_URL + '/database';
 var _GDV_URL_SCORES = _GDV_URL_DB + '/scores'
 var _GDV_PROJECT_VIEW = '/projects/view';
 
-var _POST_URL_NAMES = _GDV_URL+"/gdv_names";
+var _POST_URL_NAMES = _GDV_URL_DB + "/search";
 var _GDV_WORKER_URL = '/workers';
 var _GDV_JOB_URL = _GDV_URL + '/jobs';
 

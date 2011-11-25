@@ -269,14 +269,11 @@ class ProjectController(CrudRestController):
         
         seq = project.sequence
         default_tracks = seq.default_tracks
-        tracks += default_tracks
-        
+        all_tracks = tracks + default_tracks
         
         trackNames = []
-        for t in tracks:
-            print 'track %s' % t
+        for t in all_tracks:
             while t.name in trackNames:
-                print 'name %s' % t.name
                 ind = 0
                 while(t.name[-(ind + 1)].isdigit()):
                     ind += 1
@@ -286,24 +283,29 @@ class ProjectController(CrudRestController):
                 except ValueError:
                     cpt = 0
                 cpt += 1
-                t.name += str(cpt)
-                     
+                
+                tmp_name = t.name
+                if ind > 0:
+                    tmp_name = t.name[:-ind]
+                t.name = tmp_name + str(cpt)
+                
+                
             DBSession.add(t)
             DBSession.flush()
             trackNames.append(t.name)
         
         refSeqs = 'refSeqs = %s' % json.dumps(jb.ref_seqs(project.sequence_id))
         
-        trackInfo = 'trackInfo = %s' % json.dumps(jb.track_info(tracks))
+        trackInfo = 'trackInfo = %s' % json.dumps(jb.track_info(all_tracks))
         parameters = 'var b = new Browser(%s)' % jb.browser_parameters(
-                        constants.DATA_ROOT, constants.STYLE_ROOT, constants.IMAGE_ROOT, ','.join([track.name for track in tracks]))
+                        constants.DATA_ROOT, constants.STYLE_ROOT, constants.IMAGE_ROOT, ','.join([track.name for track in all_tracks]))
         
         style_control = '''function getFeatureStyle(type, div){
         div.style.backgroundColor='#3333D7';div.className='basic';
         switch(type){
         %s
         }};
-        ''' % jb.features_style(tracks)
+        ''' % jb.features_style(all_tracks)
         
         control = 'b.showTracks();initGDV(b, %s)' % project.id
         

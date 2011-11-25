@@ -40,22 +40,41 @@ dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
      */
     sendSearchPOST : function(){
         this.isTyping = false;
-        var tracks="";
-        dojo.forEach(trackInfo, function(entry, i){
-            // add the track to the list if it'a type of FeatureTrack
-            // & it's displayed on the view
-            if(entry.type=="FeatureTrack" && dojo.byId("label_"+entry.label)){
-                var url = entry.url;
-                var matches=String(url).match(/^(\.\.\/)(.*\..*)(\/\{refseq\}\.json)$/i);
-                if(matches && matches[2]){
-                    tracks+=matches[2]+",";
-                }
-            }
-        });
-        if(tracks!=""){
-            this.makePOST(tracks,this.field,this.refSeq);
-        }
+        this.post_it(this.field);
+	// var tracks="";
+        // dojo.forEach(trackInfo, function(entry, i){
+        //     // add the track to the list if it'a type of FeatureTrack
+        //     // & it's displayed on the view
+        //     if(entry.type=="FeatureTrack" && dojo.byId("label_"+entry.label)){
+        //         var url = entry.url;
+        //         var matches=String(url).match(/^(\.\.\/)(.*\..*)(\/\{refseq\}\.json)$/i);
+        //         if(matches && matches[2]){
+        //             tracks+=matches[2]+",";
+        //         }
+        //     }
+        // });
+        //if(tracks!=""){
+        //    this.makePOST(tracks,this.field,this.refSeq);
+        //}
     },
+    post_it : function(field){
+	var ctx = this;
+        var pData="project_id=" + _gdv_info.project_id + "&term=" + field;
+        var xhrArgs = {
+            url: _POST_URL_NAMES,
+            postData: pData,
+            handleAs: "json",
+            load: function(data) {
+		ctx.handleSearchNames(data);
+            },
+            error: function(data){
+		ctx.error(data);
+            }
+        }
+        dojo.xhrPost(xhrArgs);
+    },
+    
+
     /**
      * Build the POST query & send it
      * @param{tracks} the databases to search in
@@ -90,7 +109,8 @@ dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
      * @param{data} the result of the connection
      */
     handleSearchNames : function(data){
-        var suggest_field = dojo.byId("suggest_field");
+        console.log(data);
+	var suggest_field = dojo.byId("suggest_field");
         suggest_field.style.display="inline";
         suggest_field.innerHTML="";
         var closeSuggest=document.createElement("a");
@@ -102,18 +122,13 @@ dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
         });
         suggest_field.appendChild(closeSuggest);
         var hasResult = false;
-        for(track in data){//iterate throught tracks
-            //console.log("TRACK :");
-            //console.log(track);
-            var chrs = data[track];
-            for(chr_ in chrs){//iterate throught chromosomes
-		//console.log("CHROMOSOME");
-		//console.log(chr_);
-		var suggests = chrs[chr_];
+        for(chr in data){//iterate throught chromosomes
+
+		var suggests = data[chr];
 		var hasSuggestions=false;
 		var htmlchr=document.createElement("div");
 		htmlchr.className="chr_livesearch";
-		htmlchr.innerHTML=chr_;
+		htmlchr.innerHTML=chr;
 		var res=document.createElement("div");
 		htmlchr.appendChild(res);
 		for (field in suggests){//iterate throught results
@@ -123,10 +138,10 @@ dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
                     lin.innerHTML=field;
                     var start = parseInt(positions[0]);
                     var end = parseInt(positions[1]);
-                    var interval = end-start;
-                    start=start-interval;
-                    end=end+interval;
-                    var goTo = chr_+":"+start+".."+end;
+                    var interval = end - start;
+                    start = start - interval;
+                    end = end + interval;
+                    var goTo = chr +":" + start + ".." + end;
                     //console.log("goto :"+goTo);
                     lin.goTo = goTo;
                     lin.className="field_livesearch"
@@ -142,14 +157,14 @@ dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
 			dojo.disconnect(this);
                     });
 		}
-		if(hasSuggestions==true){
-                    suggest_field.appendChild(htmlchr);
-		}
-            }
-	    
-	    
+	    if(hasSuggestions==true){
+                suggest_field.appendChild(htmlchr);
+	    }
         }
+	
+	
     },
+    
     /**
      * Function binded to the location box 'onKeyUp'
      */
