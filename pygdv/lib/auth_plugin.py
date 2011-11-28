@@ -123,10 +123,8 @@ class CustomCookiePlugin(object):
         Identify the user
         '''
 
-        if tg.config.get('proxy-ip'):
-            remotes = environ['REMOTE_ADDR'].split(', ')
-            remotes.remove(tg.config.get('proxy-ip'))
-            environ['REMOTE_ADDR'] = remotes[0]
+        remotes = environ['REMOTE_ADDR'].split(', ')
+        environ['REMOTE_ADDR'] = remotes[0]
 
         environ['auth'] = False
         cookies = get_cookies(environ)
