@@ -36,9 +36,7 @@ dojo.declare("ch.epfl.bbcf.gdv.JobHandler",null,{
 	var desc = '';
 	var cur_chr;
 	dojo.forEach(selections, function(entry, index){
-	    console.debug(entry);
 	    cur_chr = entry['chr'];
-	    console.debug(cur_chr);
 	    if (!(cur_chr in sorted)) sorted[cur_chr] = [];
 	    sorted[cur_chr].push({'start' : entry.start, 'end' : entry.end});
 	    desc += '( ' + entry.display() + ' )';
@@ -70,7 +68,6 @@ dojo.declare("ch.epfl.bbcf.gdv.JobHandler",null,{
      * @param{body} - the body to post
      */
     post_to_gdv : function(url, body){
-	//console.log('ptgdv');
 	var ctx = this;
         var xhrArgs = {
             url: _GDV_WORKER_URL + url,

@@ -49,7 +49,7 @@ Minimap.prototype.update = function() {
         this.count = this.bands.length;
 
 	if(this.count === 0){
-	    console.info('GenRep is telling that this chromosome has no bands.');
+	    console.info('GenRep is telling there is no bands on this chromosome.');
 	};
         dojo.byId('overview').style.backgroundImage = "";
         this.draw();

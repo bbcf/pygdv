@@ -13,10 +13,10 @@ var _GDV_URL_SCORES = _GDV_URL_DB + '/scores'
 var _GDV_PROJECT_VIEW = '/projects/view';
 
 var _POST_URL_NAMES = _GDV_URL_DB + "/search";
-var _GDV_WORKER_URL = '/workers';
+var _GDV_WORKER_URL = _GDV_URL + '/workers';
 var _GDV_JOB_URL = _GDV_URL + '/jobs';
 
-var _GDV_FORM_URL = '/forms';
+var _GDV_FORM_URL = _GDV_URL + '/forms';
 
 var _GDV_JOB_STATUS_WAIT = 8000;
 var _gdvls;//the live search
