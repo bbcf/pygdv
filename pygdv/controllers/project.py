@@ -298,7 +298,7 @@ class ProjectController(CrudRestController):
         
         trackInfo = 'trackInfo = %s' % json.dumps(jb.track_info(all_tracks))
         parameters = 'var b = new Browser(%s)' % jb.browser_parameters(
-                        constants.DATA_ROOT, constants.STYLE_ROOT, constants.IMAGE_ROOT, ','.join([track.name for track in all_tracks]))
+                        constants.data_root(), constants.style_root(), constants.image_root(), ','.join([track.name for track in all_tracks]))
         
         style_control = '''function getFeatureStyle(type, div){
         div.style.backgroundColor='#3333D7';div.className='basic';
