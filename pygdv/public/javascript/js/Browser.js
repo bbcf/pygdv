@@ -579,7 +579,6 @@ Browser.prototype.navigateTo = function(loc,tag) {
  * information dictionaries
  */
 Browser.prototype.showTracks = function(trackNameList) {
-    console.debug(trackNameList);
     var brwsr = this;
     if (!this.isInitialized) {
         this.deferredFunctions.push(function() {brwsr.showTracks(trackNameList);});

@@ -68,6 +68,7 @@ dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
 		ctx.handleSearchNames(data);
             },
             error: function(data){
+		ctx.error('GeneNames');
 		ctx.error(data);
             }
         }

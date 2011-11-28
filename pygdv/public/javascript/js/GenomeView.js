@@ -467,7 +467,7 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
     // Create a minimap object
     var minimap = new Minimap(view);
     view.minimap = minimap;
-    view.minimap.update()
+    minimap.update()
 
     // Undocumented
     GDV_POST_FETCHER.send();

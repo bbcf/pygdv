@@ -28,7 +28,7 @@ function Minimap(gv) {
     this.padding = 4;
     // Store the overview element
     this.overview = dojo.byId("overview");
-    this.height = this.overview.clientHeight - 2*this.padding;
+    this.height = this.overview.clientHeight - 2 * this.padding;
     // Make a raphael graphics object
     this.raph = Raphael("overview", "100%", "100%");
     // Redraw when the window is resized
@@ -45,8 +45,12 @@ Minimap.prototype.update = function() {
     this.chr_length = this.gv.ref['length'];
     // Get the cytosomal bands
     callback = dojo.hitch(this, function(bands) {
-        this.bands = bands;
+       	this.bands = bands;
         this.count = this.bands.length;
+
+	if(this.count === 0){
+	    console.info('GenRep is telling that this chromosome has no bands.');
+	};
         dojo.byId('overview').style.backgroundImage = "";
         this.draw();
     });
@@ -76,7 +80,7 @@ Minimap.prototype.draw = function() {
     this.width = this.overview.clientWidth - 2;
     // Check that we have bands
     if (this.count === 0) {
-        r = this.raph.rect(2, this.padding, this.width-2, this.height, 9);
+        r = this.raph.rect(2, this.padding, this.width - 2, this.height, 9);
         r.attr({fill: '90-#999:30-#ccc'});
         return;
     }

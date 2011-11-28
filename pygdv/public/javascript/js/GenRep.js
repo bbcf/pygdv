@@ -18,14 +18,19 @@ function GenRep(gv) {
 */
 GenRep.prototype.get = function(fn, path, content) {
     if (!fn) {fn = function(data) {console.log(data);};}
+    var ctx = this;
     dojo.io.script.get({
                 url: this.url + path,
                 jsonp: "callback",
                 content: content,
                 load: fn,
-                error: fn
+                error: ctx.error
     });
     return this.url + path;
+};
+
+GenRep.prototype.error = function(data){
+    console.error(data);
 };
 
 /**
