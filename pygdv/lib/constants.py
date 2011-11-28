@@ -33,9 +33,9 @@ def gfeatminer_url():
     return url('/data/gfeatminer')
 
 # URLS TO PUT IN JSON
-DATA_ROOT = '/data/jbrowse/'
-STYLE_ROOT = '/css/'
-IMAGE_ROOT = '/img/'
+DATA_ROOT = url('/data/jbrowse/')
+STYLE_ROOT = url('/css/')
+IMAGE_ROOT = url('/img/')
 
 track_data = 'trackData.json'
 

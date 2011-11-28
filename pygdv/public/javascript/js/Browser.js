@@ -29,7 +29,7 @@ var Browser = function(params) {
     // Copy params variables
     var refSeqs   = params.refSeqs;
     var trackData = params.trackData;
-
+    
     // Two different roots for data and for img/css files
     if ("dataRoot" in params)  {this.dataRoot  = params.dataRoot;}
     else                       {this.dataRoot  = "";}
