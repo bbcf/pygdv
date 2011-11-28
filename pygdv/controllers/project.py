@@ -63,7 +63,7 @@ class ProjectController(CrudRestController):
         shared_projects = [util.to_datagrid(project_with_right, sp, "Shared projects", len(sp)>0)]
         #TODO check with permissions
         
-        return dict(page='projects', model='project', form_title="new project", user_projects=user_projects, shared_projects=shared_projects, value=kw)
+        return dict(page='projects', model='project',form_title="new project", user_projects=user_projects, shared_projects=shared_projects, value=kw)
     
 
 

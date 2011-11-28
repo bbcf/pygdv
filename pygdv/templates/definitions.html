@@ -49,12 +49,12 @@
 	  
 	<span py:when="True">
 	  <h1><span py:replace="item.grid_title"/></h1>
-	  <a href='/${model}s/new' class="add_link">New $model</a>
+	  <a href="/${tg.url(model)}s/new" class="add_link">New $model</a>
 	  <div py:content="item.grid(item.grid_data)"></div>
 	</span>
 	
 	<span py:when="False">
-	  <a href='/${model}s/new' class="add_link">New $model</a>
+	  <a href="/${tg.url(model)}s/new" class="add_link">New $model</a>
 	  <h1>No ${item.grid_title}</h1>
 	</span>
 	
