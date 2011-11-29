@@ -6,7 +6,7 @@ from tg import expose, flash, require, request
 from pygdv.lib.base import BaseController
 from pygdv.model import DBSession
 from repoze.what.predicates import has_permission
-
+from tg.controllers import redirect
 
 
 from pygdv.controllers import ErrorController, LoginController, GroupController
@@ -71,7 +71,7 @@ class RootController(BaseController):
     tracks = TrackController(DBSession)
     projects = ProjectController(DBSession)
     circles = CircleController(DBSession)
-    jobs = JobController()
+    jobs = JobController(DBSession)
     
     # tasks controller
     workers = WorkerController()
@@ -118,11 +118,16 @@ class RootController(BaseController):
 
     @expose()
     def test(self, **kw):
-        import tg
-        admins = tg.config.get('admin.mail')
-        print admins
-        
+        print kw
         return dict(kw)
     
+    def pilou(self):
+        if request.environ['REQUEST_CLASSIFIER'] == 'command_line':
+            print 'yooo'
+            return {'koopa' : 'troopa'}
+        flash('yoooooo')
+        raise redirect('./')
     
-    
+    @expose('json')
+    def koopa(self, **kw):
+        return self.pilou()

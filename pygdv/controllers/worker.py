@@ -45,12 +45,12 @@ class WorkerController(BaseController):
             t.datatype = constants.FEATURES
             t.assembly = project.sequence.name
             
-        rev = handler.track.create_track(user.id, project.sequence, f=path, trackname='%s %s' 
+        task_id, track_id = handler.track.create_track(user.id, project.sequence, f=path, trackname='%s %s' 
                                          % (job_name, job_description), project=project)
-        if rev  == constants.NOT_SUPPORTED_DATATYPE :
+        if task_id  == constants.NOT_SUPPORTED_DATATYPE :
             return {'error' : "not supported datatype" % project_id}
         
-        job_id = handler.job.new_sel(user.id, project.id, job_description, job_name, task_id=rev)
+        job_id = handler.job.new_sel(user.id, project.id, job_description, job_name, task_id=task_id)
         return {'job_id' : job_id,
                 'job_name' : job_name,
                 'job_description' : job_description,

@@ -15,6 +15,7 @@ import track
 from celery.task import task, chord, subtask, TaskSet
 from pygdv.lib.constants import json_directory, track_directory
 
+
 def create_track(user_id, sequence, trackname=None, f=None, project=None, session=None, admin=False):
     if session is None:
         session = DBSession
@@ -27,6 +28,7 @@ def create_track(user_id, sequence, trackname=None, f=None, project=None, sessio
     @param trackname : name to give to the track
     @param file : the file name
     @param project : if given, the track created has to be added to the project 
+    @return : task_id, track_id    
     '''
     if f is not None:
         _input = create_input(f,trackname, sequence.name, session)
@@ -63,7 +65,7 @@ def create_track(user_id, sequence, trackname=None, f=None, project=None, sessio
        
         session.flush()
         
-        return _input.task_id
+        return _input.task_id, track.id
     
     
     

@@ -86,5 +86,6 @@ formats_export = ('tsv', 'sql', 'bed')
 job_output_reload = 'RELOAD'
 job_output_image = 'IMAGE'
 
-
-
+REQUEST_TYPE = 'REQUEST_CLASSIFIER'
+REQUEST_TYPE_COMMAND_LINE = 'command_line'
+REQUEST_TYPE_BROWSER = 'browser'

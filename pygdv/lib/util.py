@@ -3,7 +3,7 @@ from pkg_resources import resource_filename
 from tg import app_globals as gl
 import tempfile
 import urllib2
-import shutil
+import shutil, os
 import hashlib
 from tw.forms.fields import TextArea
 
@@ -54,7 +54,8 @@ def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, **k
     @param file_upload : if the file is uploaded from a FileUpload HTML field.
     @param url : if the file is uploaded from an url
     @param urls : a list of urls separated by whitespaces. 
-    @param fsys : if the file is on the same file system
+    @param fsys : if the file is on the same file system, a filesystem path
+    @param fsys_list =  a list of fsys separated by whitespaces. 
     @return a list of tuples : (filename, tmp_file).
     '''
     files = []  
@@ -74,15 +75,17 @@ def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, **k
         files.append(_download_from_url(url))
     
     if fsys is not None:
+        filename = os.path.basename(fsys)
         tmp_file = tempfile.NamedTemporaryFile(suffix=filename, delete=False)
-        shutil.copyfile(fsys, tmp_file)
-        files.append((fsys.split('/')[-1], tmp_file))
+        shutil.copyfile(fsys, tmp_file.name)
+        files.append((filename, tmp_file))
     
     if fsys_list is not None: 
-        for f in fsys_list :
+        for f in fsys_list.split() :
+            filename = os.path.basename(f)
             tmp_file = tempfile.NamedTemporaryFile(suffix=filename, delete=False)
-            shutil.copyfile(f, tmp_file)
-            files.append((f.split('/')[-1], tmp_file))
+            shutil.copyfile(f, tmp_file.name)
+            files.append((filename, tmp_file))
     return files
         
 def _download_from_url(url):
@@ -166,5 +169,10 @@ def order_data(ordering, data):
         word = tmp[1]
         od[sign].append(word)
     data.order_by(asc(od['+']), desc(od['-']))
+
+
+
+
+
 
 

@@ -6,24 +6,25 @@ from tgext.crud.decorators import registered_validate
 
 from repoze.what.predicates import not_anonymous, has_any_permission
 
-from tg import expose, flash, require, request, tmpl_context, validate
+from tg import expose, flash, require, request, tmpl_context, validate, request
 from tg import app_globals as gl
 from tg.controllers import redirect
 from tg.decorators import paginate,with_trailing_slash
 
-from pygdv.model import DBSession, Track, Input, TrackParameters, Sequence
+from pygdv.model import DBSession, Track, Input, TrackParameters, Sequence, Task
 from pygdv.widgets.track import track_table, track_export, track_table_filler, track_new_form, track_edit_filler, track_edit_form, track_grid
 from pygdv import handler
 from pygdv.lib import util, constants
 import os
 import transaction
-from pygdv.lib import checker
+from pygdv.lib import checker, reply
+
 
 __all__ = ['TrackController']
 
 
 class TrackController(CrudRestController):
-    allow_only = has_any_permission(gl.perm_user, gl.perm_admin)
+    allow_only = has_any_permission(constants.perm_user, constants.perm_admin)
     model = Track
     table = track_table
     table_filler = track_table_filler
@@ -57,27 +58,37 @@ class TrackController(CrudRestController):
         tmpl_context.widget = track_new_form
         return dict(page='tracks', value=kw, title='new Track')
     
-    @expose()
-    @validate(track_new_form, error_handler=new)
-    def post(self, *args, **kw):
+
+    @expose('json')
+    def create(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
         files = util.upload(**kw)
-        print kw
-        print files
         
-        if files is not None:
-            for filename, f in files:
-                if 'assembly' in kw:
-                    sequence = DBSession.query(Sequence).filter(Sequence.id == kw['assembly']).first()
-                    ret = handler.track.create_track(user.id, sequence, f=f.name, trackname=filename)
-                    if ret == constants.NOT_SUPPORTED_DATATYPE or ret == constants.NOT_DETERMINED_DATATYPE:
-                        flash(ret)
-                        raise redirect('./') 
-            transaction.commit()
-            flash("Track(s) successfully uploaded.")
-        else :
-            flash("No file to upload.")
-        raise redirect('./') 
+        if files is None:
+            return reply.error(request, 'No file to upload.', './', {})
+            
+        if not 'assembly' in kw:
+            return reply.error(request, 'Missing assembly parameters.', './', {})
+        track_ids = []
+        
+        if not files :
+            return reply.error(request, 'No file to upload.', './', {})
+         
+        for filename, f in files:
+            sequence = DBSession.query(Sequence).filter(Sequence.id == kw['assembly']).first()
+            task_id, track_id = handler.track.create_track(user.id, sequence, f=f.name, trackname=filename)
+            
+            if task_id == constants.NOT_SUPPORTED_DATATYPE or task_id == constants.NOT_DETERMINED_DATATYPE:
+                return reply.error(request, task_id, './', {})
+            track_ids.append(track_id)
+             
+        transaction.commit()
+        return reply.normal(request, 'Track(s) successfully uploaded.', './', {'track_ids' : track_ids})  
+    
+    @expose('json')
+    @validate(track_new_form, error_handler=new)
+    def post(self, *args, **kw):
+        raise self.create(*args, **kw) 
     
 
     @expose('genshi:tgext.crud.templates.post_delete')

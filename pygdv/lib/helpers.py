@@ -57,7 +57,6 @@ def get_share_link(obj_id, param, rights = None):
                                                         
 def get_edit_link(obj_id, rights = None, link=''):
     edit = url('%s%s/edit' % (link, obj_id))
-    print edit
     if rights is not None and constants.right_upload in rights :
         if rights[constants.right_upload]:
             return '''

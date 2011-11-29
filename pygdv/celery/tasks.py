@@ -320,7 +320,7 @@ def gfeatminer_request(user_id, project_id, req, job_description, job_name):
                 session = model.DBSession()
                 project = session.query(model.Project).filter(model.Project.id == project_id).first()
                 from pygdv.handler.track import create_track
-                rev = create_track(user_id, project.sequence, f=path, trackname='%s %s' 
+                task_id, track_id = create_track(user_id, project.sequence, f=path, trackname='%s %s' 
                                              % (job_name, job_description), project=project, session = session)
                 transaction.commit()
                 session.close()
