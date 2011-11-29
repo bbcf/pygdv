@@ -19,7 +19,8 @@ import os, json
 import transaction
 from pygdv.lib import checker
 from pygdv.lib.jbrowse import util as jb
-from pygdv.lib import constants
+from pygdv.lib import constants, reply
+
 from sqlalchemy.sql import and_, or_, not_
 import re
 
@@ -74,16 +75,25 @@ class ProjectController(CrudRestController):
         user = handler.user.get_user_in_session(request)
         #tmpl_context.circles=user.circles
         return dict(page='projects', value=kw, title='new Project')
-
+    
+    @expose('json')
+    def create(self, *args, **kw):
+        user = handler.user.get_user_in_session(request)
+        if not 'name' in kw:
+            return reply.error(request, 'Missing project `name`.', './', {})
+        
+        if not 'assembly' in kw:
+            return reply.error(request, 'Missing project `assembly` identifier.', './', {})
+            
+        project = handler.project.create(kw['name'], kw['assembly'], user.id)
+        return reply.normal(request, 'Project successfully created.', './', {'project' : project})  
+    
     @expose()
     @validate(project_new_form, error_handler=new)
     def post(self, *args, **kw):
-        user = handler.user.get_user_in_session(request)
-        handler.project.create(kw['name'], kw['assembly'], user.id)
-        transaction.commit()
-        raise redirect('./')
+        return self.create(*args, **kw)
 
-
+    
 
     @expose('genshi:tgext.crud.templates.post_delete')
     def post_delete(self, *args, **kw):

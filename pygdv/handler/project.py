@@ -15,7 +15,7 @@ def create(name, sequence_id, user_id, tracks=None, isPublic=False, circles=None
     @param isPublic : if the project is public
     @param circles : a list of circles with 'read' permission
     '''
-    edit(Project(), name, user_id, sequence_id=sequence_id, tracks=tracks, isPublic=isPublic, circles=circles)
+    return edit(Project(), name, user_id, sequence_id=sequence_id, tracks=tracks, isPublic=isPublic, circles=circles)
     
 def edit(project, name, user_id, sequence_id=None, tracks=None, isPublic=False, circles=None):
     '''
@@ -39,9 +39,10 @@ def edit(project, name, user_id, sequence_id=None, tracks=None, isPublic=False, 
     if circles is not None: # adding circle with the read permission by default
         project._circle_right = []
         for circle in circles : _add_read_right(project, circle.id)
-        
+    
     DBSession.add(project)
     DBSession.flush()
+    return project
 
 
 
