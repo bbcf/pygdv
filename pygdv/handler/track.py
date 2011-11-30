@@ -77,22 +77,17 @@ def create_input(f, trackname, sequence_name, session):
     @param file : the file name
     @return : an Input
     '''
-    print 'creating input'
     sha1 = util.get_file_sha1(os.path.abspath(f))
-    print "getting sha1 %s" % sha1
     _input = session.query(Input).filter(Input.sha1 == sha1).first()
     print _input
     if _input is not None: 
         print "file already exist"
     else :
         file_path = os.path.abspath(f)
-        print 'Processing input %s' % file_path
         out_dir = track_directory()
-        print 'to %s : ' % out_dir
         
         
         fo = determine_format(file_path)
-        print 'gessing format : %s' % fo
         
         dispatch = _process_dispatch.get(fo, constants.NOT_SUPPORTED_DATATYPE)
         if  dispatch == constants.NOT_SUPPORTED_DATATYPE:
@@ -100,7 +95,6 @@ def create_input(f, trackname, sequence_name, session):
         
         
         datatype = _formats.get(fo, constants.NOT_SUPPORTED_DATATYPE)
-        print 'gessing datatype %s' % datatype
         
         if datatype == constants.NOT_SUPPORTED_DATATYPE:
             return datatype
@@ -115,16 +109,13 @@ def create_input(f, trackname, sequence_name, session):
         if datatype == constants.NOT_DETERMINED_DATATYPE:
             return datatype     
 
-        print 'dispatch %s' % dispatch
         if trackname is None:
             trackname = f
             
         
         async_result = dispatch(datatype=datatype, assembly_name=sequence_name, path=file_path,
                                 sha1=sha1, name=trackname, tmp_file=f, format=fo)
-        print 'get async_result : %s' % async_result
 
-        print 'building input'
         _input = Input()
         _input.sha1 = sha1
         _input.datatype = datatype
