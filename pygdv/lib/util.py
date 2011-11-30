@@ -63,8 +63,11 @@ def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, fil
     '''
     files = []  
     index = 0
+    print 'file_name'
+    print file_names
     if file_names is not None:
         file_names = file_names.split()
+        print file_names
     if file_upload is not None:
         filename = file_upload.filename
         if file_names:
@@ -95,6 +98,7 @@ def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, fil
         filename = os.path.basename(fsys)
         if file_names:
             filename = file_names[index]
+            print filename
             index += 1
             
         tmp_file = tempfile.NamedTemporaryFile(suffix=filename, delete=False)
