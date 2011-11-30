@@ -18,6 +18,7 @@ from pygdv import handler
 from tg import app_globals as gl
 from pygdv.lib import constants
 from pygdv.widgets import SortableColumn
+
 # TABLE
 class PTable(TableBase):
     __model__ = Project

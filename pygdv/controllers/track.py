@@ -11,7 +11,7 @@ from tg import app_globals as gl
 from tg.controllers import redirect
 from tg.decorators import paginate,with_trailing_slash
 
-from pygdv.model import DBSession, Track, Input, TrackParameters, Sequence, Task
+from pygdv.model import DBSession, Track, Input, TrackParameters, Sequence, Task, Project
 from pygdv.widgets.track import track_table, track_export, track_table_filler, track_new_form, track_edit_filler, track_edit_form, track_grid
 from pygdv import handler
 from pygdv.lib import util, constants
@@ -73,10 +73,15 @@ class TrackController(CrudRestController):
         
         if not files :
             return reply.error(request, 'No file to upload.', './', {})
-         
+        project = None
+        if 'project_id' in kw:
+            project = DBSession.query(Project).filter(Project.id == kw['project_id']).first()
+            if project is None:
+                return reply.error(request, 'Project with id %s not found.' % kw['project_id'], './', {})
+            
         for filename, f in files:
             sequence = DBSession.query(Sequence).filter(Sequence.id == kw['assembly']).first()
-            task_id, track_id = handler.track.create_track(user.id, sequence, f=f.name, trackname=filename)
+            task_id, track_id = handler.track.create_track(user.id, sequence, f=f.name, trackname=filename, project=project)
             
             if task_id == constants.NOT_SUPPORTED_DATATYPE or task_id == constants.NOT_DETERMINED_DATATYPE:
                 return reply.error(request, task_id, './', {})
