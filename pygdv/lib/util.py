@@ -63,6 +63,8 @@ def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, fil
     '''
     files = []  
     index = 0
+    if file_names is not None:
+        file_names = file_names.split()
     if file_upload is not None:
         filename = file_upload.filename
         if file_names:
