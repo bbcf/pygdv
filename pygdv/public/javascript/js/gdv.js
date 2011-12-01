@@ -32,12 +32,13 @@ var _gdv_info = {};
 * @param{project_id} the project id
 * @param{readonly} true if the user cannot launch jobs
 */
-function initGDV(browser, project_id, readonly){
+function initGDV(browser, project_id, gdv_info, readonly){
     dojo.require("dijit.form.CheckBox");
     dojo.require("dijit.form.Textarea");
     dojo.require("dijit.form.Form");
     
     /* init global parameters */
+    _gdv_info = gdv_info;
     _gdv_info.project_id = project_id;
     
     dojo.addOnLoad(function(){

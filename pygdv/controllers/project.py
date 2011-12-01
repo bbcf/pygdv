@@ -8,6 +8,7 @@ from tg import expose, flash, require, error, request, tmpl_context, validate, u
 from tg import app_globals as gl
 from tg.controllers import redirect
 from tg.decorators import paginate, with_trailing_slash,without_trailing_slash
+import tg
 
 from pygdv.model import DBSession, Project, User, RightCircleAssociation, Track, Job
 from pygdv.widgets.project import project_table, project_with_right, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid,circles_available_form, tracks_available_form, project_sharing_grid, project_grid_sharing
@@ -317,7 +318,13 @@ class ProjectController(CrudRestController):
         }};
         ''' % jb.features_style(all_tracks)
         
-        control = 'b.showTracks();initGDV(b, %s)' % project.id
+        
+        
+        info = {}
+        prefix = tg.config.get('prefix')
+        if prefix : info['prefix'] = prefix
+        
+        control = 'b.showTracks();initGDV(b, %s, %s)' % (project.id, info)
         
         jobs = DBSession.query(Job).filter(and_(Job.project_id == project.id, not_(Job.output == constants.job_output_reload))).all()
         

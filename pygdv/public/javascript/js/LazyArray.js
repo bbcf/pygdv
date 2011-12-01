@@ -77,7 +77,7 @@ LazyArray.prototype.range = function(start, end, callback, postFun, param) {
                 // start loading chunk
                 this.toProcess[chunk] = [toProcessInfo];
                 var url = this.urlTemplate.replace(/\{chunk\}/g, chunk);
-                var thisObj = this;
+		var thisObj = this;
                 dojo.xhrGet(
                     {
                         url: url,
