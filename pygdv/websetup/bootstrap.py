@@ -63,9 +63,9 @@ def bootstrap(command, conf, vars):
             u.firstname = 'troopa'
             u.email = 'public@pygdv.ch'
     
-            users.users.add(u)
+            users.users.append(u)
             
-            model.DBSession.append(u)
+            model.DBSession.add(u)
             model.DBSession.add(users)
             
             
