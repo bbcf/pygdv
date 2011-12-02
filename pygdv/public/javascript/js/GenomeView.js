@@ -371,9 +371,9 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
         if ("animation" in view) return;
         var zoomLoc = (event.pageX - dojo.coords(view.elem, true).x) / view.dim.width;
         if (event.shiftKey) {
-        view.zoomOut(event, zoomLoc, 2);
+            view.zoomOut(event, zoomLoc, 2);
         } else {
-        view.zoomIn(event, zoomLoc, 2);
+            view.zoomIn(event, zoomLoc, 2);
         }
         dojo.stopEvent(event);
     });

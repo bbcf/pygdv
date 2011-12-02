@@ -24,8 +24,10 @@ class DatabaseController(BaseController):
         @param chr : the chromosome
         @param zoom : the zoom
         @param imgs : the list of images needed
-        @return a json : {name : {image_nb : {immage_data}}
+        @return a json : {name : {image_nb : {image_data}}. With image_data = [pos, score, pos, score, ...]
         '''
+        
+        
         name = '%s/%s' % (sha1, chr_zoom)
         
         conn = sqlite3.connect(os.path.join(constants.json_directory(), sha1, chr_zoom))
@@ -34,7 +36,7 @@ class DatabaseController(BaseController):
         db_data = {}
         
         for im in imgs.split(',') :
-            im_data = {}
+            im_data = []
             cur = conn.cursor()
             try :
                 cur.execute('select pos, score from sc where number = ? order by pos asc;', (im,))
@@ -44,12 +46,12 @@ class DatabaseController(BaseController):
             r = False
             for row in cur : 
                 r = True
-                im_data[row[0]]=row[1]
+                im_data += [row [0], row[1]]
             # if no result from previous query, put score from an image before
             if not r :
                 cur.execute('select score from sc where number < ? order by number desc limit 1;', (im,))
                 row = cur.fetchone()
-                im_data[0]=row[0]
+                im_data += [0, row[0]]
                 
             db_data[im] = im_data
             cur.close()

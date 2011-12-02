@@ -237,6 +237,9 @@ class ProjectSharingDataGrid(twf.DataGrid):
     javascript=[sharing_project_js]
     
     
+
+
+    
     
 class RightSharingForm(twf.TableForm):
     submit_text = 'change rights'
@@ -308,7 +311,6 @@ class EditProjectForm2(DojoEditableForm):
         return d
     
        
-
 project_table = PTable(DBSession)
 project_table_filler = PTableFiller(DBSession)
 project_new_form = NewProjectFrom()

@@ -11,7 +11,7 @@ from tg.decorators import paginate, with_trailing_slash,without_trailing_slash
 import tg
 
 from pygdv.model import DBSession, Project, User, RightCircleAssociation, Track, Job
-from pygdv.widgets.project import project_table, project_with_right, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid,circles_available_form, tracks_available_form, project_sharing_grid, project_grid_sharing
+from pygdv.widgets.project import project_table,  project_with_right, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid,circles_available_form, tracks_available_form, project_sharing_grid, project_grid_sharing
 from pygdv.widgets.track import track_in_project_grid
 from pygdv.widgets import ModelWithRight
 from pygdv import handler
@@ -29,7 +29,7 @@ __all__ = ['ProjectController']
 
 
 class ProjectController(CrudRestController):
-    allow_only = has_any_permission(gl.perm_user, gl.perm_admin)
+    allow_only = has_any_permission(constants.perm_user, constants.perm_admin)
     model = Project
     table = project_table
     table_filler = project_table_filler
@@ -52,8 +52,6 @@ class ProjectController(CrudRestController):
         # shared projects
         project_with_rights = handler.project.get_shared_projects(user)
         
-        if 'ordercol' in kw:
-            util.order_data(kw['ordercol'], up)
         
         
         sp = []
@@ -184,10 +182,13 @@ class ProjectController(CrudRestController):
 
         # circles with rights
         cr_data = [util.to_datagrid(project_sharing_grid, project.circles_rights, "Sharing", len(project.circles_rights)>0)]
-
+        
+        # public url
+        pub = url('/public/project', {'id' : project_id, 'k' : project.key})
+       
         kw['project_id'] = project_id
         return dict(page='projects', model='Project', info=data,
-                    circle_right_data=cr_data, form_title='Circles availables', value=kw)
+                    circle_right_data=cr_data, form_title='Circles availables', value=kw, public=pub)
 
 
     @expose()

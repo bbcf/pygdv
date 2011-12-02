@@ -29,7 +29,7 @@ class LoginController(BaseController):
         '''
         u = resolve_relative_url(url(), request.environ)
         res = tequila.create_request(u+'/login/auth','tequila.epfl.ch')
-        redirect('https://tequila.epfl.ch/cgi-bin/tequila/requestauth?request'+res)
+        raise redirect('https://tequila.epfl.ch/cgi-bin/tequila/requestauth?request'+res)
         
 
     @expose('pygdv.templates.index')
@@ -40,7 +40,7 @@ class LoginController(BaseController):
         Log user.
         '''
         if not kw.has_key('key'):
-            redirect(came_from)
+            raise redirect(came_from)
 
         # take parameters
         key = kw.get('key')

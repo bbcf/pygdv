@@ -91,7 +91,7 @@ GDVPostBuffer.prototype.post = function(database){
 		    pData+=item.nb+",";
 		} else {
 		    var imd = new ImageDrawer();
-		    imd.drawScores(item,this.getScore(database,item),item.color);
+		    imd.drawScores(item, this.getScore(database, item), item.color);
 		}
 
 	    }
@@ -184,58 +184,13 @@ ImageDrawer.prototype.initDrawer = function(){
 
 
 
-
-
-ImageDrawer.prototype.drawScores_ = function(node,jsonText,color){
-    if(jsonText){
-        if(jsonText!="{}"){
-	    var data = dojo.fromJson(jsonText);
-	    
-	    var _data_=[];
-	    var p = 0;
-	    var c = 0;
-	    for(i in data){
-		while(c<i){
-		    _data_.push(data[p]);
-		    c++;
-		}
-		c++;
-		p=i;
-		_data_.push(data[p]);
-	    }
-	    var start = + new Date();
-	    var chart1 = new Highcharts.Chart({
-		chart: {
-		    renderTo: node,
-		    type: 'bar'
-		},
-		title: {
-		    text: 'Fruit Consumption'
-		},
-		xAxis: {
-		    categories: ['Apples', 'Bananas', 'Oranges']
-		},
-		yAxis: {
-		    title: {
-			text: 'Fruit eaten'
-		    }
-		},
-		series: [{
-		    name: 'test2.wig',
-		    data: _data_
-		}]
-	    });
-	}
-    }
-}
-
 /**
  * Draw the scores on the view
  * @param node - the HTML node to write on
  * @param jsonText - the scores
  * @param color - the color to write in
  */
-ImageDrawer.prototype.drawScores = function(node,jsonText,color){
+ImageDrawer.prototype.drawScores = function(node, jsonText, color){
     /* default color*/
     if(!color){
 	color = "rgb(200,0,0)";
@@ -253,49 +208,75 @@ ImageDrawer.prototype.drawScores = function(node,jsonText,color){
 	    var drawer = this;
 	    if (canvas.getContext) {
 		/* get canvas & clear old if one */
-		var baseWidth = 3;
+		var baseWidth = b.view.pxPerBp;
 		var ctx = canvas.getContext("2d");
 		var cnvs_height = canvas.height;
 		var cnvs_width = canvas.width;
+		//console.log(canvas);
 		ctx.clearRect(0, 0, cnvs_width, cnvs_height);
+		
+		
+		
+
 		/* prepare drawing*/
                 var d = max - min; // distance between min & max
 		var Z = max * cnvs_height / d; // where is the zero line
 		// draw zero line
                 ctx.fillStyle = 'black';
                 ctx.beginPath();
-                ctx.rect(0, Z, cnvs_width, 1);
-                ctx.closePath();
+                //ctx.rect(0, Z, cnvs_width, 1);
+		//ctx.rect(0, 0, cnvs_width, cnvs_height);
+//                ctx.fillText(parseInt(node.nb), 50, 50, 50);
+		ctx.closePath();
                 ctx.fill();
 		
+		var tt = - ( max * cnvs_height / d * inZoom );
+		//console.log(tt);
+		//console.log(data);
 		/* draw scores */
 		ctx.fillStyle = color;
 		ctx.beginPath();
-		var p;
-		for(var i in data){
-		    if(p){
-			var width = (i - p) * baseWidth;
-			var real_score = data[p];
-			var trans_score = - ( real_score * cnvs_height / d * inZoom );
-			//console.log(real_score);
-			//console.log(trans_score);
-			//console.log('z = ' + Z);
-			//console.log('');
-			ctx.rect(p * baseWidth, Z , width, trans_score);
-			//ctx.rect(p * baseWidth,drawer.getScoreForCanvas(min,max,data[p],cnvs_height,inZoom),width,cnvs_height);
+		var prev_pos;
+		var prev_score;
+		var i;
+		var len = data.length;
+		var end_pos = 100;
+		//console.log('width , height, len, data, end_pos ', cnvs_width, cnvs_height, len, data, Math.floor(end_pos));
+		for(i=0; i<=len - 1 ; i+=2){
+		    //console.log('loop ', i)
+		    var pos = data[i];
+		    var conv_pos = cnvs_width * pos / end_pos;
+		    //console.log(conv_pos);
+		    var real_score = data[i+1];
+		    if(prev_pos != null){
+			var width = (conv_pos - prev_pos);
+			var trans_score = - ( prev_score * cnvs_height / d * inZoom );
+			//console.log('xxxx', prev_score, cnvs_height, d, inZoom);
+			ctx.rect(prev_pos, Z , width, trans_score);
+			
+			var t = conv_pos - prev_pos;
+			//console.log(pos + ' => x ' + prev_pos + ' y ' + Z + ' width ' + width + ' height '+trans_score);
+		    };
+		    if (pos!= null){
+			prev_pos = conv_pos;
+			prev_score = real_score;
 		    }
-		    p=i;
 		}
+		
+		if(prev_pos != null){
+		    //console.log('end loop');
+		    var width = (end_pos - prev_pos) * baseWidth;
+		    //console.log('end loop');
+		    var trans_score = - ( prev_score * cnvs_height / d * inZoom );
+		    ctx.rect(prev_pos * baseWidth, Z , width, trans_score);
+		    var t = end_pos - prev_pos;
+		    //console.log('XX prev_pos : ' + prev_pos + ' (' + prev_score + '), width : ' + t);
+
+		}
+		//console.log('fill');
 		ctx.closePath();
                 ctx.fill();
-		ctx.beginPath();
-		ctx.fillStyle = color;
-		var width = (100-p)*baseWidth;
-		var real_score = data[p];
-		var trans_score = - ( real_score * cnvs_height / d * inZoom );
-		ctx.rect(p * baseWidth, Z , width, trans_score);
-		ctx.closePath();
-		ctx.fill();
+		canvas.style.zIndex = 3500;
 	    }
 	}
     }
@@ -332,19 +313,23 @@ ImageDrawer.prototype.getScore = function(db,img){
  * @param images the image list
  */
 ImageDrawer.prototype.getAllScores = function(images){
+    
     var scores = dojo.byId("sqlite_scores");
     var drawer = this;
-    if(images.length>0){
+    if(images.length > 0){
 	var db = images[0].db;
 	var imgs = GDV_POST_FETCHER.getTrack(db);
 	//if an image is not in the fetched one, add it to the list
 	dojo.forEach(images,function(item,i,arr){
-		if(!(drawer.getScore(item.db,item.nb))){
+	    var scores = drawer.getScore(item.db, item.nb);
+	    //console.log(scores);
+		if(!scores){
 		    if(!(imgs.join().indexOf(item.nb)>-1)){
 			imgs.push(item);
 		    }
 		} else {
-		    drawer.drawScores(item,drawer.getScore(db,item.nb),item.color);
+		    //console.log('else');
+		    drawer.drawScores(item, scores,item.color);
 		}
 	    });
 	GDV_POST_FETCHER.addTrack(db,imgs);
@@ -355,11 +340,10 @@ ImageDrawer.prototype.getAllScores = function(images){
  * write scores in the DOM
  *
  */
-ImageDrawer.prototype.putScore = function(images,data){
+ImageDrawer.prototype.putScore = function(images, data){
     var f = dojo.byId("sqlite_scores");
     
     for(db in data){
-	
 	var img_data = data[db];
 	
 	for(img in img_data){
@@ -374,10 +358,10 @@ ImageDrawer.prototype.putScore = function(images,data){
 	    }
 	}
     }
-
     for(i=0;i<images.length;i++){
 	var img = images[i];
-	this.drawScores(img,this.getScore(img.db,img.nb),img.color);
+	
+	this.drawScores(img, this.getScore(img.db, img.nb), img.color);
     }
 }
 

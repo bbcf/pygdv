@@ -92,33 +92,37 @@ ImageTrack.prototype.getImages = function(zoom, startBase, endBase, inzoom) {
     var result = [];
     var im;
     for (var i = startTile; i <= endTile; i++) {
-    im = this.tileToImage[i];
-
-    if (!im) {
-        im = document.createElement("canvas");
-    im.className="track_scores";
-    im.db = zoom.urlPrefix;
-    im.nb = i+1;
-        im.min = this.min;
-    im.max = this.max;
-
-
-        im.color = this.color;
-    //        im = document.createElement("img");
+	im = this.tileToImage[i];
+	
+	if (!im) {
+            im = document.createElement("canvas");
+	    im.className = "track_scores";
+	    im.db = zoom.urlPrefix;
+	    im.nb = i+1;
+            im.min = this.min;
+	    im.max = this.max;
+	    
+	    
+            im.color = this.color;
+	    //        im = document.createElement("img");
             dojo.connect(im, "onerror", this.imgErrorHandler);
             ////prepend this.baseUrl if zoom.urlPrefix is relative
             //var absUrl = new RegExp("^(([^/]+:)|\/)");
             //im.src = (zoom.urlPrefix.match(absUrl) ? "" : this.baseUrl)
-        //        + zoom.urlPrefix + i + ".png";
+            //        + zoom.urlPrefix + i + ".png";
             ////TODO: need image coord systems that don't start at 0?
-        im.startBase = (i * zoom.basesPerTile); // + this.refSeq.start;
-        im.baseWidth = zoom.basesPerTile;
-        im.tileNum = i;
-        this.tileToImage[i] = im;
-    }
-    im.inzoom=inzoom;
-    result.push(im);
-    }
+            im.startBase = (i * zoom.basesPerTile); // + this.refSeq.start;
+            im.baseWidth = zoom.basesPerTile;
+            im.tileNum = i;
+            this.tileToImage[i] = im;
+	    im.inzoom = inzoom;
+	    
+
+	};
+	im.inzoom = inzoom;
+	result.push(im);
+	
+    };
     return result;
 };
 
@@ -130,9 +134,9 @@ ImageTrack.prototype.fillBlock = function(blockIndex, block,
     var zoom = this.getZoom(scale);
     var blockWidth = rightBase - leftBase;
     if(!this.inzoom){
-    this.inzoom=1;
+	this.inzoom = 1;
     }
-    var images = this.getImages(zoom, leftBase, rightBase,this.inzoom);
+    var images = this.getImages(zoom, leftBase, rightBase, this.inzoom);
     var im;
     //CHANGES (adding image drawer)
     var imd = new ImageDrawer();
@@ -140,19 +144,18 @@ ImageTrack.prototype.fillBlock = function(blockIndex, block,
 
 
     for (var i = 0; i < images.length; i++) {
-    im = images[i];
-    if (!(im.parentNode && im.parentNode.parentNode)) {
+	im = images[i];
+	if (!(im.parentNode && im.parentNode.parentNode)) {
             im.style.position = "absolute";
-	
-        im.style.left = (100 * ((im.startBase - leftBase) / blockWidth)) + "%";
-        im.style.width = '100%';
-//(100 * (im.baseWidth / blockWidth)) + "%";
+	    //console.log(im);
+            im.style.left = (100 * ((im.startBase - leftBase) / blockWidth)) + "%";
+            im.style.width = (100 * (im.baseWidth / blockWidth)) + "%";
             //im.style.top = "0px";
-            //im.style.height = zoom.height + "px";
+            im.style.height = zoom.height + "px";
             block.appendChild(im);
-    }
-    }
-
+	};
+    };
+    
     this.heightUpdate(zoom.height, blockIndex);
 };
 

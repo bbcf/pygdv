@@ -25,7 +25,15 @@ ${item_info(info)}
 
 
 <h1><div py:replace="form_title">Title</div></h1>
-<div py:replace="tmpl_context.widget(value=value)">Input Form</div>
+<span py:replace="tmpl_context.widget(value=value)">Input Form</span>
+
+<span><p>This is a public link to your project : <a href='$public'
+> link</a></p>
+  <p> It will be possible to disable it in the future.
+  </p>
+
+</span>
+
 
 
 ${item_list_without_link(circle_right_data)}

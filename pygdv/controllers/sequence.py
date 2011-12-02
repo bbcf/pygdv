@@ -12,7 +12,7 @@ from tg.decorators import paginate,with_trailing_slash, without_trailing_slash
 from pygdv.model import DBSession, Sequence, Species
 from pygdv.widgets.sequence import sequence_table, sequence_table_filler, sequence_new_form, sequence_edit_filler, sequence_edit_form
 from pygdv import handler
-from pygdv.lib import util
+from pygdv.lib import util, constants
 
 import transaction
 
@@ -20,7 +20,7 @@ __all__ = ['SequenceController']
 
 
 class SequenceController(CrudRestController):
-    allow_only = has_any_permission(gl.perm_user, gl.perm_admin)
+    allow_only = has_any_permission(constants.perm_admin, constants.perm_user)
     model = Sequence
     table = sequence_table
     table_filler = sequence_table_filler
@@ -54,49 +54,6 @@ class SequenceController(CrudRestController):
     
     
     
-    
-    
-#    
-#    @with_trailing_slash
-#    @expose('pygdv.templates.list')
-#    @expose('json')
-#    #@paginate('items', items_per_page=10)
-#    def get_all(self, *args, **kw):
-#        user = handler.user.get_user_in_session(request)
-#        data = [util.to_datagrid(sequence_grid, user.sequences, "Sequence list", len(user.sequences)>0)]
-#        return dict(page='sequence', model='sequence', form_title="new sequence",items=data,value=kw)
-#    
-#    
-#    
-#    @require(not_anonymous())
-#    @expose('pygdv.templates.form')
-#    def new(self, *args, **kw):
-#        tmpl_context.widget = sequence_new_form
-#        return dict(page='sequences', value=kw, title='new Track')
-#    
-#    
-#
-#    @expose('genshi:tgext.crud.templates.post_delete')
-#    def post_delete(self, *args, **kw):
-#        user = handler.user.get_user_in_session(request)
-#        id = args[0]
-#        for sequence in user.sequences :
-#            if int(id) == sequence.id :
-#                return CrudRestController.post_delete(self, *args, **kw)
-#        flash("You haven't the right to delete any sequences which is not yours")
-#        raise redirect('./')
-#    
-#    
-#    
-#    @expose('tgext.crud.templates.edit')
-#    def edit(self, *args, **kw):
-#        flash("You haven't the right to edit any sequences")
-#        raise redirect('./')
-#    
-#    
-#    
-#  
-#  
     @without_trailing_slash
     @require(has_permission('admin', msg='Only for admins'))
     @expose('tgext.crud.templates.new')
