@@ -65,8 +65,8 @@ def bootstrap(command, conf, vars):
     
             users.users.add(u)
             
-            model.DBSession.add(u)
-            model.DBSession.append(users)
+            model.DBSession.append(u)
+            model.DBSession.add(users)
             
             
             transaction.commit()
