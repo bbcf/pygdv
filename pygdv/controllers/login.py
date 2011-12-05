@@ -54,6 +54,8 @@ class LoginController(BaseController):
         principal = tequila.validate_key(key,'tequila.epfl.ch')
         if principal is None:
             raise redirect('/login')
+        print '------------'
+        print principal
         tmp_user = self.build_user(principal)
         mail = tmp_user.email
         # log or create him
@@ -83,6 +85,7 @@ class LoginController(BaseController):
             #transaction.commit()
         else :
             flash( '''Welcome back: %s'''%( user, ), 'notice')
+            self.check_circles_with_user(user, principal)
         
         # look if an user is admin or not
         admins = tg.config.get('admin.mails')
@@ -150,8 +153,8 @@ class LoginController(BaseController):
         Must use the ``fake user``
         '''
         hash = dict(item.split('=') for item in principal.split('\n') if len(item.split('='))>1)
-        if(hash.has_key('group')):
-            group_list = hash.get('group').split(',')
+        if(hash.has_key('allunits')):
+            group_list = hash.get('allunits').split(',')
             for group_name in group_list:
                 circle = handler.circle.get_tequila_circle(group_name)
                 if circle is None:
@@ -160,7 +163,21 @@ class LoginController(BaseController):
                 DBSession.flush()
                     
                     
-                    
+    def check_circles_with_user(self, user, principal):
+        '''
+        Check if the groups that are in tequila and add the user to it.
+        This method is here because at first, circles was not created with `allunits` parameters but with `groups`
+        one. So users that are logged already must be re-added to the right groups
+        '''
+        hash = dict(item.split('=') for item in principal.split('\n') if len(item.split('='))>1)
+        if(hash.has_key('allunits')):
+            group_list = hash.get('allunits').split(',')
+            for group_name in group_list:
+                circle = handler.circle.get_tequila_circle(group_name)
+                if circle is None:
+                    circle = handler.circle.create_admin(group_name)
+                circle.users.append(user)
+                DBSession.flush()
                     
                     
                     

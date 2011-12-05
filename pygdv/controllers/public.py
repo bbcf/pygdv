@@ -77,7 +77,7 @@ class PublicController(BaseController):
         prefix = tg.config.get('prefix')
         if prefix : info['prefix'] = prefix
         
-        control = 'b.showTracks();initGDV(b, %s, %s)' % (project.id, info)
+        control = 'b.showTracks();initGDV(b, %s, %s);' % (project.id, info)
         
         if 'loc' in kw:
             control += 'b.navigateTo("%s");' % kw['loc']
