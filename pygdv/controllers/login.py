@@ -164,6 +164,7 @@ class LoginController(BaseController):
                     
                     
     def check_circles_with_user(self, user, principal):
+        
         '''
         Check if the groups that are in tequila and add the user to it.
         This method is here because at first, circles was not created with `allunits` parameters but with `groups`

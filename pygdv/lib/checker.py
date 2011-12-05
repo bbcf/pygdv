@@ -1,4 +1,4 @@
-from pygdv.model import DBSession, Project, User, Track, Circle, Right
+from pygdv.model import DBSession, Project, User, Track, Circle, Right, Group
 from pygdv.lib import constants
 from sqlalchemy.sql import and_, or_
 
@@ -26,7 +26,12 @@ def user_own_circle(user_id, circle_id):
     Look if the user own the circle.
     '''
     circle = DBSession.query(Circle).filter(Circle.id == circle_id).first()
-    return circle.creator_id == user_id
+    if circle.creator_id == user_id: return True
+    if circle.admin :
+        user = DBSession.query(User).filter(User.id == user_id).first()
+        admin_group = DBSession.query(Group).filter(Group.name == constants.group_admins).first()
+        return user in admin_group.users
+    return False
 
 def check_permission_project(user_id, project_id, right_id):
     if not user_own_project(user_id, project_id):
