@@ -11,7 +11,7 @@ var _linkPanel;
 function showLinkPanel(node,nrAssemblyId,name,start,end){
     if(!_linkPanel){
     var url=_GDV_URL+"/link";
-    var pData="gene_name="+name+"&nr_assembly_id="+nrAssemblyId;
+    var pData="gene_name=" + name + "&nr_assembly_id="+nrAssemblyId;
     var xhrArgs = {
             url: url,
         postData: pData,
@@ -83,7 +83,7 @@ function LinksMaker(){};
  * @return a link to ensembl
  */
 LinksMaker.prototype.getEnsembl = function (species,name) {
-    return this.buildLink("http://www.ensembl.org/"+species+"/Location/View?g="+name,"Ensembl");
+    return this.buildLink("http://www.ensembl.org/" + species + "/Location/View?g=" + name,"Ensembl");
 };
 
 LinksMaker.prototype.hover = function (node,over,out) {

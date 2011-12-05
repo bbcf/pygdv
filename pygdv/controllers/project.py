@@ -324,6 +324,7 @@ class ProjectController(CrudRestController):
         info = {}
         prefix = tg.config.get('prefix')
         if prefix : info['prefix'] = prefix
+        info['sequence_id'] = project.sequence_id
         
         control = 'b.showTracks();initGDV(b, %s, %s);' % (project.id, info)
         

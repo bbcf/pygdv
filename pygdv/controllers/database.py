@@ -65,7 +65,7 @@ class DatabaseController(BaseController):
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         sequence = project.sequence
         t = sequence.default_tracks[0]
-        result = {}
+        chrs = {}
         with track.load(t.path, 'sql', readonly=True) as t:
             for row in t.search({'gene_name' : term}):
                 chr = row[0]
@@ -73,8 +73,23 @@ class DatabaseController(BaseController):
                 start = row[3]
                 stop = row[4]
                 
-                if chr not in result:
-                    result[chr] = [] 
-                result[chr].append([name, start, stop])
+                if chr not in chrs:
+                    chrs[chr] = {}
+                    
+                names = chrs[chr]
+                if name in names:
+                    old = names[name]
+                    start = min(old[0], start)
+                    stop = max(old[1], stop)
+                names[name] = [start, stop]  
+                
+        
+        #result[chr].append([name, start, stop])
+        result = {}
+        for chr, names in chrs.iteritems() :
+            result[chr] = []
+            for k, v in names.iteritems():
+                result[chr].append([k, v[0], v[1]])
+        
         return result
     

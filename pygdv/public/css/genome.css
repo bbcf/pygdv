@@ -874,3 +874,12 @@ width: 3em;
     display:inline-block;
     margin:1px;
 }
+
+#suggest_field {
+    background-color: LightGrey;
+    padding: 0.7em;
+    position: fixed;
+    right: 0;
+    text-align: center;
+    top: 2.5em;
+}

@@ -41,21 +41,6 @@ dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
     sendSearchPOST : function(){
         this.isTyping = false;
         this.post_it(this.field);
-	// var tracks="";
-        // dojo.forEach(trackInfo, function(entry, i){
-        //     // add the track to the list if it'a type of FeatureTrack
-        //     // & it's displayed on the view
-        //     if(entry.type=="FeatureTrack" && dojo.byId("label_"+entry.label)){
-        //         var url = entry.url;
-        //         var matches=String(url).match(/^(\.\.\/)(.*\..*)(\/\{refseq\}\.json)$/i);
-        //         if(matches && matches[2]){
-        //             tracks+=matches[2]+",";
-        //         }
-        //     }
-        // });
-        //if(tracks!=""){
-        //    this.makePOST(tracks,this.field,this.refSeq);
-        //}
     },
     post_it : function(field){
 	var ctx = this;
@@ -84,7 +69,7 @@ dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
      */
     makePOST : function(tracks,name,chr){
         var _this = this;
-        var pData="id=search_name&tracks="+tracks+"&name="+name+"&chr="+chr;
+        var pData="id=search_name&tracks=" + tracks + "&name=" + name + "&chr=" + chr;
         var xhrArgs = {
             url: _POST_URL_NAMES,
             postData: pData,
@@ -124,41 +109,49 @@ dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
         suggest_field.appendChild(closeSuggest);
         var hasResult = false;
         for(chr in data){//iterate throught chromosomes
+	    
+	    var suggests = data[chr];
+	    var hasSuggestions = false;
+	    var htmlchr=document.createElement("div");
+	    htmlchr.className="chr_livesearch";
+	    htmlchr.innerHTML=chr;
+	    var res=document.createElement("div");
+	    htmlchr.appendChild(res);
+	    var limit = 4;
+	    var len = suggests.length;
+	    if (len < limit) limit = len; 
+	    var i = 0;
+	    
+	    for (i; i<limit; i++){//iterate throught results
+                hasSuggestions = true;
+                var field = suggests[i];
+		var name = field[0];
+		var start = field[1];
+		var end = field[2];
 
-		var suggests = data[chr];
-		var hasSuggestions=false;
-		var htmlchr=document.createElement("div");
-		htmlchr.className="chr_livesearch";
-		htmlchr.innerHTML=chr;
-		var res=document.createElement("div");
-		htmlchr.appendChild(res);
-		for (field in suggests){//iterate throught results
-                    hasSuggestions=true;
-                    var positions = suggests[field];
-                    var lin = document.createElement("a");
-                    lin.innerHTML=field;
-                    var start = parseInt(positions[0]);
-                    var end = parseInt(positions[1]);
-                    var interval = end - start;
-                    start = start - interval;
-                    end = end + interval;
-                    var goTo = chr +":" + start + ".." + end;
-                    //console.log("goto :"+goTo);
-                    lin.goTo = goTo;
-                    lin.className="field_livesearch"
-                    res.appendChild(lin);
-                    dojo.connect(lin, "onclick",lin, function(event) {
-			//console.log("click ");
-			//console.log(this.goTo);
-			gb=dojo.byId("GenomeBrowser").genomeBrowser;
-			gb.navigateTo(this.goTo,false);
-			suggest_field.style.display="none";
-			dojo.byId("location").value = this.goTo;
-			dojo.stopEvent(event);
-			dojo.disconnect(this);
-                    });
-		}
-	    if(hasSuggestions==true){
+                var lin = document.createElement("a");
+                lin.innerHTML = name;
+                
+		//calculate an interval
+		var interval = end - start;
+		start = start - interval;
+		end = end + interval;
+		
+                var goTo = chr +":" + start + ".." + end;
+                lin.goTo = goTo;
+                lin.className="field_livesearch"
+                res.appendChild(lin);
+                dojo.connect(lin, "onclick",lin, function(event) {
+		    gb = dojo.byId("GenomeBrowser").genomeBrowser;
+		    gb.navigateTo(this.goTo, false);
+		    suggest_field.style.display="none";
+		    dojo.byId("location").value = this.goTo;
+		    dojo.stopEvent(event);
+		    dojo.disconnect(this);
+                });
+		lin.appendChild(document.createElement('BR'));
+	    }
+	    if(hasSuggestions == true){
                 suggest_field.appendChild(htmlchr);
 	    }
         }
