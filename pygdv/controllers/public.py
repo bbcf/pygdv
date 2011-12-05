@@ -22,7 +22,7 @@ class PublicController(BaseController):
     
     
     @expose('pygdv.templates.view')
-    def project(self, id, k):
+    def project(self, id, k, **kw):
         project = DBSession.query(Project).filter(and_(Project.id == id, Project.key == k)).first()
         if project is None:
             flash('wrong link', 'error')
@@ -79,6 +79,9 @@ class PublicController(BaseController):
         
         control = 'b.showTracks();initGDV(b, %s, %s)' % (project.id, info)
         
+        if 'loc' in kw:
+            control += 'b.navigateTo("%s");' % kw['loc']
+            
         jobs = DBSession.query(Job).filter(and_(Job.project_id == project.id, not_(Job.output == constants.job_output_reload))).all()
         
         jobs_output = [{'job_id' : job.id, 

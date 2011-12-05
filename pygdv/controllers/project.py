@@ -325,7 +325,12 @@ class ProjectController(CrudRestController):
         prefix = tg.config.get('prefix')
         if prefix : info['prefix'] = prefix
         
-        control = 'b.showTracks();initGDV(b, %s, %s)' % (project.id, info)
+        control = 'b.showTracks();initGDV(b, %s, %s);' % (project.id, info)
+        
+        
+        if 'loc' in kw:
+            control += 'b.navigateTo("%s");' % kw['loc']
+        
         
         jobs = DBSession.query(Job).filter(and_(Job.project_id == project.id, not_(Job.output == constants.job_output_reload))).all()
         
@@ -337,6 +342,8 @@ class ProjectController(CrudRestController):
                        'error' : job.traceback}
                       for job in jobs
                       ]
+        
+        
         
         return dict(species_name=project.species.name, 
                     nr_assembly_id=project.sequence_id, 
