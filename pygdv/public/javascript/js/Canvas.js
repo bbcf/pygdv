@@ -88,10 +88,11 @@ GDVPostBuffer.prototype.post = function(database){
 	    if(!(_imgs.join().indexOf(nb)>-1)){
 		_imgs.push(nb);
 		if(!(post_buffer.getScore(database,nb))){
-		    pData+=item.nb+",";
+		    pData += item.nb + ",";
 		} else {
-		    var imd = new ImageDrawer();
-		    imd.drawScores(item, this.getScore(database, item), item.color);
+		    //var imd = new ImageDrawer();
+		    item.draw();
+		    //imd.drawScores(item, this.getScore(database, item), item.color);
 		}
 
 	    }
@@ -189,20 +190,25 @@ ImageDrawer.prototype.initDrawer = function(){
  * @param node - the HTML node to write on
  * @param jsonText - the scores
  * @param color - the color to write in
+ * @param min, max, the minimun and maximum values of the scale
  */
-ImageDrawer.prototype.drawScores = function(node, jsonText, color){
+ImageDrawer.prototype.drawScores = function(node, jsonText, color, min, max){
     /* default color*/
     if(!color){
 	color = "rgb(200,0,0)";
     }
+    
+
     
     if(jsonText){
 	if(jsonText!="{}"){
 	    /* there is data */
 	    var data = dojo.fromJson(jsonText);
 	    var canvas = node;
-	    var min = node.min;
-	    var max = node.max;
+	    if(!min & !max){
+		min = node.min - 1;
+		max = node.max
+	    };
 	    var inZoom = node.inzoom;
 	    
 	    var drawer = this;
@@ -276,7 +282,7 @@ ImageDrawer.prototype.drawScores = function(node, jsonText, color){
 		//console.log('fill');
 		ctx.closePath();
                 ctx.fill();
-		canvas.style.zIndex = 3500;
+		canvas.style.zIndex = 50;
 	    }
 	}
     }
@@ -313,7 +319,6 @@ ImageDrawer.prototype.getScore = function(db,img){
  * @param images the image list
  */
 ImageDrawer.prototype.getAllScores = function(images){
-    
     var scores = dojo.byId("sqlite_scores");
     var drawer = this;
     if(images.length > 0){
@@ -328,8 +333,9 @@ ImageDrawer.prototype.getAllScores = function(images){
 			imgs.push(item);
 		    }
 		} else {
+		    item.draw();
 		    //console.log('else');
-		    drawer.drawScores(item, scores,item.color);
+		    //drawer.drawScores(item, scores, item.color);
 		}
 	    });
 	GDV_POST_FETCHER.addTrack(db,imgs);
@@ -342,7 +348,6 @@ ImageDrawer.prototype.getAllScores = function(images){
  */
 ImageDrawer.prototype.putScore = function(images, data){
     var f = dojo.byId("sqlite_scores");
-    
     for(db in data){
 	var img_data = data[db];
 	
@@ -360,8 +365,8 @@ ImageDrawer.prototype.putScore = function(images, data){
     }
     for(i=0;i<images.length;i++){
 	var img = images[i];
-	
-	this.drawScores(img, this.getScore(img.db, img.nb), img.color);
+	img.draw();
+	//this.drawScores(img, this.getScore(img.db, img.nb), img.color);
     }
 }
 
@@ -373,36 +378,87 @@ ImageDrawer.prototype.putScore = function(images, data){
 /**
  * draw the scale next to each quantitative tracks
  */
-function drawScale(canvas){
+function drawScale(canvas, track){
+        
+    
+    
     if (canvas.getContext) {
         var ctx = canvas.getContext("2d");
-        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.clearRect(0 ,0, canvas.width, canvas.height);
 	//draw white rect
-	ctx.fillStyle = "rgba(255,255,255,0.7)";
-	ctx.fillRect(0,0,55,canvas.height);
+	ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+	ctx.fillRect(0, 0, 55, canvas.height);
 	//draw scale
         ctx.fillStyle = "rgb(0,0,0)";
-	ctx.lineWidth = 2;
+	ctx.lineWidth = 10;
         ctx.beginPath();
-        ctx.moveTo(10,0);
-	ctx.lineTo(10,canvas.height);
+        ctx.moveTo(9, 0);
+	ctx.lineTo(9, canvas.height);
 	//grads
-	var c = canvas.height/4;
-	ctx.lineWidth = 1;
-	ctx.moveTo(5,c);
-	ctx.lineTo(15,c);
-	
-	ctx.moveTo(5,3*c);
-	ctx.lineTo(15,3*c);
+	var c = canvas.height / 4;
 	ctx.lineWidth = 2;
-	ctx.moveTo(5,2*c);
-	ctx.lineTo(15,2*c);
+	ctx.moveTo(5, c);
+	ctx.lineTo(100, c);
+	
+	ctx.moveTo(5, 3 * c);
+	ctx.lineTo(100, 3 * c);
+	ctx.lineWidth = 2;
+	ctx.moveTo(5, 2 * c);
+	ctx.lineTo(100, 2 * c);
 	
         ctx.stroke();
-        ctx.font = '20px monospace bold';
-	ctx.fillText(parseInt(canvas.max), 12, 20);
-	ctx.fillText(parseInt(canvas.min), 12, canvas.height-1);
 	ctx.closePath();
-    } 
-    canvas.style.zIndex ="50";
-}
+
+	canvas.style.zIndex ="50";
+
+    };
+    var cont = track.scale_container;
+    
+    var min = track.input_min;
+    var max = track.input_max;
+    
+
+    if(null == min & null == max){
+	min = canvas.min - 1;
+	max = canvas.max;
+    };
+    
+    var input_max = cont.max;
+    var input_min = cont.min;
+    
+    input_max.value = max;
+    input_min.value = min;
+    
+    dojo.connect(input_max, 'dblclick', function(event){
+	dojo.stopEvent(event);
+    });
+    
+    dojo.connect(input_min, 'dblclick', function(event){
+	dojo.stopEvent(event);
+    });
+    
+    
+    dojo.connect(input_max, 'keydown', function(event){
+	if (event.keyCode == dojo.keys.ENTER) {
+	    track.input_max = input_max.value;
+	     track.input_min = input_min.value;
+	     track.redraw();
+	     dojo.stopEvent(event);
+	 };
+	 
+    });
+    dojo.connect(input_min, 'keydown', function(event){
+	if (event.keyCode == dojo.keys.ENTER) {
+	    track.input_max = input_max.value;
+	    track.input_min = input_min.value;
+	    track.redraw();
+	    dojo.stopEvent(event);
+	};
+    });
+    
+    
+
+
+    
+};
+

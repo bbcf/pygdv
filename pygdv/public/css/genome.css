@@ -642,7 +642,7 @@ div.track-label {
     background-color: rgba(200, 200, 200, 0.8);
     font-family: sans-serif;
     font-weight: bold;
-    z-index: 70;
+    z-index: 110;
     border: 1px #2b434c dotted;
     padding: 5px;
     cursor: pointer;
@@ -882,4 +882,12 @@ width: 3em;
     right: 0;
     text-align: center;
     top: 2.5em;
+}
+
+.score_input {
+    z-index: 10000;
+    position: absolute;
+    left: 11px;
+    width: 35px;
+    cursor: text;
 }

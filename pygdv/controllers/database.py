@@ -51,7 +51,8 @@ class DatabaseController(BaseController):
             if not r :
                 cur.execute('select score from sc where number < ? order by number desc limit 1;', (im,))
                 row = cur.fetchone()
-                im_data += [0, row[0]]
+                if row:
+                    im_data += [0, row[0]]
                 
             db_data[im] = im_data
             cur.close()

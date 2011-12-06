@@ -626,6 +626,7 @@ Browser.prototype.visibleTracks = function() {
  * Undocumented
  */
 Browser.prototype.onCoarseMove = function(startbp, endbp) {
+    console.log('onCoarseMove');
     var length = this.view.ref.end - this.view.ref.start;
     var trapLeft = Math.round((((startbp - this.view.ref.start) / length) * this.view.overviewBox.w) + this.view.overviewBox.l);
     var trapRight = Math.round((((endbp - this.view.ref.start) / length) * this.view.overviewBox.w) + this.view.overviewBox.l);
@@ -754,15 +755,16 @@ Browser.prototype.createNavBox = function(params) {
     this.locationBox.id="location";
     this.locationBox.style.cssText = "width: 130px; vertical-align: top;";
     dojo.connect(this.locationBox, "keydown", function(event) {
-            if (event.keyCode == dojo.keys.ENTER) {
-        brwsr.navigateTo(brwsr.locationBox.value);
-
-        brwsr.goButton.disabled = true;
-                dojo.stopEvent(event);
-            } else {
-                brwsr.goButton.disabled = false;
-            }
-        });
+	console.log('key down');
+        if (event.keyCode == dojo.keys.ENTER) {
+            brwsr.navigateTo(brwsr.locationBox.value);
+	    
+            brwsr.goButton.disabled = true;
+            dojo.stopEvent(event);
+        } else {
+            brwsr.goButton.disabled = false;
+        }
+    });
     // //add connection of the locationBox to a suggest search field
     // dojo.connect(this.locationBox, "keyup", function(event) {
     //         var field = brwsr.locationBox.value;
