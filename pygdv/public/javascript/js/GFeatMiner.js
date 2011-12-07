@@ -465,7 +465,8 @@ function initGFM(){
          * error handle
          */
         error : function(data){
-        console.error(data);
+            console.error(data);
+	    
         },
         /**
          * handler for a submitted job
@@ -473,8 +474,7 @@ function initGFM(){
         handleJobSubmitted : function(data){
         console.log(data);
         var job_id= data.jobId;
-        console.log(job_id);
-        //TODO add an ajax loader to the stack of jobs
+            //TODO add an ajax loader to the stack of jobs
         },
 
         /**

@@ -369,7 +369,7 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
 
 		/* launch the new job */
 		_jh.new_gfeatminer_job(jsonform);
-		ctx.destroyForm();
+		//ctx.destroyForm();
 		ctx.jobs();
             }
         });

@@ -3,7 +3,7 @@ from pkg_resources import resource_filename
 from tg import app_globals as gl
 import tempfile
 import urllib2
-import shutil
+import shutil, os
 import hashlib
 from tw.forms.fields import TextArea
 
@@ -48,18 +48,31 @@ def get_unique_tmp_directory():
 
 block_sz = 8192
 
-def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, **kw):
+def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, file_names=None, **kw):
     '''
     Upload the file and make it temporary.
     @param file_upload : if the file is uploaded from a FileUpload HTML field.
     @param url : if the file is uploaded from an url
     @param urls : a list of urls separated by whitespaces. 
-    @param fsys : if the file is on the same file system
+    @param fsys : if the file is on the same file system, a filesystem path
+    @param fsys_list :  a list of fsys separated by whitespaces.
+    @param file_names : a list of file name, in the same order than the files uploaded.
+    If there is differents parameters given, the first file uploaded will be file_upload, 
+    then urls, url, fsys and finally fsys_list
     @return a list of tuples : (filename, tmp_file).
     '''
     files = []  
+    index = 0
+    print 'file_name'
+    print file_names
+    if file_names is not None:
+        file_names = file_names.split()
+        print file_names
     if file_upload is not None:
         filename = file_upload.filename
+        if file_names:
+            filename = file_names[index]
+            index += 1
         file_value = file_upload.value
         tmp_file = tempfile.NamedTemporaryFile(suffix=filename, delete=False)
         tmp_file.write(file_value)
@@ -68,30 +81,49 @@ def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, **k
 
     if urls is not None: 
         for u in urls.split():
-            files.append(_download_from_url(u))
+            filename = None
+            if file_names:
+                filename = file_names[index]
+                index += 1
+            files.append(_download_from_url(u, filename=filename))
     
     if url is not None:
-        files.append(_download_from_url(url))
+        filename = None
+        if file_names:
+            filename = file_names[index]
+            index += 1
+        files.append(_download_from_url(url, filename=filename))
     
     if fsys is not None:
+        filename = os.path.basename(fsys)
+        if file_names:
+            filename = file_names[index]
+            print filename
+            index += 1
+            
         tmp_file = tempfile.NamedTemporaryFile(suffix=filename, delete=False)
-        shutil.copyfile(fsys, tmp_file)
-        files.append((fsys.split('/')[-1], tmp_file))
+        shutil.copyfile(fsys, tmp_file.name)
+        files.append((filename, tmp_file))
     
     if fsys_list is not None: 
-        for f in fsys_list :
+        for f in fsys_list.split() :
+            filename = os.path.basename(f)
+            if file_names:
+                filename = file_names[index]
+                index += 1
             tmp_file = tempfile.NamedTemporaryFile(suffix=filename, delete=False)
-            shutil.copyfile(f, tmp_file)
-            files.append((f.split('/')[-1], tmp_file))
+            shutil.copyfile(f, tmp_file.name)
+            files.append((filename, tmp_file))
     return files
         
-def _download_from_url(url):
+def _download_from_url(url, filename=None):
     '''
     Download a file from an url.
     @param url : the url
     @return a tuple : (filename, tmp_file).
     '''
-    filename = url.split('/')[-1]
+    if filename is None:
+        filename = url.split('/')[-1]
     u = urllib2.urlopen(url)
     
 #    meta = u.info()
@@ -166,5 +198,10 @@ def order_data(ordering, data):
         word = tmp[1]
         od[sign].append(word)
     data.order_by(asc(od['+']), desc(od['-']))
+
+
+
+
+
 
 

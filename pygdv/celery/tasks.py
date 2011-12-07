@@ -4,11 +4,25 @@ import shutil, os, sys, traceback
 from pygdv.lib.jbrowse import jsongen, scores
 from pygdv.lib.constants import json_directory, track_directory
 from celery.result import AsyncResult
+from celery.signals import worker_init
+
 from pygdv.lib import constants
 import track
-import tempfile
-
+import tempfile, transaction
+from pygdv.celery import model
 success = 1
+
+
+
+
+def session_connection(*args, **kw):
+    print 'init of sessions args : %s, kw : %s' %(args, kw)
+    import pygdv.celery.model
+   
+    
+    
+worker_init.connect(session_connection)
+
 
 
 #############################################################################################################
@@ -148,15 +162,17 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, pr
                     for chrom in t:
                         ## TODO
                         t2.write(chrom, t.read(chrom, fields=signal_fields), fields=signal_fields)
+                    t2.datatype = constants.SIGNAL
                     t2.assembly = assembly_name
-
+                    
         elif datatype == constants.FEATURES:
             f = simple_fields
             with track.load(tmp_dst, 'sql', readonly=True) as t:
                 with track.new(dst, 'sql') as t2:
                     for chrom in t:
-                        gen = t.aggregated_read(f)
+                        gen = t.aggregated_read(chrom, f)
                         t2.write(chrom, gen, fields=f + (agg_field,))
+                    t2.datatype = constants.FEATURES
                     t2.assembly = assembly_name
 
 
@@ -165,8 +181,9 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, pr
             with track.load(tmp_dst, 'sql', readonly=True) as t:
                 with track.new(dst, 'sql') as t2:
                     for chrom in t:
-                        gen = t.aggregated_read(f)
+                        gen = t.aggregated_read(chrom, f)
                         t2.write(chrom, gen, fields=f + (agg_field,))
+                    t2.datatype = constants.RELATIONAL
                     t2.assembly = assembly_name
 
         try:
@@ -195,6 +212,9 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, pr
 
 @task()
 def process_database(datatype, assembly_name, path, sha1, name, format):
+    '''
+    Entry point of the sqlite file
+    '''
 
     dispatch = _sql_dispatch.get(datatype, lambda *args, **kw : cannot_process(*args, **kw))
     try :
@@ -283,12 +303,27 @@ _sql_dispatch = {'quantitative' : lambda *args, **kw : _signal(*args, **kw),
 import gMiner
 
 @task()
-def gfeatminer_request(req):
+def gfeatminer_request(user_id, project_id, req, job_description, job_name):
+    '''
+    Launch a gFeatMiner request.
+    '''
     print 'gfeatminer request %s : ' % req
     try :
         
         data = gMiner.run(**req)
         print 'gMiner ended with %s ' % data
+        for path in data:
+            print path
+            print os.path.splitext(path)
+            if os.path.splitext(path)[1] == '.sql':
+                print 'sql'
+                session = model.DBSession()
+                project = session.query(model.Project).filter(model.Project.id == project_id).first()
+                from pygdv.handler.track import create_track
+                task_id, track_id = create_track(user_id, project.sequence, f=path, trackname='%s %s' 
+                                             % (job_name, job_description), project=project, session = session)
+                transaction.commit()
+                session.close()
         
     except Exception as e:
         etype, value, tb = sys.exc_info()

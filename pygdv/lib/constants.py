@@ -1,5 +1,6 @@
 from pkg_resources import resource_filename
 import os
+from tg import url
 
 data_dir = 'pygdv.public.data'
 json_dir = 'jbrowse'
@@ -28,10 +29,18 @@ def track_directory():
 def gfeatminer_directory():
     return os.path.join(resource_filename(data_dir, gfeatminer_dir))
 
+def gfeatminer_url():
+    return url('/data/gfeatminer')
+
 # URLS TO PUT IN JSON
-DATA_ROOT = '/data/jbrowse/'
-STYLE_ROOT = '/css/'
-IMAGE_ROOT = '/img/'
+def data_root():
+    return url('/data/jbrowse/')
+def style_root():
+    return url('/css/')
+def image_root():
+    return url('/img/')
+
+
 
 track_data = 'trackData.json'
 
@@ -77,5 +86,6 @@ formats_export = ('tsv', 'sql', 'bed')
 job_output_reload = 'RELOAD'
 job_output_image = 'IMAGE'
 
-
-
+REQUEST_TYPE = 'REQUEST_CLASSIFIER'
+REQUEST_TYPE_COMMAND_LINE = 'command_line'
+REQUEST_TYPE_BROWSER = 'browser'

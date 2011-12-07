@@ -259,7 +259,7 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
 
     // Add scale list & zoom
     this.trackScales = [];
-    this.trackZooms = [];
+    //this.trackZooms = [];
     // Undocumented
     this.prevCursors = [];
 
@@ -271,10 +271,11 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
                                             else                {e.style.cursor = 'move';}};
     this.setCursorToGrabbing  = function(e) {if (dojo.isSafari) {e.style.cursor = '-webkit-grabbing';}
                                             else                {e.style.cursor = 'move';}};
-    this.setCursorToSelect    = function(e)                     {e.style.cursor = 'crosshair';}
-    this.eventCursorGrab      = function(e) {this.setCursorToGrab(    e.target);}
+    this.setCursorToSelect    = function(e) {e.style.cursor = 'crosshair';}
+    this.eventCursorGrab      = function(e) {this.setCursorToGrab(e.target);}
     this.eventCursorGrabbing  = function(e) {this.setCursorToGrabbing(e.target);}
-    this.eventCursorSelect    = function(e) {this.setCursorToSelect(  e.target);}
+    this.eventCursorSelect    = function(e) {this.setCursorToSelect(e.target);}
+    
     this.setCursorToGrab(this.elem)
 
     // The locationThumb is the currently viewed zone indicator on the minimap
@@ -324,7 +325,7 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
 
     // The function triggered when the user drags the view space
     view.dragMove = function(event) {
-        view.setPosition({
+	view.setPosition({
             x: view.winStartPos.x - (event.clientX - view.dragStartPos.x),
             y: view.winStartPos.y - (event.clientY - view.dragStartPos.y)
         });
@@ -334,10 +335,9 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
 
     // When the mouse button is clicked but not released
     view.mouseDown = function(event) {
-    if(event.target.className=="zplus"||event.target.className=="zmoins"){
-        dojo.stopEvent(event);
-        return;
-    }
+	if(event.target.className == "score_input"){
+            return false;
+	}
         if ("animation" in view) {
             if (view.animation instanceof Zoomer) {
                 dojo.stopEvent(event);
@@ -371,13 +371,12 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
         if ("animation" in view) return;
         var zoomLoc = (event.pageX - dojo.coords(view.elem, true).x) / view.dim.width;
         if (event.shiftKey) {
-        view.zoomOut(event, zoomLoc, 2);
+            view.zoomOut(event, zoomLoc, 2);
         } else {
-        view.zoomIn(event, zoomLoc, 2);
+            view.zoomIn(event, zoomLoc, 2);
         }
         dojo.stopEvent(event);
     });
-
     // Undocumented
     view.afterSlide = function() {
         view.showCoarse();
@@ -467,7 +466,7 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
     // Create a minimap object
     var minimap = new Minimap(view);
     view.minimap = minimap;
-    view.minimap.update()
+    minimap.update()
 
     // Undocumented
     GDV_POST_FETCHER.send();
@@ -753,10 +752,10 @@ GenomeView.prototype.updateTrackLabels = function(newX) {
         if(ts){
             ts.style.left = newX + "px";
         }
-        var tz = this.trackZooms[i];
-        if(tz){
-            tz.style.left = newX - 70  +"px";
-        }
+        // var tz = this.trackZooms[i];
+        // if(tz){
+        //     tz.style.left = newX - 70  +"px";
+        // }
     }
 };
 
@@ -1191,58 +1190,91 @@ GenomeView.prototype.addTrack = function(track) {
     var tmp = this.getX() + 100;
     labelDiv.style.left = tmp + "px";
     trackDiv.appendChild(labelDiv);
-    dojo.connect(trackDiv,"click",function(e){
-	    //console.log("##??##");
+    // dojo.connect(trackDiv,"click",function(e){
+    // 	    console.log("##??##");
 
-    });
+    // });
     //creating the scale and the zoom buttons
     //depending of the track type
     if(track instanceof ImageTrack){
         // #scale
-        var scale = document.createElement("canvas");
+	var container = document.createElement('DIV');
+        container.style.position = "absolute";
+        container.style.top = "0px";
+        var newPos = this.getX() ;
+        container.style.left = newPos + "px";
+        container.style.width = "200px";
+        container.style.height = "100px";
+	
+	var scale = document.createElement("canvas");
         scale.className = "track_scale";
         scale.style.position = "absolute";
         scale.style.top = "0px";
-        var newPos= this.getX() ;
-        scale.style.left = newPos+"px";
-        scale.style.width = "200px";
+        // var newPos = this.getX() ;
+        // scale.style.left = newPos+"px";
+	scale.style.width = "15px";
         scale.style.height = "100px";
         scale.id = "scale_"+track.name;
-        trackDiv.appendChild(scale);
-        this.trackScales.push(scale);
-        track.setScale(scale);
-        // #zoom
-        var zs = document.createElement("div");
-        zs.style.position = "absolute";
-        zs.style.top = "0px";
-        zs.style.left = newPos - 70 +"px";
-        zs.style.width = "100px";
-        zs.style.height = "100px";
-        zs.style.zIndex=250;
-        zs.className="zs";
-        var zp = document.createElement("div");
-        zp.className="zplus";
-        zp.innerHTML="+";
-        zs.appendChild(zp);
-        var zm = document.createElement("div");
-        zm.className="zmoins";
-        zm.innerHTML="-";
-        zs.appendChild(zm);
-        trackDiv.appendChild(zs);
-        this.trackZooms.push(zs);
-        //connect the links
-        var gv = this;
-        dojo.connect(zp, "onclick", function(event) {
-            track.innerZoom(gv,scale,0.3);
-            dojo.stopEvent(event);
-            });
-        dojo.connect(zm, "onclick", function(event) {
-            track.innerZoom(gv,scale,-0.3);
-            dojo.stopEvent(event);
-            });
-        dojo.connect(zs,"ondblclick",function(event){
-            dojo.stopEvent(event);
-            });
+        container.appendChild(scale);
+	track.setScale(scale);
+        
+	// // #zoom
+        // var zs = document.createElement("div");
+        // zs.style.position = "absolute";
+        // // zs.style.top = "0px";
+        // // zs.style.left = newPos - 70 +"px";
+        // // zs.style.width = "100px";
+        // // zs.style.height = "100px";
+        // // zs.style.zIndex=250;
+        // zs.className = "zs";
+        // var zp = document.createElement("div");
+        // zp.className = "zplus";
+        // zp.innerHTML = "+";
+        // zs.appendChild(zp);
+        // var zm = document.createElement("div");
+        // zm.className = "zmoins";
+        // zm.innerHTML = "-";
+        // zs.appendChild(zm);
+        // container.appendChild(zs);
+	//trackDiv.appendChild(zs);
+        //this.trackZooms.push(zs);
+       
+	// #inputs
+
+	var input_max = document.createElement('input');
+	input_max.className = 'score_input';
+	input_max.type = 'text';
+	input_max.name = 'max_score';
+	input_max.id = track.name + '_max_input';
+	container.max = input_max;
+	container.appendChild(input_max);
+	var input_min = document.createElement('input');
+	input_min.className = 'score_input';
+	input_min.type = 'text';
+	input_min.name = 'min_score'
+	input_min.style.bottom = '0px';
+	container.min = input_min;
+	container.appendChild(input_min);
+		
+    
+	
+	trackDiv.appendChild(container);
+        track.scale_container = container;
+	this.trackScales.push(container);
+
+	//connect the links
+        //var gv = this;
+        // dojo.connect(zp, "onclick", function(event) {
+        //     track.innerZoom(gv,scale,0.3);
+        //     dojo.stopEvent(event);
+        // });
+        // dojo.connect(zm, "onclick", function(event) {
+        //     track.innerZoom(gv,scale,-0.3);
+        //     dojo.stopEvent(event);
+        // });
+        // dojo.connect(zs,"ondblclick",function(event){
+        //     dojo.stopEvent(event);
+        // });
     }
 
     // A label starts unselected

@@ -16,7 +16,7 @@ from webob import Request, Response
 from repoze.who.utils import resolveDotted
 from zope.interface import implements
 from pygdv import handler
-
+from pygdv.lib import constants
 
 from repoze.who.interfaces import IIdentifier, IChallenger, IAuthenticator, IRequestClassifier
 import zope.interface
@@ -123,10 +123,8 @@ class CustomCookiePlugin(object):
         Identify the user
         '''
 
-        if tg.config.get('proxy-ip'):
-            remotes = environ['REMOTE_ADDR'].split(', ')
-            remotes.remove(tg.config.get('proxy-ip'))
-            environ['REMOTE_ADDR'] = remotes[0]
+        remotes = environ['REMOTE_ADDR'].split(', ')
+        environ['REMOTE_ADDR'] = remotes[0]
 
         environ['auth'] = False
         cookies = get_cookies(environ)
@@ -388,8 +386,10 @@ def request_classifier(environ):
     if request_method == 'POST':
         req = Request(environ)
         if not 'Cookie' in req.headers:
-            return 'command_line'
-    return 'browser'
+            environ[constants.REQUEST_TYPE] = constants.REQUEST_TYPE_COMMAND_LINE
+            return constants.REQUEST_TYPE_COMMAND_LINE
+    environ[constants.REQUEST_TYPE] = constants.REQUEST_TYPE_BROWSER
+    return constants.REQUEST_TYPE_BROWSER
 zope.interface.directlyProvides(request_classifier, IRequestClassifier)
 
 

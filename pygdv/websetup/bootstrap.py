@@ -12,19 +12,9 @@ def bootstrap(command, conf, vars):
     """Place any commands to setup turbotequila here.
     Note that you will have to log in the application one before launching the bootstrap."""
     
-    print 'command : %s ' % command
-    
-    print 'conf : %s' % conf
-    
-    print 'vars : %s' % vars
     
     try:
 
-        #admin = model.DBSession.query(model.User).filter(model.User.email == 'your_email_on_tequila@your_university.ch').first()
-       # admin = model.DBSession.query(model.User).filter(model.User.email == 'yohan.jarosz@epfl.ch').first()
-
-
-        #if admin:
             print 'Adding default groups and permissions'
             # ADMIN GROUP
             admins = model.Group()
@@ -44,7 +34,7 @@ def bootstrap(command, conf, vars):
             # USER GROUP
             users = model.Group()
             users.name = group_users
-            model.DBSession.add(users)
+          
             # READ PERMISSION
             read = model.Permission()
             read.name = perm_user
@@ -66,6 +56,18 @@ def bootstrap(command, conf, vars):
             read.name = right_read
             read.description = u'A group with this permission can view the project.'
             model.DBSession.add(read)
+            
+            print 'adding a special user'
+            u = model.User()
+            u.name = 'koopa'
+            u.firstname = 'troopa'
+            u.email = 'public@pygdv.ch'
+    
+            users.users.append(u)
+            
+            model.DBSession.add(u)
+            model.DBSession.add(users)
+            
             
             transaction.commit()
            

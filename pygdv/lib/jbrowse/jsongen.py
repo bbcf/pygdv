@@ -77,6 +77,9 @@ _extended_headers = ('start', 'end', 'name', 'strand', 'subfeatures')
 _subfeature_headers = ('start', 'end', 'score', 'name', 'strand', 'type', 'attributes')
 _extended_fields = ('start', 'end', 'score', 'name', 'strand', 'type', 'attributes', 'id')
 
+
+
+
 _extended_client_config = {'labelScale':5, 'subfeatureScale':10, 
         'featureCallback':'(function(feat, fields, div){if(fields.type){getFeatureStyle(feat[fields.type],div);}})'}
 
@@ -121,7 +124,9 @@ def _generate_nested_extended_features(cursor, keep_field, count_index, subfeatu
     prev_feature = None
 
     nb_feature = 1
+    ## 'generate nested features'
     for row in cursor:
+        ## row
         feature = [row[start_index], row[end_index], row[name_index], row[strand_index]]
         count = row[count_index]
         # add the sub-features
@@ -209,9 +214,9 @@ def _count_features(cursor, loop, chr_length):
     array = np.zeros(nb)
     
     for row in cursor:
-        start = row[0]
+        start = row['start']
         start_pos = _get_array_index(start, loop)
-        end = row[1]
+        end = row['end']
         end_pos = _get_array_index(end, loop)
         array[start_pos:end_pos+1]+=1
     return array
@@ -266,6 +271,7 @@ def _generate_lazy_output(feature_generator):
             buffer_list = []
             first = None
     if first :
+        chunk_number += 1
         yield first, stop, chunk_number, buffer_list, chunk_size
         
         
@@ -320,7 +326,7 @@ def _generate_hist_outputs(array, chr_length, coef=1):
     '''
     Generate the hist-output. 
     '''
-    for i in xrange(1, chr_length, HIST_CHUNK_SIZE * coef):
+    for i in xrange(1, int(math.ceil(chr_length/HIST_CHUNK_SIZE)), HIST_CHUNK_SIZE * coef):
         yield array[i:i+HIST_CHUNK_SIZE * 100]      
     
     
@@ -361,15 +367,6 @@ def jsonify(database_path, name, sha1, output_root_directory, public_url, browse
     
     with track.load(database_path, 'sql', readonly=False) as t :
         for chr_name in t:
-#    conn = sqlite3.connect(database_path)
-#    cursor = conn.cursor()
-#    cursor.execute('select * from chrNames;')
-#    
-#    for row in cursor:
-            print t.chrmeta
-            print list(t)
-            print chr_name
-            
             chr_length = t.chrmeta[chr_name]['length']
             ## 'doing %s ' % chr_name
             out = os.path.join(output_path, chr_name)
@@ -409,15 +406,24 @@ def jsonify_quantitative(sha1, output_root_directory, database_path):
 def _gen_gen(t, chr_name):
     prev_id = None
     l = []
-    for row in t.read(chr_name, ['start', 'end', 'score', 'name', 'strand', 'type', 'attributes', 'id'], cursor=True):
-        idi = row[7]
+    #for row in t.read(chr_name, ['start', 'end', 'score', 'name', 'strand', 'type', 'attributes', 'id'], cursor=True):
+    for row in t.aggregated_read(chr_name, ('start', 'end', 'score', 'gene_name', 'strand', 'type', 'gene_id'), cursor=True):
+        
+        
+        idi = row[6]
         if prev_id is not None:
             if prev_id == idi :
-                l.append(row[0:6])
+                l.append(row[0:5] + row[7:])
             else :
                 yield prev_id, json.dumps(l)
                 l = []
         prev_id = idi
+        
+def _gen_gen2(t, chr_name):
+    for row in t.aggregated_read(chr_name, ('start', 'end', 'score', 'gene_name', 'strand', 'type', 'gene_id'), cursor=True):
+        ## 'row'
+        ## row
+        yield row
 
 def _prepare_database(t, chr_name):
     '''
@@ -425,13 +431,19 @@ def _prepare_database(t, chr_name):
     :return: the table name to erase after
     '''
     table_name = 'tmp_%s' % chr_name
+    ##  'create table tmp_%s' % chr_name
     t.cursor.execute('create table "%s"(id text, subs text, foreign key(id) references "%s"(id));' % (table_name, chr_name))
     t.write(table_name, _gen_gen(t, chr_name) , ('id', 'subs'))
     
+    table_name2 = 'tmp_%s2' % chr_name
+    ##  'create table tmp_%s2' % chr_name
+    t.cursor.execute('create table "%s"(start int, end int, score float, name text, strand int , type text, attributes text, id text);' % (table_name2))
+    t.write(table_name2, _gen_gen2(t, chr_name) , ('start', 'end', 'score', 'name', 'strand', 'type', 'id', 'attributes')) 
     
     
     
-    return table_name
+    
+    return table_name, table_name2
     
     
 def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directory, extended):
@@ -449,10 +461,12 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
 
         
         client_config = _extended_client_config
-        ## 'preparedb'
-        table_name = _prepare_database(t, chr_name)
+        ##  'preparedb'
+        table_name , table_name2 = _prepare_database(t, chr_name)
         
-        t.cursor.execute('select min(t1.start), max(t1.end), t1.score, t1.name, t1.strand, t1.type, t1.attributes, t1.id, count(t1.id), t2.subs from "%s" as t1 inner join "%s" as t2 on t1.id = t2.id group by t1.id order by t1.start asc, t1.end asc ;' % (chr_name, table_name))
+        #t.cursor.execute('select min(t1.start), max(t1.end), t1.score, t1.name, t1.strand, t1.type, t1.attributes, t1.id, count(t1.id), t2.subs from "%s" as t1 inner join "%s" as t2 on t1.id = t2.id group by t1.id order by t1.start asc, t1.end asc ;' % (chr_name, table_name))
+        t.cursor.execute('select min(t1.start), max(t1.end), t1.score, t1.name, t1.strand, t1.type, t1.attributes, t1.id, count(t1.id), t2.subs from "%s" as t1 inner join "%s" as t2 on t1.id = t2.id group by t1.id order by t1.start asc, t1.end asc ;' % (table_name2, table_name))
+        
         ## ' calculate lazy features'
         lazy_feats = _generate_lazy_output(
                     _generate_nested_extended_features(t.cursor, keep_field=7, count_index=8, 
@@ -490,7 +504,10 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
         
     if extended :    
         ## 'erase table'
+        ## 'drop table %s'% table_name
         t.cursor.execute('drop table "%s";' % table_name)
+        ## 'drop table %s'% table_name2
+        t.cursor.execute('drop table "%s";' % table_name2)
         t.vacuum()
         #t.cursor.execute('vacuum')
         ## 'dropped'

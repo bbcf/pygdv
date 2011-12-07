@@ -2,7 +2,7 @@
 from tgext.crud import CrudRestController
 from tgext.crud.decorators import registered_validate
 
-from repoze.what.predicates import not_anonymous, has_permission
+from repoze.what.predicates import has_any_permission
 
 from tg import expose, flash, require, request, tmpl_context, validate
 from tg import app_globals as gl
@@ -12,7 +12,7 @@ from tg.decorators import paginate,with_trailing_slash, without_trailing_slash
 from pygdv.model import DBSession, Circle, Species, User
 from pygdv.widgets.circle import circle_table, circle_table_filler, circle_new_form, circle_edit_filler, circle_edit_form
 from pygdv import handler
-from pygdv.lib import util, checker
+from pygdv.lib import util, checker, constants
 from sqlalchemy import and_
 
 
@@ -22,7 +22,7 @@ __all__ = ['CircleController']
 
 
 class CircleController(CrudRestController):
-    allow_only = has_permission(gl.perm_admin)
+    allow_only = has_any_permission(constants.perm_admin, constants.perm_user)
     model = Circle
     table = circle_table
     table_filler = circle_table_filler

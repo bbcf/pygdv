@@ -12,10 +12,10 @@ a.add_link, a.edit_link{
     padding-left: 20px;
 }
 a.add_link{
-    background-image: url('/images/add.png');
+    background-image: url('../images/add.png');
 }
 a.edit_link{
-    background-image: url('/images/pencil.png');
+    background-image: url('../images/pencil.png');
 }
 
 /* admin list view */
@@ -28,7 +28,7 @@ a.edit_link{
 }
 
 .crud_table .grid th{
-    background: url("/images/menubg.png") no-repeat scroll -20px top transparent;
+    background: url("../images/menubg.png") no-repeat scroll -20px top transparent;
     color: #fff;
     font-weight: normal;
     text-transform: capitalize;
@@ -49,7 +49,7 @@ a.edit_link{
 }
 .crud_table .grid td.col_0 .delete-button, .crud_table .grid .button-to .delete-button{
     font-size: inherit;
-    background-image: url('/images/delete.png');
+    background-image: url('../images/delete.png');
     cursor: pointer;
 }
 
@@ -73,7 +73,7 @@ a.edit_link{
 
 .delete-button{
     font-size: inherit;
-    background-image: url('/images/delete.png');
+    background-image: url('../images/delete.png');
     cursor: pointer;
 }
 
@@ -84,14 +84,14 @@ a.view_link{
     
 }
 a.view_link{
-    background-image: url('/images/view.png');
+    background-image: url('../images/view.png');
 }
 a.share_link{
     background-repeat: no-repeat;
     padding-left: 20px;
 }
 a.share_link{
-    background-image: url('/images/share.png');
+    background-image: url('../images/share.png');
 }
 
 a.detail_link{
@@ -99,14 +99,14 @@ a.detail_link{
     padding-left: 20px;
 }
 a.detail_link{
-    background-image: url('/images/plus.png');
+    background-image: url('../images/plus.png');
 }
 a.export_link{
     background-repeat: no-repeat;
     padding-left: 20px;
 }
 a.export_link{
-    background-image: url('/images/export.png');
+    background-image: url('../images/export.png');
 }
 
 
@@ -124,7 +124,7 @@ table.grid .odd{
 }
 
 table.grid th{
-    background: url("/images/menubg.png") no-repeat scroll -20px top transparent;
+    background: url("../images/menubg.png") no-repeat scroll -20px top transparent;
     color: #fff;
     font-weight: normal;
     text-transform: capitalize;
@@ -145,7 +145,7 @@ table.grid td.col_0 .edit_link, .crud_table .grid td.col_0 .delete-button, .crud
 }
 table.grid td.col_0 .delete-button, .crud_table .grid .button-to .delete-button{
     font-size: inherit;
-    background-image: url('/images/delete.png');
+    background-image: url('../images/delete.png');
     cursor: pointer;
 }
 

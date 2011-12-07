@@ -8,9 +8,10 @@ from tg import expose, flash, require, error, request, tmpl_context, validate, u
 from tg import app_globals as gl
 from tg.controllers import redirect
 from tg.decorators import paginate, with_trailing_slash,without_trailing_slash
+import tg
 
 from pygdv.model import DBSession, Project, User, RightCircleAssociation, Track, Job
-from pygdv.widgets.project import project_table, project_with_right, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid,circles_available_form, tracks_available_form, project_sharing_grid, project_grid_sharing
+from pygdv.widgets.project import project_table,  project_with_right, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid,circles_available_form, tracks_available_form, project_sharing_grid, project_grid_sharing
 from pygdv.widgets.track import track_in_project_grid
 from pygdv.widgets import ModelWithRight
 from pygdv import handler
@@ -19,15 +20,16 @@ import os, json
 import transaction
 from pygdv.lib import checker
 from pygdv.lib.jbrowse import util as jb
-from pygdv.lib import constants
-from sqlalchemy.sql import and_
+from pygdv.lib import constants, reply
+
+from sqlalchemy.sql import and_, or_, not_
 import re
 
 __all__ = ['ProjectController']
 
 
 class ProjectController(CrudRestController):
-    allow_only = has_any_permission(gl.perm_user, gl.perm_admin)
+    allow_only = has_any_permission(constants.perm_user, constants.perm_admin)
     model = Project
     table = project_table
     table_filler = project_table_filler
@@ -50,8 +52,6 @@ class ProjectController(CrudRestController):
         # shared projects
         project_with_rights = handler.project.get_shared_projects(user)
         
-        if 'ordercol' in kw:
-            util.order_data(kw['ordercol'], up)
         
         
         sp = []
@@ -63,7 +63,7 @@ class ProjectController(CrudRestController):
         shared_projects = [util.to_datagrid(project_with_right, sp, "Shared projects", len(sp)>0)]
         #TODO check with permissions
         
-        return dict(page='projects', model='project', form_title="new project", user_projects=user_projects, shared_projects=shared_projects, value=kw)
+        return dict(page='projects', model='project',form_title="new project", user_projects=user_projects, shared_projects=shared_projects, value=kw)
     
 
 
@@ -74,16 +74,25 @@ class ProjectController(CrudRestController):
         user = handler.user.get_user_in_session(request)
         #tmpl_context.circles=user.circles
         return dict(page='projects', value=kw, title='new Project')
-
+    
+    @expose('json')
+    def create(self, *args, **kw):
+        user = handler.user.get_user_in_session(request)
+        if not 'name' in kw:
+            return reply.error(request, 'Missing project `name`.', './', {})
+        
+        if not 'assembly' in kw:
+            return reply.error(request, 'Missing project `assembly` identifier.', './', {})
+            
+        project = handler.project.create(kw['name'], kw['assembly'], user.id)
+        return reply.normal(request, 'Project successfully created.', './', {'project' : project})  
+    
     @expose()
     @validate(project_new_form, error_handler=new)
     def post(self, *args, **kw):
-        user = handler.user.get_user_in_session(request)
-        handler.project.create(kw['name'], kw['nr_assembly'], user.id)
-        transaction.commit()
-        raise redirect('./')
+        return self.create(*args, **kw)
 
-
+    
 
     @expose('genshi:tgext.crud.templates.post_delete')
     def post_delete(self, *args, **kw):
@@ -173,10 +182,13 @@ class ProjectController(CrudRestController):
 
         # circles with rights
         cr_data = [util.to_datagrid(project_sharing_grid, project.circles_rights, "Sharing", len(project.circles_rights)>0)]
-
+        
+        # public url
+        pub = url('/public/project', {'id' : project_id, 'k' : project.key})
+       
         kw['project_id'] = project_id
         return dict(page='projects', model='Project', info=data,
-                    circle_right_data=cr_data, form_title='Circles availables', value=kw)
+                    circle_right_data=cr_data, form_title='Circles availables', value=kw, public=pub)
 
 
     @expose()
@@ -266,22 +278,62 @@ class ProjectController(CrudRestController):
             raise redirect(url('/'))
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         tracks = project.tracks
+        
+        seq = project.sequence
+        default_tracks = seq.default_tracks
+        all_tracks = tracks + default_tracks
+        
+        trackNames = []
+        for t in all_tracks:
+            while t.name in trackNames:
+                ind = 0
+                while(t.name[-(ind + 1)].isdigit()):
+                    ind += 1
+                cpt = t.name[-ind:]
+                try : 
+                    cpt = int(cpt)
+                except ValueError:
+                    cpt = 0
+                cpt += 1
+                
+                tmp_name = t.name
+                if ind > 0:
+                    tmp_name = t.name[:-ind]
+                t.name = tmp_name + str(cpt)
+                
+                
+            DBSession.add(t)
+            DBSession.flush()
+            trackNames.append(t.name)
+        
         refSeqs = 'refSeqs = %s' % json.dumps(jb.ref_seqs(project.sequence_id))
         
-        trackInfo = 'trackInfo = %s' % json.dumps(jb.track_info(tracks))
+        trackInfo = 'trackInfo = %s' % json.dumps(jb.track_info(all_tracks))
         parameters = 'var b = new Browser(%s)' % jb.browser_parameters(
-                        constants.DATA_ROOT, constants.STYLE_ROOT, constants.IMAGE_ROOT, ','.join([track.name for track in tracks]))
+                        constants.data_root(), constants.style_root(), constants.image_root(), ','.join([track.name for track in all_tracks]))
         
         style_control = '''function getFeatureStyle(type, div){
         div.style.backgroundColor='#3333D7';div.className='basic';
         switch(type){
         %s
         }};
-        ''' % jb.features_style(tracks)
+        ''' % jb.features_style(all_tracks)
         
-        control = 'b.showTracks();initGDV(b, %s)' % project.id
         
-        jobs = DBSession.query(Job).filter(Job.project_id == project.id).all()
+        
+        info = {}
+        prefix = tg.config.get('prefix')
+        if prefix : info['prefix'] = prefix
+        info['sequence_id'] = project.sequence_id
+        
+        control = 'b.showTracks();initGDV(b, %s, %s);' % (project.id, info)
+        
+        
+        if 'loc' in kw:
+            control += 'b.navigateTo("%s");' % kw['loc']
+        
+        
+        jobs = DBSession.query(Job).filter(and_(Job.project_id == project.id, not_(Job.output == constants.job_output_reload))).all()
         
         jobs_output = [{'job_id' : job.id, 
                        'status' : job.status, 
@@ -291,6 +343,8 @@ class ProjectController(CrudRestController):
                        'error' : job.traceback}
                       for job in jobs
                       ]
+        
+        
         
         return dict(species_name=project.species.name, 
                     nr_assembly_id=project.sequence_id, 

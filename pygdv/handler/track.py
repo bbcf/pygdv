@@ -15,7 +15,10 @@ import track
 from celery.task import task, chord, subtask, TaskSet
 from pygdv.lib.constants import json_directory, track_directory
 
-def create_track(user_id, sequence, trackname=None, f=None):
+
+def create_track(user_id, sequence, trackname=None, f=None, project=None, session=None, admin=False):
+    if session is None:
+        session = DBSession
     '''
     Create track from files :
     
@@ -24,61 +27,67 @@ def create_track(user_id, sequence, trackname=None, f=None):
     
     @param trackname : name to give to the track
     @param file : the file name
+    @param project : if given, the track created has to be added to the project 
+    @return : task_id, track_id    
     '''
-    print 'creating track'
     if f is not None:
-        _input = create_input(f,trackname, sequence.name)
-        if _input == constants.NOT_SUPPORTED_DATATYPE :
-            print 'deleting temporary file'
+        _input = create_input(f,trackname, sequence.name, session)
+        if _input == constants.NOT_SUPPORTED_DATATYPE or _input == constants.NOT_DETERMINED_DATATYPE:
             try:
                 os.remove(os.path.abspath(f.name))
             except OSError :
                 pass
-            return constants.NOT_SUPPORTED_DATATYPE
-        
+            return _input
         track = Track()
         if trackname is not None:
             track.name = trackname
         track.sequence_id = sequence.id
-        track.user_id = user_id
+        if not admin:
+            track.user_id = user_id
         track.input_id = _input.id
-        DBSession.add(track)
-        DBSession.flush()
+        session.add(track)
+        session.flush()
+        
         
         params = TrackParameters()
         params.track = track        
         
         params.build_parameters()
-        DBSession.add(params)
-        DBSession.add(track)
-        DBSession.flush()
-        return _input.task_id
+        session.add(params)
+        session.add(track)
+        if project is not None:
+            project.tracks.append(track)
+            session.add(project)
+            
+        if admin :
+            sequence.default_tracks.append(track)    
+            session.add(sequence)
+       
+        session.flush()
+        
+        return _input.task_id, track.id
     
     
     
     
 
-def create_input(f, trackname, sequence_name):
+def create_input(f, trackname, sequence_name, session):
     '''
     Create an input if it's new, or simply return the id of an already inputed file 
     @param file : the file name
     @return : an Input
     '''
-    print 'creating input'
     sha1 = util.get_file_sha1(os.path.abspath(f))
-    print "getting sha1 %s" % sha1
-    _input = DBSession.query(Input).filter(Input.sha1 == sha1).first()
+    _input = session.query(Input).filter(Input.sha1 == sha1).first()
+    print _input
     if _input is not None: 
         print "file already exist"
     else :
         file_path = os.path.abspath(f)
-        print 'Processing input %s' % file_path
         out_dir = track_directory()
-        print 'to %s : ' % out_dir
         
         
         fo = determine_format(file_path)
-        print 'gessing format : %s' % fo
         
         dispatch = _process_dispatch.get(fo, constants.NOT_SUPPORTED_DATATYPE)
         if  dispatch == constants.NOT_SUPPORTED_DATATYPE:
@@ -86,37 +95,37 @@ def create_input(f, trackname, sequence_name):
         
         
         datatype = _formats.get(fo, constants.NOT_SUPPORTED_DATATYPE)
-        print 'gessing datatype %s' % datatype
         
         if datatype == constants.NOT_SUPPORTED_DATATYPE:
             return datatype
         
         elif datatype == constants.NOT_DETERMINED_DATATYPE:
-            # this is an sql
-            #make a track and guess datatype
-            pass
-       
-      
-        print 'dispatch %s' % dispatch
+            with track.load(file_path) as t:
+                print t.datatype
+                if t.datatype is not None:
+                    datatype = _datatypes.get(t.datatype, constants.NOT_DETERMINED_DATATYPE)
+        
+        
+        if datatype == constants.NOT_DETERMINED_DATATYPE:
+            return datatype     
+
         if trackname is None:
             trackname = f
             
         
         async_result = dispatch(datatype=datatype, assembly_name=sequence_name, path=file_path,
                                 sha1=sha1, name=trackname, tmp_file=f, format=fo)
-        print 'get async_result : %s' % async_result
 
-        print 'building input'
         _input = Input()
         _input.sha1 = sha1
         _input.datatype = datatype
        
         _input.task_id = async_result.task_id
         
-        DBSession.add(_input)
+        session.add(_input)
         
     
-    DBSession.flush()
+    session.flush()
     return _input   
 
 
@@ -147,6 +156,16 @@ _formats = {'sql' : constants.NOT_DETERMINED_DATATYPE,
                     'bedgraph' : constants.SIGNAL
                     }
 
+_datatypes = {      constants.FEATURES : constants.FEATURES,
+                    'qualitative' : constants.FEATURES,
+                    'QUALITATIVE' : constants.FEATURES,
+                    constants.SIGNAL : constants.SIGNAL,
+                    'quantitative' : constants.SIGNAL,
+                    'QUANTITATIVE' : constants.SIGNAL,
+                    constants.RELATIONAL : constants.RELATIONAL,
+                    'qualitative_extended' : constants.RELATIONAL,
+                    'QUALITATIVE_EXTENDED' : constants.RELATIONAL,
+                    }
 #_sql_dispatch = {'quantitative' : lambda *args, **kw : _signal2(*args, **kw),
 #                 constants.SIGNAL : lambda *args, **kw : _signal2(*args, **kw),
 #                 
@@ -168,7 +187,7 @@ _formats = {'sql' : constants.NOT_DETERMINED_DATATYPE,
 #                  constants.RELATIONAL :  lambda *args, **kw : _relational2(*args, **kw)
 #                 }
 
-def move_database(datatype, assembly_id, path, sha1, name, tmp_file, format):
+def move_database(datatype, assembly_name, path, sha1, name, tmp_file, format):
     '''
     Move the database to the right directory.
     Then process the database.
@@ -176,7 +195,7 @@ def move_database(datatype, assembly_id, path, sha1, name, tmp_file, format):
     out_name = '%s.%s' % (sha1, 'sql')
     dst = os.path.join(track_directory(), out_name)
     shutil.move(path, dst)
-    return tasks.process_database.delay(datatype, assembly_id, dst, sha1, name, format);
+    return tasks.process_database.delay(datatype, assembly_name, dst, sha1, name, format);
 
 def convert_file(datatype, assembly_name, path, sha1, name, tmp_file, format):
     '''

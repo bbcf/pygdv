@@ -332,19 +332,21 @@ class Track(DeclarativeBase):
     
     # columns
     id = Column(Integer, autoincrement=True, primary_key=True)
-    name = Column(Unicode(255), nullable=False)
+    _name = Column(Unicode(255), nullable=False)
     _created = Column(DateTime, nullable=False, default=datetime.now)
     _last_access = Column(DateTime, default=datetime.now, nullable=False)
     
     input_id = Column(Integer, ForeignKey('Input.id', ondelete="CASCADE"), nullable=False)
    
-    user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=False)
+    user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=True)
     
     
     sequence_id = Column(Integer, ForeignKey('Sequence.id', ondelete="CASCADE"), nullable=False)
     sequence = relationship("Sequence")
     
     parameters = relationship('TrackParameters', uselist=False, backref='track', cascade='delete')
+    
+    
     
     # special methods
     def __repr__(self):
@@ -364,6 +366,15 @@ class Track(DeclarativeBase):
     def _set_last_access(self, date):
         self._last_access=date
 
+    def _get_name(self):
+        return self._name
+    
+    def _set_name(self, value):
+        if self.parameters is not None :
+            self.parameters.key = value
+            self.parameters.label = value
+        self._name = value
+        
     @property
     def status(self):
         return self.input.status
@@ -384,7 +395,7 @@ class Track(DeclarativeBase):
     
     created = synonym('_created', descriptor=property(_get_date, _set_date))
     last_access = synonym('_last_access', descriptor=property(_get_last_access, _set_last_access))
-    
+    name = synonym('_name', descriptor=property(_get_name, _set_name))
     @property
     def accessed(self):
         '''
@@ -392,6 +403,10 @@ class Track(DeclarativeBase):
         '''
         self._set_last_access(datetime.now())
 
+    @property
+    def path(self):
+        return self.input.path
+    
 class TrackParameters(DeclarativeBase):
     '''
     Track parameters.

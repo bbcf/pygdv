@@ -15,6 +15,8 @@ from pygdv.controllers.worker import WorkerController
 from pygdv.controllers.task import TaskController
 from pygdv.controllers.input import InputController
 from pygdv.controllers.database import DatabaseController
-from pygdv.controllers.jobs import JobController
+from pygdv.controllers.job import JobController
+from pygdv.controllers.public import PublicController
+
 
 from pygdv.controllers.root import RootController

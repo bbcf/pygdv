@@ -6,7 +6,8 @@ import numpy as np
 from pygdv.lib.util import float_equals
 from pygdv.lib.jbrowse import TAB_WIDTH, zooms
 import track
-
+from ConfigParser import ParsingError
+from bbcflib.common import timer
 
 
 
@@ -40,16 +41,19 @@ def get_position_end(image_nb, tab_index, zoom):
     '''
     return (image_nb * TAB_WIDTH + tab_index - TAB_WIDTH) * zoom + zoom - 1 
 
-    
-def generate_array(cursor, max, max_zoom):
+
+
+
+def generate_array(cursor, _max, max_zoom):
     '''
     Generate a numpy array that will represent the last feature on the cursor
     '''
     
-    if max_zoom % max != 0:
-        max = max_zoom - (max % max_zoom) + max
-    array = np.zeros(max )
+    if max_zoom % _max != 0:
+        _max = max_zoom - (_max % max_zoom) + _max
+    array = np.zeros(_max)
     for row in cursor :
+        #print tuple(row)
         start = row[0]
         stop = row[1]
         score = row[2]
@@ -62,10 +66,20 @@ def generate_array(cursor, max, max_zoom):
     
         index_start = img_nb_start * TAB_WIDTH + tab_index_start
         index_stop = img_nb_stop * TAB_WIDTH + tab_index_stop
-        
-        array[index_start:index_stop+1] = score
+        #print '(%s, %s) %s' % (index_start, index_stop, score)
+        array[start:stop] = score
+    #print 'array : %s' % array[100:210]
     return array
 
+def get_image_and_tab_index(index, zoom):
+    '''
+    (image_nb * TAB_WIDTH + tab_index - TAB_WIDTH) * zoom
+    '''
+    tab_index = math.ceil(index / zoom) % TAB_WIDTH
+    image_nb = math.ceil(index / TAB_WIDTH)
+    return image_nb, tab_index
+    
+    
 def gen_tuples(array, max, zoom):
     '''
     Generate the features (number, pos, score) to write in the db
@@ -76,16 +90,42 @@ def gen_tuples(array, max, zoom):
     max_images = get_image_nb(max, zoom)
     tab_list = range(TAB_WIDTH)
     prev_score = None
-    print 'm im : %s' % max_images
-    for i in range(1, max_images+1):
+    
+    #print 'm im : %s' % max_images
+    #print 'array : %s' % array[100:210]
+#    prev_image_nb = None
+#    prev_tab_index = None
+#    
+#    for index in range(len(array)):
+#        score = array[index]
+#        image_nb, tab_index = get_image_and_tab_index(index, zoom)
+#        if prev_score and score != prev_score:
+#                if tab_index != prev_tab_index or image_nb != prev_image_nb:
+#                    yield prev_image_nb, prev_tab_index, prev_score
+#                else:
+#                    if(abs(prev_score) - abs(score) < 0) :
+#                        prev_score = score
+#                        
+#        prev_score = score
+#        prev_image_nb = image_nb
+#        prev_tab_index = tab_index
+#    
+#    if prev_score:
+#        yield prev_image_nb, prev_tab_index, prev_score
+        
+    
+    # OLD ALGO
+    for i in range(1, max_images + 1):
         for t in tab_list:
             index_start = get_position_start(i, t, zoom)
             index_end = get_position_end(i, t, zoom)
             if index_start > max :
                 yield i, t, 0
                 break
-            #print 'i(%s), t(%s), z(%s), start %s, end %s' %(i, t, zoom, index_start, index_end)
-            tmp = array[index_start:index_end+1]
+            
+            
+            tmp = array[index_start:index_end + 1]
+            ##print 'tmp_array : %s' % tmp
             max_score = tmp.max()
             min_score = tmp.min()
             if(abs(max_score) - abs(min_score) < 0) :
@@ -98,7 +138,6 @@ def gen_tuples(array, max, zoom):
                 
     
 
-    
 def get_features(connection, chromosome):
     '''
     Get the features on a chromosome.
@@ -107,6 +146,7 @@ def get_features(connection, chromosome):
     '''
     cursor = connection.cursor()
     return cursor.execute('select start, end, score from "%s"' % chromosome)
+
 
 def get_chromosomes(connection):
     '''
@@ -124,14 +164,14 @@ def write_tuples(conn, generator):
     cursor.executemany('insert into sc values (?, ?, ?);', generator)
     conn.commit()
     cursor.close()
-    
+
 def get_last_feature_stop(t, chromosome):
     '''
     Get the stop of the last feature.
     '''
-    max = t.cursor.execute('select max(end) from "%s";' % chromosome).fetchone()[0]
-    return max
-           
+    return t.cursor.execute('select max(end) from "%s";' % chromosome).fetchone()[0]
+
+@timer
 def pre_compute_sql_scores(database_path, sha1, output_dir):
     '''
     Pre compute scores for a quantitative database
@@ -139,41 +179,35 @@ def pre_compute_sql_scores(database_path, sha1, output_dir):
     @param sha1 : the sha1 sun hexdigest of the database
     @param output_dir : where files will be write
     '''
-    print 'prepare output directory'
     out_path = os.path.join(output_dir, sha1)
     try :
         os.mkdir(out_path)
     except :
         pass
     
-    print 'prepare connection'
+    #print 'prepare connection'
     
-    #conn = sqlite3.connect(database_path)
     with track.load(database_path, format='sql', readonly=True) as t:
         for chromosome in t:
-    #c = get_chromosomes(conn)
-    
-    #for row in c:
-        #chromosome = row[0]
-            print 'getting max'
+            #       print 'doing chr %s' % chromosome
             max = get_last_feature_stop(t, chromosome)
-            if max is None:
-                return
-            print 'getting features'
-            #features = get_features(t.re, chromosome)
-            print 'generating score array'
-            array = generate_array(t.read(chromosome, ('start', 'end', 'score')), max, 100000)
-            
-            for zoom in zooms:
-                print 'compute : zoom = %s' % zoom
-                gen = gen_tuples(array, max, zoom)
-                
-                print 'prepare output'
-                output = os.path.join(out_path, '%s_%s.db' % (chromosome, zoom))
-                out_connection = sqlite3.connect(output)
-                
-                print 'write'
-                write_tuples(out_connection, gen)
+            if max is not None:
+                #          print 'generating score array'
+                array = generate_array(t.read(chromosome, ('start', 'end', 'score')), max, 100000)
+    
+                #         print 'doing for each zoom'            
+                for zoom in zooms:
+                    #            print 'compute : zoom = %s' % zoom
+                    gen = gen_tuples(array, max, zoom)
+                    
+                    #           print 'prepare output'
+                    output = os.path.join(out_path, '%s_%s.db' % (chromosome, zoom))
+                    out_connection = sqlite3.connect(output)
+                    
+                    #          print 'write'
+                    write_tuples(out_connection, gen)
+                    #     print 'end zooms'
+                    #print 'end chr'
     return 1
 
 

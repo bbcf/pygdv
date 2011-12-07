@@ -40,22 +40,27 @@ dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
      */
     sendSearchPOST : function(){
         this.isTyping = false;
-        var tracks="";
-        dojo.forEach(trackInfo, function(entry, i){
-            // add the track to the list if it'a type of FeatureTrack
-            // & it's displayed on the view
-            if(entry.type=="FeatureTrack" && dojo.byId("label_"+entry.label)){
-                var url = entry.url;
-                var matches=String(url).match(/^(\.\.\/)(.*\..*)(\/\{refseq\}\.json)$/i);
-                if(matches && matches[2]){
-                    tracks+=matches[2]+",";
-                }
-            }
-        });
-        if(tracks!=""){
-            this.makePOST(tracks,this.field,this.refSeq);
-        }
+        this.post_it(this.field);
     },
+    post_it : function(field){
+	var ctx = this;
+        var pData="project_id=" + _gdv_info.project_id + "&term=" + field;
+        var xhrArgs = {
+            url: _POST_URL_NAMES,
+            postData: pData,
+            handleAs: "json",
+            load: function(data) {
+		ctx.handleSearchNames(data);
+            },
+            error: function(data){
+		ctx.error('GeneNames');
+		ctx.error(data);
+            }
+        }
+        dojo.xhrPost(xhrArgs);
+    },
+    
+
     /**
      * Build the POST query & send it
      * @param{tracks} the databases to search in
@@ -64,7 +69,7 @@ dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
      */
     makePOST : function(tracks,name,chr){
         var _this = this;
-        var pData="id=search_name&tracks="+tracks+"&name="+name+"&chr="+chr;
+        var pData="id=search_name&tracks=" + tracks + "&name=" + name + "&chr=" + chr;
         var xhrArgs = {
             url: _POST_URL_NAMES,
             postData: pData,
@@ -90,7 +95,8 @@ dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
      * @param{data} the result of the connection
      */
     handleSearchNames : function(data){
-        var suggest_field = dojo.byId("suggest_field");
+        console.log(data);
+	var suggest_field = dojo.byId("suggest_field");
         suggest_field.style.display="inline";
         suggest_field.innerHTML="";
         var closeSuggest=document.createElement("a");
@@ -102,54 +108,57 @@ dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
         });
         suggest_field.appendChild(closeSuggest);
         var hasResult = false;
-        for(track in data){//iterate throught tracks
-            //console.log("TRACK :");
-            //console.log(track);
-            var chrs = data[track];
-            for(chr_ in chrs){//iterate throught chromosomes
-		//console.log("CHROMOSOME");
-		//console.log(chr_);
-		var suggests = chrs[chr_];
-		var hasSuggestions=false;
-		var htmlchr=document.createElement("div");
-		htmlchr.className="chr_livesearch";
-		htmlchr.innerHTML=chr_;
-		var res=document.createElement("div");
-		htmlchr.appendChild(res);
-		for (field in suggests){//iterate throught results
-                    hasSuggestions=true;
-                    var positions = suggests[field];
-                    var lin = document.createElement("a");
-                    lin.innerHTML=field;
-                    var start = parseInt(positions[0]);
-                    var end = parseInt(positions[1]);
-                    var interval = end-start;
-                    start=start-interval;
-                    end=end+interval;
-                    var goTo = chr_+":"+start+".."+end;
-                    //console.log("goto :"+goTo);
-                    lin.goTo = goTo;
-                    lin.className="field_livesearch"
-                    res.appendChild(lin);
-                    dojo.connect(lin, "onclick",lin, function(event) {
-			//console.log("click ");
-			//console.log(this.goTo);
-			gb=dojo.byId("GenomeBrowser").genomeBrowser;
-			gb.navigateTo(this.goTo,false);
-			suggest_field.style.display="none";
-			dojo.byId("location").value = this.goTo;
-			dojo.stopEvent(event);
-			dojo.disconnect(this);
-                    });
-		}
-		if(hasSuggestions==true){
-                    suggest_field.appendChild(htmlchr);
-		}
-            }
+        for(chr in data){//iterate throught chromosomes
 	    
+	    var suggests = data[chr];
+	    var hasSuggestions = false;
+	    var htmlchr=document.createElement("div");
+	    htmlchr.className="chr_livesearch";
+	    htmlchr.innerHTML=chr;
+	    var res=document.createElement("div");
+	    htmlchr.appendChild(res);
+	    var limit = 4;
+	    var len = suggests.length;
+	    if (len < limit) limit = len; 
+	    var i = 0;
 	    
+	    for (i; i<limit; i++){//iterate throught results
+                hasSuggestions = true;
+                var field = suggests[i];
+		var name = field[0];
+		var start = field[1];
+		var end = field[2];
+
+                var lin = document.createElement("a");
+                lin.innerHTML = name;
+                
+		//calculate an interval
+		var interval = end - start;
+		start = start - interval;
+		end = end + interval;
+		
+                var goTo = chr +":" + start + ".." + end;
+                lin.goTo = goTo;
+                lin.className="field_livesearch"
+                res.appendChild(lin);
+                dojo.connect(lin, "onclick",lin, function(event) {
+		    gb = dojo.byId("GenomeBrowser").genomeBrowser;
+		    gb.navigateTo(this.goTo, false);
+		    suggest_field.style.display="none";
+		    dojo.byId("location").value = this.goTo;
+		    dojo.stopEvent(event);
+		    dojo.disconnect(this);
+                });
+		lin.appendChild(document.createElement('BR'));
+	    }
+	    if(hasSuggestions == true){
+                suggest_field.appendChild(htmlchr);
+	    }
         }
+	
+	
     },
+    
     /**
      * Function binded to the location box 'onKeyUp'
      */

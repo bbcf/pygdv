@@ -10,13 +10,13 @@ var _GDV_URL=_GDV_PROXY;
 //GLOBAL VARIABLES
 var _GDV_URL_DB = _GDV_URL + '/database';
 var _GDV_URL_SCORES = _GDV_URL_DB + '/scores'
-var _GDV_PROJECT_VIEW = '/projects/view';
+var _GDV_PROJECT_VIEW = _GDV_URL + '/projects/view';
 
-var _POST_URL_NAMES = _GDV_URL+"/gdv_names";
-var _GDV_WORKER_URL = '/workers';
+var _POST_URL_NAMES = _GDV_URL_DB + "/search";
+var _GDV_WORKER_URL = _GDV_URL + '/workers';
 var _GDV_JOB_URL = _GDV_URL + '/jobs';
 
-var _GDV_FORM_URL = '/forms';
+var _GDV_FORM_URL = _GDV_URL + '/forms';
 
 var _GDV_JOB_STATUS_WAIT = 8000;
 var _gdvls;//the live search
@@ -32,12 +32,13 @@ var _gdv_info = {};
 * @param{project_id} the project id
 * @param{readonly} true if the user cannot launch jobs
 */
-function initGDV(browser, project_id, readonly){
+function initGDV(browser, project_id, gdv_info, readonly){
     dojo.require("dijit.form.CheckBox");
     dojo.require("dijit.form.Textarea");
     dojo.require("dijit.form.Form");
     
     /* init global parameters */
+    _gdv_info = gdv_info;
     _gdv_info.project_id = project_id;
     
     dojo.addOnLoad(function(){
