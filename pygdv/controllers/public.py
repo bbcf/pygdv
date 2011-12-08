@@ -11,6 +11,7 @@ import tg
 from pygdv.model import DBSession, Project, Job
 from pygdv.lib.jbrowse import util as jb
 from pygdv.lib import constants, reply
+from pygdv.celery import tasks
 import json
 from sqlalchemy import and_, not_
 __all__ = ['LoginController']
@@ -19,7 +20,10 @@ __all__ = ['LoginController']
 
 class PublicController(BaseController):
     
-    
+    @expose()
+    def test(self, *args, **kw):
+        t = tasks.test_command_line.delay(*args, **kw)
+        return dict(task_id=t.task_id)
     
     @expose('pygdv.templates.view')
     def project(self, id, k, **kw):
@@ -105,3 +109,9 @@ class PublicController(BaseController):
                     control = control,
                     page='view')
         
+        
+        
+        
+        
+      
+            

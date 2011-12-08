@@ -259,11 +259,11 @@ ImageDrawer.prototype.drawScores = function(node, jsonText, color, min, max){
 			var trans_score = - ( prev_score * cnvs_height / d * inZoom );
 			//console.log('xxxx', prev_score, cnvs_height, d, inZoom);
 			ctx.rect(prev_pos, Z , width, trans_score);
-			
-			var t = conv_pos - prev_pos;
+			console.log('x: ' + prev_pos + ' y: ' + Z + ' w: ' + width + ' h: ' + trans_score);
+			//var t = conv_pos - prev_pos;
 			//console.log(pos + ' => x ' + prev_pos + ' y ' + Z + ' width ' + width + ' height '+trans_score);
 		    };
-		    if (pos!= null){
+		    if (pos != null){
 			prev_pos = conv_pos;
 			prev_score = real_score;
 		    }
@@ -275,6 +275,7 @@ ImageDrawer.prototype.drawScores = function(node, jsonText, color, min, max){
 		    //console.log('end loop');
 		    var trans_score = - ( prev_score * cnvs_height / d * inZoom );
 		    ctx.rect(prev_pos * baseWidth, Z , width, trans_score);
+		    console.log('x: ' + prev_pos + ' y: ' + Z + ' w: ' + width + ' h: ' + trans_score);
 		    var t = end_pos - prev_pos;
 		    //console.log('XX prev_pos : ' + prev_pos + ' (' + prev_score + '), width : ' + t);
 
