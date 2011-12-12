@@ -97,8 +97,10 @@ class RootController(BaseController):
         """Handle the 'about' page."""
         return dict(page='about')
 
-
     
+    @expose()
+    def home(self,*args,**kw):
+        raise redirect('/')
     
     
     
