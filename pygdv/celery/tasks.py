@@ -25,6 +25,23 @@ worker_init.connect(session_connection)
 
 
 
+
+
+import subprocess
+@task()
+def test_command_line(*args, **kw):
+    print 'start of task'
+    p = subprocess.Popen('pwd')
+    print p.__dict__
+    bin_dir = constants.bin_directory()
+    print bin_dir
+    script = 'test.sh'
+    e = os.path.join(bin_dir, script)
+    p2 = subprocess.call(['sh', e])
+    if p2 != 0:
+        raise p2
+    print 'end of task'
+    return 1
 #############################################################################################################
 #        FILE PROCESSING
 #############################################################################################################
@@ -92,7 +109,17 @@ def _compute_scores(database, sha1, output_dir, callback=None, callback_on_error
     '''
     print '[t] starting task ``compute scores`` : db (%s), sha1(%s)' % (database, sha1)
     try :
-        scores.pre_compute_sql_scores(database, sha1, output_dir)
+        
+        bin_dir = constants.bin_directory()
+        print bin_dir
+        script = 'psd.jar'
+        efile = os.path.join(bin_dir, script)
+        p2 = subprocess.call(['java', '-jar', efile, database, sha1, output_dir])
+        print p2
+        print 'end of task'
+        
+        # old call
+        #scores.pre_compute_sql_scores(database, sha1, output_dir)
         if callback :
             output_dir = json_directory()
             return subtask(callback).delay(sha1, output_dir, database, callback_on_error=callback_on_error)
