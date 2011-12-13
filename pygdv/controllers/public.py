@@ -79,6 +79,8 @@ class PublicController(BaseController):
         
         info = {}
         prefix = tg.config.get('prefix')
+        info['admin'] = False
+        info['sequence_id'] = project.sequence_id
         if prefix : info['prefix'] = prefix
         
         control = 'b.showTracks();initGDV(b, %s, %s);' % (project.id, info)
@@ -100,7 +102,7 @@ class PublicController(BaseController):
         return dict(species_name=project.species.name, 
                     nr_assembly_id=project.sequence_id, 
                     project_id=project.id,
-                    is_admin=True,
+                    is_admin=False,
                     init_jobs=json.dumps(jobs_output),
                     ref_seqs = refSeqs,
                     track_info = trackInfo,

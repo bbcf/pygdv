@@ -2,10 +2,11 @@ import os,uuid,errno
 from pkg_resources import resource_filename
 from tg import app_globals as gl
 import tempfile
-import urllib2
+import urllib2, urlparse
 import shutil, os
 import hashlib
 from tw.forms.fields import TextArea
+from urllib2 import HTTPError
 
 def to_datagrid(grid_type, grid_data, grid_title = None, grid_display = None):
     '''
@@ -63,11 +64,8 @@ def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, fil
     '''
     files = []  
     index = 0
-    print 'file_name'
-    print file_names
     if file_names is not None:
         file_names = file_names.split()
-        print file_names
     if file_upload is not None:
         filename = file_upload.filename
         if file_names:
@@ -81,18 +79,27 @@ def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, fil
 
     if urls is not None: 
         for u in urls.split():
+            
+            u = urlparse.urlparse(u)
+            if u.hostname:
+                filename = None
+                if file_names:
+                    filename = file_names[index]
+                    index += 1
+                    filename, tmp_file = _download_from_url(u.geturl(), filename=filename)
+                    if filename is not None :
+                        files.append((filename, tmp_file))
+    
+    if url is not None:
+        u = urlparse.urlparse(url)
+        if u.hostname:
             filename = None
             if file_names:
                 filename = file_names[index]
                 index += 1
-            files.append(_download_from_url(u, filename=filename))
-    
-    if url is not None:
-        filename = None
-        if file_names:
-            filename = file_names[index]
-            index += 1
-        files.append(_download_from_url(url, filename=filename))
+            filename, tmp_file = _download_from_url(u.geturl(), filename=filename)
+            if filename is not None :
+                files.append((filename, tmp_file))
     
     if fsys is not None:
         filename = os.path.basename(fsys)
@@ -124,24 +131,29 @@ def _download_from_url(url, filename=None):
     '''
     if filename is None:
         filename = url.split('/')[-1]
-    u = urllib2.urlopen(url)
+    try:
+        u = urllib2.urlopen(url)
     
+        
 #    meta = u.info()
 #    file_size = int(meta.getheaders("Content-Length")[0])
 #    print "Downloading: %s Bytes: %s" % (filename, file_size)
-    file_size_dl = 0
-    tmp_file = tempfile.NamedTemporaryFile(delete=False)
-    while True:
-        buffer = u.read(block_sz)
-        if not buffer:
-            break
-        file_size_dl += len(buffer)
-        tmp_file.write(buffer)
-#        status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
-#        status = status + chr(8)*(len(status)+1)
-#        print status,
-    tmp_file.close()
-    return filename, tmp_file
+        file_size_dl = 0
+        tmp_file = tempfile.NamedTemporaryFile(delete=False)
+        while True:
+            buffer = u.read(block_sz)
+            if not buffer:
+                break
+            file_size_dl += len(buffer)
+            tmp_file.write(buffer)
+    #        status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
+    #        status = status + chr(8)*(len(status)+1)
+    #        print status,
+        tmp_file.close()
+        return filename, tmp_file
+    except HTTPError as e:
+        print '%s : %s' % (url, e)
+        return None, None
 
 
 

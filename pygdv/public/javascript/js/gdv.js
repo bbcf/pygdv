@@ -41,9 +41,17 @@ function initGDV(browser, project_id, gdv_info, readonly){
     _gdv_info = gdv_info;
     _gdv_info.project_id = project_id;
     
+    /* if it's a public view, parameters must be instancied diferrently */
+    
+    if (!_gdv_info.admin){
+	gminer = {};
+	menu_nav = ['Home', 'Copy in Profile']
+    };
+    
     dojo.addOnLoad(function(){
 	/* the menu on the left */
 	try {
+	    var bool = 
 	    _menub = new ch.epfl.bbcf.gdv.GDVMenuBar(
 		{'toolbar' : gminer, 'menu_navigation' : menu_nav , 'browser' : browser});
 	} catch(err) {console.error(err);}
