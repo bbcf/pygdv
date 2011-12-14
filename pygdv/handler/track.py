@@ -79,7 +79,6 @@ def create_input(f, trackname, sequence_name, session):
     '''
     sha1 = util.get_file_sha1(os.path.abspath(f))
     _input = session.query(Input).filter(Input.sha1 == sha1).first()
-    print _input
     if _input is not None: 
         print "file already exist"
     else :
@@ -101,7 +100,6 @@ def create_input(f, trackname, sequence_name, session):
         
         elif datatype == constants.NOT_DETERMINED_DATATYPE:
             with track.load(file_path) as t:
-                print t.datatype
                 if t.datatype is not None:
                     datatype = _datatypes.get(t.datatype, constants.NOT_DETERMINED_DATATYPE)
         
