@@ -95,7 +95,7 @@ dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
      * @param{data} the result of the connection
      */
     handleSearchNames : function(data){
-        console.log(data);
+ 
 	var suggest_field = dojo.byId("suggest_field");
         suggest_field.style.display="inline";
         suggest_field.innerHTML="";
@@ -124,7 +124,8 @@ dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
 	    
 	    for (i; i<limit; i++){//iterate throught results
                 hasSuggestions = true;
-                var field = suggests[i];
+                
+		var field = suggests[i];
 		var name = field[0];
 		var start = field[1];
 		var end = field[2];
@@ -141,7 +142,8 @@ dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
                 lin.goTo = goTo;
                 lin.className="field_livesearch"
                 res.appendChild(lin);
-                dojo.connect(lin, "onclick",lin, function(event) {
+                
+		dojo.connect(lin, "onclick",lin, function(event) {
 		    gb = dojo.byId("GenomeBrowser").genomeBrowser;
 		    gb.navigateTo(this.goTo, false);
 		    suggest_field.style.display="none";

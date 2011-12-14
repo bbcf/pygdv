@@ -70,10 +70,9 @@ class DatabaseController(BaseController):
         with track.load(t.path, 'sql', readonly=True) as t:
             for row in t.search({'gene_name' : term}):
                 chr = row[0]
-                name = row[8]
+                name = row[9]
                 start = row[3]
                 stop = row[4]
-                
                 if chr not in chrs:
                     chrs[chr] = {}
                     
