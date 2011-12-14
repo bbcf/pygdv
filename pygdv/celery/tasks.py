@@ -57,7 +57,6 @@ def del_file_on_error(tasks, sha1, *args, **kw):
     print 'del file on error tasks :%s, sha1 : %s in %s and %s' % (tasks, sha1, track_directory(), json_directory())
     for theid in tasks:
         if not theid == success :
-            print 'sha1 : ' + sha1
             path1 = os.path.join(track_directory(), sha1, '.sql')
             path2 = os.path.join(json_directory(), sha1, '.sql')
             shutil.rmtree(path1, ignore_errors = True)
@@ -111,7 +110,6 @@ def _compute_scores(database, sha1, output_dir, callback=None, callback_on_error
     try :
         
         bin_dir = constants.bin_directory()
-        print bin_dir
         script = 'psd.jar'
         efile = os.path.join(bin_dir, script)
         p2 = subprocess.call(['java', '-jar', efile, database, sha1, output_dir])
@@ -340,10 +338,7 @@ def gfeatminer_request(user_id, project_id, req, job_description, job_name):
         data = gMiner.run(**req)
         print 'gMiner ended with %s ' % data
         for path in data:
-            print path
-            print os.path.splitext(path)
             if os.path.splitext(path)[1] == '.sql':
-                print 'sql'
                 session = model.DBSession()
                 project = session.query(model.Project).filter(model.Project.id == project_id).first()
                 from pygdv.handler.track import create_track

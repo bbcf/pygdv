@@ -123,12 +123,10 @@ class RootController(BaseController):
 
     @expose()
     def test(self, **kw):
-        print kw
         return dict(kw)
     
     def pilou(self):
         if request.environ['REQUEST_CLASSIFIER'] == 'command_line':
-            print 'yooo'
             return {'koopa' : 'troopa'}
         flash('yoooooo')
         raise redirect('./')

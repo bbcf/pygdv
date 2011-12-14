@@ -50,7 +50,6 @@ class JobController(CrudRestController):
         path = path = os.path.join(constants.gfeatminer_directory(), str(job.id))
         
         filename = os.listdir(path)[0]
-        print filename
         
         final = os.path.join(constants.gfeatminer_url(),  str(job.id), filename)
         

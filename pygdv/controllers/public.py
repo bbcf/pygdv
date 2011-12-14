@@ -31,7 +31,6 @@ class PublicController(BaseController):
         if project is None:
             flash('wrong link', 'error')
             raise redirect('/home')
-        print project
         
         tracks = project.tracks
         

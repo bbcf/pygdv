@@ -146,7 +146,6 @@ class ProjectController(CrudRestController):
     @validate(project_edit_form, error_handler=edit)
     def put(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        print kw
         project_id = args[0]
         if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
             flash('You must have %s permission to view the project.' % constants.right_upload, 'error')
@@ -198,7 +197,6 @@ class ProjectController(CrudRestController):
             flash('You cannot modify a project which is not yours')
             raise redirect(url('/'))
         
-        print '[x] post_share [x] project_id %s, circle_id %s, args : %s, kw : %s' % (project_id, circle_id, args, kw)
         
         if 'rights_checkboxes' in kw:
             rights_checkboxes = kw['rights_checkboxes']
@@ -219,9 +217,6 @@ class ProjectController(CrudRestController):
         if not checker.user_own_project(user.id, project_id):
             flash('You cannot modify a project which is not yours')
             raise redirect(url('/'))
-        print 'ddfddffd'
-        print args
-        print kw
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         if 'circles' in kw:
             if isinstance(kw['circles'], list):
@@ -234,7 +229,6 @@ class ProjectController(CrudRestController):
     def test(self, n):
         user = handler.user.get_user_in_session(request)
         p = handler.project.get_projects_with_permission(user.id, n)
-        print p
         raise redirect('./');
 
     @expose('pygdv.templates.add_track')

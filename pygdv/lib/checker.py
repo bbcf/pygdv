@@ -48,7 +48,6 @@ def can_download_track(user_id, track_id):
             and_(Track.id == track_id, User.id == user_id)
             
              ).first()
-        print t
         return t != None
     return True
     

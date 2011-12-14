@@ -54,8 +54,6 @@ class LoginController(BaseController):
         principal = tequila.validate_key(key,'tequila.epfl.ch')
         if principal is None:
             raise redirect('/login')
-        print '------------'
-        print principal
         tmp_user = self.build_user(principal)
         mail = tmp_user.email
         # log or create him
