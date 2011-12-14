@@ -182,6 +182,15 @@ project_grid = twf.DataGrid(fields=[
         ))
 ])
 
+project_admin_grid = twf.DataGrid(fields=[
+    ('Id', 'id'),
+    ('Name', 'name'),
+    ('User', 'user'),
+    ('Created', 'created'),
+    ('Assembly', 'assembly'),
+    ('Circles', 'get_circle_with_right_display'),
+    ('Tracks', 'get_tracks')
+])
 
 
 

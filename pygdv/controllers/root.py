@@ -4,9 +4,11 @@
 from tg import expose, flash, require, request
 
 from pygdv.lib.base import BaseController
-from pygdv.model import DBSession
+from pygdv.model import DBSession, Project
 from repoze.what.predicates import has_permission
 from tg.controllers import redirect
+from pygdv.lib import util
+from pygdv.widgets.project import project_admin_grid
 
 
 from pygdv.controllers import ErrorController, LoginController, GroupController
@@ -137,3 +139,24 @@ class RootController(BaseController):
     @expose('json')
     def koopa(self, **kw):
         return self.pilou()
+    
+    
+    
+    @require(has_permission('admin', msg='Only for admins'))
+    @expose('pygdv.templates.admin_project')
+    def all_projects(self):
+        projects = DBSession.query(Project).all()
+        data_projects = [util.to_datagrid(project_admin_grid, projects, "All projects", len(projects)>0)]
+        
+        
+        return dict(page='projects', model='project',form_title="new project", projects=data_projects, value={})
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

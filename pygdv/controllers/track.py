@@ -67,20 +67,24 @@ class TrackController(CrudRestController):
         if files is None:
             return reply.error(request, 'No file to upload.', './', {})
             
-        if not 'assembly' in kw:
+        if not 'assembly' in kw and not 'project_id' in kw:
             return reply.error(request, 'Missing assembly parameters.', './', {})
         track_ids = []
+        assembly_id = kw['assembly_id']
         
         if not files :
             return reply.error(request, 'No file to upload.', './', {})
         project = None
+        
         if 'project_id' in kw:
             project = DBSession.query(Project).filter(Project.id == kw['project_id']).first()
             if project is None:
                 return reply.error(request, 'Project with id %s not found.' % kw['project_id'], './', {})
+            assembly_id = project.sequence_id
+            
             
         for filename, f in files:
-            sequence = DBSession.query(Sequence).filter(Sequence.id == kw['assembly']).first()
+            sequence = DBSession.query(Sequence).filter(Sequence.id == assembly_id).first()
             task_id, track_id = handler.track.create_track(user.id, sequence, f=f.name, trackname=filename, project=project)
             
             if task_id == constants.NOT_SUPPORTED_DATATYPE or task_id == constants.NOT_DETERMINED_DATATYPE:
