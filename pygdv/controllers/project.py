@@ -320,6 +320,7 @@ class ProjectController(CrudRestController):
         if prefix : info['prefix'] = prefix
         info['sequence_id'] = project.sequence_id
         info['admin'] = True
+        info = json.dumps(info)
         control = 'b.showTracks();initGDV(b, %s, %s);' % (project.id, info)
         
         

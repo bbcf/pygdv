@@ -626,7 +626,6 @@ Browser.prototype.visibleTracks = function() {
  * Undocumented
  */
 Browser.prototype.onCoarseMove = function(startbp, endbp) {
-    console.log('onCoarseMove');
     var length = this.view.ref.end - this.view.ref.start;
     var trapLeft = Math.round((((startbp - this.view.ref.start) / length) * this.view.overviewBox.w) + this.view.overviewBox.l);
     var trapRight = Math.round((((endbp - this.view.ref.start) / length) * this.view.overviewBox.w) + this.view.overviewBox.l);

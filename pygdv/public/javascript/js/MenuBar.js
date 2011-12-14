@@ -65,16 +65,20 @@ dojo.declare("ch.epfl.bbcf.gdv.GDVMenuBar",null,{
      */
     build_gminer : function(){
         var toolbar = this.toolbar;
-        this.form_ids_template = toolbar['form_ids_template'];
-        /* title */
-        var htmlroot = dojo.byId("gdv_menu");
-        var div = document.createElement("div");
-        div.className = "menu_entry";
-        div.innerHTML=toolbar['title'];
-        htmlroot.appendChild(div);
-        /* pricipal menu */
-        var pmenu = this.getMenu(toolbar,'100%')
-        pmenu.placeAt("gdv_menu")
+	console.log(toolbar);
+	if(toolbar){
+	    this.form_ids_template = toolbar['form_ids_template'];
+	    if(!this.form_ids_template) return;
+	    /* title */
+	    var htmlroot = dojo.byId("gdv_menu");
+	    var div = document.createElement("div");
+	    div.className = "menu_entry";
+	    div.innerHTML=toolbar['title'];
+	    htmlroot.appendChild(div);
+	    /* pricipal menu */
+	    var pmenu = this.getMenu(toolbar,'100%');
+	    pmenu.placeAt("gdv_menu");
+	};
     },
     /**
      * Get the children of the item and not other parameters

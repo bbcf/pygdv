@@ -291,12 +291,12 @@ ImageTrack.prototype.draw = function(){
 		var pos = data[i];
 		var conv_pos = cnvs_width * pos / end_pos;
 		var real_score = data[i+1];
-		console.log(pos + '  ' +real_score);
+		//console.log(pos + '  ' +real_score);
 		if(prev_pos != null){
 		    var width = (conv_pos - prev_pos);
 		    var trans_score = - ( prev_score * cnvs_height / d * inZoom );
 		    ctx.rect(prev_pos, Z , width, trans_score);
-		    console.log('x: ' + prev_pos + ' y: ' + Z + ' w: ' + width + ' h: ' + trans_score + ' => ' + (Z + trans_score));
+		    //console.log('x: ' + prev_pos + ' y: ' + Z + ' w: ' + width + ' h: ' + trans_score + ' => ' + (Z + trans_score));
 		};
 		if (pos!= null){
 		    prev_pos = conv_pos;
@@ -307,7 +307,7 @@ ImageTrack.prototype.draw = function(){
 		var width = (conv_pos - prev_pos);
 		var trans_score = - ( prev_score * cnvs_height / d * inZoom );
 		ctx.rect(prev_pos * baseWidth, Z , width, trans_score);
-		console.log('x: ' + prev_pos + ' y: ' + Z + ' w: ' + width + ' h: ' + trans_score);
+		//console.log('x: ' + prev_pos + ' y: ' + Z + ' w: ' + width + ' h: ' + trans_score);
 	    }
 	    ctx.closePath();
             ctx.fill();

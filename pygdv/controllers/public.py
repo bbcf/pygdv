@@ -81,7 +81,7 @@ class PublicController(BaseController):
         info['admin'] = False
         info['sequence_id'] = project.sequence_id
         if prefix : info['prefix'] = prefix
-        
+        info = json.dumps(info)
         control = 'b.showTracks();initGDV(b, %s, %s);' % (project.id, info)
         
         if 'loc' in kw:

@@ -45,7 +45,7 @@ function initGDV(browser, project_id, gdv_info, readonly){
     
     if (!_gdv_info.admin){
 	gminer = {};
-	menu_nav = ['Home', 'Copy in Profile']
+	menu_nav = ['Home', 'Copy']
     };
     
     dojo.addOnLoad(function(){
