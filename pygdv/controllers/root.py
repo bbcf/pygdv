@@ -122,6 +122,9 @@ class RootController(BaseController):
     
 
     @expose()
+    def copy(self):
+        return 'You will be able to copy the project viewed into your profile. It will be implemented soon'
+    @expose()
     def test(self, **kw):
         return dict(kw)
     

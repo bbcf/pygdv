@@ -140,7 +140,7 @@ class TrackController(CrudRestController):
     
     @expose()
     def dump(self, *args, **kw):
-        pass
+        return "You will be able to export the desired track in the format wanted. It's not implemented yet."
     
     @expose()
     def link(self, track_id, *args, **kw):
