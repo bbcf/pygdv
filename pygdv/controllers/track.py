@@ -70,7 +70,7 @@ class TrackController(CrudRestController):
         if not 'assembly' in kw and not 'project_id' in kw:
             return reply.error(request, 'Missing assembly parameters.', './', {})
         track_ids = []
-        assembly_id = kw['assembly_id']
+        assembly_id = kw.get('assembly_id', '')
         
         if not files :
             return reply.error(request, 'No file to upload.', './', {})
