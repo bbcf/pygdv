@@ -61,6 +61,9 @@ FeatureTrack.prototype.loadSuccess = function(trackInfo) {
     this.labelScale = 50 * (trackInfo.featureCount / this.refSeq.length);
     this.subfeatureScale = 80 * (trackInfo.featureCount / this.refSeq.length);
     this.className = trackInfo.className;
+   
+
+    
     this.subfeatureClasses = trackInfo.subfeatureClasses;
     this.arrowheadClass = trackInfo.arrowheadClass;
     this.urlTemplate = trackInfo.urlTemplate;
@@ -379,6 +382,8 @@ FeatureTrack.prototype.measureStyles = function() {
     this.padding += glyphBox.w;
     document.body.removeChild(heightTest);
 
+
+
     //determine the width of the arrowhead, if any
     if (this.arrowheadClass) {
     var ah = document.createElement("div");
@@ -462,7 +467,11 @@ FeatureTrack.prototype.renderFeature = function(feature, uniqueId, block, scale,
 
     if ((fields["phase"] !== undefined) && (feature[fields["phase"]] !== null))
         featDiv.className = featDiv.className + feature[fields["phase"]];
+    
+    
 
+
+    
     // Since some browsers don't deal well with the situation where
     // the feature goes way, way offscreen, we truncate the feature
     // to exist betwen containerStart and containerEnd.
@@ -500,6 +509,14 @@ FeatureTrack.prototype.renderFeature = function(feature, uniqueId, block, scale,
         }
     }
     
+    //hack for color
+    if (this.trackMeta){
+    	if (this.trackMeta['color']){
+    	    featDiv.style.backgroundColor = this.trackMeta['color']; 
+	    featDiv.style.color = this.trackMeta['color'];
+    	};
+    };
+
     if ((scale > this.labelScale)
         && fields["name"]
         && feature[fields["name"]]) {

@@ -42,6 +42,8 @@ def test_command_line(*args, **kw):
         raise p2
     print 'end of task'
     return 1
+
+
 #############################################################################################################
 #        FILE PROCESSING
 #############################################################################################################
@@ -152,6 +154,7 @@ def _jsonify_features(database, name, sha1, output_dir, public_url, browser_url,
     '''
     Launch the process to produce a JSON output for a ``feature`` database.
     '''
+    print 'blob'
     try :
         jsongen.jsonify(database, name, sha1, output_dir, public_url, browser_url, extended)
     except Exception as e:
@@ -175,9 +178,9 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, pr
     tfile.close()
     try:
         # normal convert
-        print 'convert %s to %s' %(path, tmp_dst)
+        print 'converting %s to %s' %(path, tmp_dst)
         track.convert(path, tmp_dst)
-
+        print 'done'
 
         # then tranform to GDV format
         if datatype == constants.SIGNAL:
@@ -210,7 +213,8 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, pr
                         t2.write(chrom, gen, fields=f + (agg_field,))
                     t2.datatype = constants.RELATIONAL
                     t2.assembly = assembly_name
-
+        
+        print 'removing tmp files'
         try:
             os.remove(os.path.abspath(path))
         except OSError :
@@ -220,7 +224,7 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, pr
         except OSError :
             pass
 
-
+        
         if process_db :
             return subtask(process_db).delay(datatype, assembly_name, dst, sha1, name, format)
 
@@ -240,7 +244,7 @@ def process_database(datatype, assembly_name, path, sha1, name, format):
     '''
     Entry point of the sqlite file
     '''
-
+    print 'process db'
     dispatch = _sql_dispatch.get(datatype, lambda *args, **kw : cannot_process(*args, **kw))
     try :
         return dispatch(path, sha1, name)
@@ -285,6 +289,7 @@ def _features(path, sha1, name):
     Task for a ``feature`` database.
     @return the subtask associated
     '''
+    print 'features'
     output_dir = json_directory()
     callback_on_error = subtask(task=del_file_on_error, args=(sha1,))
 

@@ -12,9 +12,7 @@ def track_info(tracks):
     '''
     Build ``trackInfo`` variable.
     '''
-    list = []
     ##TODO add DNA track
-    l = [track.parameters.jb_dict for track in tracks]
     return [track.parameters.jb_dict for track in tracks]
         
         

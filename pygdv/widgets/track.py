@@ -7,7 +7,7 @@ import tw.forms as twf
 import tw.dynforms as twd
 import genshi
 
-from tg import url
+from tg import url, tmpl_context
 
 from pygdv.model import DBSession, Track, Species, Sequence
 from pygdv.lib.helpers import get_delete_link, get_edit_link, get_task_status, get_export_link
@@ -28,10 +28,15 @@ class NewTForm(AddRecordForm):
     __model__ = Track
     __base_widget_args__ = {'hover_help': True}
 
+
+def get_track_color():
+    return tmpl_context.color
 # EDIT
 class TEditForm(EditableForm):
     __model__ = Track
     __limit_fields__ = ['name']
+    color = twf.InputField(id='color',label_text='Enter a color',
+                          help_text = 'You can put rgb(102,30,29), hex value or just "red".', default=get_track_color)
 
 # EDIT FILLER
 class TEditFiller(EditFormFiller):

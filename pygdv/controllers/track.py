@@ -64,13 +64,14 @@ class TrackController(CrudRestController):
         user = handler.user.get_user_in_session(request)
         files = util.upload(**kw)
         
+        
         if files is None:
             return reply.error(request, 'No file to upload.', './', {})
             
         if not 'assembly' in kw and not 'project_id' in kw:
             return reply.error(request, 'Missing assembly parameters.', './', {})
         track_ids = []
-        assembly_id = kw.get('assembly_id', '')
+        assembly_id = kw.get('assembly', None)
         
         if not files :
             return reply.error(request, 'No file to upload.', './', {})
@@ -82,7 +83,9 @@ class TrackController(CrudRestController):
                 return reply.error(request, 'Project with id %s not found.' % kw['project_id'], './', {})
             assembly_id = project.sequence_id
             
-            
+        if not 'assembly' in kw:
+            return reply.error(request, 'Missing assembly parameters.', './', {})
+        
         for filename, f in files:
             sequence = DBSession.query(Sequence).filter(Sequence.id == assembly_id).first()
             task_id, track_id = handler.track.create_track(user.id, sequence, f=f.name, trackname=filename, project=project)
@@ -113,6 +116,8 @@ class TrackController(CrudRestController):
     
     @expose('tgext.crud.templates.edit')
     def edit(self, *args, **kw):
+        track = DBSession.query(Track).filter(Track.id == args[0]).first()
+        tmpl_context.color = track.parameters.color
         return CrudRestController.edit(self, *args, **kw)
     
     @expose()
@@ -124,6 +129,8 @@ class TrackController(CrudRestController):
             if int(id) == track.id :
                 track = DBSession.query(Track).filter(Track.id == id).first()
                 track.name = kw['name']
+                if 'color' in kw:
+                    track.parameters.color = kw['color']
                 DBSession.flush()
                 redirect('../')
         

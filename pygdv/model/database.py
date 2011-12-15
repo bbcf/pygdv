@@ -428,9 +428,11 @@ class TrackParameters(DeclarativeBase):
         '''
         Get the representation dict for jbrowse
         '''
-        return {'url' : self.url, 'label' : self.label, 'type' : self.type, 
+        d = {'url' : self.url, 'label' : self.label, 'type' : self.type, 
                 'gdv_id' : self.id, 'key' : self.key}
-    
+        if self.color:
+            d['color'] = self.color
+        return d
     def build_parameters(self):
         self.url = os.path.join(self.track.input.sha1, '{refseq}' ,constants.track_data)
         self.label = self.track.name
