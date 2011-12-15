@@ -164,21 +164,21 @@ dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
     /**
      * Function binded to the location box 'onKeyUp'
      */
-    search : function(field,refSeq){
+    search : function(field, refSeq){
         var suggest_field = dojo.byId("suggest_field");
         var browser = dojo.byId("GenomeBrowser").genomeBrowser;
         suggest_field.style.display="inline";
-        suggest_field.innerHTML="";
+        suggest_field.innerHTML = "";
         var loader = document.createElement("img");
         loader.src = browser.imageRoot + "ajax-loader.gif";
         suggest_field.appendChild(loader);
         this.field = field;
         this.refSeq = refSeq;
-        if(this.isTyping==true){
+        if(this.isTyping == true){
 	    this.restartTiming();
         } else {
 	    this.startTiming();
-	    this.isTyping=true;
+	    this.isTyping = true;
         }
     }
     
@@ -354,8 +354,8 @@ GeneNameFetcher.prototype.handleSearchNames = function(data){
             });
 	}
     }
-    if(hasResult==false){
-	suggest_field.innerHTML="no suggestions";
+    if(hasResult == false){
+	suggest_field.innerHTML = "no suggestions";
     }
 };
 

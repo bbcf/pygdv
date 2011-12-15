@@ -25,6 +25,7 @@ var _gdvls;//the live search
 var _tc;//the tab container
 var _jh;//the job handler
 var _menub;//the menubar
+var _lp;//the link panel
 
 var _gdv_info = {};
 
@@ -73,6 +74,7 @@ function initGDV(browser, project_id, gdv_info, readonly){
 	    _jh = new ch.epfl.bbcf.gdv.JobHandler({});
 	} catch(err) {console.error(err);}
 	
+	_lp = new LinkPanel();
 	
 	if(!_menub) console.error('menu bar failed');
 	if(!_gdvls) console.error('tab container failed');

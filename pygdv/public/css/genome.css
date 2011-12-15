@@ -891,3 +891,11 @@ width: 3em;
     width: 35px;
     cursor: text;
 }
+
+.link_panel {
+    border: 1px dotted black;
+    padding: 10px;
+    position: absolute;
+    top: -2px;
+    left: -2px;
+}

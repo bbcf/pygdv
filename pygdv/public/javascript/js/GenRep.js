@@ -30,6 +30,38 @@ GenRep.prototype.error = function(data){
     console.error(data);
 };
 
+
+/**
+* Get an assembly GenRep object.
+*/
+GenRep.prototype.assemblies = function(assembly_id, callback){
+    if(!callback) callback = function(data){console.log('GenRep.assemblies :: ' + data)};
+    this.get(callback, 'assemblies/' + assembly_id + '.jsonp');
+};
+
+/**
+* Get the links for an assembly and a gene name. (to Ensembl, UCSC, ...)
+* @return {"Ensembl" : "link/to/ensembl", "UCSC" : ...}
+*/
+GenRep.prototype.links = function(assembly_id, gene_name, callback){
+    if(!callback) callback = function(data){console.log(data)};
+    var ctx = this;
+    
+    process_assembly = function(data){
+	var ass = data['assembly'];
+	ctx.get_links(ass['nr_assembly_id'], ass['md5'], gene_name, callback);
+    };
+    this.assemblies(assembly_id, process_assembly);
+};
+
+/**
+* Get the links for an nr_assembly, a md5 and a gene name. (to Ensembl, UCSC, ...)
+*/
+GenRep.prototype.get_links = function(nr_assembly_id, md5, gene_name, callback){
+    if (!callback) callback = function(data){console.log(data)};
+    this.get(callback, 'nr_assemblies/get_links/' + nr_assembly_id + '.jsonp?md5=' + md5 + '&gene_name=' + gene_name);
+};
+
 /**
 * Determines the currently view chromosome id (e.g. 3075)
 * @param{fn} the function to be executed with the data
@@ -141,5 +173,3 @@ GenRep.prototype.annotate_bands = function(bands) {
     return bands;
 };
 
-
-GenRep.prototype.toto = function(){};

@@ -1,4 +1,9 @@
-var _linkPanel;
+function LinkPanel(){
+    this._lp_showed = false;
+    this.id = 'link_panel'
+};
+
+
 /**
  * Quick made function which has the purpose
  * to show a link Panel on the browser view
@@ -10,80 +15,63 @@ var _linkPanel;
  */
 
  
-function showPanelInfo(node, nrAssemblyId, feat, fields){
-    console.log(feat);
-    console.log("   ");
-    console.log(fields);
-    var name = feat[fields["name"]]; 
-    var start = feat[fields["start"]];
-    var end = feat[fields["end"]];
-    
-    if(!_linkPanel){
-    var url = _GENREP_URL + '/nr_assemblies/g';
-    var pData="gene_name=" + name + "&nr_assembly_id=" + nrAssemblyId;
-    var xhrArgs = {
-            url: url,
-        postData: pData,
-            handleAs: "json",
-            load: function(data){
-        console.log(data);
-        console.log(node);
-        buildLinkPanel(node,data);
-        },
-            error: function(error) {
-        console.error(data);
-            }
-        };
-    console.log(xhrArgs);
-    var deferred = dojo.xhrPost(xhrArgs);
-    }
+LinkPanel.prototype.showPanelInfo = function(node, assembly_id, feat, fields){
+    if(!this._lp_showed){
+	this._lp_showed = true;
+	this.wait(node);
+	var ctx = this;
+	var name = feat[fields["name"]]; 
+	var start = feat[fields["start"]];
+	var end = feat[fields["end"]];
+	callback = function(data){ctx.buildLinkPanel(node, data)};
+	new GenRep().links(assembly_id, name, callback);
+    };
 };
 
-function makeUrl(){
-
-};
 /**
- * Build the HTNL panel
+ * Build the HTML panel
  * @param{node} the HTML node
  * @param{data} the link data as JSON
  */
-function buildLinkPanel(node,data){
-    var panel = document.createElement("div");
-    panel.className = "link_panel";
-    panel.id = "linkPanel";
-    panel.style.border="1px solid black";
-    panel.style.padding="1px";
-    var title = document.createElement("h5");
-    title.innerHTML = "Links";
+LinkPanel.prototype.buildLinkPanel = function(node, data){
+    var panel = dojo.byId(this.id);
+    dojo.empty(panel);
+    
+    var title = document.createElement('h5');
+    title.innerHTML = 'Links';
     panel.appendChild(title);
     for(key in data){
-    var el = document.createElement("a");
-    el.innerHTML=key;
-    el.href=data[key];
-    panel.appendChild(el);
+	var d = document.createElement('DIV');
+	var el = document.createElement('a');
+	el.innerHTML = key;
+	el.href = data[key];
+	d.appendChild(el);
+	panel.appendChild(d);
     }
     node.appendChild(panel);
-    _linkPanel=true;
+    var ctx = this;
     //add events
-    var handler = dojo.connect(panel,'onmouseleave',function(e){
-        e.stopPropagation();
-        dojo.stopEvent(e);
-        if(e.srcElement){
-        if(e.srcElement.tagName=="DIV"){
-            node.removeChild(panel);
-            _linkPanel=false;
-            dojo.disconnect(handler);
-            }
-        }
-        else {
-            if(e.currentTarget.className=="link_panel"){
-            _linkPanel=false;
-            node.removeChild(panel);
-            dojo.disconnect(handler);
-            }
-        }
-        });
+    var handler = dojo.connect(panel, 'onmouseleave', function(e){
+        node.removeChild(panel);
+	ctx._lp_showed = false;
+	dojo.stopEvent(e);
+    });
 };
+
+
+
+LinkPanel.prototype.wait = function(node){
+    var panel = document.createElement("div");
+    panel.className = "link_panel";
+    panel.id = this.id;
+        
+    var browser = dojo.byId("GenomeBrowser").genomeBrowser;
+    var loader = document.createElement("img");
+    loader.src = browser.imageRoot + "ajax-loader.gif";
+    panel.appendChild(loader);
+    node.appendChild(panel);
+};
+
 
 
 function LinksMaker(){};
