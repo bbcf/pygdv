@@ -54,7 +54,8 @@ Minimap.prototype.update = function() {
         dojo.byId('overview').style.backgroundImage = "";
         this.draw();
     });
-    this.gv.genrep.bands(callback);
+    var gv = this.gv;
+    gv.genrep.bands(gv, callback);
 };
 
 /**

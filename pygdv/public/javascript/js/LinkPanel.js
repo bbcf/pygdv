@@ -8,10 +8,19 @@ var _linkPanel;
  * @param{start} start of the feature
  * @param{end of the feature}
  */
-function showLinkPanel(node,nrAssemblyId,name,start,end){
+
+ 
+function showPanelInfo(node, nrAssemblyId, feat, fields){
+    console.log(feat);
+    console.log("   ");
+    console.log(fields);
+    var name = feat[fields["name"]]; 
+    var start = feat[fields["start"]];
+    var end = feat[fields["end"]];
+    
     if(!_linkPanel){
-    var url=_GDV_URL+"/link";
-    var pData="gene_name=" + name + "&nr_assembly_id="+nrAssemblyId;
+    var url = _GENREP_URL + '/nr_assemblies/g';
+    var pData="gene_name=" + name + "&nr_assembly_id=" + nrAssemblyId;
     var xhrArgs = {
             url: url,
         postData: pData,
@@ -30,6 +39,9 @@ function showLinkPanel(node,nrAssemblyId,name,start,end){
     }
 };
 
+function makeUrl(){
+
+};
 /**
  * Build the HTNL panel
  * @param{node} the HTML node

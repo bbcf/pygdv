@@ -457,7 +457,7 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
     view.zoneSel = zoneSel;
 
     // Create a genrep object
-    var genrep = new GenRep(view);
+    var genrep = new GenRep();
     view.genrep = genrep;
 
     // Default image in case minimap doesn't work

@@ -18,6 +18,8 @@ var _GDV_JOB_URL = _GDV_URL + '/jobs';
 
 var _GDV_FORM_URL = _GDV_URL + '/forms';
 
+var _GENREP_URL = 'http://bbcftools.vital-it.ch/genrep';
+
 var _GDV_JOB_STATUS_WAIT = 8000;
 var _gdvls;//the live search
 var _tc;//the tab container
@@ -105,3 +107,8 @@ function notify(mess){
     dojo.byId('gdv_notifier').innerHTML = str;
     
 }
+
+
+
+
+

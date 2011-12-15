@@ -1,11 +1,8 @@
 /**
 * The general GenRep object used for queries.
 */
-function GenRep(gv) {
-    // Store the view
-    this.gv = gv;
-    // Hard coded URL
-    this.url = 'http://bbcftools.vital-it.ch/genrep/';
+function GenRep() {
+    this.url = _GENREP_URL;
 }
 
 /**
@@ -20,13 +17,13 @@ GenRep.prototype.get = function(fn, path, content) {
     if (!fn) {fn = function(data) {console.log(data);};}
     var ctx = this;
     dojo.io.script.get({
-                url: this.url + path,
+                url: this.url + '/' + path,
                 jsonp: "callback",
                 content: content,
                 load: fn,
                 error: ctx.error
     });
-    return this.url + path;
+    return this.url + '/' + path;
 };
 
 GenRep.prototype.error = function(data){
@@ -36,11 +33,12 @@ GenRep.prototype.error = function(data){
 /**
 * Determines the currently view chromosome id (e.g. 3075)
 * @param{fn} the function to be executed with the data
+* @param{view} the GenomeView
 * @example: b.view.genrep.current_chr_id(function(id) {console.log("The id is:", id)})
 * @returns nothing
 */
-GenRep.prototype.current_chr_id = function(fn) {
-    var assembly_id  = this.gv.nr_assembly_id;
+GenRep.prototype.current_chr_id = function(view, fn) {
+    var assembly_id  = view.nr_assembly_id;
     var chr_name  = b.refSeq['name'];
     this.chr_name_to_id(fn, assembly_id, chr_name);
 };
@@ -99,9 +97,9 @@ GenRep.prototype.get_chr_id = function(chrom) {
 * @param{fn} the function to be executed with the data
 * @returns nothing
 */
-GenRep.prototype.bands = function(fn) {
+GenRep.prototype.bands = function(view, fn) {
     callback = dojo.hitch(this, function(chr_id) {this.bands_by_chr(fn, chr_id);});
-    this.current_chr_id(callback);
+    this.current_chr_id(view, callback);
 };
 
 /**
@@ -142,3 +140,6 @@ GenRep.prototype.annotate_bands = function(bands) {
     }
     return bands;
 };
+
+
+GenRep.prototype.toto = function(){};

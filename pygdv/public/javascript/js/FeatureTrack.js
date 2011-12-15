@@ -105,8 +105,8 @@ FeatureTrack.prototype.loadSuccess = function(trackInfo) {
             var feat = elem.feature;
         //make link for the feature (it call a GDV javascript)
 
-        showPanelInfo(this, _gdv_info.sequence_id,
-		      feat[fields["name"]],feat[fields["start"]],feat[fields["end"]]);
+        showPanelInfo(this, _gdv_info.sequence_id, feat, fields);
+
         // alert("clicked on feature\nstart: " + feat[fields["start"]] +
         // ", end: " + feat[fields["end"]] +
         // ", strand: " + feat[fields["strand"]] +
