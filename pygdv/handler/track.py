@@ -30,14 +30,16 @@ def create_track(user_id, sequence, trackname=None, f=None, project=None, sessio
     @param project : if given, the track created has to be added to the project 
     @return : task_id, track_id    
     '''
+    print f
     if f is not None:
         _input = create_input(f,trackname, sequence.name, session)
         if _input == constants.NOT_SUPPORTED_DATATYPE or _input == constants.NOT_DETERMINED_DATATYPE:
             try:
-                os.remove(os.path.abspath(f.name))
+                os.remove(os.path.abspath(f))
             except OSError :
                 pass
-            return _input
+            return _input, 0
+        
         track = Track()
         if trackname is not None:
             track.name = trackname
@@ -64,7 +66,7 @@ def create_track(user_id, sequence, trackname=None, f=None, project=None, sessio
             session.add(sequence)
        
         session.flush()
-        
+        print _input.task_id, track.id
         return _input.task_id, track.id
     
     
@@ -141,6 +143,8 @@ _sql_dispatch : will choose in which process the database will go, based on it's
 '''
 _process_dispatch = {'sql' : lambda *args, **kw : move_database(*args, **kw),
                     'bed' : lambda *args, **kw : convert_file(*args, **kw),
+                    'gff' : lambda *args, **kw : convert_file(*args, **kw),
+                    'gtf' : lambda *args, **kw : convert_file(*args, **kw),
                     'bigWig' : lambda *args, **kw : not_impl(*args, **kw),
                     'wig' : lambda *args, **kw : convert_file(*args, **kw),
                     'bedgraph' : lambda *args, **kw : convert_file(*args, **kw)}
@@ -149,6 +153,7 @@ _process_dispatch = {'sql' : lambda *args, **kw : move_database(*args, **kw),
 _formats = {'sql' : constants.NOT_DETERMINED_DATATYPE,
                     'bed' : constants.FEATURES,
                     'gff' : constants.RELATIONAL,
+                    'gtf' : constants.RELATIONAL,
                     'bigWig' : constants.SIGNAL,
                     'wig' : constants.SIGNAL,
                     'bedgraph' : constants.SIGNAL

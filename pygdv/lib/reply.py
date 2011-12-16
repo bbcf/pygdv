@@ -31,5 +31,5 @@ def error(request, message, redirection, dic):
     if request.environ[REQUEST_TYPE] == REQUEST_TYPE_COMMAND_LINE:
             dic['error'] = message
             return dic
-    error(message)
+    flash(message, 'error')
     raise redirect(redirection)

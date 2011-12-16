@@ -17,6 +17,10 @@ files['feature']= os.path.join(test_file_dir, 'feature.sql')
 files['signal']= os.path.join(test_file_dir, 'signal.sql')
 files['relational']= os.path.join(test_file_dir, 'relational.sql')
 
+files['feature_r']= os.path.join(test_file_dir, 'feature.result')
+files['signal_r']= os.path.join(test_file_dir, 'signal.result')
+files['relational_r']= os.path.join(test_file_dir, 'relational.result')
+
 
 random_name = lambda x: ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(x))
 
