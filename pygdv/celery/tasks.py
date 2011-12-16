@@ -43,7 +43,7 @@ def test_command_line(*args, **kw):
     print 'end of task'
     return 1
 @task()
-def testit():
+def test():
     return 0
 #############################################################################################################
 #        FILE PROCESSING
