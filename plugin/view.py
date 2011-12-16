@@ -6,7 +6,7 @@ It will be combined with an external javascript file to produce the form desired
 
 elements_types = ('radio_choice', 'boolean', 'drop_container', 'number')
 drop_container_types = ('ntracks', 'filter')
-''' WARNING : you cannot add another drop_container type without modifying the java class who handle
+''' WARNING : you cannot add another drop_container type without modifying the controller who handle
 the tracks '''
 form_ids_template = 'gfm_el'
 
@@ -33,7 +33,7 @@ class FormExpose(object):
         Get an unique id for elements in the form.
         @return an unique string based on 'form_ids_template'
         '''
-        self.id+=1
+        self.id += 1
         return form_ids_template+'_%s' % self.id
 
     def output(self):
@@ -44,7 +44,7 @@ class FormExpose(object):
         final_data = {'title':self.title, 'form_ids_template':form_ids_template}
         for child in self.childs :
             child_data = {self.next_id:child.output(self)}
-            final_data[self.next_id]=child.output(self)
+            final_data[self.next_id] = child.output(self)
         return final_data
 
 ################################################################################
@@ -100,9 +100,9 @@ class FormButton(object):
                 # don't keep the None values
                 for k, v in child.__dict__.items() :
                     if v == True :
-                        tmp_data[k]='true'
+                        tmp_data[k] = 'true'
                     elif v :
-                        tmp_data[k]=v
+                        tmp_data[k] = v
                 final_data[root.next_id]=tmp_data
         else : # just intermediate, continue recursively
             for child in self.childs :

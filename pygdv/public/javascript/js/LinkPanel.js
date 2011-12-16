@@ -23,7 +23,7 @@ LinkPanel.prototype.showPanelInfo = function(node, assembly_id, feat, fields){
 	var name = feat[fields["name"]]; 
 	var start = feat[fields["start"]];
 	var end = feat[fields["end"]];
-	callback = function(data){ctx.buildLinkPanel(node, data)};
+	callback = function(data){ctx.buildLinkPanel(node, name, data)};
 	new GenRep().links(assembly_id, name, callback);
     };
 };
@@ -33,10 +33,12 @@ LinkPanel.prototype.showPanelInfo = function(node, assembly_id, feat, fields){
  * @param{node} the HTML node
  * @param{data} the link data as JSON
  */
-LinkPanel.prototype.buildLinkPanel = function(node, data){
+LinkPanel.prototype.buildLinkPanel = function(node, gene_name, data){
     var panel = dojo.byId(this.id);
     dojo.empty(panel);
-    
+    var gn = document.createElement('h4');
+    gn.innerHTML = gene_name;
+    panel.appendChild(gn);
     var title = document.createElement('h5');
     title.innerHTML = 'Links';
     panel.appendChild(title);
