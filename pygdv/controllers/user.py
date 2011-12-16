@@ -5,18 +5,17 @@ from tgext.crud.decorators import registered_validate
 from repoze.what.predicates import not_anonymous, has_permission
 
 from tg import expose, flash, require
-from tg import app_globals as gl
 from tg.controllers import redirect
 from tg.decorators import paginate,with_trailing_slash
 
 from pygdv.model import User
 from pygdv.widgets.user import user_table, user_table_filler, user_new_form, user_edit_filler, user_edit_form
-
+from pygdv.lib import constants
 __all__ = ['UserController']
 
 
 class UserController(CrudRestController):
-    allow_only = has_permission(gl.perm_admin)
+    allow_only = has_permission(constants.perm_admin)
     model = User
     table = user_table
     table_filler = user_table_filler

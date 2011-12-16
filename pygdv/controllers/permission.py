@@ -5,13 +5,12 @@ from repoze.what.predicates import has_permission
 
 from tg import expose, flash
 from tg.controllers import redirect
-from tg import app_globals as gl
-
+from pygdv.lib import constants
 from pygdv.widgets.permission import perm_table, perm_table_filler, perm_new_form, perm_edit_filler, perm_edit_form
 from pygdv.model import DBSession, Permission
 
 class PermissionController(CrudRestController):
-    allow_only = has_permission(gl.perm_admin)
+    allow_only = has_permission(constants.perm_admin)
     model = Permission
     table = perm_table
     table_filler = perm_table_filler

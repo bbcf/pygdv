@@ -4,6 +4,7 @@ from tg import url
 
 mother_dir = 'pygdv'
 bin_dir = 'bin'
+test_dir = 'tests'
 data_dir = 'pygdv.public.data'
 json_dir = 'jbrowse'
 tracks_dir = 'tracks'
@@ -37,6 +38,12 @@ def gfeatminer_url():
 
 def bin_directory():
     return os.path.join(resource_filename(mother_dir, bin_dir))
+
+def test_directory():
+    return os.path.join(resource_filename(mother_dir, test_dir))
+
+
+
 
 # URLS TO PUT IN JSON
 def data_root():

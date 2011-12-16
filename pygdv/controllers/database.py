@@ -5,14 +5,13 @@ from tg import expose, flash, require, request
 from pygdv.lib.base import BaseController
 from pygdv.model import DBSession, Project, Track, Sequence
 from repoze.what.predicates import has_any_permission
-from tg import app_globals as gl
 import sqlite3, os
 from pygdv.lib import constants
 from sqlite3 import OperationalError
 import track
 
 class DatabaseController(BaseController):
-    allow_only = has_any_permission(gl.perm_user, gl.perm_admin)
+    allow_only = has_any_permission(constants.perm_admin, constants.perm_user)
 
     
     @expose('json')

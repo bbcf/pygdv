@@ -5,12 +5,12 @@ from repoze.what.predicates import has_permission
 from tg.controllers import redirect
 from pygdv.widgets.group import group_table, group_table_filler, new_group_form, group_edit_filler, group_edit_form
 from pygdv.model import DBSession, Group
-from tg import app_globals as gl
+from pygdv.lib import constants
 __all__ = ['GroupController']
 
 
 class GroupController(CrudRestController):
-    allow_only = has_permission(gl.perm_admin)
+    allow_only = has_permission(constants.perm_admin)
     model = Group
     table = group_table
     table_filler = group_table_filler

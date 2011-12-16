@@ -6,15 +6,14 @@ from tg.decorators import with_trailing_slash, paginate
 from tg.controllers import redirect
 from pygdv.widgets.tasks import celerytask_table, celerytask_table_filler, celerytask_new_form, celerytask_edit_filler, celerytask_edit_form, task_grid
 from pygdv.model import DBSession, Task
-from tg import app_globals as gl
 from pygdv import handler
-from pygdv.lib import util
+from pygdv.lib import util, constants
 from celery.result import AsyncResult
 __all__ = ['TaskController']
 
 
 class TaskController(CrudRestController):
-    allow_only = has_permission(gl.perm_admin)
+    allow_only = has_permission(constants.perm_admin)
     model = Task
     table = celerytask_table
     table_filler = celerytask_table_filler

@@ -3,7 +3,6 @@ from __future__ import absolute_import
 from pygdv.lib.base import BaseController
 from tg import expose, request
 from repoze.what.predicates import has_any_permission
-from tg import app_globals as gl
 from pygdv.celery import tasks
 from celery.task import chord
 from pygdv import handler
@@ -17,7 +16,7 @@ __all__ = ['WorkerController']
 simple_fields = ('start', 'end', 'score', 'name', 'strand', 'attributes')
 
 class WorkerController(BaseController):
-    allow_only = has_any_permission(gl.perm_admin, gl.perm_user)
+    allow_only = has_any_permission(constants.perm_admin, constants.perm_user)
     
     
     

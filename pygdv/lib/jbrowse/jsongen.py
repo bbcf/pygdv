@@ -358,7 +358,6 @@ def jsonify(database_path, name, sha1, output_root_directory, public_url, browse
     @param output_root_directory : the base system path where to write the output
     @param extended : if the format is ``basic`` or ``extended``
     '''
-    print 'jsonify'
     # configure outputs
     output_path = os.path.join(output_root_directory, sha1)
     out_public_url = os.path.join(public_url, sha1)
@@ -368,7 +367,6 @@ def jsonify(database_path, name, sha1, output_root_directory, public_url, browse
     with track.load(database_path, 'sql', readonly=False) as t :
         for chr_name in t:
             chr_length = t.chrmeta[chr_name]['length']
-            print 'doing %s ' % chr_name
             out = os.path.join(output_path, chr_name)
             os.mkdir(out)
             lazy_url = os.path.join(out_browser_url, chr_name, 'lazyfeatures-{chunk}.json')
