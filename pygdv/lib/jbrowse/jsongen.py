@@ -162,32 +162,32 @@ def _generate_nested_features(cursor, keep_field, start_index, end_index):
     '''
     Generate features that has to be written in JSON
     '''
-    stack = []
-    prev_feature = None
     nb_feature = 1
     field_number_list = range(keep_field)
     for row in cursor:
         feature = [row[i] for i in field_number_list]
+        yield feature, nb_feature
+        nb_feature += 1
         
-        if prev_feature is not None:
-            if feature[end_index] < prev_feature[end_index]:
-                stack.append(prev_feature)
-            else :
-                while stack :
-                    tmp_feature = stack.pop()
-                    _nest(tmp_feature, prev_feature, keep_field + 1, keep_field)
-                    nb_feature += 1
-                    prev_feature = tmp_feature
-                    if feature[1] < prev_feature[1]:
-                        stack.append(prev_feature)
-                        break
-                else:
-                    yield prev_feature, nb_feature
-                    nb_feature = 1
-                    
-        prev_feature = feature
-    if prev_feature is not None:
-            yield prev_feature, nb_feature
+#        if prev_feature is not None:
+#            if feature[end_index] < prev_feature[end_index]:
+#                stack.append(prev_feature)
+#            else :
+#                while stack :
+#                    tmp_feature = stack.pop()
+#                    _nest(tmp_feature, prev_feature, keep_field + 1, keep_field)
+#                    nb_feature += 1
+#                    prev_feature = tmp_feature
+#                    if feature[1] < prev_feature[1]:
+#                        stack.append(prev_feature)
+#                        break
+#                else:
+#                    yield prev_feature, nb_feature
+#                    nb_feature = 1
+#                    
+#        prev_feature = feature
+#    if prev_feature is not None:
+#            yield prev_feature, nb_feature
         
 
         
