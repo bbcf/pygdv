@@ -51,13 +51,6 @@ LinkPanel.prototype.buildLinkPanel = function(node, gene_name, data){
 	panel.appendChild(d);
     }
     node.appendChild(panel);
-    var ctx = this;
-    //add events
-    var handler = dojo.connect(panel, 'onmouseleave', function(e){
-        node.removeChild(panel);
-	ctx._lp_showed = false;
-	dojo.stopEvent(e);
-    });
 };
 
 
@@ -71,6 +64,14 @@ LinkPanel.prototype.wait = function(node){
     var loader = document.createElement("img");
     loader.src = browser.imageRoot + "ajax-loader.gif";
     panel.appendChild(loader);
+
+    var ctx = this;
+    var handler = dojo.connect(panel, 'onmouseleave', function(e){
+        node.removeChild(panel);
+	ctx._lp_showed = false;
+	dojo.stopEvent(e);
+    });
+
     node.appendChild(panel);
 };
 
