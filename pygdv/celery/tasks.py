@@ -155,7 +155,6 @@ def _jsonify_features(database, name, sha1, output_dir, public_url, browser_url,
     '''
     Launch the process to produce a JSON output for a ``feature`` database.
     '''
-    print 'blob'
     try :
         jsongen.jsonify(database, name, sha1, output_dir, public_url, browser_url, extended)
     except Exception as e:
@@ -181,7 +180,6 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, pr
         # normal convert
         print 'converting %s to %s' %(path, tmp_dst)
         track.convert(path, tmp_dst)
-        print 'done'
 
         # then tranform to GDV format
         if datatype == constants.SIGNAL:
@@ -245,7 +243,6 @@ def process_database(datatype, assembly_name, path, sha1, name, format):
     '''
     Entry point of the sqlite file
     '''
-    print 'process db'
     dispatch = _sql_dispatch.get(datatype, lambda *args, **kw : cannot_process(*args, **kw))
     try :
         return dispatch(path, sha1, name)
@@ -290,7 +287,6 @@ def _features(path, sha1, name):
     Task for a ``feature`` database.
     @return the subtask associated
     '''
-    print 'features'
     output_dir = json_directory()
     callback_on_error = subtask(task=del_file_on_error, args=(sha1,))
 
