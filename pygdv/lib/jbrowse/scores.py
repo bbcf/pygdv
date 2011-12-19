@@ -169,7 +169,7 @@ def get_last_feature_stop(t, chromosome):
     '''
     Get the stop of the last feature.
     '''
-    return t.cursor.execute('select max(end) from "%s";' % chromosome).fetchone()[0]
+    return t.cursor().execute('select max(end) from "%s";' % chromosome).fetchone()[0]
 
 @timer
 def pre_compute_sql_scores(database_path, sha1, output_dir):

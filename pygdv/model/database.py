@@ -95,7 +95,7 @@ class RightCircleAssociation(DeclarativeBase):
     right = relationship('Right')
     right_id = Column(Integer,
                        ForeignKey('Right.id',  ondelete="CASCADE"), nullable=False, primary_key=True)
-    circle =  relationship('Circle',  cascade="all, delete")
+    circle =  relationship('Circle')
     circle_id = Column(Integer,
                        ForeignKey('Circle.id',  ondelete="CASCADE"), nullable=False, primary_key=True)
     project_id = Column(Integer, ForeignKey('Project.id',  ondelete="CASCADE"), nullable=False, primary_key=True)

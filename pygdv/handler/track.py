@@ -31,6 +31,7 @@ def copy_track(user_id, track):
     DBSession.add(params)
     DBSession.add(to_copy)
     DBSession.flush()
+    return to_copy
 
 def create_track(user_id, sequence, trackname=None, f=None, project=None, session=None, admin=False):
     if session is None:
@@ -104,7 +105,7 @@ def create_input(f, trackname, sequence_name, session):
         
         
         fo = determine_format(file_path)
-        
+
         dispatch = _process_dispatch.get(fo, constants.NOT_SUPPORTED_DATATYPE)
         if  dispatch == constants.NOT_SUPPORTED_DATATYPE:
             return dispatch

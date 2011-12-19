@@ -353,5 +353,11 @@ class ProjectController(CrudRestController):
                     control = control,
                     page='view')
     
-    
-    
+    @expose()
+    def copy(self, project_id):
+        user = handler.user.get_user_in_session(request)
+        if not checker.check_permission_project(user.id, project_id, constants.right_download_id):
+            return reply.error(request, 'You have no right to copy this project in your profile.', './', {})
+        handler.project.copy(user.id, project_id)
+        return reply.normal(request, 'Copy successfull', '/projects', {})
+        

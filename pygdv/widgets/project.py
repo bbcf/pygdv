@@ -13,7 +13,7 @@ from tg import url, tmpl_context
 from sprox.dojo.formbase import DojoEditableForm
 from sprox.widgets.dojo import SproxDojoSelectShuttleField, SproxDojoSortedSelectShuttleField
 from pygdv.model import DBSession, Project, Species, Sequence, Track, User, Group
-from pygdv.lib.helpers import get_delete_link, get_detail_link, get_edit_link, get_project_right_sharing_form, get_view_link, get_share_link
+from pygdv.lib.helpers import get_delete_link, get_detail_link, get_edit_link, get_project_right_sharing_form, get_view_link, get_share_link, get_copy_link
 from pygdv import handler
 from tg import app_globals as gl
 from pygdv.lib import constants
@@ -215,22 +215,11 @@ project_with_right = twf.DataGrid(fields = [
     ('Created', 'dec.created'),
     ('Assembly', 'dec.assembly'),
     ('Tracks', 'dec.get_tracks'),
-    #('Rights', lambda obj : ', '.join([right for right in obj.rights if obj.rights[right]])),
-#    ('Read', lambda obj:genshi.Markup(
-#        get_view_link(obj.dec.id, 'project_id', obj.rights) )),
-#    ('Download', lambda obj:genshi.Markup(
-#                                          get_detail_link(obj.dec.id, 'project_id', obj.rights)
-#                                          )),
-#    ('Upload', lambda obj:genshi.Markup(
-#                                    get_share_link(obj.dec.id, 'project_id', obj.rights)
-#                                    + get_edit_link(obj.dec.id, obj.rights)
-#                                    + get_delete_link(obj.dec.id, obj.rights) 
-#                                         
-#                                        ))
     ('Action', lambda obj:genshi.Markup(
         '<div class="actions">'
         + get_view_link(obj.dec.id, 'project_id', obj.rights) 
-        + get_share_link(obj.dec.id, 'project_id', obj.rights) 
+        + get_share_link(obj.dec.id, 'project_id', obj.rights)
+        + get_copy_link(obj.dec.id, 'project_id', obj.rights, base_url='/projects')
         + get_delete_link(obj.dec.id, obj.rights) 
         + get_edit_link(obj.dec.id, obj.rights)
         + get_detail_link(obj.dec.id, 'project_id', obj.rights)

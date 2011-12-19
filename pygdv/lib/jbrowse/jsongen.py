@@ -293,7 +293,7 @@ def _histogram_meta(chr_length, threshold, resource_url):
 
 def _write_histo_stats(generator, threshold, output):
     '''
-    Write the files hist-{threshold}-{chunk}.json
+    Write the files hist-{threshold}-{chunk}.jsont.cursor
     '''
     # write
     chunk_nb = -1
@@ -430,12 +430,12 @@ def _prepare_database(t, chr_name):
     '''
     table_name = 'tmp_%s' % chr_name
     ##  'create table tmp_%s' % chr_name
-    t.cursor.execute('create table "%s"(id text, subs text, foreign key(id) references "%s"(id));' % (table_name, chr_name))
+    t.cursor().execute('create table "%s"(id text, subs text, foreign key(id) references "%s"(id));' % (table_name, chr_name))
     t.write(table_name, _gen_gen(t, chr_name) , ('id', 'subs'))
     
     table_name2 = 'tmp_%s2' % chr_name
     ##  'create table tmp_%s2' % chr_name
-    t.cursor.execute('create table "%s"(start int, end int, score float, name text, strand int , type text, attributes text, id text);' % (table_name2))
+    t.cursor().execute('create table "%s"(start int, end int, score float, name text, strand int , type text, attributes text, id text);' % (table_name2))
     t.write(table_name2, _gen_gen2(t, chr_name) , ('start', 'end', 'score', 'name', 'strand', 'type', 'id', 'attributes')) 
     
     return table_name, table_name2
@@ -459,11 +459,11 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
         table_name , table_name2 = _prepare_database(t, chr_name)
         
         #t.cursor.execute('select min(t1.start), max(t1.end), t1.score, t1.name, t1.strand, t1.type, t1.attributes, t1.id, count(t1.id), t2.subs from "%s" as t1 inner join "%s" as t2 on t1.id = t2.id group by t1.id order by t1.start asc, t1.end asc ;' % (chr_name, table_name))
-        t.cursor.execute('select min(t1.start), max(t1.end), t1.score, t1.name, t1.strand, t1.type, t1.attributes, t1.id, count(t1.id), t2.subs from "%s" as t1 inner join "%s" as t2 on t1.id = t2.id group by t1.id order by t1.start asc, t1.end asc ;' % (table_name2, table_name))
+        cursor = t.cursor().execute('select min(t1.start), max(t1.end), t1.score, t1.name, t1.strand, t1.type, t1.attributes, t1.id, count(t1.id), t2.subs from "%s" as t1 inner join "%s" as t2 on t1.id = t2.id group by t1.id order by t1.start asc, t1.end asc ;' % (table_name2, table_name))
         
         ## ' calculate lazy features'
         lazy_feats = _generate_lazy_output(
-                    _generate_nested_extended_features(t.cursor, keep_field=7, count_index=8, 
+                    _generate_nested_extended_features(cursor, keep_field=7, count_index=8, 
                                     subfeatures_index=9, start_index=0, end_index=1, name_index=3, strand_index=4))
         
         
@@ -473,10 +473,10 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
         client_config = _basic_client_config
         ## ' calculate lazy features'
         
-        t.cursor.execute('select t1.start, t1.end, t1.score, t1.name, t1.strand, t1.attributes from "%s" as t1 order by t1.start asc, t1.end asc ;' % chr_name )
+        cursor = t.cursor().execute('select t1.start, t1.end, t1.score, t1.name, t1.strand, t1.attributes from "%s" as t1 order by t1.start asc, t1.end asc ;' % chr_name )
         
         lazy_feats = _generate_lazy_output(
-                            _generate_nested_features(t.cursor, keep_field=6, start_index=0, end_index=1))
+                            _generate_nested_features(cursor, keep_field=6, start_index=0, end_index=1))
    
    
     #cursor = _get_cursor(connection, chr_name, fields_needed, order_by=ob)
@@ -499,9 +499,9 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
     if extended :    
         ## 'erase table'
         ## 'drop table %s'% table_name
-        t.cursor.execute('drop table "%s";' % table_name)
+        t.cursor().execute('drop table "%s";' % table_name)
         ## 'drop table %s'% table_name2
-        t.cursor.execute('drop table "%s";' % table_name2)
+        t.cursor().execute('drop table "%s";' % table_name2)
         t.vacuum()
         #t.cursor.execute('vacuum')
         ## 'dropped'
@@ -515,7 +515,7 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
     histogram_meta = _histogram_meta(chr_length, threshold, url_output)
     
     ## ' count array'
-    cursor = t.cursor.execute("select * from '%s' ;" % (chr_name))
+    cursor = t.cursor().execute("select * from '%s' ;" % (chr_name))
     array = _count_features(cursor, threshold, chr_length)
     
     ## ' hists stats'

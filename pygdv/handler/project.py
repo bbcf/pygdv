@@ -1,9 +1,9 @@
 from pygdv.model import DBSession, Project, Track, Right, RightCircleAssociation, User, Circle
-from tg import app_globals as gl
 from sqlalchemy.sql import and_, or_, not_
 from sqlalchemy.orm import aliased
 from pygdv.lib import constants
 from sqlalchemy.types import Boolean
+from pygdv.handler import track
 
 def create(name, sequence_id, user_id, tracks=None, isPublic=False, circles=None):
     '''
@@ -61,8 +61,9 @@ def change_rights(project_id, circle_id, rights=None):
     for rc in rc_assocs:
         if rc.circle.id == int(circle_id) :
             project._circle_right.remove(rc)
+            DBSession.delete(rc)
+            DBSession.flush()
    
-    
     if rights is not None:
         _add_read_right(project, circle_id)
         for right_name in rights:
@@ -70,6 +71,7 @@ def change_rights(project_id, circle_id, rights=None):
                 right = DBSession.query(Right).filter(Right.name == right_name).first()
                 cr_assoc = _get_circle_right_assoc(right, circle_id, project_id)
                 project._circle_right.append(cr_assoc)
+                
     DBSession.add(project)
     DBSession.flush()
     
@@ -94,7 +96,7 @@ def _add_read_right(project, circle_id):
     '''
     Add the ``read`` right to the project % circle specified without flushing
     '''
-    read_right = DBSession.query(Right).filter(Right.name == gl.right_read).first()
+    read_right = DBSession.query(Right).filter(Right.name == constants.right_read).first()
     cr_assoc = _get_circle_right_assoc(read_right, circle_id, project.id)
     project._circle_right.append(cr_assoc)
     
@@ -173,4 +175,9 @@ def get_shared_projects(user):
     return data
     
     
-    
+def copy(user_id, project_id):
+    project = DBSession.query(Project).filter(Project.id == project_id).first()
+    ts = []
+    for to_copy in project.tracks:
+        ts.append(track.copy_track(user_id, to_copy))
+    create('copied ' + project.name, project.sequence_id, user_id, tracks=[t.id for t in ts])
