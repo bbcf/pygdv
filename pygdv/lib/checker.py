@@ -35,10 +35,29 @@ def user_own_circle(user_id, circle_id):
 
 def check_permission_project(user_id, project_id, right_id):
     if not user_own_project(user_id, project_id):
-        p = DBSession.query(Project).join(
-                                Project._circle_right).join(Right).join(User.circles).filter(
-                and_(User.id == user_id, Project.id == project_id, Right.id == right_id)
-                ).first()
+        print 'user does not own the project'
+#        p1 = DBSession.query(Project).join(
+#                                Project._circle_right).join(Right).join(User.circles).filter(
+#                and_(User.id == user_id, Project.id == project_id, Right.id == right_id)
+#                )
+        p1 = DBSession.query(Project).join(
+                                Project._circle_right).join(Right).filter(
+                and_(Project.id == project_id, Right.id == right_id)
+                )
+        print p1
+        p = p1.first()
+        print p
+        
+        print 'project_circles'
+        
+        pc = DBSession.query(Project).filter(Project.id == project_id).first()
+        print pc.circles_with_rights
+        
+        u = DBSession.query(User).filter(User.id == user_id).first()
+        print u.circles
+        
+        
+        
         return p != None
     return True
 

@@ -38,6 +38,14 @@ def get_view_link(obj_id, param, rights = None):
         return ''' <a class='action view_link' href="%s"></a>''' % url('./view', params={'project_id':obj_id})
     return ''
 
+def get_copy_link(obj_id, param='track_id', rights=None):
+    '''
+    Return a HTML export link.
+    '''
+    if rights is not None:
+        return ''' <a class='action copy_link' href="%s"></a>''' % url('/tracks/copy', params={param:obj_id})
+    return ''
+
 def get_export_link(obj_id, param='track_id', rights=None):
     '''
     Return a HTML export link.

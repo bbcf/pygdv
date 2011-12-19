@@ -14,10 +14,9 @@ from tg.decorators import paginate,with_trailing_slash
 from pygdv.model import DBSession, Track, Input, TrackParameters, Sequence, Task, Project
 from pygdv.widgets.track import track_table, track_export, track_table_filler, track_new_form, track_edit_filler, track_edit_form, track_grid
 from pygdv import handler
-from pygdv.lib import util, constants
+from pygdv.lib import util, constants, checker, reply
 import os
 import transaction
-from pygdv.lib import checker, reply
 
 
 __all__ = ['TrackController']
@@ -170,5 +169,20 @@ class TrackController(CrudRestController):
             raise redirect('./')
         track = DBSession.query(Track).filter(Track.id == track_id).first()
         return track.traceback
+    
+    @expose()
+    def copy(self, track_id):
+        user = handler.user.get_user_in_session(request)
+        if not checker.can_download_track(user.id, track_id):
+            return reply.error(request, 'You have no right to copy this track in your profile.', './', {})
+        t = DBSession.query(Track).filter(Track.id == track_id).first()
+        if not t:
+            return reply.error(request, 'No track with this id.', './', {})
+        handler.track.copy_track(user.id, t)
+        return reply.normal(request, 'Copy successfull', './', {})
+    
+    
+    
+    
     
     

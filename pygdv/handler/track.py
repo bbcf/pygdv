@@ -16,6 +16,22 @@ from celery.task import task, chord, subtask, TaskSet
 from pygdv.lib.constants import json_directory, track_directory
 
 
+
+def copy_track(user_id, track):
+    to_copy = Track()
+    to_copy.name = track.name
+    to_copy.sequence_id = track.sequence_id
+    to_copy.user_id = user_id
+    to_copy.input_id = track.input_id
+    DBSession.add(to_copy)
+    DBSession.flush()
+    params = TrackParameters()
+    params.track = to_copy        
+    params.build_parameters()
+    DBSession.add(params)
+    DBSession.add(to_copy)
+    DBSession.flush()
+
 def create_track(user_id, sequence, trackname=None, f=None, project=None, session=None, admin=False):
     if session is None:
         session = DBSession
@@ -30,7 +46,6 @@ def create_track(user_id, sequence, trackname=None, f=None, project=None, sessio
     @param project : if given, the track created has to be added to the project 
     @return : task_id, track_id    
     '''
-    print f
     if f is not None:
         _input = create_input(f,trackname, sequence.name, session)
         if _input == constants.NOT_SUPPORTED_DATATYPE or _input == constants.NOT_DETERMINED_DATATYPE:

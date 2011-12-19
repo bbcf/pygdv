@@ -8,6 +8,8 @@ import transaction
 
 
 from pygdv.lib.constants import right_upload, right_download, right_read, group_admins, perm_admin, group_users, perm_user
+from pygdv.lib.constants import right_download_id, right_read_id, right_upload_id
+
 def bootstrap(command, conf, vars):
     """Place any commands to setup turbotequila here.
     Note that you will have to log in the application one before launching the bootstrap."""
@@ -41,18 +43,22 @@ def bootstrap(command, conf, vars):
             read.description = u'This permission give "read" right to the bearer.'
             read.groups.append(users)
             model.DBSession.add(read)
+            
             # RIGHTS
             write = model.Right()
+            write.id = right_upload_id
             write.name = right_upload
             write.description = u'A group with this permission can upload tracks to the project and execute jobs on the web interface.'
             model.DBSession.add(write)
             
             execute = model.Right()
+            execute.id = right_download_id
             execute.name = right_download
             execute.description = u'A group with this permission can download files on a project.'
             model.DBSession.add(execute)
             
             read = model.Right()
+            read.id = right_read_id
             read.name = right_read
             read.description = u'A group with this permission can view the project.'
             model.DBSession.add(read)

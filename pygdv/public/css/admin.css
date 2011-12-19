@@ -101,6 +101,15 @@ a.detail_link{
 a.detail_link{
     background-image: url('../images/plus.png');
 }
+
+a.copy_link{
+    background-repeat: no-repeat;
+    padding-left: 20px;
+}
+a.copy_link{
+    background-image: url('../images/copy.png');
+}
+
 a.export_link{
     background-repeat: no-repeat;
     padding-left: 20px;
