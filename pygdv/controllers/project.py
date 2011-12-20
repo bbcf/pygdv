@@ -63,7 +63,24 @@ class ProjectController(CrudRestController):
         shared_projects = [util.to_datagrid(project_with_right, sp, "Shared projects", len(sp)>0)]
         #TODO check with permissions
         
-        return dict(page='projects', model='project',form_title="new project", user_projects=user_projects, shared_projects=shared_projects, value=kw)
+        control = '''
+        
+        $(document).ready(function() {
+            /* Build the DataTable with third column using our custom sort functions */
+            
+             $('.grid tr').click( function() {
+                if ( $(this).hasClass('row_selected') )
+                    $(this).removeClass('row_selected');
+                else
+                    $(this).addClass('row_selected');
+    } );
+            
+            $('.grid').dataTable( {
+                "aaSorting": [ [0,'asc'], [1,'asc'] ]
+            });
+        });
+        '''
+        return dict(page='projects', model='project',form_title="new project", user_projects=user_projects, shared_projects=shared_projects, control=control, value=kw)
     
 
 

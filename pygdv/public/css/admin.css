@@ -164,3 +164,8 @@ div.actions {
 a.action {
     margin:1px;
 }
+
+tr.row_selected {
+    border: dashed 2px red;
+
+}
