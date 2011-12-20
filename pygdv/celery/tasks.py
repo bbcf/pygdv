@@ -6,7 +6,8 @@ from pygdv.lib.constants import json_directory, track_directory
 from celery.result import AsyncResult
 from celery.signals import worker_init
 
-from pygdv.lib import constants
+from pygdv.lib import constants, util
+import pygdv
 import track
 import tempfile, transaction
 from pygdv.celery import model
@@ -326,6 +327,41 @@ _sql_dispatch = {'quantitative' : lambda *args, **kw : _signal(*args, **kw),
 
 
 
+
+
+
+@task()
+def process_track(user, **kw):
+    files = util.upload(**kw)
+        
+        
+    if files is None:
+        raise 'No files to upload'
+        
+    if not 'assembly' in kw and not 'project_id' in kw:
+        raise 'Missing assembly parameters.'
+    assembly_id = kw.get('assembly', None)
+    
+    project = None
+    session = model.DBSession()
+    
+    if 'project_id' in kw:
+        project = session.query(model.Project).filter(model.Project.id == kw['project_id']).first()
+        if project is None:
+            raise 'Project with id %s not found.' % kw['project_id']
+        assembly_id = project.sequence_id
+
+    if not 'assembly' in kw:
+        raise 'Missing assembly parameters.'
+    
+    for filename, f in files:
+        sequence = session.query(model.Sequence).filter(model.Sequence.id == assembly_id).first()
+        task_id, track_id = pygdv.handler.track.create_track(user.id, sequence, f=f.name, trackname=filename, project=project, session=session)
+        
+        if task_id == constants.NOT_SUPPORTED_DATATYPE or task_id == constants.NOT_DETERMINED_DATATYPE:
+            raise 'format %s' % task_id 
+    
+
 #### GFEATMINER ####
 import gMiner
 
@@ -354,6 +390,6 @@ def gfeatminer_request(user_id, project_id, req, job_description, job_name):
         traceback.print_exception(etype, value, tb)
         raise e
    
-    
+
     
  

@@ -18,7 +18,7 @@ def init_model(url):
 
 # Import your model modules here.
 from pygdv.model.constants import *
-from pygdv.model.database import Project
+from pygdv.model.database import Project, Sequence
 
 
 

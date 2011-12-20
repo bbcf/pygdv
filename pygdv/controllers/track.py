@@ -17,6 +17,7 @@ from pygdv import handler
 from pygdv.lib import util, constants, checker, reply
 import os
 import transaction
+from pygdv.celery import tasks
 
 
 __all__ = ['TrackController']
@@ -61,40 +62,10 @@ class TrackController(CrudRestController):
     @expose('json')
     def create(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        files = util.upload(**kw)
         
-        
-        if files is None:
-            return reply.error(request, 'No file to upload.', './', {})
-            
-        if not 'assembly' in kw and not 'project_id' in kw:
-            return reply.error(request, 'Missing assembly parameters.', './', {})
-        track_ids = []
-        assembly_id = kw.get('assembly', None)
-        
-        if not files :
-            return reply.error(request, 'No file to upload.', './', {})
-        project = None
-        
-        if 'project_id' in kw:
-            project = DBSession.query(Project).filter(Project.id == kw['project_id']).first()
-            if project is None:
-                return reply.error(request, 'Project with id %s not found.' % kw['project_id'], './', {})
-            assembly_id = project.sequence_id
-            
-        if not 'assembly' in kw:
-            return reply.error(request, 'Missing assembly parameters.', './', {})
-        
-        for filename, f in files:
-            sequence = DBSession.query(Sequence).filter(Sequence.id == assembly_id).first()
-            task_id, track_id = handler.track.create_track(user.id, sequence, f=f.name, trackname=filename, project=project)
-            
-            if task_id == constants.NOT_SUPPORTED_DATATYPE or task_id == constants.NOT_DETERMINED_DATATYPE:
-                return reply.error(request, task_id, './', {})
-            track_ids.append(track_id)
+        task_id = tasks.process_track(user, **kw)
              
-        transaction.commit()
-        return reply.normal(request, 'Track(s) successfully uploaded.', './', {'track_ids' : track_ids})  
+        return reply.normal(request, 'Task launched.', './', {'task_id' : task_id})  
     
     @expose('json')
     @validate(track_new_form, error_handler=new)
