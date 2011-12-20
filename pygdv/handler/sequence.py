@@ -10,7 +10,6 @@ def add_new_sequence(user_id, sequence):
     '''
     
     file_url = Assembly(sequence).get_sqlite_url()
-    print file_url
     files = util.upload(url=file_url)
     if len(files) > 0:
         filename, tmp_file = files[0]

@@ -57,6 +57,7 @@ dojo.declare("ch.epfl.bbcf.gdv.GDVMenuBar",null,{
 	    // Configure the link
 	    link.href=_GDV_URL+'/'+link_end;
 	    link.className='hl';
+	    link.id = 'menu_' + link_name;
 	    container.appendChild(cont);
 	}
     },

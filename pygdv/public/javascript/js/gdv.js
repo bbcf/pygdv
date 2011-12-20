@@ -82,7 +82,18 @@ function initGDV(browser, project_id, gdv_info, readonly){
 	if(!_gdvls) console.error('tab container failed');
 	if(!_gdvls) console.error('search field initialization failed');
 	if(!_jh) console.error('job handler failed');
-
+	
+	/* hack for the copy menu */
+	if(!gdv_info.admin){
+	    var copy_link = dojo.byId('menu_Copy');
+	    var uri = document.URL;
+	    var query = uri.substring(uri.indexOf('?') + 1, uri.length);
+	    var queryO = dojo.queryToObject(query);
+	    if ('k' in queryO){
+		copy_link.href= _GDV_URL + '/projects/copy?k=' + queryO['k'] + '&project_id=' + _gdv_info.project_id;
+	    } else {console.fatal('you will not be able to copy the project')};
+	};
+	
     });
 
     
