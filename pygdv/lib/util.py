@@ -215,5 +215,3 @@ def order_data(ordering, data):
 
 
 
-
-

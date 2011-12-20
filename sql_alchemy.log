@@ -906,3 +906,63 @@ WHERE "Input".sha1 = %(sha1_1)s
 10:29:25,586    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "TrackParameters" (url, label, type, key, color, track_id) VALUES (%(url)s, %(label)s, %(type)s, %(key)s, %(color)s, %(track_id)s) RETURNING "TrackParameters".id
 10:29:25,587    INFO  [sqlalchemy.engine.base.Engine] {'url': '98a983e8fd7067bdb05ccba2b44d99259c24f76b/{refseq}/trackData.json', 'track_id': 23, 'color': None, 'key': u'test.wig', 'label': u'test.wig', 'type': 'ImageTrack'}
 10:29:25,592    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+10:55:09,072    INFO  [sqlalchemy.engine.base.Engine] select version()
+10:55:09,072    INFO  [sqlalchemy.engine.base.Engine] {}
+10:55:09,074    INFO  [sqlalchemy.engine.base.Engine] select current_schema()
+10:55:09,075    INFO  [sqlalchemy.engine.base.Engine] {}
+10:55:09,077    INFO  [sqlalchemy.engine.base.Engine] BEGIN (implicit)
+10:55:09,078    INFO  [sqlalchemy.engine.base.Engine] SELECT "Sequence".id AS "Sequence_id", "Sequence".name AS "Sequence_name", "Sequence".species_id AS "Sequence_species_id" 
+FROM "Sequence" 
+WHERE "Sequence".id = %(id_1)s 
+ LIMIT %(param_1)s OFFSET %(param_2)s
+10:55:09,078    INFO  [sqlalchemy.engine.base.Engine] {'id_1': u'12', 'param_1': 1, 'param_2': 0}
+10:55:09,082    INFO  [sqlalchemy.engine.base.Engine] SELECT "Input".id AS "Input_id", "Input".sha1 AS "Input_sha1", "Input"._last_access AS "Input__last_access", "Input".task_id AS "Input_task_id", "Input".datatype AS "Input_datatype" 
+FROM "Input" 
+WHERE "Input".sha1 = %(sha1_1)s 
+ LIMIT %(param_1)s OFFSET %(param_2)s
+10:55:09,082    INFO  [sqlalchemy.engine.base.Engine] {'sha1_1': '6b60f83d4794a86c61c608e15c6307d6ed059fdd', 'param_1': 1, 'param_2': 0}
+10:55:09,088    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Track" (_name, _created, _last_access, input_id, user_id, sequence_id) VALUES (%(_name)s, %(_created)s, %(_last_access)s, %(input_id)s, %(user_id)s, %(sequence_id)s) RETURNING "Track".id
+10:55:09,088    INFO  [sqlalchemy.engine.base.Engine] {'user_id': 2, '_name': u'rel.sql', 'sequence_id': 12, 'input_id': 8, '_last_access': datetime.datetime(2011, 12, 20, 10, 55, 9, 87855), '_created': datetime.datetime(2011, 12, 20, 10, 55, 9, 87820)}
+10:55:09,128    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "TrackParameters" (url, label, type, key, color, track_id) VALUES (%(url)s, %(label)s, %(type)s, %(key)s, %(color)s, %(track_id)s) RETURNING "TrackParameters".id
+10:55:09,128    INFO  [sqlalchemy.engine.base.Engine] {'color': None, 'track_id': 24, 'url': u'6b60f83d4794a86c61c608e15c6307d6ed059fdd/{refseq}/trackData.json', 'key': u'rel.sql', 'label': u'rel.sql', 'type': 'FeatureTrack'}
+10:55:09,133    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+11:02:42,439    INFO  [sqlalchemy.engine.base.Engine] select version()
+11:02:42,440    INFO  [sqlalchemy.engine.base.Engine] {}
+11:02:42,442    INFO  [sqlalchemy.engine.base.Engine] select current_schema()
+11:02:42,442    INFO  [sqlalchemy.engine.base.Engine] {}
+11:02:42,444    INFO  [sqlalchemy.engine.base.Engine] BEGIN (implicit)
+11:02:42,445    INFO  [sqlalchemy.engine.base.Engine] SELECT "Sequence".id AS "Sequence_id", "Sequence".name AS "Sequence_name", "Sequence".species_id AS "Sequence_species_id" 
+FROM "Sequence" 
+WHERE "Sequence".id = %(id_1)s 
+ LIMIT %(param_1)s OFFSET %(param_2)s
+11:02:42,445    INFO  [sqlalchemy.engine.base.Engine] {'id_1': u'12', 'param_1': 1, 'param_2': 0}
+11:02:42,448    INFO  [sqlalchemy.engine.base.Engine] SELECT "Input".id AS "Input_id", "Input".sha1 AS "Input_sha1", "Input"._last_access AS "Input__last_access", "Input".task_id AS "Input_task_id", "Input".datatype AS "Input_datatype" 
+FROM "Input" 
+WHERE "Input".sha1 = %(sha1_1)s 
+ LIMIT %(param_1)s OFFSET %(param_2)s
+11:02:42,449    INFO  [sqlalchemy.engine.base.Engine] {'sha1_1': 'd5eb0db76c0ccbec77d6938dc81fcd1e44499f5b', 'param_1': 1, 'param_2': 0}
+11:02:42,571    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Input" (sha1, _last_access, task_id, datatype) VALUES (%(sha1)s, %(_last_access)s, %(task_id)s, %(datatype)s) RETURNING "Input".id
+11:02:42,572    INFO  [sqlalchemy.engine.base.Engine] {'_last_access': datetime.datetime(2011, 12, 20, 11, 2, 42, 571556), 'datatype': 'relational', 'sha1': 'd5eb0db76c0ccbec77d6938dc81fcd1e44499f5b', 'task_id': 'e6b54b9f-c59b-4687-a544-ea529e43f4ef'}
+11:02:42,589    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Track" (_name, _created, _last_access, input_id, user_id, sequence_id) VALUES (%(_name)s, %(_created)s, %(_last_access)s, %(input_id)s, %(user_id)s, %(sequence_id)s) RETURNING "Track".id
+11:02:42,590    INFO  [sqlalchemy.engine.base.Engine] {'user_id': 2, '_name': u'rel.sql', 'sequence_id': 12, 'input_id': 10, '_last_access': datetime.datetime(2011, 12, 20, 11, 2, 42, 589390), '_created': datetime.datetime(2011, 12, 20, 11, 2, 42, 589361)}
+11:02:42,596    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "TrackParameters" (url, label, type, key, color, track_id) VALUES (%(url)s, %(label)s, %(type)s, %(key)s, %(color)s, %(track_id)s) RETURNING "TrackParameters".id
+11:02:42,596    INFO  [sqlalchemy.engine.base.Engine] {'color': None, 'track_id': 25, 'url': 'd5eb0db76c0ccbec77d6938dc81fcd1e44499f5b/{refseq}/trackData.json', 'key': u'rel.sql', 'label': u'rel.sql', 'type': 'FeatureTrack'}
+11:02:42,601    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+11:04:32,675    INFO  [sqlalchemy.engine.base.Engine] BEGIN (implicit)
+11:04:32,676    INFO  [sqlalchemy.engine.base.Engine] SELECT "Sequence".id AS "Sequence_id", "Sequence".name AS "Sequence_name", "Sequence".species_id AS "Sequence_species_id" 
+FROM "Sequence" 
+WHERE "Sequence".id = %(id_1)s 
+ LIMIT %(param_1)s OFFSET %(param_2)s
+11:04:32,676    INFO  [sqlalchemy.engine.base.Engine] {'id_1': u'12', 'param_1': 1, 'param_2': 0}
+11:04:32,678    INFO  [sqlalchemy.engine.base.Engine] SELECT "Input".id AS "Input_id", "Input".sha1 AS "Input_sha1", "Input"._last_access AS "Input__last_access", "Input".task_id AS "Input_task_id", "Input".datatype AS "Input_datatype" 
+FROM "Input" 
+WHERE "Input".sha1 = %(sha1_1)s 
+ LIMIT %(param_1)s OFFSET %(param_2)s
+11:04:32,679    INFO  [sqlalchemy.engine.base.Engine] {'sha1_1': '51f97263c4264fa61faa5b8ff516548f3127ed99', 'param_1': 1, 'param_2': 0}
+11:04:32,696    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Input" (sha1, _last_access, task_id, datatype) VALUES (%(sha1)s, %(_last_access)s, %(task_id)s, %(datatype)s) RETURNING "Input".id
+11:04:32,697    INFO  [sqlalchemy.engine.base.Engine] {'_last_access': datetime.datetime(2011, 12, 20, 11, 4, 32, 696618), 'datatype': 'features', 'sha1': '51f97263c4264fa61faa5b8ff516548f3127ed99', 'task_id': 'cbf1a001-0ba7-4d67-ac72-e096984e20cb'}
+11:04:32,699    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Track" (_name, _created, _last_access, input_id, user_id, sequence_id) VALUES (%(_name)s, %(_created)s, %(_last_access)s, %(input_id)s, %(user_id)s, %(sequence_id)s) RETURNING "Track".id
+11:04:32,700    INFO  [sqlalchemy.engine.base.Engine] {'user_id': 2, '_name': u'test.bed', 'sequence_id': 12, 'input_id': 11, '_last_access': datetime.datetime(2011, 12, 20, 11, 4, 32, 699835), '_created': datetime.datetime(2011, 12, 20, 11, 4, 32, 699802)}
+11:04:32,704    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "TrackParameters" (url, label, type, key, color, track_id) VALUES (%(url)s, %(label)s, %(type)s, %(key)s, %(color)s, %(track_id)s) RETURNING "TrackParameters".id
+11:04:32,705    INFO  [sqlalchemy.engine.base.Engine] {'color': None, 'track_id': 26, 'url': '51f97263c4264fa61faa5b8ff516548f3127ed99/{refseq}/trackData.json', 'key': u'test.bed', 'label': u'test.bed', 'type': 'FeatureTrack'}
+11:04:32,709    INFO  [sqlalchemy.engine.base.Engine] COMMIT

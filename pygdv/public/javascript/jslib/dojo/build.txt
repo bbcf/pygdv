@@ -112,3 +112,4 @@ jbrowse_dojo.js:
 ./../../../created/dojo/dijit/Tooltip.js
 ./../../../created/dojo/dijit/form/ValidationTextBox.js
 ./../../../created/dojo/dijit/form/NumberTextBox.js
+./../../../created/dojo/dojo/io/iframe.js

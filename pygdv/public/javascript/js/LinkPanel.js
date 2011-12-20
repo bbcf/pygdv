@@ -16,17 +16,53 @@ function LinkPanel(){
 
  
 LinkPanel.prototype.showPanelInfo = function(node, assembly_id, feat, fields){
+    // var name = feat[fields["name"]];
+    // var deferred = dojo.io.iframe.send({
+    // 	url : 'http://reflect.ws/REST/GetPopup?name=' + name,
+    // 	contentType: 'html',
+    // 	handleAs: 'html',
+    // 	handle: function(data, ioargs){
+    // 	    console.log(data);
+    // 	    console.log(ioargs);
+    // 	}
+    // });
+
+    // var name = feat[fields["name"]];
+    // var ctx = this;
+    // callback = function(data){ctx.buildReflectPanel(node, data)};
+    // var xhrArgs = {
+    // 	url : _GDV_LINK_URL + '?name=' + name + '&assembly_id=' + assembly_id,
+    // 	handleAs : 'html',
+    // 	load : function(data){
+    // 	    callback(data);
+    // 	},
+    // 	error : function(data){
+    // 	    console.error(data);
+	
+    // 	}
+    // };
+    // 	dojo.xhrGet(xhrArgs);
+	
+
+
     if(!this._lp_showed){
-	this._lp_showed = true;
-	this.wait(node);
-	var ctx = this;
-	var name = feat[fields["name"]]; 
-	var start = feat[fields["start"]];
-	var end = feat[fields["end"]];
-	callback = function(data){ctx.buildLinkPanel(node, name, data)};
-	new GenRep().links(assembly_id, name, callback);
+    	this._lp_showed = true;
+    	this.wait(node);
+    	var ctx = this;
+    	var name = feat[fields["name"]]; 
+    	var start = feat[fields["start"]];
+    	var end = feat[fields["end"]];
+    	callback = function(data){ctx.buildLinkPanel(node, name, data)};
+    	new GenRep().links(assembly_id, name, callback);
     };
 };
+
+LinkPanel.prototype.buildReflectPanel = function(node, data){
+    var f = document.createElement('IFRAME');
+    f.innerHTML = data;
+    node.appendChild(f);
+};
+
 
 /**
  * Build the HTML panel

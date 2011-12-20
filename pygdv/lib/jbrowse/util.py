@@ -1,5 +1,5 @@
 from tg import app_globals as gl
-from bbcflib.genrep import GenRep
+from bbcflib.genrep import Assembly
 from pygdv.lib.jbrowse import SEQUENCE_CHUNK_SIZE
 from pygdv.model import Track
 import json
@@ -23,7 +23,7 @@ def ref_seqs(sequence_id):
     Build the ``refSeqs`` variable.
     @param sequence_id : the assembly_id in GenRep.
     '''
-    ass = gl.genrep.assembly(sequence_id)
+    ass = Assembly(sequence_id)
     l = [_chromosome_output(chr) for id, chr in ass.chromosomes.iteritems()]
     l.sort(key=lambda obj : obj['num'])
     return l
