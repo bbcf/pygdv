@@ -66,7 +66,6 @@ dojo.declare("ch.epfl.bbcf.gdv.GDVMenuBar",null,{
      */
     build_gminer : function(){
         var toolbar = this.toolbar;
-	console.log(toolbar);
 	if(toolbar){
 	    this.form_ids_template = toolbar['form_ids_template'];
 	    if(!this.form_ids_template) return;
