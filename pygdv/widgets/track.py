@@ -130,6 +130,35 @@ help_text = 'Choose the assembly.'),
         return d
 
 
+class UploadAdminFrom(twf.TableForm):
+
+    submit_text = 'Upload a file'
+    hover_help = True
+    show_errors = True
+    action='./default_tracks_upload'
+    species = get_species()
+    assemblies = get_assemblies(species)
+    fields = [
+              
+    twf.FileField(label_text='Select a file in your computer ',id='file_upload',
+    help_text = 'Browse the file to upload in your computer. It will be converted to a Track.'),
+    twf.TextArea(id='urls',label_text='Or enter url(s) to access your file(s)',
+                          help_text = 'You can enter multiple urls separated by space or "enter".'),
+   twd.CascadingSingleSelectField(id='species', label_text='Species : ',options=get_species,
+help_text = 'Choose the species',cascadeurl=url('/sequences/get_assemblies_from_species_id')),
+  twf.Spacer(),
+    twf.SingleSelectField(id='assembly', label_text='Assembly : ',options=assemblies,
+help_text = 'Choose the assembly.'),
+  twf.Spacer(),
+              ]
+    def update_params(self, d):
+        super(UploadAdminFrom,self).update_params(d)
+        species=get_species()
+        d['species']=species
+        d['assembly']=get_assemblies(species)
+        return d
+
+
 #def get_import_file_form(project_id):
 #    return ImportFile('import_file_form',action='upload',value={'project_id':project_id})
 #
@@ -152,5 +181,6 @@ track_export = TrackExport()
 track_table = TTable(DBSession)
 track_table_filler = TTableFiller(DBSession)
 track_new_form = UploadFrom('upload_form',action='post')
+default_track_form = UploadAdminFrom()
 track_edit_form = TEditForm(DBSession)
 track_edit_filler = TEditFiller(DBSession)

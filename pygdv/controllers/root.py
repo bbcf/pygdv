@@ -123,28 +123,8 @@ class RootController(BaseController):
 #        return dict(page='data',params=kw)
     
 
-    @expose()
-    def copy(self):
-        return 'You will be able to copy the project viewed into your profile. It will be implemented soon'
-    @expose()
-    def test(self, **kw):
-        return dict(kw)
-    
-    def pilou(self):
-        if request.environ['REQUEST_CLASSIFIER'] == 'command_line':
-            return {'koopa' : 'troopa'}
-        flash('yoooooo')
-        raise redirect('./')
-    
-    @expose('json')
-    def koopa(self, **kw):
-        return self.pilou()
-    
-    
     
    
-    
-    
     
     
     

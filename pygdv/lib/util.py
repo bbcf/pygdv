@@ -49,6 +49,7 @@ def get_unique_tmp_directory():
 
 block_sz = 8192
 
+
 def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, file_names=None, **kw):
     '''
     Upload the file and make it temporary.
@@ -66,12 +67,15 @@ def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, fil
     index = 0
     if file_names is not None:
         file_names = file_names.split()
+    print 'toto'
+    print file_upload
     if file_upload is not None:
-        filename = file_upload.filename
+        print file_upload
+        filename = file_upload['filename']
         if file_names:
             filename = file_names[index]
             index += 1
-        file_value = file_upload.value
+        file_value = file_upload['value']
         tmp_file = tempfile.NamedTemporaryFile(suffix=filename, delete=False)
         tmp_file.write(file_value)
         tmp_file.close()
@@ -213,5 +217,10 @@ def order_data(ordering, data):
 
 
 
-
-
+def file_upload_converter(kw):
+    if 'file_upload' in kw:
+        file_upload = kw['file_upload']
+        new_fu = {}
+        new_fu['filename'] = file_upload.filename
+        new_fu['value'] = file_upload.value
+        kw['file_upload'] = new_fu

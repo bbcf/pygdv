@@ -82,7 +82,6 @@ def create_track(user_id, sequence, trackname=None, f=None, project=None, sessio
             session.add(sequence)
        
         session.flush()
-        print _input.task_id, track.id
         return _input.task_id, track.id
     
     

@@ -160,7 +160,7 @@ div.tracklist-container {
     padding: 0px 0px 0px 0px;
     white-space: nowrap;
     background-color: #eee;
-    z-index: 10;
+    z-index: 60;
     cursor: pointer;
 }
 
@@ -898,4 +898,5 @@ width: 3em;
     position: absolute;
     top: -2px;
     left: -2px;
+    z-index: 60;
 }

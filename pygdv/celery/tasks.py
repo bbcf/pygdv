@@ -7,7 +7,6 @@ from celery.result import AsyncResult
 from celery.signals import worker_init
 
 from pygdv.lib import constants, util
-import pygdv
 import track
 import tempfile, transaction
 from pygdv.celery import model
@@ -331,7 +330,7 @@ _sql_dispatch = {'quantitative' : lambda *args, **kw : _signal(*args, **kw),
 
 
 @task()
-def process_track(user, **kw):
+def process_track(user_id, **kw):
     files = util.upload(**kw)
         
         
@@ -345,6 +344,11 @@ def process_track(user, **kw):
     project = None
     session = model.DBSession()
     
+    admin = False
+    
+    if 'admin' in kw:
+        admin = kw['admin']
+        
     if 'project_id' in kw:
         project = session.query(model.Project).filter(model.Project.id == kw['project_id']).first()
         if project is None:
@@ -356,7 +360,11 @@ def process_track(user, **kw):
     
     for filename, f in files:
         sequence = session.query(model.Sequence).filter(model.Sequence.id == assembly_id).first()
-        task_id, track_id = pygdv.handler.track.create_track(user.id, sequence, f=f.name, trackname=filename, project=project, session=session)
+        from pygdv.handler.track import create_track
+        task_id, track_id = create_track(user_id, sequence, f=f.name, trackname=filename, project=project, session=session, admin=admin)
+        
+        transaction.commit()
+        session.close()
         
         if task_id == constants.NOT_SUPPORTED_DATATYPE or task_id == constants.NOT_DETERMINED_DATATYPE:
             raise 'format %s' % task_id 

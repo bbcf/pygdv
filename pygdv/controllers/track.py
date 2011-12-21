@@ -4,7 +4,7 @@ from pygdv.lib.base import BaseController
 from tgext.crud import CrudRestController
 from tgext.crud.decorators import registered_validate
 
-from repoze.what.predicates import not_anonymous, has_any_permission
+from repoze.what.predicates import not_anonymous, has_any_permission, has_permission
 
 from tg import expose, flash, require, request, tmpl_context, validate, request
 from tg import app_globals as gl
@@ -12,13 +12,13 @@ from tg.controllers import redirect
 from tg.decorators import paginate,with_trailing_slash
 
 from pygdv.model import DBSession, Track, Input, TrackParameters, Sequence, Task, Project
-from pygdv.widgets.track import track_table, track_export, track_table_filler, track_new_form, track_edit_filler, track_edit_form, track_grid
+from pygdv.widgets.track import track_table, track_export, track_table_filler, track_new_form, track_edit_filler, track_edit_form, track_grid, default_track_form
 from pygdv import handler
 from pygdv.lib import util, constants, checker, reply
 import os
 import transaction
 from pygdv.celery import tasks
-
+import pickle
 
 __all__ = ['TrackController']
 
@@ -62,8 +62,8 @@ class TrackController(CrudRestController):
     @expose('json')
     def create(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        
-        task_id = tasks.process_track(user, **kw)
+        util.file_upload_converter(kw)
+        task_id = tasks.process_track.delay(user.id, **kw)
              
         return reply.normal(request, 'Task launched.', './', {'task_id' : task_id})  
     
@@ -151,6 +151,25 @@ class TrackController(CrudRestController):
             return reply.error(request, 'No track with this id.', './', {})
         handler.track.copy_track(user.id, t)
         return reply.normal(request, 'Copy successfull', './', {})
+    
+    
+    @require(has_permission('admin', msg='Only for admins'))
+    @expose('pygdv.templates.form')
+    def default_tracks(self, **kw):
+        tmpl_context.widget = default_track_form
+        return dict(page='tracks', value=kw, title='new default track (visible on all projects with the same assembly)')
+    
+    @expose()
+    @require(has_permission('admin', msg='Only for admins'))
+    @validate(default_track_form, error_handler=default_tracks)
+    def default_tracks_upload(self, *args, **kw):
+        user = handler.user.get_user_in_session(request)
+        kw['admin'] = True
+        util.file_upload_converter(kw)
+        print 'test'
+        
+        task_id = tasks.process_track.delay(user.id, **kw)
+        return reply.normal(request, 'Task launched.', '/home', {'task_id' : task_id})  
     
     
     

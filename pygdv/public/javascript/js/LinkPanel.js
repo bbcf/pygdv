@@ -103,7 +103,7 @@ LinkPanel.prototype.wait = function(node){
 
     var ctx = this;
     var handler = dojo.connect(panel, 'onmouseleave', function(e){
-        node.removeChild(panel);
+        //node.removeChild(panel);
 	ctx._lp_showed = false;
 	dojo.stopEvent(e);
     });
