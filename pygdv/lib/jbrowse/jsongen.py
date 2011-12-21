@@ -500,7 +500,7 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
         output_chunk = os.path.join(output_directory, 'lazyfeatures-%s.json' % chunk_number)
         with open(output_chunk, 'w', -1) as fil:
             fil.write(json.dumps(buff))
-        
+    
     if extended :    
         ## 'erase table'
         ## 'drop table %s'% table_name
@@ -530,7 +530,6 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
     ## ' count array'
     cursor = t.cursor().execute("select * from '%s' ;" % (chr_name))
     array = _count_features(cursor, threshold, chr_length)
-    cursor.commit()
     cursor.close()
     ## ' hists stats'
     hist_stats = _calculate_histo_stats(array, threshold, chr_length)
