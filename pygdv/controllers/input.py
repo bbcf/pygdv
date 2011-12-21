@@ -27,7 +27,7 @@ class InputController(CrudRestController):
     @with_trailing_slash
     @expose('tgext.crud.templates.get_all')
     @expose('json')
-    @paginate('value_list', items_per_page=10)
+    @paginate('value_list', items_per_page=1000)
     def get_all(self, *args, **kw):
         return CrudRestController.get_all(self, *args, **kw)
     

@@ -434,12 +434,13 @@ def _prepare_database(t, chr_name):
     cur.execute('create table "%s"(id text, subs text, foreign key(id) references "%s"(id));' % (table_name, chr_name))
     cur.close()
     t.write(table_name, _gen_gen(t, chr_name) , ('id', 'subs'))
-    
+    t._connection.commit()
     table_name2 = 'tmp_%s2' % chr_name
     ##  'create table tmp_%s2' % chr_name
     cur = t.cursor()
     cur.execute('create table "%s"(start int, end int, score float, name text, strand int , type text, attributes text, id text);' % (table_name2))
-    t.write(table_name2, _gen_gen2(t, chr_name) , ('start', 'end', 'score', 'name', 'strand', 'type', 'id', 'attributes')) 
+    t.write(table_name2, _gen_gen2(t, chr_name) , ('start', 'end', 'score', 'name', 'strand', 'type', 'id', 'attributes'))
+    t._connection.commit()
     cur.close()
     
     return table_name, table_name2
@@ -471,7 +472,7 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
                                     subfeatures_index=9, start_index=0, end_index=1, name_index=3, strand_index=4))
         
         cursor.close()
-        
+        t._connection.commit()
     else :
         headers = _basic_headers
         subfeature_headers = _basic_subfeature_headers
@@ -505,13 +506,14 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
         ## 'erase table'
         ## 'drop table %s'% table_name
         cur = t.cursor().execute('drop table "%s";' % table_name)
-        cur.commit()
+        t._connection.commit()
         cur.close()
+        
         ## 'drop table %s'% table_name2
         cur = t.cursor().execute('drop table "%s";' % table_name2)
-        cur.commit()
         cur.close()
         t.vacuum()
+        t._connection.commit()
         #t.cursor.execute('vacuum')
         ## 'dropped'
             

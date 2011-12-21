@@ -7,7 +7,7 @@ from repoze.what.predicates import not_anonymous, has_any_permission, has_permis
 from tg import expose, flash, require, request, tmpl_context, validate
 from tg import app_globals as gl
 from tg.controllers import redirect
-from tg.decorators import paginate,with_trailing_slash, without_trailing_slash
+from tg.decorators import with_trailing_slash, without_trailing_slash
 
 from pygdv.model import DBSession, Sequence, Species
 from pygdv.widgets.sequence import sequence_table, sequence_table_filler, sequence_new_form, sequence_edit_filler, sequence_edit_form
