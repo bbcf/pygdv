@@ -432,7 +432,6 @@ def _prepare_database(t, chr_name):
     ##  'create table tmp_%s' % chr_name
     cur = t.cursor()
     cur.execute('create table "%s"(id text, subs text, foreign key(id) references "%s"(id));' % (table_name, chr_name))
-    cur.commit()
     cur.close()
     t.write(table_name, _gen_gen(t, chr_name) , ('id', 'subs'))
     
@@ -441,7 +440,6 @@ def _prepare_database(t, chr_name):
     cur = t.cursor()
     cur.execute('create table "%s"(start int, end int, score float, name text, strand int , type text, attributes text, id text);' % (table_name2))
     t.write(table_name2, _gen_gen2(t, chr_name) , ('start', 'end', 'score', 'name', 'strand', 'type', 'id', 'attributes')) 
-    cur.commit()
     cur.close()
     
     return table_name, table_name2
@@ -472,7 +470,6 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
                     _generate_nested_extended_features(cursor, keep_field=7, count_index=8, 
                                     subfeatures_index=9, start_index=0, end_index=1, name_index=3, strand_index=4))
         
-        cursor.commit()
         cursor.close()
         
     else :
@@ -486,7 +483,6 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
         lazy_feats = _generate_lazy_output(
                             _generate_nested_features(cursor, keep_field=6, start_index=0, end_index=1))
    
-        cursor.commit()
         cursor.close()
     #cursor = _get_cursor(connection, chr_name, fields_needed, order_by=ob)
    
