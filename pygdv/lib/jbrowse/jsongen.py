@@ -453,7 +453,6 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
     @param output_directory : where files will be write
     @param url_output : url access to the ressources
     '''
-    print chr_name
     if extended :
         headers = _extended_headers
         subfeature_headers = _subfeature_headers
@@ -506,6 +505,8 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
         ## 'erase table'
         ## 'drop table %s'% table_name
         t._connection.commit()
+        import time
+        time.sleep(5)
         cur = t.cursor().execute('drop table "%s";' % table_name)
         t._connection.commit()
         cur.close()
