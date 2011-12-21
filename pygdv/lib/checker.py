@@ -33,12 +33,17 @@ def user_own_circle(user_id, circle_id):
         return user in admin_group.users
     return False
 
+def user_is_admin(user_id):
+    user = DBSession.query(User).filter(User.id == user_id).first()
+    admin_group = DBSession.query(Group).filter(Group.name == constants.group_admins).first()
+    return user in admin_group.users
+
 def check_permission_project(user_id, project_id, right_id):
-    if not user_own_project(user_id, project_id):
+    if not user_own_project(user_id, project_id) and not user_is_admin(user_id):
         p = DBSession.query(Project).join(
                                 Project._circle_right).join(Right).join(User.circles).filter(
                 and_(User.id == user_id, Project.id == project_id, Right.id == right_id)
-                )
+                ).first()
         return p != None
     return True
 

@@ -189,7 +189,10 @@ project_admin_grid = twf.DataGrid(fields=[
     ('Created', 'created'),
     ('Assembly', 'assembly'),
     ('Circles', 'get_circle_with_right_display'),
-    ('Tracks', 'get_tracks')
+    ('Tracks', 'get_tracks'),
+    ('Action', lambda obj:genshi.Markup(
+        get_view_link(obj.id, 'project_id', constants.full_rights)
+        ))
 ])
 
 
@@ -200,7 +203,8 @@ project_grid_sharing = twf.DataGrid(fields=[
     ('Assembly', 'assembly'),
     ('Circles', 'get_circle_with_right_display'),
     ('Tracks', 'get_tracks'),
-    ('Action', lambda obj:genshi.Markup(get_view_link(obj.id) + get_share_link(obj.id) 
+    ('Action', lambda obj:genshi.Markup(get_view_link(obj.id, 'project_id', constants.full_rights)
+        + get_share_link(obj.id) 
         + get_delete_link(obj.id) 
         + get_edit_link(obj.id)
         + '<a href="%s">add track</a> '

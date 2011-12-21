@@ -2,7 +2,7 @@
 from tgext.crud import CrudRestController
 from tgext.crud.decorators import registered_validate
 
-from repoze.what.predicates import not_anonymous, has_any_permission
+from repoze.what.predicates import not_anonymous, has_any_permission, has_permission
 
 from tg import expose, flash, require, error, request, tmpl_context, validate, url
 from tg import app_globals as gl
@@ -11,7 +11,7 @@ from tg.decorators import paginate, with_trailing_slash,without_trailing_slash
 import tg
 
 from pygdv.model import DBSession, Project, User, RightCircleAssociation, Track, Job
-from pygdv.widgets.project import project_table,  project_with_right, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid,circles_available_form, tracks_available_form, project_sharing_grid, project_grid_sharing
+from pygdv.widgets.project import project_table,  project_admin_grid, project_with_right, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid,circles_available_form, tracks_available_form, project_sharing_grid, project_grid_sharing
 from pygdv.widgets.track import track_in_project_grid
 from pygdv.widgets import ModelWithRight
 from pygdv import handler
@@ -368,3 +368,12 @@ class ProjectController(CrudRestController):
         handler.project.copy(user.id, project_id)
         return reply.normal(request, 'Copy successfull', '/projects', {})
         
+        
+        
+    @require(has_permission('admin', msg='Only for admins'))
+    @expose('pygdv.templates.admin_project')
+    def admin(self):
+        projects = DBSession.query(Project).all()
+        data_projects = [util.to_datagrid(project_admin_grid, projects, "All projects", len(projects)>0)]
+        
+        return dict(page='projects', model='project',form_title="new project", projects=data_projects, value={})
