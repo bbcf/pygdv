@@ -153,6 +153,7 @@ def _generate_nested_extended_features(cursor, keep_field, count_index, subfeatu
                     nb_feature = 1
       
         prev_feature = feature
+    cursor.close()
     if prev_feature is not None:    
         yield prev_feature, nb_feature
     
@@ -167,6 +168,7 @@ def _generate_nested_features(cursor, keep_field, start_index, end_index):
         feature = [row[i] for i in field_number_list]
         yield feature, nb_feature
         nb_feature += 1
+    cursor.close()
         
 #        if prev_feature is not None:
 #            if feature[end_index] < prev_feature[end_index]:
@@ -218,6 +220,7 @@ def _count_features(cursor, loop, chr_length):
         end = row['end']
         end_pos = _get_array_index(end, loop)
         array[start_pos:end_pos+1]+=1
+    cursor.close()
     return array
 
     
@@ -504,9 +507,7 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
     if extended :    
         ## 'erase table'
         ## 'drop table %s'% table_name
-        t._connection.commit()
-        import time
-        time.sleep(5)
+        t._cursor.close()
         cur = t.cursor().execute('drop table "%s";' % table_name)
         t._connection.commit()
         cur.close()
