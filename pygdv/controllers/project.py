@@ -64,21 +64,7 @@ class ProjectController(CrudRestController):
         #TODO check with permissions
         
         control = '''
-        
-        $(document).ready(function() {
-            /* Build the DataTable with third column using our custom sort functions */
-            
-             $('.grid tr').click( function() {
-                if ( $(this).hasClass('row_selected') )
-                    $(this).removeClass('row_selected');
-                else
-                    $(this).addClass('row_selected');
-    } );
-            
-            $('.grid').dataTable( {
-                "aaSorting": [ [0,'asc'], [1,'asc'] ]
-            });
-        });
+       
         '''
         return dict(page='projects', model='project',form_title="new project", user_projects=user_projects, shared_projects=shared_projects, control=control, value=kw)
     

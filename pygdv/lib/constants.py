@@ -66,7 +66,7 @@ FEATURES = 'features'
 NOT_SUPPORTED_DATATYPE = 'format not supported'
 
 # DATA FORMAT
-date_format = "%A %d. %B %Y %H.%M.%S"
+date_format = "%d. %b %Y %Hh%M"
 
 
 
