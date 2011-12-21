@@ -67,10 +67,7 @@ def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, fil
     index = 0
     if file_names is not None:
         file_names = file_names.split()
-    print 'toto'
-    print file_upload
     if file_upload is not None:
-        print file_upload
         filename = file_upload['filename']
         if file_names:
             filename = file_names[index]

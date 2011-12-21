@@ -166,7 +166,6 @@ class TrackController(CrudRestController):
         user = handler.user.get_user_in_session(request)
         kw['admin'] = True
         util.file_upload_converter(kw)
-        print 'test'
         
         task_id = tasks.process_track.delay(user.id, **kw)
         return reply.normal(request, 'Task launched.', '/home', {'task_id' : task_id})  
