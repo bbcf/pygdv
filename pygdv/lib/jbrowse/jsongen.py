@@ -507,7 +507,8 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
     if extended :    
         ## 'erase table'
         ## 'drop table %s'% table_name
-        t._cursor.close()
+        for x in t._cursor:
+            print x
         cur = t.cursor().execute('drop table "%s";' % table_name)
         t._connection.commit()
         cur.close()
