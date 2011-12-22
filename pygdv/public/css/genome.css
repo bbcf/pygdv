@@ -898,5 +898,5 @@ width: 3em;
     position: absolute;
     top: -2px;
     left: -2px;
-    z-index: 60;
+    z-index: 100;
 }

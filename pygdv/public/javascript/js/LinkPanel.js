@@ -44,16 +44,45 @@ LinkPanel.prototype.showPanelInfo = function(node, assembly_id, feat, fields){
     // 	dojo.xhrGet(xhrArgs);
 	
 
-
+    
+    // if(!this._lp_showed){
+    // 	this._lp_showed = true;
+    // 	this.wait(node);
+    // 	var ctx = this;
+    // 	var name = feat[fields["name"]]; 
+    // 	var start = feat[fields["start"]];
+    // 	var end = feat[fields["end"]];
+    // 	callback = function(data){ctx.buildLinkPanel(node, name, data)};
+    // 	new GenRep().links(assembly_id, name, callback);
+    // };
     if(!this._lp_showed){
-    	this._lp_showed = true;
-    	this.wait(node);
-    	var ctx = this;
+	this._lp_showed = true;
+	this.wait(node);
+	
+	var ctx = this;
     	var name = feat[fields["name"]]; 
-    	var start = feat[fields["start"]];
-    	var end = feat[fields["end"]];
-    	callback = function(data){ctx.buildLinkPanel(node, name, data)};
-    	new GenRep().links(assembly_id, name, callback);
+	var start = feat[fields["start"]];
+	var end = feat[fields["end"]];
+    	
+	var callback = function(data){console.log('fdfdd');};
+	dojo.io.iframe.create('_link_pan', 'callback', 'http://reflect.ws/REST/GetPopup?name=' + name);
+	console.log('e');
+	
+	// var panel = document.createElement("iframe");
+	// panel.className = "link_panel";
+	// panel.id = this.id;
+	// panel.src = 'http://reflect.ws/REST/GetPopup?name=' + name
+		
+	// var ctx = this;
+	// var handler = dojo.connect(panel, 'onmouseleave', function(e){
+        //     //node.removeChild(panel);
+	//     ctx._lp_showed = false;
+	//     dojo.stopEvent(e);
+	// });
+
+	// node.appendChild(panel);
+
+	
     };
 };
 
@@ -95,7 +124,7 @@ LinkPanel.prototype.wait = function(node){
     var panel = document.createElement("div");
     panel.className = "link_panel";
     panel.id = this.id;
-        
+    panel.style.zIndex = '100';
     var browser = dojo.byId("GenomeBrowser").genomeBrowser;
     var loader = document.createElement("img");
     loader.src = browser.imageRoot + "ajax-loader.gif";

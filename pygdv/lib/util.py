@@ -217,7 +217,8 @@ def order_data(ordering, data):
 def file_upload_converter(kw):
     if 'file_upload' in kw:
         file_upload = kw['file_upload']
-        new_fu = {}
-        new_fu['filename'] = file_upload.filename
-        new_fu['value'] = file_upload.value
-        kw['file_upload'] = new_fu
+        if file_upload:
+            new_fu = {}
+            new_fu['filename'] = file_upload.filename
+            new_fu['value'] = file_upload.value
+            kw['file_upload'] = new_fu
