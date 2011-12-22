@@ -1,6 +1,8 @@
 function LinkPanel(){
     this._lp_showed = false;
-    this.id = 'link_panel'
+    this.id = 'link_panel';
+    this.ifr_id = 'ifr_reflect';
+    this.loader_id = 'link_panel_loader';
 };
 
 
@@ -41,7 +43,7 @@ LinkPanel.prototype.showPanelInfo = function(node, assembly_id, feat, fields){
 	
     // 	}
     // };
-    // 	dojo.xhrGet(xhrArgs);
+    // 	dojo.xhrGet(xUncaught Error: NOT_FOUND_ERR: DOM Exception 8hrArgs);
 	
 
     
@@ -55,41 +57,49 @@ LinkPanel.prototype.showPanelInfo = function(node, assembly_id, feat, fields){
     // 	callback = function(data){ctx.buildLinkPanel(node, name, data)};
     // 	new GenRep().links(assembly_id, name, callback);
     // };
+    var pnode = node.parentNode;
     if(!this._lp_showed){
 	this._lp_showed = true;
-	this.wait(node);
+	this.wait(pnode, node);
 	
 	var ctx = this;
     	var name = feat[fields["name"]]; 
 	var start = feat[fields["start"]];
 	var end = feat[fields["end"]];
     	
-	var callback = function(data){console.log('fdfdd');};
-	dojo.io.iframe.create('_link_pan', 'callback', 'http://reflect.ws/REST/GetPopup?name=' + name);
-	console.log('e');
-	
-	// var panel = document.createElement("iframe");
-	// panel.className = "link_panel";
-	// panel.id = this.id;
-	// panel.src = 'http://reflect.ws/REST/GetPopup?name=' + name
-		
-	// var ctx = this;
-	// var handler = dojo.connect(panel, 'onmouseleave', function(e){
-        //     //node.removeChild(panel);
-	//     ctx._lp_showed = false;
-	//     dojo.stopEvent(e);
-	// });
 
-	// node.appendChild(panel);
-
+	var fr = dojo.io.iframe.create(this.ifr_id, '_lp.loaded()', 'http://reflect.ws/REST/GetPopup?name=' + name);
 	
+	var fr_cont = document.createElement('div');
+	fr_cont.width='100%';
+	var cclose = document.createElement('img');
+	cclose.src = '../images/delete.png';
+	cclose.className = 'lp_close';
+	var panel = dojo.byId(this.id);
+	var ctx = this;
+	dojo.connect(cclose, 'onclick', function(e){
+	    dojo.query('#' + ctx.id).orphan();
+	    ctx._lp_showed = false;
+	    dojo.stopEvent(e);
+	});
+	fr_cont.appendChild(cclose);
+	fr_cont.appendChild(fr);
+	
+	fr_cont.style.display = 'none';
+	
+	panel.appendChild(fr_cont);
     };
 };
 
-LinkPanel.prototype.buildReflectPanel = function(node, data){
-    var f = document.createElement('IFRAME');
-    f.innerHTML = data;
-    node.appendChild(f);
+
+
+LinkPanel.prototype.loaded = function(){
+    var loader = dojo.query('#' + this.loader_id).orphan();
+    dojo.query('#' + this.id + ' >').forEach(function(node, i, arr){
+	node.style.display='block';
+    });
+    var ifr = dojo.style(dojo.byId(this.ifr_id), {visibility:'visible', height:'100%', width:'100%', zIndex:'200'});
+    
 };
 
 
@@ -120,24 +130,18 @@ LinkPanel.prototype.buildLinkPanel = function(node, gene_name, data){
 
 
 
-LinkPanel.prototype.wait = function(node){
+LinkPanel.prototype.wait = function(parent_node, node){
     var panel = document.createElement("div");
     panel.className = "link_panel";
     panel.id = this.id;
-    panel.style.zIndex = '100';
+    panel.style.cssText = node.style.cssText;
     var browser = dojo.byId("GenomeBrowser").genomeBrowser;
     var loader = document.createElement("img");
     loader.src = browser.imageRoot + "ajax-loader.gif";
+    loader.id = this.loader_id;
     panel.appendChild(loader);
 
-    var ctx = this;
-    var handler = dojo.connect(panel, 'onmouseleave', function(e){
-        node.removeChild(panel);
-	ctx._lp_showed = false;
-	dojo.stopEvent(e);
-    });
-
-    node.appendChild(panel);
+    parent_node.appendChild(panel);
 };
 
 
