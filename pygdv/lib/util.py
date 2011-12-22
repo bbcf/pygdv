@@ -63,6 +63,7 @@ def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, fil
     then urls, url, fsys and finally fsys_list
     @return a list of tuples : (filename, tmp_file).
     '''
+    
     files = []  
     index = 0
     if file_names is not None:
@@ -80,16 +81,15 @@ def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, fil
 
     if urls is not None: 
         for u in urls.split():
-            
             u = urlparse.urlparse(u)
             if u.hostname:
                 filename = None
                 if file_names:
                     filename = file_names[index]
                     index += 1
-                    filename, tmp_file = _download_from_url(u.geturl(), filename=filename)
-                    if filename is not None :
-                        files.append((filename, tmp_file))
+                filename, tmp_file = _download_from_url(u.geturl(), filename=filename)
+                if filename is not None :
+                    files.append((filename, tmp_file))
     
     if url is not None:
         u = urlparse.urlparse(url)
@@ -106,7 +106,6 @@ def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, fil
         filename = os.path.basename(fsys)
         if file_names:
             filename = file_names[index]
-            print filename
             index += 1
             
         tmp_file = tempfile.NamedTemporaryFile(suffix=filename, delete=False)
@@ -140,7 +139,7 @@ def _download_from_url(url, filename=None):
 #    file_size = int(meta.getheaders("Content-Length")[0])
 #    print "Downloading: %s Bytes: %s" % (filename, file_size)
         file_size_dl = 0
-        tmp_file = tempfile.NamedTemporaryFile(delete=False)
+        tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=filename)
         while True:
             buffer = u.read(block_sz)
             if not buffer:
@@ -217,7 +216,7 @@ def order_data(ordering, data):
 def file_upload_converter(kw):
     if 'file_upload' in kw:
         file_upload = kw['file_upload']
-        if file_upload:
+        if file_upload is not None:
             new_fu = {}
             new_fu['filename'] = file_upload.filename
             new_fu['value'] = file_upload.value

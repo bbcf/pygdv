@@ -333,7 +333,9 @@ _sql_dispatch = {'quantitative' : lambda *args, **kw : _signal(*args, **kw),
 def process_track(user_id, **kw):
     files = util.upload(**kw)
         
-        
+    print files
+    
+            
     if files is None:
         raise 'No files to upload'
         
@@ -362,7 +364,7 @@ def process_track(user_id, **kw):
         sequence = session.query(model.Sequence).filter(model.Sequence.id == assembly_id).first()
         from pygdv.handler.track import create_track
         task_id, track_id = create_track(user_id, sequence, f=f.name, trackname=filename, project=project, session=session, admin=admin)
-        
+        print 'creating track'
         transaction.commit()
         session.close()
         
