@@ -153,7 +153,6 @@ def _generate_nested_extended_features(cursor, keep_field, count_index, subfeatu
                     nb_feature = 1
       
         prev_feature = feature
-    cursor.close()
     if prev_feature is not None:    
         yield prev_feature, nb_feature
     
@@ -168,27 +167,6 @@ def _generate_nested_features(cursor, keep_field, start_index, end_index):
         feature = [row[i] for i in field_number_list]
         yield feature, nb_feature
         nb_feature += 1
-    cursor.close()
-        
-#        if prev_feature is not None:
-#            if feature[end_index] < prev_feature[end_index]:
-#                stack.append(prev_feature)
-#            else :
-#                while stack :
-#                    tmp_feature = stack.pop()
-#                    _nest(tmp_feature, prev_feature, keep_field + 1, keep_field)
-#                    nb_feature += 1
-#                    prev_feature = tmp_feature
-#                    if feature[1] < prev_feature[1]:
-#                        stack.append(prev_feature)
-#                        break
-#                else:
-#                    yield prev_feature, nb_feature
-#                    nb_feature = 1
-#                    
-#        prev_feature = feature
-#    if prev_feature is not None:
-#            yield prev_feature, nb_feature
         
 
         
@@ -220,7 +198,6 @@ def _count_features(cursor, loop, chr_length):
         end = row['end']
         end_pos = _get_array_index(end, loop)
         array[start_pos:end_pos+1]+=1
-    cursor.close()
     return array
 
     
@@ -433,18 +410,12 @@ def _prepare_database(t, chr_name):
     '''
     table_name = 'tmp_%s' % chr_name
     ##  'create table tmp_%s' % chr_name
-    cur = t.cursor()
-    cur.execute('create table "%s"(id text, subs text, foreign key(id) references "%s"(id));' % (table_name, chr_name))
-    cur.close()
+    t.cursor().execute('create table "%s"(id text, subs text, foreign key(id) references "%s"(id));' % (table_name, chr_name))
     t.write(table_name, _gen_gen(t, chr_name) , ('id', 'subs'))
-    t._connection.commit()
     table_name2 = 'tmp_%s2' % chr_name
     ##  'create table tmp_%s2' % chr_name
-    cur = t.cursor()
-    cur.execute('create table "%s"(start int, end int, score float, name text, strand int , type text, attributes text, id text);' % (table_name2))
+    t.cursor().execute('create table "%s"(start int, end int, score float, name text, strand int , type text, attributes text, id text);' % (table_name2))
     t.write(table_name2, _gen_gen2(t, chr_name) , ('start', 'end', 'score', 'name', 'strand', 'type', 'id', 'attributes'))
-    t._connection.commit()
-    cur.close()
     
     return table_name, table_name2
     
@@ -473,8 +444,6 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
                     _generate_nested_extended_features(cursor, keep_field=7, count_index=8, 
                                     subfeatures_index=9, start_index=0, end_index=1, name_index=3, strand_index=4))
         
-        cursor.close()
-        t._connection.commit()
     else :
         headers = _basic_headers
         subfeature_headers = _basic_subfeature_headers
@@ -486,15 +455,8 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
         lazy_feats = _generate_lazy_output(
                             _generate_nested_features(cursor, keep_field=6, start_index=0, end_index=1))
    
-        cursor.close()
-    #cursor = _get_cursor(connection, chr_name, fields_needed, order_by=ob)
    
-    
-    
-    
     ## 'NCLIST'
-    
-    
     NCList = []
     feature_count = 0
     for start, stop, chunk_number, buff, nb_feats in lazy_feats:
@@ -507,17 +469,11 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
     if extended :    
         ## 'erase table'
         ## 'drop table %s'% table_name
-        for x in t._cursor:
-            print x
-        cur = t.cursor().execute('drop table "%s";' % table_name)
-        t._connection.commit()
-        cur.close()
+        t._cursor.execute('drop table "%s";' % table_name)
         
         ## 'drop table %s'% table_name2
-        cur = t.cursor().execute('drop table "%s";' % table_name2)
-        cur.close()
+        t._cursor.execute('drop table "%s";' % table_name2)
         t.vacuum()
-        t._connection.commit()
         #t.cursor.execute('vacuum')
         ## 'dropped'
             
@@ -529,10 +485,8 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
     ## ' histogram meta %s, %s, %s' % (chr_length, threshold, url_output)
     histogram_meta = _histogram_meta(chr_length, threshold, url_output)
     
-    ## ' count array'
     cursor = t.cursor().execute("select * from '%s' ;" % (chr_name))
     array = _count_features(cursor, threshold, chr_length)
-    cursor.close()
     ## ' hists stats'
     hist_stats = _calculate_histo_stats(array, threshold, chr_length)
     
@@ -540,6 +494,7 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
     _write_histo_stats(_generate_hist_outputs(array, chr_length), threshold, output_directory)
     ## ' write hist in output' 
     _write_histo_stats(_generate_hist_outputs(array, chr_length, 100), threshold * 100, output_directory)
+    
     data = _prepare_track_data(
                                headers, 
                                subfeature_headers, 
