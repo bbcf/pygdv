@@ -3,6 +3,7 @@ Contains method needed to build JSON files from SQLite files.
 '''
 from __future__ import absolute_import
 import os, sqlite3, json, math
+#from lib.jbrowse import higher_zoom, TYPE, zooms, JSON_HEIGHT, SUBLIST_INDEX, CHUNK_SIZE, LAZY_INDEX, ARROWHEAD_CLASS, CLASSNAME, HIST_CHUNK_SIZE
 from pygdv.lib.jbrowse import higher_zoom, TYPE, zooms, JSON_HEIGHT, SUBLIST_INDEX, CHUNK_SIZE, LAZY_INDEX, ARROWHEAD_CLASS, CLASSNAME, HIST_CHUNK_SIZE
 import numpy as np
 import track
@@ -383,7 +384,7 @@ def _gen_gen(t, chr_name):
     prev_id = None
     l = []
     #for row in t.read(chr_name, ['start', 'end', 'score', 'name', 'strand', 'type', 'attributes', 'id'], cursor=True):
-    for row in t.aggregated_read(chr_name, ('start', 'end', 'score', 'gene_name', 'strand', 'type', 'gene_id')):
+    for row in t.aggregated_read(chr_name, ('start', 'end', 'score', 'gene_name', 'strand', 'type', 'gene_id'), order_by='gene_id'):
         
         idi = row[6]
         if prev_id is not None:
@@ -466,7 +467,8 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
         with open(output_chunk, 'w', -1) as fil:
             fil.write(json.dumps(buff))
     
-    if extended :    
+    if extended :
+        
         ## 'erase table'
         ## 'drop table %s'% table_name
         t._cursor.execute('drop table "%s";' % table_name)
@@ -526,3 +528,23 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
     return 1
 
 
+
+
+
+
+
+
+
+#if __name__ == '__main__':
+#    import shutil
+#    f = 'mm9_chr7_overlapping_test.sql'
+#    database = '/Users/jarosz/Documents/epfl/flat_files/' + f
+#    name = 'mm9_chr7_genes'
+#    sha1 = 'nosha1'
+#    out_dir = '/Users/jarosz/Desktop/jsongen_test'
+#    try: 
+#        shutil.rmtree(out_dir)
+#    except OSError:
+#        pass
+#    os.mkdir(out_dir)
+#    jsonify(database, name, sha1, out_dir, 'public_url', 'browser_url', True)
