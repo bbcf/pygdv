@@ -94,18 +94,20 @@ class TrackController(CrudRestController):
     @validate(track_edit_form, error_handler=edit)
     def put(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        id = args[0]
-        for track in user.tracks :
-            if int(id) == track.id :
-                track = DBSession.query(Track).filter(Track.id == id).first()
-                track.name = kw['name']
-                if 'color' in kw:
-                    track.parameters.color = kw['color']
-                DBSession.flush()
-                redirect('../')
+        _id = args[0]
         
-        flash("You haven't the right to edit any tracks which is not yours")
-        raise redirect('../')
+        if not checker.can_edit_track(user, _id) and not checker.user_is_admin(user.id):
+            flash("You haven't the right to edit any tracks which is not yours")
+            raise redirect('../')
+        
+        track = DBSession.query(Track).filter(Track.id == _id).first()
+        track.name = kw['name']
+        if 'color' in kw:
+            track.parameters.color = kw['color']
+        DBSession.flush()
+        redirect('../')
+        
+        
     
     @expose('pygdv.templates.track_export')
     def export(self, track_id, *args, **kw):
@@ -170,7 +172,16 @@ class TrackController(CrudRestController):
         task_id = tasks.process_track.delay(user.id, **kw)
         return reply.normal(request, 'Task launched.', '/home', {'task_id' : task_id})  
     
-    
+    @require(has_permission('admin', msg='Only for admins'))
+    @expose('pygdv.templates.list')
+    def admin(self, **kw):
+        sequences = DBSession.query(Sequence).all()
+        tracks = []
+        for sequence in sequences:
+            tracks += sequence.default_tracks
+        data = [util.to_datagrid(track_grid, tracks, "Track Listing", len(tracks)>0)]
+        
+        return dict(page='tracks', model='track', form_title="admin tracks",items=data,value=kw)
     
     
     

@@ -3,7 +3,13 @@ from pygdv.lib import constants
 from sqlalchemy.sql import and_, or_
 
 
-
+def can_edit_track(user, track_id):
+    for track in user.tracks :
+        if int(track_id) == track.id : return True
+    return False
+            
+            
+            
 
 def user_own_project(user_id, project_id):
     '''
