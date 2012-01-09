@@ -63,9 +63,9 @@ class TrackController(CrudRestController):
     def create(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
         util.file_upload_converter(kw)
-        task_id = tasks.process_track.delay(user.id, **kw)
+        task = tasks.process_track.delay(user.id, **kw)
              
-        return reply.normal(request, 'Task launched.', './', {'task_id' : task_id})  
+        return reply.normal(request, 'Task launched.', './', {'task_id' : task.task_id})  
     
     @expose('json')
     @validate(track_new_form, error_handler=new)

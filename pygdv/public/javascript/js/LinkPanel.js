@@ -3,8 +3,38 @@ function LinkPanel(){
     this.id = 'link_panel';
     this.ifr_id = 'ifr_reflect';
     this.loader_id = 'link_panel_loader';
+    this.data = null;
+    this.ifr_node = null;
+    this.gr_loaded = false;
+    this.ifr_loaded = false;
 };
 
+/**
+* Called when the iframe finished loading
+*/
+LinkPanel.prototype.iframe_loaded = function(){
+    this.ifr_loaded = true;
+    this.ifr_node = null;
+    this.loaded();
+};
+
+/**
+* Called when GenRep Has send back result
+*/
+LinkPanel.prototype.genrep_loaded = function(data){
+    this.gr_loaded = true;
+    this.data = data;
+    this.loaded();
+};
+
+/**
+* Called when closing the link panel
+*/
+LinkPanel.prototype.unload = function(data){
+    this.ifr_loaded = false;
+    this.gr_loaded = false;
+    this.data = null;
+};
 
 /**
  * Quick made function which has the purpose
@@ -18,88 +48,66 @@ function LinkPanel(){
 
  
 LinkPanel.prototype.showPanelInfo = function(node, assembly_id, feat, fields){
-    // var name = feat[fields["name"]];
-    // var deferred = dojo.io.iframe.send({
-    // 	url : 'http://reflect.ws/REST/GetPopup?name=' + name,
-    // 	contentType: 'html',
-    // 	handleAs: 'html',
-    // 	handle: function(data, ioargs){
-    // 	    console.log(data);
-    // 	    console.log(ioargs);
-    // 	}
-    // });
-
-    // var name = feat[fields["name"]];
-    // var ctx = this;
-    // callback = function(data){ctx.buildReflectPanel(node, data)};
-    // var xhrArgs = {
-    // 	url : _GDV_LINK_URL + '?name=' + name + '&assembly_id=' + assembly_id,
-    // 	handleAs : 'html',
-    // 	load : function(data){
-    // 	    callback(data);
-    // 	},
-    // 	error : function(data){
-    // 	    console.error(data);
-	
-    // 	}
-    // };
-    // 	dojo.xhrGet(xUncaught Error: NOT_FOUND_ERR: DOM Exception 8hrArgs);
-	
-
-    
-    // if(!this._lp_showed){
-    // 	this._lp_showed = true;
-    // 	this.wait(node);
-    // 	var ctx = this;
-    // 	var name = feat[fields["name"]]; 
-    // 	var start = feat[fields["start"]];
-    // 	var end = feat[fields["end"]];
-    // 	callback = function(data){ctx.buildLinkPanel(node, name, data)};
-    // 	new GenRep().links(assembly_id, name, callback);
-    // };
     var pnode = node.parentNode;
-    if(!this._lp_showed){
-	this._lp_showed = true;
-	this.wait(pnode, node);
-	
-	var ctx = this;
-    	var name = feat[fields["name"]]; 
-	var start = feat[fields["start"]];
-	var end = feat[fields["end"]];
-    	
-
-	var fr = dojo.io.iframe.create(this.ifr_id, '_lp.loaded()', 'http://reflect.ws/REST/GetPopup?name=' + name);
-	
-	var fr_cont = document.createElement('div');
-	fr_cont.width='100%';
-	var cclose = document.createElement('img');
-	cclose.src = '../images/delete.png';
-	cclose.className = 'lp_close';
-	var panel = dojo.byId(this.id);
-	var ctx = this;
-	dojo.connect(cclose, 'onclick', function(e){
-	    dojo.query('#' + ctx.id).orphan();
-	    ctx._lp_showed = false;
-	    dojo.stopEvent(e);
-	});
-	fr_cont.appendChild(cclose);
-	fr_cont.appendChild(fr);
-	
-	fr_cont.style.display = 'none';
-	
-	panel.appendChild(fr_cont);
+    /* remove panel if one */
+    if(this._lp_showed){
+	dojo.query('#' + this.id).orphan();
     };
+    this._lp_showed = true;
+    this.wait(pnode, node);
+    
+    var ctx = this;
+    var name = feat[fields["name"]]; 
+    var start = feat[fields["start"]];
+    var end = feat[fields["end"]];
+    
+    /* create iframe (should juste create one and use it everytime) */
+    var fr = dojo.io.iframe.create(this.ifr_id, '_lp.iframe_loaded()', 'http://reflect.ws/REST/GetPopup?name=' + name);
+    
+    /* send request to GenRep */
+    callback = function(data){ctx.genrep_loaded(data)};
+    new GenRep().links(assembly_id, name, callback);
+
+    /* create container for the iframe */
+    var fr_cont = document.createElement('div');
+    fr_cont.width='100%';
+    fr_cont.id = 'link_panel_cont';
+    var cclose = document.createElement('img');
+    cclose.src = '../images/delete.png';
+    cclose.className = 'lp_close';
+    var panel = dojo.byId(this.id);
+    var ctx = this;
+    dojo.connect(cclose, 'onclick', function(e){
+	dojo.query('#' + ctx.id).orphan();
+	ctx.unload();
+	dojo.stopEvent(e);
+    });
+    fr_cont.appendChild(cclose);
+    
+    fr_cont.appendChild(fr);
+    fr_cont.style.display = 'none';
+    panel.appendChild(fr_cont);
 };
 
 
 
+/**
+* Called by the two method of loading data (iframe & GenRep),
+* executing when both are complete
+*/
 LinkPanel.prototype.loaded = function(){
-    var loader = dojo.query('#' + this.loader_id).orphan();
-    dojo.query('#' + this.id + ' >').forEach(function(node, i, arr){
-	node.style.display='block';
-    });
-    var ifr = dojo.style(dojo.byId(this.ifr_id), {visibility:'visible', height:'100%', width:'100%', zIndex:'200'});
-    
+    console.log('loaded');
+    if (this.ifr_loaded && this.gr_loaded){
+	/* destroy loader */
+	var loader = dojo.query('#' + this.loader_id).orphan();
+	dojo.query('#' + this.id + ' >').forEach(function(node, i, arr){
+	    node.style.display='block';
+	});
+
+		
+	var ifr = dojo.style(dojo.byId(this.ifr_id), {visibility:'visible', height:'100%', width:'100%', zIndex:'200'});
+	this.buildLinkPanel(dojo.byId('link_panel_cont'), name, this.data);
+    };
 };
 
 
@@ -109,23 +117,23 @@ LinkPanel.prototype.loaded = function(){
  * @param{data} the link data as JSON
  */
 LinkPanel.prototype.buildLinkPanel = function(node, gene_name, data){
-    var panel = dojo.byId(this.id);
-    dojo.empty(panel);
+    var ct = document.createElement("DIV");
     var gn = document.createElement('h4');
     gn.innerHTML = gene_name;
-    panel.appendChild(gn);
+    ct.appendChild(gn);
     var title = document.createElement('h5');
     title.innerHTML = 'Links';
-    panel.appendChild(title);
+    ct.appendChild(title);
     for(key in data){
 	var d = document.createElement('DIV');
 	var el = document.createElement('a');
 	el.innerHTML = key;
 	el.href = data[key];
 	d.appendChild(el);
-	panel.appendChild(d);
+	ct.appendChild(d);
     }
-    node.appendChild(panel);
+    ct.className = 'link_panel_gr'
+    node.appendChild(ct);
 };
 
 

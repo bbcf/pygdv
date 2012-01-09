@@ -357,8 +357,8 @@ def process_track(user_id, **kw):
             raise 'Project with id %s not found.' % kw['project_id']
         assembly_id = project.sequence_id
 
-    if not 'assembly' in kw:
-        raise 'Missing assembly parameters.'
+    if not assembly_id:
+        raise Exception('Missing assembly parameters.')
     
     for filename, f in files:
         sequence = session.query(model.Sequence).filter(model.Sequence.id == assembly_id).first()

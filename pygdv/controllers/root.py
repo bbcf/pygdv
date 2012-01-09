@@ -91,7 +91,7 @@ class RootController(BaseController):
     
     @expose('pygdv.templates.index')
     def login_needed(self):
-        flash('You need to login')
+        flash('You need to login', 'error')
         return dict(page='index')
 
     @expose('pygdv.templates.about')
