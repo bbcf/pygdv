@@ -21,12 +21,12 @@ def get_delete_link(obj_id, rights = None):
     <form method="POST" action=%s class="button-to">
     <input name="_method" value="DELETE" type="hidden"/>
    
-    <input class="action delete-button" onclick="return confirm('Are you sure?');" 
+    <input class="action delete-button" title="%s" onclick="return confirm('Are you sure?');" 
         value="delete" style="background-color: transparent; float:left; 
         border:0; color: #286571; display: inline; margin: 0; padding: 0;" 
     type="submit"/>
     </form>
-        ''' % (obj_id)
+        ''' % (obj_id, 'delete')
     return ''
         
 def get_view_link(obj_id, param, rights = None):
@@ -35,7 +35,7 @@ def get_view_link(obj_id, param, rights = None):
     
     '''
     if rights is not None:
-        return ''' <a class='action view_link' href="%s"></a>''' % url('./view', params={'project_id':obj_id})
+        return ''' <a class='action view_link' title="%s" href="%s"></a>''' % ('view', url('./view', params={'project_id':obj_id}))
     return ''
 
 def get_copy_link(obj_id, param='track_id', rights=None, base_url='.'):
@@ -43,7 +43,7 @@ def get_copy_link(obj_id, param='track_id', rights=None, base_url='.'):
     Return a HTML export link.
     '''
     if rights is not None:
-        return ''' <a class='action copy_link' href="%s%s"></a>''' % (base_url, url('/copy', params={param:obj_id}))
+        return ''' <a class='action copy_link' title="%s" href="%s%s"></a>''' % ('copy in your profile', base_url, url('/copy', params={param:obj_id}))
     return ''
 
 def get_export_link(obj_id, param='track_id', rights=None):
@@ -51,7 +51,7 @@ def get_export_link(obj_id, param='track_id', rights=None):
     Return a HTML export link.
     '''
     if rights is not None:
-        return ''' <a class='action export_link' href="%s"></a>''' % url('/tracks/export', params={param:obj_id})
+        return ''' <a class='action export_link' title="%s" href="%s"></a>''' % ('export', url('/tracks/export', params={param:obj_id}))
     return ''
 
 def get_share_link(obj_id, param, rights = None):
@@ -60,7 +60,7 @@ def get_share_link(obj_id, param, rights = None):
     '''
     if rights is not None and constants.right_upload in rights :
         if rights[constants.right_upload]:
-            return ''' <a class='action share_link' href="%s"></a>''' % url('./share', params={param:obj_id})
+            return ''' <a class='action share_link' title="%s" href="%s"></a>''' % ('share with others', url('./share', params={param:obj_id}))
     return ''
                                                         
 def get_edit_link(obj_id, rights = None, link=''):
@@ -68,16 +68,16 @@ def get_edit_link(obj_id, rights = None, link=''):
     if rights is not None and constants.right_upload in rights :
         if rights[constants.right_upload]:
             return '''
-    <a class="action edit_link" href="%s%s/edit" style="text-decoration:none"></a>
-           ''' % (link, obj_id)
+    <a class="action edit_link" title="%s" href="%s%s/edit" style="text-decoration:none"></a>
+           ''' % ('edit', link, obj_id)
     return ''
 
 def get_detail_link(obj_id, param, rights = None):
     
     if rights is not None and (constants.right_download in rights and rights[constants.right_download]):
             return '''
-    <a class="action detail_link" href="%s" style="text-decoration:none"></a>
-           ''' % url('./detail', params={param:obj_id})
+    <a class="action detail_link" title="%s" href="%s" style="text-decoration:none"></a>
+           ''' % ('details', url('./detail', params={param:obj_id}))
     return ''
        
 def get_right_checkbok(obj, right_name):
