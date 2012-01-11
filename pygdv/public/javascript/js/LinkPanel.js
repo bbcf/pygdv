@@ -63,7 +63,8 @@ LinkPanel.prototype.showPanelInfo = function(node, assembly_id, feat, fields){
     
     /* create iframe (should juste create one and use it everytime) */
     var fr = dojo.io.iframe.create(this.ifr_id, '_lp.iframe_loaded()', 'http://reflect.ws/REST/GetPopup?name=' + name);
-    
+    fr.src='http://reflect.ws/REST/GetPopup?name=' + name;
+   
     /* send request to GenRep */
     callback = function(data){ctx.genrep_loaded(data)};
     new GenRep().links(assembly_id, name, callback);
@@ -96,16 +97,15 @@ LinkPanel.prototype.showPanelInfo = function(node, assembly_id, feat, fields){
 * executing when both are complete
 */
 LinkPanel.prototype.loaded = function(){
-    console.log('loaded');
     if (this.ifr_loaded && this.gr_loaded){
 	/* destroy loader */
 	var loader = dojo.query('#' + this.loader_id).orphan();
 	dojo.query('#' + this.id + ' >').forEach(function(node, i, arr){
 	    node.style.display='block';
 	});
-
-		
-	var ifr = dojo.style(dojo.byId(this.ifr_id), {visibility:'visible', height:'100%', width:'100%', zIndex:'200'});
+	
+	
+	var ifr = dojo.style(dojo.byId(this.ifr_id), {visibility:'visible', height:'100%', width:'100%', zIndex:'200', backgroundColor: 'white'});
 	this.buildLinkPanel(dojo.byId('link_panel_cont'), name, this.data);
     };
 };
