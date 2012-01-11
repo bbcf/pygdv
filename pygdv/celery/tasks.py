@@ -340,7 +340,7 @@ def process_track(user_id, **kw):
         raise 'No files to upload'
         
     if not 'assembly' in kw and not 'project_id' in kw:
-        raise 'Missing assembly parameters.'
+        raise Exception('Missing assembly parameters.')
     assembly_id = kw.get('assembly', None)
     
     project = None
@@ -354,7 +354,7 @@ def process_track(user_id, **kw):
     if 'project_id' in kw:
         project = session.query(model.Project).filter(model.Project.id == kw['project_id']).first()
         if project is None:
-            raise 'Project with id %s not found.' % kw['project_id']
+            raise Exception('Project with id %s not found.' % kw['project_id'])
         assembly_id = project.sequence_id
 
     if not assembly_id:
@@ -364,12 +364,11 @@ def process_track(user_id, **kw):
         sequence = session.query(model.Sequence).filter(model.Sequence.id == assembly_id).first()
         from pygdv.handler.track import create_track
         task_id, track_id = create_track(user_id, sequence, f=f.name, trackname=filename, project=project, session=session, admin=admin)
-        print 'creating track'
         transaction.commit()
         session.close()
         
         if task_id == constants.NOT_SUPPORTED_DATATYPE or task_id == constants.NOT_DETERMINED_DATATYPE:
-            raise 'format %s' % task_id 
+            raise Exception('format %s' % task_id)
     
 
 #### GFEATMINER ####

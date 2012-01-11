@@ -55,7 +55,7 @@ def create_track(user_id, sequence, trackname=None, f=None, project=None, sessio
             except OSError :
                 pass
             return _input, 0
-        
+
         track = Track()
         if trackname is not None:
             track.name = trackname
