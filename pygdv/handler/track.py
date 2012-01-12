@@ -130,11 +130,10 @@ def create_input(f, trackname, sequence_name, session):
         
         async_result = dispatch(datatype=datatype, assembly_name=sequence_name, path=file_path,
                                 sha1=sha1, name=trackname, tmp_file=f, format=fo)
-
         _input = Input()
         _input.sha1 = sha1
         _input.datatype = datatype
-       
+        
         _input.task_id = async_result.task_id
         
         session.add(_input)
@@ -213,7 +212,8 @@ def move_database(datatype, assembly_name, path, sha1, name, tmp_file, format):
     out_name = '%s.%s' % (sha1, 'sql')
     dst = os.path.join(track_directory(), out_name)
     shutil.move(path, dst)
-    return tasks.process_database.delay(datatype, assembly_name, dst, sha1, name, format);
+    t = tasks.process_database(datatype, assembly_name, dst, sha1, name, format);
+    return t
 
 def convert_file(datatype, assembly_name, path, sha1, name, tmp_file, format):
     '''

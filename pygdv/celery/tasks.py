@@ -245,7 +245,8 @@ def process_database(datatype, assembly_name, path, sha1, name, format):
     '''
     dispatch = _sql_dispatch.get(datatype, lambda *args, **kw : cannot_process(*args, **kw))
     try :
-        return dispatch(path, sha1, name)
+        t =  dispatch(path, sha1, name)
+        return t
     except Exception as e:
         etype, value, tb = sys.exc_info()
         traceback.print_exception(etype, value, tb)
@@ -289,9 +290,15 @@ def _features(path, sha1, name):
     '''
     output_dir = json_directory()
     callback_on_error = subtask(task=del_file_on_error, args=(sha1,))
-
-    t1 = _jsonify_features.delay(path, name, sha1, output_dir, '/data/jbrowse', '', False,
+    try :
+        t1 = _jsonify_features.delay(path, name, sha1, output_dir, '/data/jbrowse', '', False,
                             callback_on_error=callback_on_error)
+    except Exception as e:
+        etype, value, tb = sys.exc_info()
+        traceback.print_exception(etype, value, tb)
+        if callback_on_error :
+            subtask(callback_on_error).delay([e], sha1)
+        raise e
     return t1
 
 
@@ -302,9 +309,16 @@ def _relational(path, sha1, name):
     '''
     output_dir = json_directory()
     callback_on_error = subtask(task=del_file_on_error, args=(sha1,))
-
-    t1 = _jsonify_features.delay(path, name, sha1, output_dir, '/data/jbrowse', '', True,
-                            callback_on_error=callback_on_error)
+    try :
+        t1 = _jsonify_features.delay(path, name, sha1, output_dir, '/data/jbrowse', '', True,
+                    callback_on_error=callback_on_error)
+        print t1.task_id
+    except Exception as e:
+        etype, value, tb = sys.exc_info()
+        traceback.print_exception(etype, value, tb)
+        if callback_on_error :
+            subtask(callback_on_error).delay([e], sha1)
+        raise e
     return t1
 
 
