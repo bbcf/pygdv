@@ -79,7 +79,10 @@ class TrackController(CrudRestController):
         id = args[0]
         for track in user.tracks :
             if int(id) == track.id :
-                return CrudRestController.post_delete(self, *args, **kw)
+                test = CrudRestController.post_delete(self, *args, **kw)
+                print test
+                print 'woooooooooooo'
+                return test
         flash("You haven't the right to delete any tracks which is not yours")
         raise redirect('./')
     
