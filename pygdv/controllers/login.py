@@ -65,7 +65,7 @@ class LoginController(BaseController):
             DBSession.flush()
             #transaction.commit()
             user = DBSession.query(User).filter(User.email == mail).first()
-            flash( '''Your account has been created: %s'''%( user, ))
+            flash( 'Your account has been created')
             DBSession.flush()
             self.build_circles_with_user(tmp_user, principal)
             DBSession.flush()
@@ -75,14 +75,14 @@ class LoginController(BaseController):
             user._set_date(datetime.datetime.now())
             user_group = DBSession.query(Group).filter(Group.name == constants.group_users).first()
             user_group.users.append(tmp_user)
-            flash( '''Your account has been created: %s'''%( user, ))
+            flash( 'Your account has been created')
             DBSession.add(user)
             DBSession.flush()
             self.build_circles_with_user(tmp_user, principal)
             DBSession.flush()
             #transaction.commit()
         else :
-            flash( '''Welcome back: %s'''%( user, ), 'notice')
+            flash( 'Welcome back', 'notice')
             self.check_circles_with_user(user, principal)
         
         # look if an user is admin or not
