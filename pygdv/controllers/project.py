@@ -66,7 +66,7 @@ class ProjectController(CrudRestController):
         control = '''
        
         '''
-        return dict(page='projects', model='project',form_title="new project", user_projects=user_projects, shared_projects=shared_projects, control=control, value=kw)
+        return dict(page='projects', model='project',form_title="New project", user_projects=user_projects, shared_projects=shared_projects, control=control, value=kw)
     
 
 
@@ -76,7 +76,7 @@ class ProjectController(CrudRestController):
         tmpl_context.widget = project_new_form
         user = handler.user.get_user_in_session(request)
         #tmpl_context.circles=user.circles
-        return dict(page='projects', value=kw, title='new Project')
+        return dict(page='projects', value=kw, title='New Project')
     
     @expose('json')
     def create(self, *args, **kw):
@@ -143,7 +143,7 @@ class ProjectController(CrudRestController):
                             and_(User.id == user.id, Track.sequence_id == project.sequence_id)).all()
 
         kw['_method']='PUT'
-        return dict(page='projects', value=kw, title='edit Project')
+        return dict(page='projects', value=kw, title='Edit Project')
 
     @expose()
     @validate(project_edit_form, error_handler=edit)
