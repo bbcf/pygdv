@@ -33,6 +33,22 @@ def copy_track(user_id, track):
     DBSession.flush()
     return to_copy
 
+def delete(track_id, session=None):
+    '''
+    Delete the track and the input associated if this is the only track with this input.
+    '''
+    if session is None:
+        session = DBSession
+    track = session.query(Track).filter(Track.id == track_id).first()
+    if track is not None:
+        _input = track.input
+        print _input
+        if len(_input.tracks) == 1:
+            tasks.del_input.delay(_input.sha1)
+            session.delete(_input)
+        session.delete(track)
+        session.flush()
+
 def create_track(user_id, sequence, trackname=None, f=None, project=None, session=None, admin=False):
     if session is None:
         session = DBSession

@@ -10,6 +10,7 @@ json_dir = 'jbrowse'
 tracks_dir = 'tracks'
 gfeatminer_dir = 'gfeatminer'
 
+public_user_email = 'public@pygdv.ch'
 # STATUSES
 PENDING = 'PENDING'
 SUCCESS = 'SUCCESS'

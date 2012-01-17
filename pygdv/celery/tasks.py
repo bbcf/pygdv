@@ -51,7 +51,21 @@ def test(x):
 
 
 
+import datetime
 
+@task()
+def erase_data_from_public_user(delta=datetime.timedelta(minutes = 1)):
+    print 'erase data from public user older than %s' % delta
+    session = model.DBSession()
+    public_user = session.query(model.User).filter(model.User.email == constants.public_user_email).first()
+    for t in public_user.tracks:
+        now = datetime.datetime.now()
+        if delta < (now - t._created):
+            from pygdv.handler.track import delete
+            delete(t.id, session)
+        
+    transaction.commit()
+    session.close()
 
 
 
@@ -63,6 +77,23 @@ def test(x):
 #############################################################################################################
 #        FILE PROCESSING
 #############################################################################################################
+@task(max_retries=1)
+def del_input(sha1, *args, **kw):
+    '''
+    Verify if the file are well processed.
+    If no, it will erase the directory created in the
+    tracks directory
+    @param tasks : a list of return result. If one is different from 1, the directory is erased.
+    '''
+    path1 = os.path.join(track_directory(), sha1 + '.sql')
+    path2 = os.path.join(json_directory(), sha1 + '.sql')
+    try :
+        os.remove(path1)
+    except OSError: 
+        pass
+    shutil.rmtree(path2, ignore_errors = True)
+    return 1
+
 
 @task(max_retries=1)
 def del_file_on_error(tasks, sha1, *args, **kw):
@@ -75,10 +106,13 @@ def del_file_on_error(tasks, sha1, *args, **kw):
     print 'del file on error tasks :%s, sha1 : %s in %s and %s' % (tasks, sha1, track_directory(), json_directory())
     for theid in tasks:
         if not theid == success :
-            path1 = os.path.join(track_directory(), sha1, '.sql')
-            path2 = os.path.join(json_directory(), sha1, '.sql')
-            shutil.rmtree(path1, ignore_errors = True)
-            shutil.rmtree(path2, ignore_errors = True)
+            path1 = os.path.join(track_directory(), sha1 + '.sql')
+            path2 = os.path.join(json_directory(), sha1 + '.sql')
+            try :
+                os.remove(path1)
+            except OSError: 
+                pass
+            shutil.rmtree(path2, ignore_errors = False)
             raise theid
     return 1
 

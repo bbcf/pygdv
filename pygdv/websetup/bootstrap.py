@@ -8,7 +8,7 @@ import transaction
 
 
 from pygdv.lib.constants import right_upload, right_download, right_read, group_admins, perm_admin, group_users, perm_user
-from pygdv.lib.constants import right_download_id, right_read_id, right_upload_id
+from pygdv.lib.constants import right_download_id, right_read_id, right_upload_id, public_user_email
 
 def bootstrap(command, conf, vars):
     """Place any commands to setup turbotequila here.
@@ -67,7 +67,7 @@ def bootstrap(command, conf, vars):
             u = model.User()
             u.name = 'koopa'
             u.firstname = 'troopa'
-            u.email = 'public@pygdv.ch'
+            u.email = public_user_email
     
             users.users.append(u)
             

@@ -11,7 +11,7 @@ from celery.conf import conf
 
 
 def init_model(url):
-    engine = create_engine(url, echo=True)
+    engine = create_engine(url, echo=False)
     Session = sessionmaker(autoflush=False, autocommit=False,
                      extension=ZopeTransactionExtension(), bind=engine)
     return Session
@@ -19,6 +19,7 @@ def init_model(url):
 # Import your model modules here.
 from pygdv.model.constants import *
 from pygdv.model.database import Project, Sequence
+from pygdv.model.auth import User
 
 
 

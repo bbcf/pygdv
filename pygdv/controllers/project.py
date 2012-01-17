@@ -80,6 +80,7 @@ class ProjectController(CrudRestController):
     
     @expose('json')
     def create(self, *args, **kw):
+        print 'create'
         user = handler.user.get_user_in_session(request)
         if not 'name' in kw:
             return reply.error(request, 'Missing project `name`.', './', {})
