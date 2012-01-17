@@ -54,7 +54,7 @@ def test(x):
 import datetime
 
 @task()
-def erase_data_from_public_user(delta=datetime.timedelta(minutes = 1)):
+def erase_data_from_public_user(delta=datetime.timedelta(days = 14)):
     print 'erase data from public user older than %s' % delta
     session = model.DBSession()
     public_user = session.query(model.User).filter(model.User.email == constants.public_user_email).first()

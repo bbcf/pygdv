@@ -42,7 +42,6 @@ def delete(track_id, session=None):
     track = session.query(Track).filter(Track.id == track_id).first()
     if track is not None:
         _input = track.input
-        print _input
         if len(_input.tracks) == 1:
             tasks.del_input.delay(_input.sha1)
             session.delete(_input)
