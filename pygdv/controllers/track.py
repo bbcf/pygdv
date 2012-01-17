@@ -33,10 +33,12 @@ class TrackController(CrudRestController):
     edit_filler = track_edit_filler
 
    
-    @expose('json')
+    @require(has_permission('admin', msg='Only for admins'))
+    @expose('pygdv.templates.list')
     def all(self, *args, **kw):
-        user=handler.user.get_user_in_session(request)
-        return dict(tracks=user.tracks)
+        tracks = DBSession.query(Track).all()
+        data = [util.to_datagrid(track_grid, tracks, "Track Listing", len(tracks)>0)]
+        return dict(page='tracks', model='track', form_title="new track",items=data,value=kw)
 
 
     
