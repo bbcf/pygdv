@@ -11,7 +11,7 @@ from sqlite3 import OperationalError
 import track
 
 class DatabaseController(BaseController):
-    allow_only = has_any_permission(constants.perm_admin, constants.perm_user)
+    
 
     
     @expose('json')
