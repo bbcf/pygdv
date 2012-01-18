@@ -230,7 +230,6 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, pr
         # normal convert
         print 'converting %s to %s' %(path, tmp_dst)
         track.convert(path, tmp_dst)
-
         # then tranform to GDV format
         if datatype == constants.SIGNAL:
             f = signal_fields
@@ -489,11 +488,14 @@ def process_sqlite_file(datatype, assembly_name, path, sha1, name, format):
     '''
     Entry point of the sqlite file.
     '''
-    print 'processing'
-    dispatch = _sqlite_dispatch.get(datatype, lambda *args, **kw : cannot_process(*args, **kw))
-    dispatch(path, sha1, name)
-    print 'processing done'
-
+    try :
+        dispatch = _sqlite_dispatch.get(datatype, lambda *args, **kw : cannot_process(*args, **kw))
+        dispatch(path, sha1, name)
+    except Exception as e:
+        etype, value, tb = sys.exc_info()
+        traceback.print_exception(etype, value, tb)
+        del_input.delay(sha1)
+        raise e
 
 @task()
 def process_text_file(datatype, assembly_name, path, sha1, name, format, tmp_file, destination):
@@ -501,14 +503,9 @@ def process_text_file(datatype, assembly_name, path, sha1, name, format, tmp_fil
     Entry point of the text file.
     '''
     try :
-        print 'converting'
         convert(path, destination, sha1, datatype, assembly_name, name, tmp_file, format)
-        print 'converting done'
-        print 'processing'
         dispatch = _sqlite_dispatch.get(datatype, lambda *args, **kw : cannot_process(*args, **kw))
-        dispatch(path, sha1, name)
-        print 'processing done'
-        
+        dispatch(destination, sha1, name)
     except Exception as e:
         etype, value, tb = sys.exc_info()
         traceback.print_exception(etype, value, tb)

@@ -254,7 +254,6 @@ def _generate_lazy_output(feature_generator):
         chunk_number += 1
         yield first, stop, chunk_number, buffer_list, chunk_size
         
-        
 #########################################################################
 def _histogram_meta(chr_length, threshold, resource_url):
     '''
