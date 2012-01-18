@@ -139,10 +139,16 @@ class ProjectController(CrudRestController):
 
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         tmpl_context.widget = project_edit_form
+        project_tracks = project.tracks
+        tmpl_context.selected_tracks =  project_tracks
         tmpl_context.project = project
-        tmpl_context.tracks = DBSession.query(Track).join(User.tracks).filter(
-                            and_(User.id == user.id, Track.sequence_id == project.sequence_id)).all()
-
+        user_tracks = DBSession.query(Track).join(User.tracks).filter(
+                            and_(User.id == user.id, Track.sequence_id == project.sequence_id,
+                            not_(Track.id.in_([t.id for t in project_tracks])))
+                                 ).all()
+        
+        tmpl_context.tracks = user_tracks
+        
         kw['_method']='PUT'
         return dict(page='projects', value=kw, title='Edit Project')
 

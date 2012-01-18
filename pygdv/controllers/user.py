@@ -29,7 +29,7 @@ class UserController(CrudRestController):
     @with_trailing_slash
     @expose('tgext.crud.templates.get_all')
     @expose('json')
-    @paginate('value_list', items_per_page=7)
+    @paginate('value_list', items_per_page=3000)
     def get_all(self, *args, **kw):
         return CrudRestController.get_all(self, *args, **kw)
 

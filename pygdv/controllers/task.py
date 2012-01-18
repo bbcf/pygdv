@@ -24,7 +24,7 @@ class TaskController(CrudRestController):
 
     @with_trailing_slash
     @expose('pygdv.templates.list')
-    @paginate('items', items_per_page=10)
+    @paginate('items', items_per_page=100000)
     @expose('json')
     def get_all(self, *args, **kw):
         user = handler.user.get_user_in_session(request)

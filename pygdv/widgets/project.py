@@ -284,7 +284,11 @@ class AvailableTracksForm(twf.TableForm):
              twf.MultipleSelectField(id='tracks', label_text="Tracks : ",options=get_tracks, validator=NotEmpty,
                 help_text="Add track(s) to the project by selecting them. You can select more the one by holding the Ctrl button.")
               ]         
-    
+def get_selected_tracks():
+    return tmpl_context.selected_tracks
+def get_test():
+    return [( track.id, track.name) for track in tmpl_context.tracks] + [(track.id,track.name, {'selected' : True}) for track in tmpl_context.selected_tracks ]
+    return [(track.id, track.name) for track in tmpl_context.tracks] + [(track.id, track.name) for track in tmpl_context.selected_tracks ]
 class EditProjectForm2(DojoEditableForm):
     __model__ = Project
     __base_widget_args__ = {'hover_help': True,'submit_text':'Edit project','show_errors':True}
@@ -300,7 +304,7 @@ class EditProjectForm2(DojoEditableForm):
 #            help_text = 'Choose the species',cascadeurl='/sequences/getassemblies_from_species_id')
 #    assembly = twf.SingleSelectField(id='assembly', label_text='Assembly : ',options=get_project_assemblies,
 #            help_text = 'Choose the assembly.')
-    tracks = twf.MultipleSelectField(id='tracks', label_text='Tracks : ',options=get_tracks,
+    tracks = twf.MultipleSelectField(id='tracks', label_text='Tracks : ',options=get_test, value='selected',
              help_text="Add track(s) to the project by selecting them. You can select more the one by holding the Ctrl/Cmd button.")
     #tracks = TracksSelectField
     #_circle_right = CircleSelectField

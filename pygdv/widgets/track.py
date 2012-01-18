@@ -31,6 +31,7 @@ class NewTForm(AddRecordForm):
 
 def get_track_color():
     return tmpl_context.color
+
 # EDIT
 class TEditForm(EditableForm):
     __model__ = Track
