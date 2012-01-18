@@ -64,6 +64,7 @@ def create_track(user_id, sequence, trackname=None, f=None, project=None, sessio
     '''
     if f is not None:
         _input = create_input(f,trackname, sequence.name, session)
+        print 'create track : %s ' % _input
         if _input == constants.NOT_SUPPORTED_DATATYPE or _input == constants.NOT_DETERMINED_DATATYPE:
             try:
                 os.remove(os.path.abspath(f))
@@ -145,6 +146,8 @@ def create_input(f, trackname, sequence_name, session):
         
         async_result = dispatch(datatype=datatype, assembly_name=sequence_name, path=file_path,
                                 sha1=sha1, name=trackname, tmp_file=f, format=fo)
+        
+        print async_result
         _input = Input()
         _input.sha1 = sha1
         _input.datatype = datatype
@@ -227,7 +230,7 @@ def move_database(datatype, assembly_name, path, sha1, name, tmp_file, format):
     out_name = '%s.%s' % (sha1, 'sql')
     dst = os.path.join(track_directory(), out_name)
     shutil.move(path, dst)
-    t = tasks.process_database(datatype, assembly_name, dst, sha1, name, format);
+    t = tasks.process_sqlite_file.delay(datatype, assembly_name, dst, sha1, name, format);
     return t
 
 def convert_file(datatype, assembly_name, path, sha1, name, tmp_file, format):
@@ -236,11 +239,8 @@ def convert_file(datatype, assembly_name, path, sha1, name, tmp_file, format):
     '''
     out_name = '%s.%s' % (sha1, 'sql')
     dst = os.path.join(track_directory(), out_name)
-
-    callback = subtask(task=tasks.del_file_on_error, args=(sha1,))
-    t2 = subtask(tasks.process_database)
-    t1 = tasks.convert.delay(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, process_db=t2, callback_on_error=callback)
-    return t1
+    t = tasks.process_text_file.delay(datatype, assembly_name, path, sha1, name, format, out_name, dst)
+    return t
 
 
 

@@ -380,11 +380,11 @@ def jsonify_quantitative(sha1, output_root_directory, database_path):
     conn.close()
     return 1
 
-def _gen_gen(t, chr_name):
+def _gen_gen(t, chr_name,  gene_name_alias, gene_identifier_alias):
     prev_id = None
     l = []
     #for row in t.read(chr_name, ['start', 'end', 'score', 'name', 'strand', 'type', 'attributes', 'id'], cursor=True):
-    for row in t.aggregated_read(chr_name, ('start', 'end', 'score', 'gene_name', 'strand', 'type', 'gene_id'), order_by='gene_id'):
+    for row in t.aggregated_read(chr_name, ('start', 'end', 'score', gene_name_alias, 'strand', 'type', gene_identifier_alias), order_by=gene_identifier_alias):
         
         idi = row[6]
         if prev_id is not None:
@@ -400,11 +400,11 @@ def _gen_gen(t, chr_name):
     if prev_id is not None:
         yield prev_id, json.dumps(l)
         
-def _gen_gen2(t, chr_name):
-    for row in t.aggregated_read(chr_name, ('start', 'end', 'score', 'gene_name', 'strand', 'type', 'gene_id')):
+def _gen_gen2(t, chr_name,  gene_name_alias, gene_identifier_alias):
+    for row in t.aggregated_read(chr_name, ('start', 'end', 'score', gene_name_alias, 'strand', 'type', gene_identifier_alias)):
         yield row
 
-def _prepare_database(t, chr_name):
+def _prepare_database(t, chr_name, gene_name_alias, gene_identifier_alias):
     '''
     Add a table that will reference all sub-features for a feature.
     :return: the table name to erase after
@@ -412,11 +412,11 @@ def _prepare_database(t, chr_name):
     table_name = 'tmp_%s' % chr_name
     ##  'create table tmp_%s' % chr_name
     t.cursor().execute('create table "%s"(id text, subs text, foreign key(id) references "%s"(id));' % (table_name, chr_name))
-    t.write(table_name, _gen_gen(t, chr_name) , ('id', 'subs'))
+    t.write(table_name, _gen_gen(t, chr_name, gene_name_alias, gene_identifier_alias) , ('id', 'subs'))
     table_name2 = 'tmp_%s2' % chr_name
     ##  'create table tmp_%s2' % chr_name
     t.cursor().execute('create table "%s"(start int, end int, score float, name text, strand int , type text, attributes text, id text);' % (table_name2))
-    t.write(table_name2, _gen_gen2(t, chr_name) , ('start', 'end', 'score', 'name', 'strand', 'type', 'id', 'attributes'))
+    t.write(table_name2, _gen_gen2(t, chr_name, gene_name_alias, gene_identifier_alias) , ('start', 'end', 'score', 'name', 'strand', 'type', 'id', 'attributes'))
     
     return table_name, table_name2
     
@@ -428,14 +428,17 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
     @param output_directory : where files will be write
     @param url_output : url access to the ressources
     '''
+    gene_name_alias =  t.find_column_name(['name', 'gene_name', 'gene name', 'gname', 'Name'])
+    
     if extended :
+        gene_identifier_alias =  t.find_column_name(['id', 'gene_id', 'gene id', 'Id', 'identifier', 'Identifier'])
         headers = _extended_headers
         subfeature_headers = _subfeature_headers
 
         
         client_config = _extended_client_config
         ##  'preparedb'
-        table_name , table_name2 = _prepare_database(t, chr_name)
+        table_name , table_name2 = _prepare_database(t, chr_name, gene_name_alias, gene_identifier_alias)
         
         #t.cursor.execute('select min(t1.start), max(t1.end), t1.score, t1.name, t1.strand, t1.type, t1.attributes, t1.id, count(t1.id), t2.subs from "%s" as t1 inner join "%s" as t2 on t1.id = t2.id group by t1.id order by t1.start asc, t1.end asc ;' % (chr_name, table_name))
         cursor = t.cursor().execute('select min(t1.start), max(t1.end), t1.score, t1.name, t1.strand, t1.type, t1.attributes, t1.id, count(t1.id), t2.subs from "%s" as t1 inner join "%s" as t2 on t1.id = t2.id group by t1.id order by t1.start asc, t1.end asc ;' % (table_name2, table_name))
@@ -451,7 +454,7 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
         client_config = _basic_client_config
         ## ' calculate lazy features'
         
-        cursor = t.cursor().execute('select t1.start, t1.end, t1.score, t1.name, t1.strand, t1.attributes from "%s" as t1 order by t1.start asc, t1.end asc ;' % chr_name )
+        cursor = t.cursor().execute('select t1.start, t1.end, t1.score, t1.' + gene_name_alias  + ', t1.strand, t1.attributes from "%s" as t1 order by t1.start asc, t1.end asc ;' % chr_name )
         
         lazy_feats = _generate_lazy_output(
                             _generate_nested_features(cursor, keep_field=6, start_index=0, end_index=1))

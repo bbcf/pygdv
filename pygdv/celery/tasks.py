@@ -1,5 +1,6 @@
 from __future__ import absolute_import
-from celery.task import task, chord, subtask, TaskSet
+from celery.task import task, chord, subtask
+from celery.task.sets import TaskSet
 import shutil, os, sys, traceback
 from pygdv.lib.jbrowse import jsongen, scores
 from pygdv.lib.constants import json_directory, track_directory
@@ -86,7 +87,7 @@ def del_input(sha1, *args, **kw):
     @param tasks : a list of return result. If one is different from 1, the directory is erased.
     '''
     path1 = os.path.join(track_directory(), sha1 + '.sql')
-    path2 = os.path.join(json_directory(), sha1 + '.sql')
+    path2 = os.path.join(json_directory(), sha1)
     try :
         os.remove(path1)
     except OSError: 
@@ -107,12 +108,12 @@ def del_file_on_error(tasks, sha1, *args, **kw):
     for theid in tasks:
         if not theid == success :
             path1 = os.path.join(track_directory(), sha1 + '.sql')
-            path2 = os.path.join(json_directory(), sha1 + '.sql')
+            path2 = os.path.join(json_directory(), sha1)
             try :
                 os.remove(path1)
             except OSError: 
                 pass
-            shutil.rmtree(path2, ignore_errors = False)
+            shutil.rmtree(path2, ignore_errors = True)
             raise theid
     return 1
 
@@ -290,7 +291,7 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, pr
 @task()
 def process_database(datatype, assembly_name, path, sha1, name, format):
     '''
-    Entry point of the sqlite file
+    Entry point of the sqlite file.
     '''
     dispatch = _sql_dispatch.get(datatype, lambda *args, **kw : cannot_process(*args, **kw))
     try :
@@ -304,6 +305,8 @@ def process_database(datatype, assembly_name, path, sha1, name, format):
 
 
 
+
+    
 def cannot_process():
     print '[x] ERROR [x] cannot process'
     return -1;
@@ -373,6 +376,8 @@ def _relational(path, sha1, name):
 
 
 
+
+
 '''
 _sql_dispatch : will choose in which process the database will go, based on it's datatype
 '''
@@ -392,8 +397,52 @@ _sql_dispatch = {'quantitative' : lambda *args, **kw : _signal(*args, **kw),
 
 
 
+
+#### GFEATMINER ####
+import gMiner
+
+@task()
+def gfeatminer_request(user_id, project_id, req, job_description, job_name):
+    '''
+    Launch a gFeatMiner request.
+    '''
+    print 'gfeatminer request %s : ' % req
+    try :
+        
+        data = gMiner.run(**req)
+        print 'gMiner ended with %s ' % data
+        for path in data:
+            if os.path.splitext(path)[1] == '.sql':
+                session = model.DBSession()
+                project = session.query(model.Project).filter(model.Project.id == project_id).first()
+                from pygdv.handler.track import create_track
+                task_id, track_id = create_track(user_id, project.sequence, f=path, trackname='%s %s' 
+                                             % (job_name, job_description), project=project, session = session)
+                transaction.commit()
+                session.close()
+        
+    except Exception as e:
+        etype, value, tb = sys.exc_info()
+        traceback.print_exception(etype, value, tb)
+        raise e
+   
+
+
+
+
+
+
+
+### TRACK PROCESSING ###
+
+
+
+
 @task()
 def process_track(user_id, **kw):
+    '''
+    Entry point for uploading and processing tracks.
+    '''
     files = util.upload(**kw)
         
     print files
@@ -433,35 +482,91 @@ def process_track(user_id, **kw):
         if task_id == constants.NOT_SUPPORTED_DATATYPE or task_id == constants.NOT_DETERMINED_DATATYPE:
             raise Exception('format %s' % task_id)
     
+    
+    
+@task()
+def process_sqlite_file(datatype, assembly_name, path, sha1, name, format):
+    '''
+    Entry point of the sqlite file.
+    '''
+    print 'processing'
+    dispatch = _sqlite_dispatch.get(datatype, lambda *args, **kw : cannot_process(*args, **kw))
+    dispatch(path, sha1, name)
+    print 'processing done'
 
-#### GFEATMINER ####
-import gMiner
 
 @task()
-def gfeatminer_request(user_id, project_id, req, job_description, job_name):
+def process_text_file(datatype, assembly_name, path, sha1, name, format, tmp_file, destination):
     '''
-    Launch a gFeatMiner request.
+    Entry point of the text file.
     '''
-    print 'gfeatminer request %s : ' % req
     try :
-        
-        data = gMiner.run(**req)
-        print 'gMiner ended with %s ' % data
-        for path in data:
-            if os.path.splitext(path)[1] == '.sql':
-                session = model.DBSession()
-                project = session.query(model.Project).filter(model.Project.id == project_id).first()
-                from pygdv.handler.track import create_track
-                task_id, track_id = create_track(user_id, project.sequence, f=path, trackname='%s %s' 
-                                             % (job_name, job_description), project=project, session = session)
-                transaction.commit()
-                session.close()
+        print 'converting'
+        convert(path, destination, sha1, datatype, assembly_name, name, tmp_file, format)
+        print 'converting done'
+        print 'processing'
+        dispatch = _sqlite_dispatch.get(datatype, lambda *args, **kw : cannot_process(*args, **kw))
+        dispatch(path, sha1, name)
+        print 'processing done'
         
     except Exception as e:
         etype, value, tb = sys.exc_info()
         traceback.print_exception(etype, value, tb)
+        del_input.delay(sha1)
         raise e
-   
 
-    
+
+
+
+### DATABASE PROCESSING ###
+
+
+
+_sqlite_dispatch = {'quantitative' : lambda *args, **kw : _signal_database(*args, **kw),
+                 constants.SIGNAL : lambda *args, **kw : _signal_database(*args, **kw),
+
+                 'qualitative' :  lambda *args, **kw : _features_database(*args, **kw),
+                 constants.FEATURES :  lambda *args, **kw : _features_database(*args, **kw),
+
+                 'extended' :  lambda *args, **kw : _relational_database(*args, **kw),
+                  constants.RELATIONAL :  lambda *args, **kw : _relational_database(*args, **kw)
+                  }
+
+
+
+def _signal_database(path, sha1, name):
+    '''
+    Process a``signal`` database.
+    @return the subtask associated
+    '''
+    output_dir = json_directory()
+    bin_dir = constants.bin_directory()
+    print '[t] starting task ``compute scores`` : db (%s), sha1(%s)' % (path, sha1)
+    script = 'psd.jar'
+    efile = os.path.join(bin_dir, script)
+    res = subprocess.call(['java', '-jar', efile, path, sha1, output_dir])
+    print res
+    jsongen.jsonify_quantitative(sha1, output_dir, path)
+    print 'end'
+
+def _features_database(path, sha1, name):
+    '''
+    Launch the process to produce a JSON output for a ``feature`` database.
+    '''
+    print 'json gen  db (%s), sha1(%s)' % (path, sha1)
+    output_dir = json_directory()
+    jsongen.jsonify(path, name, sha1, output_dir, '/data/jbrowse', '', False)
+
+
+def _relational_database(path, sha1, name):
+    '''
+    Task for a ``relational`` database
+    @return the subtask associated
+    '''
+    output_dir = json_directory()
+    jsongen.jsonify(path, name, sha1, output_dir, '/data/jbrowse', '', False)
+
+
+
+
  
