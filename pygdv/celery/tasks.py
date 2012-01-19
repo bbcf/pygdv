@@ -545,7 +545,7 @@ def _signal_database(path, sha1, name):
     if res != 0:
         raise Exception("Computation of scores failed");
     jsongen.jsonify_quantitative(sha1, output_dir, path)
-
+    
 def _features_database(path, sha1, name):
     '''
     Launch the process to produce a JSON output for a ``feature`` database.

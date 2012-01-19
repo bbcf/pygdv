@@ -67,7 +67,8 @@ class DatabaseController(BaseController):
         t = sequence.default_tracks[0]
         chrs = {}
         with track.load(t.path, 'sql', readonly=True) as t:
-            for row in t.search({'gene_name' : term}, ['gene_name', 'start', 'end']):
+            gene_name_alias =  t.find_column_name(['name', 'gene_name', 'gene name', 'gname', 'Name'])
+            for row in t.search({'gene_name_alias' : term}, ['gene_name_alias', 'start', 'end']):
                 chr, name, start, stop = row
                 if chr not in chrs:
                     chrs[chr] = {}
