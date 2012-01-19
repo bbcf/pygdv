@@ -542,9 +542,9 @@ def _signal_database(path, sha1, name):
     script = 'psd.jar'
     efile = os.path.join(bin_dir, script)
     res = subprocess.call(['java', '-jar', efile, path, sha1, output_dir])
-    print res
+    if res != 0:
+        raise Exception("Computation of scores failed");
     jsongen.jsonify_quantitative(sha1, output_dir, path)
-    print 'end'
 
 def _features_database(path, sha1, name):
     '''
