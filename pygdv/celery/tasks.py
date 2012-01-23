@@ -49,7 +49,7 @@ def test_command_line(*args, **kw):
 @task()
 def test(x):
     print 'this is a test %s' % x
-    return 0
+    return x
 
 
 

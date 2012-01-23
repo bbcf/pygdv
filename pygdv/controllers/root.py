@@ -122,10 +122,11 @@ class RootController(BaseController):
 #        """This method showcases how you can use the same controller for a data page and a display page"""
 #        return dict(page='data',params=kw)
     
-
-    
-   
-    
+    @expose('json')
+    def test(self, x):
+        from pygdv.celery import tasks
+        res = tasks.test.delay((x))
+        return dict(result=res.get())
     
     
     
