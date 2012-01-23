@@ -147,7 +147,6 @@ def create_input(f, trackname, sequence_name, session):
         async_result = dispatch(datatype=datatype, assembly_name=sequence_name, path=file_path,
                                 sha1=sha1, name=trackname, tmp_file=f, format=fo)
         
-        print async_result
         _input = Input()
         _input.sha1 = sha1
         _input.datatype = datatype

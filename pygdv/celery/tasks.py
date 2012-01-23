@@ -11,6 +11,7 @@ from pygdv.lib import constants, util
 import track
 import tempfile, transaction
 from pygdv.celery import model
+from sqlalchemy.sql.expression import except_
 success = 1
 
 
@@ -541,9 +542,10 @@ def _signal_database(path, sha1, name):
     print '[t] starting task ``compute scores`` : db (%s), sha1(%s)' % (path, sha1)
     script = 'psd.jar'
     efile = os.path.join(bin_dir, script)
-    res = subprocess.call(['java', '-jar', efile, path, sha1, output_dir])
-    if res != 0:
-        raise Exception("Computation of scores failed");
+    try :
+        res = subprocess.check_call(['java', '-jar', efile, path, sha1, output_dir])
+    except subprocess.CalledProcessError as e:
+        raise Exception(e + "\nComputation of scores failed");
     jsongen.jsonify_quantitative(sha1, output_dir, path)
     
 def _features_database(path, sha1, name):

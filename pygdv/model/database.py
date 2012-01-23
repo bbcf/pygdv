@@ -290,7 +290,7 @@ class Input(DeclarativeBase):
     
     # special methods
     def __repr__(self):
-        return '<Input: id=%r, sha1=%r>' % (self.id,self.sha1)
+        return '<Input: id=%r, sha1=%r, task_id=%s>' % (self.id, self.sha1, self.task_id)
     def __unicode__(self):
         return self.sha1
     
