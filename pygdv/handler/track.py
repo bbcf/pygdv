@@ -48,7 +48,7 @@ def delete(track_id, session=None):
         session.delete(track)
         session.flush()
 
-def create_track(user_id, sequence, trackname=None, f=None, project=None, session=None, admin=False):
+def create_track(user_id, sequence, trackname=None, f=None, project=None, session=None, admin=False, force=False):
     if session is None:
         session = DBSession
     '''
@@ -63,7 +63,7 @@ def create_track(user_id, sequence, trackname=None, f=None, project=None, sessio
     @return : task_id, track_id    
     '''
     if f is not None:
-        _input = create_input(f,trackname, sequence.name, session)
+        _input = create_input(f,trackname, sequence.name, session, force=force)
         print 'create track : %s ' % _input
         if _input == constants.NOT_SUPPORTED_DATATYPE or _input == constants.NOT_DETERMINED_DATATYPE:
             try:
@@ -104,7 +104,7 @@ def create_track(user_id, sequence, trackname=None, f=None, project=None, sessio
     
     
 
-def create_input(f, trackname, sequence_name, session):
+def create_input(f, trackname, sequence_name, session, force=False):
     '''
     Create an input if it's new, or simply return the id of an already inputed file 
     @param file : the file name
@@ -112,9 +112,12 @@ def create_input(f, trackname, sequence_name, session):
     '''
     sha1 = util.get_file_sha1(os.path.abspath(f))
     _input = session.query(Input).filter(Input.sha1 == sha1).first()
-    if _input is not None: 
+    if _input is not None and not force: 
         print "file already exist"
     else :
+        if force :
+            tasks.del_input(_input.sha1)
+            
         file_path = os.path.abspath(f)
         out_dir = track_directory()
         

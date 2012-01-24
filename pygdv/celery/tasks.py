@@ -444,17 +444,17 @@ def process_track(user_id, **kw):
     '''
     Entry point for uploading and processing tracks.
     '''
-    files = util.upload(**kw)
-        
-    print files
-    
-            
-    if files is None:
-        raise 'No files to upload'
+   
         
     if not 'assembly' in kw and not 'project_id' in kw:
         raise Exception('Missing assembly parameters.')
     assembly_id = kw.get('assembly', None)
+    
+    files = util.upload(**kw)
+        
+    if files is None:
+        raise 'No files to upload'
+    
     
     project = None
     session = model.DBSession()
@@ -473,10 +473,14 @@ def process_track(user_id, **kw):
     if not assembly_id:
         raise Exception('Missing assembly parameters.')
     
+    force = False
+    if 'force' in kw:
+        force = kw['force']
+        
     for filename, f in files:
         sequence = session.query(model.Sequence).filter(model.Sequence.id == assembly_id).first()
         from pygdv.handler.track import create_track
-        task_id, track_id = create_track(user_id, sequence, f=f.name, trackname=filename, project=project, session=session, admin=admin)
+        task_id, track_id = create_track(user_id, sequence, f=f.name, trackname=filename, project=project, session=session, admin=admin, force=force)
         transaction.commit()
         session.close()
         
