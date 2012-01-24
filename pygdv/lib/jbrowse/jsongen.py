@@ -452,8 +452,10 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
         subfeature_headers = _basic_subfeature_headers
         client_config = _basic_client_config
         ## ' calculate lazy features'
-        
-        cursor = t.cursor().execute('select t1.start, t1.end, t1.score, t1.' + gene_name_alias  + ', t1.strand, t1.attributes from "%s" as t1 order by t1.start asc, t1.end asc ;' % chr_name )
+        att_name = 't1.%s' % gene_name_alias
+        if gene_name_alias == '':
+            att_name = ' '
+        cursor = t.cursor().execute('select t1.start, t1.end, t1.score, %s , t1.strand, t1.attributes from "%s" as t1 order by t1.start asc, t1.end asc ;' % (att_name, chr_name) )
         
         lazy_feats = _generate_lazy_output(
                             _generate_nested_features(cursor, keep_field=6, start_index=0, end_index=1))
