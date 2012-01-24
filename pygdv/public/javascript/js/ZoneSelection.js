@@ -303,7 +303,8 @@ MarqueeHandler.prototype.draw = function(list) {
     // Redraw every marquee in the list
     context.clearRect(0, 0, canvas.width, canvas.height)
     dojo.forEach(list, function(m) {
-        context.fillStyle = 'rgba(0,0,0,' + m.alpha + ');'
+        context.fillStyle = 'rgba(0,0,0,0.2);'
+	context.globalAlpha = 0.2;
         if (m.x1 < m.x2) {context.fillRect(m.x1, 0, m.x2-m.x1, height);}
         else             {context.fillRect(m.x2, 0, m.x1-m.x2, height);}
     });
