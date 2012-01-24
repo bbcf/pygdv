@@ -30,11 +30,12 @@ LinkPanel.prototype.genRepPanel = function(node, assembly_id, feat, fields){
     this.wait(pnode, node);
     
     var ctx = this;
+    
     this.gene_name = feat[fields["name"]]; 
     var start = feat[fields["start"]];
     var end = feat[fields["end"]];
 
-    callback = function(data){ctx.genrep_loaded(data)};
+    callback = function(data){ctx.genrep_loaded(data, feat[fields['subfeatures']])};
     new GenRep().links(assembly_id, this.gene_name, callback);
     
 };
@@ -45,7 +46,7 @@ LinkPanel.prototype.genRepPanel = function(node, assembly_id, feat, fields){
 /**
 * Called when GenRep Has send back result
 */
-LinkPanel.prototype.genrep_loaded = function(data){
+LinkPanel.prototype.genrep_loaded = function(data, subfeatures){
     this.gr_loaded = true;
     this.data = data;
     /* destroy loader */
@@ -58,6 +59,12 @@ LinkPanel.prototype.genrep_loaded = function(data){
     var gn = document.createElement('h4');
     gn.innerHTML = this.gene_name;
     ct.appendChild(gn);
+
+
+    /* subfeatures */
+    if (subfeatures){};
+
+    /* links */
     var title = document.createElement('h5');
     title.innerHTML = 'Links';
     ct.appendChild(title);

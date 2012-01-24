@@ -344,11 +344,15 @@ def jsonify(database_path, name, sha1, output_root_directory, public_url, browse
     os.mkdir(output_path)
     with track.load(database_path, 'sql', readonly=False) as t :
         for chr_name in t:
-            chr_length = t.chrmeta[chr_name]['length']
-            out = os.path.join(output_path, chr_name)
-            os.mkdir(out)
-            lazy_url = os.path.join(out_browser_url, chr_name, 'lazyfeatures-{chunk}.json')
-            _jsonify(t, name, chr_length, chr_name, os.path.join(out_public_url, chr_name), lazy_url, out, extended)
+            print chr_name
+            try:
+                chr_length = t.chrmeta[chr_name]['length']
+                out = os.path.join(output_path, chr_name)
+                os.mkdir(out)
+                lazy_url = os.path.join(out_browser_url, chr_name, 'lazyfeatures-{chunk}.json')
+                _jsonify(t, name, chr_length, chr_name, os.path.join(out_public_url, chr_name), lazy_url, out, extended)
+            except KeyError:
+                pass
     return 1
 
 def jsonify_quantitative(sha1, output_root_directory, database_path):

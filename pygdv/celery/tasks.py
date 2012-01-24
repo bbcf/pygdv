@@ -228,8 +228,9 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, pr
     tmp_dst = tfile.name
     tfile.close()
     try:
+        
         # normal convert
-        print 'converting %s to %s' %(path, tmp_dst)
+        print 'converting %s to %s using the assembly ' %(path, tmp_dst, assembly_name)
         track.convert(path, tmp_dst)
         # then tranform to GDV format
         if datatype == constants.SIGNAL:
@@ -542,7 +543,11 @@ def _signal_database(path, sha1, name):
     print '[t] starting task ``compute scores`` : db (%s), sha1(%s)' % (path, sha1)
     script = 'psd.jar'
     efile = os.path.join(bin_dir, script)
-    res = subprocess.check_call(['java', '-jar', efile, path, sha1, output_dir])
+    p = subprocess.Popen(['java', '-jar', efile, path, sha1, output_dir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    result = p.wait()
+    if result == 1:
+        err = ', '.join(p.stderr)
+        raise Exception(err)
     jsongen.jsonify_quantitative(sha1, output_dir, path)
     
 def _features_database(path, sha1, name):
