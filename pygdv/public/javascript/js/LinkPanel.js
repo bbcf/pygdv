@@ -12,16 +12,26 @@ function LinkPanel(){
 /**
 * Show the info panel.
 */
-LinkPanel.prototype.showPanelInfo = function(node, assembly_id, feat, fields){
+LinkPanel.prototype.showPanelInfo = function(node, event, assembly_id, feat, fields){
     this.node = node;
-    this.genRepPanel(node, assembly_id, feat, fields);
-}
+    this.genRepPanel(node, event, assembly_id, feat, fields);
+};
+
+LinkPanel.prototype.parent_node = function(event){
+    var p = document.createElement("div");
+    p.style.position = 'fixed'; 
+    console.log(event);
+    p.style.top =  event.pageY + 'px';
+    p.style.left = event.pageX + 'px';
+    document.body.appendChild(p);
+    return p;
+};
 
 /**
 * Show GenRep info.
 */
-LinkPanel.prototype.genRepPanel = function(node, assembly_id, feat, fields){
-    var pnode = node.parentNode;
+LinkPanel.prototype.genRepPanel = function(node, event, assembly_id, feat, fields){
+    var pnode = this.parent_node(event);
     /* remove panel if one */
     if(this._lp_showed){
 	dojo.query('#' + this.id).orphan();
@@ -35,9 +45,8 @@ LinkPanel.prototype.genRepPanel = function(node, assembly_id, feat, fields){
     var start = feat[fields["start"]];
     var end = feat[fields["end"]];
 
-    callback = function(data){ctx.genrep_loaded(data, feat[fields['subfeatures']])};
+    callback = function(data){ctx.genrep_loaded(data, pnode, feat[fields['subfeatures']])};
     new GenRep().links(assembly_id, this.gene_name, callback);
-    
 };
 
 
@@ -46,7 +55,7 @@ LinkPanel.prototype.genRepPanel = function(node, assembly_id, feat, fields){
 /**
 * Called when GenRep Has send back result
 */
-LinkPanel.prototype.genrep_loaded = function(data, subfeatures){
+LinkPanel.prototype.genrep_loaded = function(data, pnode, subfeatures){
     this.gr_loaded = true;
     this.data = data;
     /* destroy loader */
@@ -103,10 +112,9 @@ LinkPanel.prototype.genrep_loaded = function(data, subfeatures){
     
     /* connect reflex */
     dojo.connect(reflex_div, 'onclick', function(e){
-	ctx.reflexPanel();
+	ctx.reflexPanel(pnode);
 	dojo.stopEvent(e);
     });
-    
 };
 
 
@@ -115,7 +123,7 @@ LinkPanel.prototype.genrep_loaded = function(data, subfeatures){
 /**
 * Info panel from reflex.ws
 */
-LinkPanel.prototype.reflexPanel = function(){
+LinkPanel.prototype.reflexPanel = function(pnode){
     /* create iframe (should juste create one and use it everytime) */
     var fr = dojo.io.iframe.create(this.ifr_id, '_lp.iframe_loaded()', 'http://reflect.ws/REST/GetPopup?name=' + this.gene_name);
     fr.src='http://reflect.ws/REST/GetPopup?name=' + this.gene_name;
@@ -126,9 +134,10 @@ LinkPanel.prototype.reflexPanel = function(){
     
     /* show wait panel*/
     var node = this.node;
-    var pnode = node.parentNode;
     this.wait(pnode, node);
-    
+    var n = dojo.byId(this.id);
+    n.style.height='300px';
+    n.style.width='400px';
 
     /* create container for the iframe */
     var fr_cont = document.createElement('div');
@@ -195,6 +204,7 @@ LinkPanel.prototype.wait = function(parent_node, node){
     panel.className = "link_panel";
     panel.id = this.id;
     panel.style.cssText = node.style.cssText;
+    
     var browser = dojo.byId("GenomeBrowser").genomeBrowser;
     var loader = document.createElement("img");
     loader.src = browser.imageRoot + "ajax-loader.gif";

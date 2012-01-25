@@ -224,13 +224,28 @@ signal_fields = ('start', 'end', 'score')
 @task()
 def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, process_db=None, callback_on_error=None):
 
+    print 'converting %s to %s using the assembly %s' %(path, dst, assembly_name)
+    track.convert(path, dst)
+    with track.load(dst, 'sql', readonly=False) as t:
+        t.datatype = datatype
+        t.assembly = assembly_name
+    
+    try:
+        os.remove(os.path.abspath(path))
+    except OSError :
+        pass
+
+
+@task()
+def convert2(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, process_db=None, callback_on_error=None):
+
     tfile = tempfile.NamedTemporaryFile(suffix='.sql', delete=True)
     tmp_dst = tfile.name
     tfile.close()
     try:
         
         # normal convert
-        print 'converting %s to %s using the assembly ' %(path, tmp_dst, assembly_name)
+        print 'converting %s to %s using the assembly %s' %(path, tmp_dst, assembly_name)
         track.convert(path, tmp_dst)
         # then tranform to GDV format
         if datatype == constants.SIGNAL:
@@ -238,7 +253,7 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, pr
             with track.load(tmp_dst, 'sql', readonly=True) as t:
                 with track.new(dst, 'sql') as t2:
                     for chrom in t:
-                        ## TODO
+                        
                         t2.write(chrom, t.read(chrom, fields=signal_fields), fields=signal_fields)
                     t2.datatype = constants.SIGNAL
                     t2.assembly = assembly_name
@@ -287,112 +302,117 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, pr
     return 1
 
 
-#### DATABASE PROCESS ####
-
 @task()
 def process_database(datatype, assembly_name, path, sha1, name, format):
-    '''
-    Entry point of the sqlite file.
-    '''
-    dispatch = _sql_dispatch.get(datatype, lambda *args, **kw : cannot_process(*args, **kw))
-    try :
-        t =  dispatch(path, sha1, name)
-        return t
-    except Exception as e:
-        etype, value, tb = sys.exc_info()
-        traceback.print_exception(etype, value, tb)
-        raise e
+    pass
+#
+##### DATABASE PROCESS ####
+#def check_database(path, sha1):
+#    pass
+#
+#@task()
+#def process_database(datatype, assembly_name, path, sha1, name, format):
+#    '''
+#    Entry point of the sqlite file.
+#    '''
+#    check_database(path, sha1)
+#    dispatch = _sql_dispatch.get(datatype)
+#    try :
+#        t =  dispatch(path, sha1, name)
+#        return t
+#    except Exception as e:
+#        etype, value, tb = sys.exc_info()
+#        traceback.print_exception(etype, value, tb)
+#        raise e
+#
+
+
+
+#    
+#def cannot_process():
+#    print '[x] ERROR [x] cannot process'
+#    return -1;
+#
+#
+#
+#
+#
+#
+#
+#def _signal(path, sha1, name):
+#    '''
+#    Task for a ``signal`` database.
+#    @return the subtask associated
+#    '''
+#    output_dir = json_directory()
+#    callback_on_error = subtask(task=del_file_on_error, args=(sha1,))
+#    try :
+#        t1 = _compute_scores.delay(path, sha1, output_dir, callback=subtask(_jsonify_signal),
+#                                     callback_on_error=callback_on_error)
+#    except Exception as e:
+#        etype, value, tb = sys.exc_info()
+#        traceback.print_exception(etype, value, tb)
+#        if callback_on_error :
+#            subtask(callback_on_error).delay([e], sha1)
+#        raise e
+#    return t1
+
+#def _features(path, sha1, name):
+#    '''
+#    Task for a ``feature`` database.
+#    @return the subtask associated
+#    '''
+#    output_dir = json_directory()
+#    callback_on_error = subtask(task=del_file_on_error, args=(sha1,))
+#    try :
+#        t1 = _jsonify_features.delay(path, name, sha1, output_dir, '/data/jbrowse', '', False,
+#                            callback_on_error=callback_on_error)
+#    except Exception as e:
+#        etype, value, tb = sys.exc_info()
+#        traceback.print_exception(etype, value, tb)
+#        if callback_on_error :
+#            subtask(callback_on_error).delay([e], sha1)
+#        raise e
+#    return t1
+
+
+#def _relational(path, sha1, name):
+#    '''
+#    Task for a ``relational`` database
+#    @return the subtask associated
+#    '''
+#    output_dir = json_directory()
+#    callback_on_error = subtask(task=del_file_on_error, args=(sha1,))
+#    try :
+#        t1 = _jsonify_features.delay(path, name, sha1, output_dir, '/data/jbrowse', '', True,
+#                    callback_on_error=callback_on_error)
+#        print t1.task_id
+#    except Exception as e:
+#        etype, value, tb = sys.exc_info()
+#        traceback.print_exception(etype, value, tb)
+#        if callback_on_error :
+#            subtask(callback_on_error).delay([e], sha1)
+#        raise e
+#    return t1
 
 
 
 
 
-    
-def cannot_process():
-    print '[x] ERROR [x] cannot process'
-    return -1;
-
-
-
-
-
-
-
-def _signal(path, sha1, name):
-    '''
-    Task for a ``signal`` database.
-    @return the subtask associated
-    '''
-    output_dir = json_directory()
-    callback_on_error = subtask(task=del_file_on_error, args=(sha1,))
-    try :
-        t1 = _compute_scores.delay(path, sha1, output_dir, callback=subtask(_jsonify_signal),
-                                     callback_on_error=callback_on_error)
-    except Exception as e:
-        etype, value, tb = sys.exc_info()
-        traceback.print_exception(etype, value, tb)
-        if callback_on_error :
-            subtask(callback_on_error).delay([e], sha1)
-        raise e
-    return t1
-
-def _features(path, sha1, name):
-    '''
-    Task for a ``feature`` database.
-    @return the subtask associated
-    '''
-    output_dir = json_directory()
-    callback_on_error = subtask(task=del_file_on_error, args=(sha1,))
-    try :
-        t1 = _jsonify_features.delay(path, name, sha1, output_dir, '/data/jbrowse', '', False,
-                            callback_on_error=callback_on_error)
-    except Exception as e:
-        etype, value, tb = sys.exc_info()
-        traceback.print_exception(etype, value, tb)
-        if callback_on_error :
-            subtask(callback_on_error).delay([e], sha1)
-        raise e
-    return t1
-
-
-def _relational(path, sha1, name):
-    '''
-    Task for a ``relational`` database
-    @return the subtask associated
-    '''
-    output_dir = json_directory()
-    callback_on_error = subtask(task=del_file_on_error, args=(sha1,))
-    try :
-        t1 = _jsonify_features.delay(path, name, sha1, output_dir, '/data/jbrowse', '', True,
-                    callback_on_error=callback_on_error)
-        print t1.task_id
-    except Exception as e:
-        etype, value, tb = sys.exc_info()
-        traceback.print_exception(etype, value, tb)
-        if callback_on_error :
-            subtask(callback_on_error).delay([e], sha1)
-        raise e
-    return t1
-
-
-
-
-
-
-'''
-_sql_dispatch : will choose in which process the database will go, based on it's datatype
-'''
-
-_sql_dispatch = {'quantitative' : lambda *args, **kw : _signal(*args, **kw),
-                 constants.SIGNAL : lambda *args, **kw : _signal(*args, **kw),
-
-                 'qualitative' :  lambda *args, **kw : _features(*args, **kw),
-                 constants.FEATURES :  lambda *args, **kw : _features(*args, **kw),
-
-                 'extended' :  lambda *args, **kw : _relational(*args, **kw),
-                  constants.RELATIONAL :  lambda *args, **kw : _relational(*args, **kw)
-                  }
-
+#
+#'''
+#_sql_dispatch : will choose in which process the database will go, based on it's datatype
+#'''
+#
+#_sql_dispatch = {'quantitative' : lambda *args, **kw : _signal(*args, **kw),
+#                 constants.SIGNAL : lambda *args, **kw : _signal(*args, **kw),
+#
+#                 'qualitative' :  lambda *args, **kw : _features(*args, **kw),
+#                 constants.FEATURES :  lambda *args, **kw : _features(*args, **kw),
+#
+#                 'extended' :  lambda *args, **kw : _relational(*args, **kw),
+#                  constants.RELATIONAL :  lambda *args, **kw : _relational(*args, **kw)
+#                  }
 
 
 
@@ -495,7 +515,7 @@ def process_sqlite_file(datatype, assembly_name, path, sha1, name, format):
     Entry point of the sqlite file.
     '''
     try :
-        dispatch = _sqlite_dispatch.get(datatype, lambda *args, **kw : cannot_process(*args, **kw))
+        dispatch = _sqlite_dispatch.get(datatype)
         dispatch(path, sha1, name)
     except Exception as e:
         etype, value, tb = sys.exc_info()
@@ -510,7 +530,7 @@ def process_text_file(datatype, assembly_name, path, sha1, name, format, tmp_fil
     '''
     try :
         convert(path, destination, sha1, datatype, assembly_name, name, tmp_file, format)
-        dispatch = _sqlite_dispatch.get(datatype, lambda *args, **kw : cannot_process(*args, **kw))
+        dispatch = _sqlite_dispatch.get(datatype)
         dispatch(destination, sha1, name)
     except Exception as e:
         etype, value, tb = sys.exc_info()
@@ -569,7 +589,7 @@ def _relational_database(path, sha1, name):
     @return the subtask associated
     '''
     output_dir = json_directory()
-    jsongen.jsonify(path, name, sha1, output_dir, '/data/jbrowse', '', False)
+    jsongen.jsonify(path, name, sha1, output_dir, '/data/jbrowse', '', True)
 
 
 

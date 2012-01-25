@@ -80,7 +80,6 @@ class ProjectController(CrudRestController):
     
     @expose('json')
     def create(self, *args, **kw):
-        print 'create'
         user = handler.user.get_user_in_session(request)
         if not 'name' in kw:
             return reply.error(request, 'Missing project `name`.', './', {})
@@ -158,11 +157,11 @@ class ProjectController(CrudRestController):
         user = handler.user.get_user_in_session(request)
         project_id = args[0]
         if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
-            flash('You must have %s permission to view the project.' % constants.right_upload, 'error')
+            flash('You must have %s permission to edit the project.' % constants.right_upload, 'error')
             raise redirect('/projects')
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         handler.project.edit(project, kw['name'],
-                                     user.id, tracks=kw['tracks'])
+                                     project.user_id, tracks=kw['tracks'])
         raise redirect('/projects')
 
 

@@ -146,6 +146,7 @@ class Project(DeclarativeBase):
     jobs = relationship('Job', backref='project')
     
     is_public = Column(Boolean, nullable=False)
+    
     key = Column(Unicode(255), unique=True,default=setdefaultkey, nullable=False)
     
     def _get_date(self):

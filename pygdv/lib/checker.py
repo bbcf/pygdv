@@ -6,7 +6,7 @@ from sqlalchemy.sql import and_, or_
 def can_edit_track(user, track_id):
     for track in user.tracks :
         if int(track_id) == track.id : return True
-    return False
+    return user_is_admin(user.id)
             
             
             
@@ -54,7 +54,7 @@ def check_permission_project(user_id, project_id, right_id):
     return True
 
 def can_download_track(user_id, track_id):
-    if not user_own_track(user_id, track_id):
+    if not user_own_track(user_id, track_id) and not user_is_admin(user_id):
         t = DBSession.query(Track).join(Project.tracks).filter(
             and_(Track.id == track_id, User.id == user_id)
             

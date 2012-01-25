@@ -241,6 +241,8 @@ def _generate_lazy_output(feature_generator):
         start = feat[0]
         if first is None : first = start
         stop = feat[1]
+        if start > stop :
+            raise Exception("You cannot have a feature ending before starting %s " % feat)
         chunk_size+= nb
         buffer_list.append(feat)
         if chunk_size >= CHUNK_SIZE :
@@ -344,7 +346,6 @@ def jsonify(database_path, name, sha1, output_root_directory, public_url, browse
     os.mkdir(output_path)
     with track.load(database_path, 'sql', readonly=False) as t :
         for chr_name in t:
-            print chr_name
             try:
                 chr_length = t.chrmeta[chr_name]['length']
                 out = os.path.join(output_path, chr_name)
@@ -418,7 +419,7 @@ def _prepare_database(t, chr_name, gene_name_alias, gene_identifier_alias):
     t.write(table_name, _gen_gen(t, chr_name, gene_name_alias, gene_identifier_alias) , ('id', 'subs'))
     table_name2 = 'tmp_%s2' % chr_name
     ##  'create table tmp_%s2' % chr_name
-    t.cursor().execute('create table "%s"(start int, end int, score float, name text, strand int , type text, attributes text, id text);' % (table_name2))
+    t.cursor().execute('create table "%s"(start int, end int, score float, name text, strand int , type text, id text, attributes text);' % (table_name2))
     t.write(table_name2, _gen_gen2(t, chr_name, gene_name_alias, gene_identifier_alias) , ('start', 'end', 'score', 'name', 'strand', 'type', 'id', 'attributes'))
     
     return table_name, table_name2
@@ -431,6 +432,8 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
     @param output_directory : where files will be write
     @param url_output : url access to the ressources
     '''
+    
+    
     gene_name_alias =  t.find_column_name(['name', 'gene_name', 'gene name', 'gname', 'Name'])
     
     if extended :
@@ -459,10 +462,12 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
         att_name = 't1.%s' % gene_name_alias
         if gene_name_alias == '':
             att_name = ' '
-        cursor = t.cursor().execute('select t1.start, t1.end, t1.score, %s , t1.strand, t1.attributes from "%s" as t1 order by t1.start asc, t1.end asc ;' % (att_name, chr_name) )
+            
+        gen =  t.aggregated_read(chr_name, ('start', 'end', 'score', gene_name_alias, 'strand'), order_by='start asc, end asc');
+        #cursor = t.cursor().execute('select t1.start, t1.end, t1.score, %s , t1.strand, t1.attributes from "%s" as t1 order by t1.start asc, t1.end asc ;' % (att_name, chr_name) )
         
         lazy_feats = _generate_lazy_output(
-                            _generate_nested_features(cursor, keep_field=6, start_index=0, end_index=1))
+                            _generate_nested_features(gen, keep_field=6, start_index=0, end_index=1))
    
    
     ## 'NCLIST'
