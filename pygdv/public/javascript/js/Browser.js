@@ -131,15 +131,24 @@ var Browser = function(params) {
 
         // Connect something
         dojo.connect(brwsr.chromList, "onchange", function(event) {
-        var oldLocMap = dojo.fromJson(dojo.cookie(brwsr.container.id + "-location")) || {};
-                var newRef = brwsr.allRefs[brwsr.chromList.options[brwsr.chromList.selectedIndex].value];
-                if (oldLocMap[newRef.name])
-                    brwsr.navigateTo(newRef.name + ":" + oldLocMap[newRef.name]);
-                else
-                    brwsr.navigateTo(newRef.name + ":"
+	    var oldLocMap = dojo.fromJson(dojo.cookie(brwsr.container.id + "-location")) || {};
+            var newRef = brwsr.allRefs[brwsr.chromList.options[brwsr.chromList.selectedIndex].value];
+            if (oldLocMap[newRef.name]){
+		var oldLoc = oldLocMap[newRef.name];
+		if (oldLoc == 'NaN .. NaN'){
+		    brwsr.navigateTo(newRef.name + ":"
                                      + (((newRef.start + newRef.end) * 0.4) | 0)
                                      + " .. "
                                      + (((newRef.start + newRef.end) * 0.6) | 0));
+		} else {
+                    brwsr.navigateTo(newRef.name + ":" + oldLoc);
+		}
+	    } else {
+                brwsr.navigateTo(newRef.name + ":"
+                                 + (((newRef.start + newRef.end) * 0.4) | 0)
+                                 + " .. "
+                                 + (((newRef.start + newRef.end) * 0.6) | 0));
+	    }
         });
 
         // Hook up GenomeView
@@ -536,7 +545,6 @@ Browser.prototype.navigateTo = function(loc,tag) {
             return;
         }
     }
-
     // If we get here, we didn't match any expected location format
     // add our own gene name indexing
     _gdvls.search(loc,this.refSeq.name);
@@ -754,8 +762,7 @@ Browser.prototype.createNavBox = function(params) {
     this.locationBox.id="location";
     this.locationBox.style.cssText = "width: 130px; vertical-align: top;";
     dojo.connect(this.locationBox, "keydown", function(event) {
-	console.log('key down');
-        if (event.keyCode == dojo.keys.ENTER) {
+	if (event.keyCode == dojo.keys.ENTER) {
             brwsr.navigateTo(brwsr.locationBox.value);
 	    
             brwsr.goButton.disabled = true;
