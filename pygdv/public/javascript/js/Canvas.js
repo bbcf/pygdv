@@ -198,8 +198,6 @@ ImageDrawer.prototype.drawScores = function(node, jsonText, color, min, max){
 	color = "rgb(200,0,0)";
     }
     
-
-    
     if(jsonText){
 	if(jsonText!="{}"){
 	    /* there is data */
@@ -275,7 +273,7 @@ ImageDrawer.prototype.drawScores = function(node, jsonText, color, min, max){
 		    //console.log('end loop');
 		    var trans_score = - ( prev_score * cnvs_height / d * inZoom );
 		    ctx.rect(prev_pos * baseWidth, Z , width, trans_score);
-		    console.log('x: ' + prev_pos + ' y: ' + Z + ' w: ' + width + ' h: ' + trans_score);
+		    //console.log('x: ' + prev_pos + ' y: ' + Z + ' w: ' + width + ' h: ' + trans_score);
 		    var t = end_pos - prev_pos;
 		    //console.log('XX prev_pos : ' + prev_pos + ' (' + prev_score + '), width : ' + t);
 
@@ -328,8 +326,7 @@ ImageDrawer.prototype.getAllScores = function(images){
 	//if an image is not in the fetched one, add it to the list
 	dojo.forEach(images,function(item,i,arr){
 	    var scores = drawer.getScore(item.db, item.nb);
-	    //console.log(scores);
-		if(!scores){
+	    if(!scores){
 		    if(!(imgs.join().indexOf(item.nb)>-1)){
 			imgs.push(item);
 		    }

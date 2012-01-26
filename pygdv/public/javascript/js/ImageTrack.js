@@ -252,7 +252,9 @@ ImageTrack.prototype.draw = function(){
     };
     
     var data = this.scores();
-    
+    // console.log(this);
+    // console.log(this.nb);
+    // console.log(data);    
     if (data){
 	var canvas = this;
 	var track = this.track;
@@ -287,11 +289,12 @@ ImageTrack.prototype.draw = function(){
 	    var i;
 	    var len = data.length;
 	    var end_pos = 100;
+
+	    /* DRAW SCORES */
 	    for(i=0; i<=len - 1 ; i+=2){
 		var pos = data[i];
 		var conv_pos = cnvs_width * pos / end_pos;
 		var real_score = data[i+1];
-		//console.log(pos + '  ' +real_score);
 		if(prev_pos != null){
 		    var width = (conv_pos - prev_pos);
 		    var trans_score = - ( prev_score * cnvs_height / d * inZoom );
@@ -303,10 +306,12 @@ ImageTrack.prototype.draw = function(){
 		    prev_score = real_score;
 		}
 	    }
+	    
 	    if(prev_pos != null){
-		var width = (conv_pos - prev_pos);
+		var width = (cnvs_width - prev_pos);
 		var trans_score = - ( prev_score * cnvs_height / d * inZoom );
-		ctx.rect(prev_pos * baseWidth, Z , width, trans_score);
+		//ctx.rect(prev_pos * baseWidth, Z , width, trans_score);
+		ctx.rect(prev_pos, Z , width, trans_score);
 		//console.log('x: ' + prev_pos + ' y: ' + Z + ' w: ' + width + ' h: ' + trans_score);
 	    }
 	    ctx.closePath();
