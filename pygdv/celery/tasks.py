@@ -588,6 +588,7 @@ def _relational_database(path, sha1, name):
     Task for a ``relational`` database
     @return the subtask associated
     '''
+    print 'json gen  db (%s), sha1(%s)' % (path, sha1)
     output_dir = json_directory()
     jsongen.jsonify(path, name, sha1, output_dir, '/data/jbrowse', '', True)
 

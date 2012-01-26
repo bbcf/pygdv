@@ -346,14 +346,11 @@ def jsonify(database_path, name, sha1, output_root_directory, public_url, browse
     os.mkdir(output_path)
     with track.load(database_path, 'sql', readonly=False) as t :
         for chr_name in t:
-            try:
-                chr_length = t.chrmeta[chr_name]['length']
-                out = os.path.join(output_path, chr_name)
-                os.mkdir(out)
-                lazy_url = os.path.join(out_browser_url, chr_name, 'lazyfeatures-{chunk}.json')
-                _jsonify(t, name, chr_length, chr_name, os.path.join(out_public_url, chr_name), lazy_url, out, extended)
-            except KeyError:
-                pass
+            chr_length = t.chrmeta[chr_name]['length']
+            out = os.path.join(output_path, chr_name)
+            os.mkdir(out)
+            lazy_url = os.path.join(out_browser_url, chr_name, 'lazyfeatures-{chunk}.json')
+            _jsonify(t, name, chr_length, chr_name, os.path.join(out_public_url, chr_name), lazy_url, out, extended)
     return 1
 
 def jsonify_quantitative(sha1, output_root_directory, database_path):
@@ -434,10 +431,10 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
     '''
     
     
-    gene_name_alias =  t.find_column_name(['name', 'gene_name', 'gene name', 'gname', 'Name'])
+    gene_name_alias =  t.find_column_name(['name', 'gene_name', 'gene name', 'gname', 'Name', 'product'])
     
     if extended :
-        gene_identifier_alias =  t.find_column_name(['id', 'gene_id', 'gene id', 'Id', 'identifier', 'Identifier'])
+        gene_identifier_alias =  t.find_column_name(['id', 'gene_id', 'gene id', 'Id', 'identifier', 'Identifier', 'protein_id'])
         headers = _extended_headers
         subfeature_headers = _subfeature_headers
 
