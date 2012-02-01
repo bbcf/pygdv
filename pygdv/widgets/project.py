@@ -13,7 +13,7 @@ from tg import url, tmpl_context
 from sprox.dojo.formbase import DojoEditableForm
 from sprox.widgets.dojo import SproxDojoSelectShuttleField, SproxDojoSortedSelectShuttleField
 from pygdv.model import DBSession, Project, Species, Sequence, Track, User, Group
-from pygdv.lib.helpers import get_delete_link, get_detail_link, get_edit_link, get_project_right_sharing_form, get_view_link, get_share_link, get_copy_link
+from pygdv.lib.helpers import get_delete_link, get_detail_link, get_edit_link, get_project_right_sharing_form, get_view_link, get_share_link, get_copy_project_link
 from pygdv import handler
 from tg import app_globals as gl
 from pygdv.lib import constants
@@ -223,7 +223,7 @@ project_with_right = twf.DataGrid(fields = [
         '<div class="actions">'
         + get_view_link(obj.dec.id, 'project_id', obj.rights) 
         + get_share_link(obj.dec.id, 'project_id', obj.rights)
-        + get_copy_link(obj.dec.id, 'project_id', obj.rights, base_url='/projects')
+        + get_copy_project_link(obj.dec.id, obj.rights)
         + get_delete_link(obj.dec.id, obj.rights) 
         + get_edit_link(obj.dec.id, obj.rights)
         + get_detail_link(obj.dec.id, 'project_id', obj.rights)
