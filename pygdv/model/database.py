@@ -149,6 +149,8 @@ class Project(DeclarativeBase):
     
     key = Column(Unicode(255), unique=True,default=setdefaultkey, nullable=False)
     
+    download_key = Column(Unicode(255), unique=True,default=setdefaultkey, nullable=False)
+    
     def _get_date(self):
         return self._created.strftime(constants.date_format);
         

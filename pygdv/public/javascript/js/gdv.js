@@ -50,7 +50,11 @@ function initGDV(browser, project_id, gdv_info, readonly){
     
     if (!_gdv_info.admin){
 	gminer = {};
-	menu_nav = ['Home', 'Copy']
+	if (_gdv_info.mode == 'download'){
+	    menu_nav = ['Home', 'Copy']
+	} else {
+	    menu_nav = ['Home']
+	}
     };
     
     dojo.addOnLoad(function(){

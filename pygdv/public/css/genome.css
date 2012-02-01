@@ -723,7 +723,14 @@ input#disableSel {
 
 .field_livesearch{
     color: green;
+    cursor: pointer;
 }
+.close_livesearch{
+    color: blue;
+    cursor: pointer;
+}
+
+
 .loader_livesearch{
     background-color: rgba(181, 213, 255, 0.8);
     background-image: url('../img/ajax-loader.gif');

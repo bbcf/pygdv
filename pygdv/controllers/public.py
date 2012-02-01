@@ -27,10 +27,19 @@ class PublicController(BaseController):
     
     @expose('pygdv.templates.view')
     def project(self, id, k, **kw):
-        project = DBSession.query(Project).filter(and_(Project.id == id, Project.key == k)).first()
+        project = DBSession.query(Project).filter(Project.id == id).first()
         if project is None:
             flash('wrong link', 'error')
-            raise redirect('/home')
+            raise redirect(url('/home'))
+        mode = None
+        
+        if k == project.key : mode = 'read'
+        elif k == project.download_key : mode = 'download'
+        
+        if mode is None :
+            flash('wrong link', 'error')
+            raise redirect(url('/home'))
+        
         
         tracks = project.tracks
         
@@ -79,6 +88,7 @@ class PublicController(BaseController):
         info = {}
         prefix = tg.config.get('prefix')
         info['admin'] = False
+        info['mode'] = mode
         info['sequence_id'] = project.sequence_id
         if prefix : info['prefix'] = prefix
         info = json.dumps(info)

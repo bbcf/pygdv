@@ -194,9 +194,16 @@ class ProjectController(CrudRestController):
         # public url
         pub = url('/public/project', {'id' : project_id, 'k' : project.key})
        
+        # download url
+        print project.download_key
+        if project.download_key is None:
+            project.download_key = project.setdefaultkey()
+        
+        down = url('/public/project', {'id' : project_id, 'k' : project.download_key})
+       
         kw['project_id'] = project_id
         return dict(page='projects', model='Project', info=data,
-                    circle_right_data=cr_data, form_title='Circles availables', value=kw, public=pub)
+                    circle_right_data=cr_data, form_title='Circles availables', value=kw, public=pub, download=down)
 
 
     @expose()
@@ -367,7 +374,7 @@ class ProjectController(CrudRestController):
         user = handler.user.get_user_in_session(request)
         if 'k' in kw:
             project = DBSession.query(Project).filter(Project.id == project_id).first()
-            if not kw['k'] == project.key:
+            if not kw['k'] == project.download_key:
                 return reply.error(request, 'You have no right to copy this project in your profile.', './', {})
         elif not checker.check_permission_project(user.id, project_id, constants.right_download_id):
             return reply.error(request, 'You have no right to copy this project in your profile.', './', {})
