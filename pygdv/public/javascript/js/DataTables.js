@@ -17,6 +17,27 @@ $(document).ready(function() {
     // });
     
     $('.grid').dataTable( {
-        "aaSorting": [ [0,'asc'], [1,'asc'] ]
+        "aaSorting": [ [0,'asc'], [1,'asc'] ],
+	"bStateSave" : true,
+
+	"fnCookieCallback" : function(sName, oData, sExpires, sPath){
+	    console.log('cook');
+	    console.log(sName);
+	    console.log(oData);
+	    console.log(sExpires);
+	    console.log(sPath);
+	},
+	
+	"fnDrawCallback" : function(sName, oData){
+	    console.log('draw');
+	    console.log(sName);
+	},
+	"fnServerParams" : function(sName, oData){
+	    console.log('serv');
+	    console.log(sName);
+	    console.log(oData);
+}
+
+
     });
 });

@@ -432,7 +432,10 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
     
     
     gene_name_alias =  t.find_column_name(['name', 'gene_name', 'gene name', 'gname', 'Name', 'product'])
-    
+    att_name = '%s' % gene_name_alias
+    if gene_name_alias == '':
+        att_name = 'name'
+            
     if extended :
         gene_identifier_alias =  t.find_column_name(['id', 'gene_id', 'gene id', 'Id', 'identifier', 'Identifier', 'protein_id'])
         headers = _extended_headers
@@ -441,7 +444,7 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
         
         client_config = _extended_client_config
         ##  'preparedb'
-        table_name , table_name2 = _prepare_database(t, chr_name, gene_name_alias, gene_identifier_alias)
+        table_name , table_name2 = _prepare_database(t, chr_name, att_name, gene_identifier_alias)
         
         #t.cursor.execute('select min(t1.start), max(t1.end), t1.score, t1.name, t1.strand, t1.type, t1.attributes, t1.id, count(t1.id), t2.subs from "%s" as t1 inner join "%s" as t2 on t1.id = t2.id group by t1.id order by t1.start asc, t1.end asc ;' % (chr_name, table_name))
         cursor = t.cursor().execute('select min(t1.start), max(t1.end), t1.score, t1.name, t1.strand, t1.type, t1.attributes, t1.id, count(t1.id), t2.subs from "%s" as t1 inner join "%s" as t2 on t1.id = t2.id group by t1.id order by t1.start asc, t1.end asc ;' % (table_name2, table_name))
@@ -456,11 +459,8 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
         subfeature_headers = _basic_subfeature_headers
         client_config = _basic_client_config
         ## ' calculate lazy features'
-        att_name = 't1.%s' % gene_name_alias
-        if gene_name_alias == '':
-            att_name = ' '
-            
-        gen =  t.aggregated_read(chr_name, ('start', 'end', 'score', gene_name_alias, 'strand'), order_by='start asc, end asc');
+        
+        gen =  t.aggregated_read(chr_name, ('start', 'end', 'score', att_name, 'strand'), order_by='start asc, end asc');
         #cursor = t.cursor().execute('select t1.start, t1.end, t1.score, %s , t1.strand, t1.attributes from "%s" as t1 order by t1.start asc, t1.end asc ;' % (att_name, chr_name) )
         
         lazy_feats = _generate_lazy_output(

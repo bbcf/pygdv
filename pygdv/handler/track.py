@@ -114,10 +114,13 @@ def create_input(f, trackname, sequence_name, session, force=False):
     _input = session.query(Input).filter(Input.sha1 == sha1).first()
     if _input is not None and not force: 
         print "file already exist"
+    
     else :
-        if force :
+        if _input is not None and force :
             tasks.del_input(_input.sha1)
-            
+            session.delete(_input)
+            session.flush()
+
         file_path = os.path.abspath(f)
         out_dir = track_directory()
         

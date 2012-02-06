@@ -87,13 +87,13 @@ def del_input(sha1, *args, **kw):
     tracks directory
     @param tasks : a list of return result. If one is different from 1, the directory is erased.
     '''
-    path1 = os.path.join(track_directory(), sha1 + '.sql')
-    path2 = os.path.join(json_directory(), sha1)
-    try :
-        os.remove(path1)
-    except OSError: 
-        pass
-    shutil.rmtree(path2, ignore_errors = True)
+#    path1 = os.path.join(track_directory(), sha1 + '.sql')
+#    path2 = os.path.join(json_directory(), sha1)
+#    try :
+#        os.remove(path1)
+#    except OSError: 
+#        pass
+#    shutil.rmtree(path2, ignore_errors = True)
     return 1
 
 
