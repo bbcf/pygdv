@@ -10,7 +10,7 @@ from tg.controllers import redirect
 from tg.decorators import paginate,with_trailing_slash, without_trailing_slash
 
 from pygdv.model import DBSession, Circle, Species, User
-from pygdv.widgets.circle import circle_table, circle_table_filler, circle_new_form, circle_edit_filler, circle_edit_form
+from pygdv.widgets.circle import circle_table, circle_table_filler, circle_new_form, circle_edit_filler, circle_edit_form, circle_grid
 from pygdv import handler
 from pygdv.lib import util, checker, constants
 from sqlalchemy import and_
@@ -44,12 +44,13 @@ class CircleController(CrudRestController):
     
     
     @with_trailing_slash
-    @expose('tgext.crud.templates.get_all')
+    @expose('pygdv.templates.list')
     @expose('json')
-    @paginate('value_list', items_per_page=3000)
     def get_all(self, *args, **kw):
         kw['page']='circle'
-        return CrudRestController.get_all(self, *args, **kw)
+        user = handler.user.get_user_in_session(request)
+        data = [util.to_datagrid(circle_grid, user.circles, "Circle Listing", len(user.tracks)>0)]
+        return dict(page='circles', model='circle', form_title="new circle",items=data,value=kw)
 
     @expose('genshi:tgext.crud.templates.post_delete')
     def post_delete(self, *args, **kw):

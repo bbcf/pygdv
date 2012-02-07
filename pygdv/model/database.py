@@ -80,15 +80,18 @@ class Circle(DeclarativeBase):
     description = Column(Text(), nullable=False)
     creator_id = Column(Integer, ForeignKey('User.id',  ondelete="CASCADE"), nullable=True)
     admin = Column(Boolean, nullable= False, default = False)
-    
+    creator = relationship("User")
     
     @property
     def display(self):
         return '%s (%s)' % (self.name, self.description)
-
+    
     def __repr__(self):
         return '<Circle : name : %s, desc : %s>' % (self.name, self.description)
     
+    @property 
+    def get_users(self):
+        return ', '.join([user.name for user in self.users])
 class RightCircleAssociation(DeclarativeBase):
     __tablename__='RightCircleAssociation'
     

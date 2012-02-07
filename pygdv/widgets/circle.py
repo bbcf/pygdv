@@ -59,6 +59,7 @@ def get_circle_name():
 
 def get_circle_description():
     return tmpl_context.circle.description
+
 def get_users():
     return [(user.id, user.__unicode__()) for user in DBSession.query(User).all()]
 
@@ -89,6 +90,17 @@ class EditCircleForm(DojoEditableForm):
 class SEditForm(DojoEditableForm):
     __model__ = Circle
     __omit_fields__ = ['creator_id', 'id']
+
+
+
+
+circle_grid = twf.DataGrid(fields=[
+    ('Name', 'name'),
+    ('Description', 'description'),
+    ('Creator', 'creator'),
+    ('Members', 'get_users'),
+    ])
+
 
 
 
