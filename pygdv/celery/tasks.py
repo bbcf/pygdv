@@ -59,15 +59,18 @@ import datetime
 def erase_data_from_public_user(delta=datetime.timedelta(days = 14)):
     print 'erase data from public user older than %s' % delta
     session = model.DBSession()
-    public_user = session.query(model.User).filter(model.User.email == constants.public_user_email).first()
-    for t in public_user.tracks:
-        now = datetime.datetime.now()
-        if delta < (now - t._created):
-            from pygdv.handler.track import delete
-            delete(t.id, session)
-        
-    transaction.commit()
-    session.close()
+    try :
+        public_user = session.query(model.User).filter(model.User.email == constants.public_user_email).first()
+        for t in public_user.tracks:
+            now = datetime.datetime.now()
+            if delta < (now - t._created):
+                from pygdv.handler.track import delete
+                delete(t.id, session)
+    except Exception as e:
+        session.rollback()
+        raise e
+    finally:
+        session.close()
 
 
 
@@ -87,13 +90,13 @@ def del_input(sha1, *args, **kw):
     tracks directory
     @param tasks : a list of return result. If one is different from 1, the directory is erased.
     '''
-#    path1 = os.path.join(track_directory(), sha1 + '.sql')
-#    path2 = os.path.join(json_directory(), sha1)
-#    try :
-#        os.remove(path1)
-#    except OSError: 
-#        pass
-#    shutil.rmtree(path2, ignore_errors = True)
+    path1 = os.path.join(track_directory(), sha1 + '.sql')
+    path2 = os.path.join(json_directory(), sha1)
+    try :
+        os.remove(path1)
+    except OSError: 
+        pass
+    shutil.rmtree(path2, ignore_errors = True)
     return 1
 
 
@@ -222,10 +225,10 @@ agg_field = 'attributes'
 signal_fields = ('start', 'end', 'score')
 
 @task()
-def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, process_db=None, callback_on_error=None):
+def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, _format, process_db=None, callback_on_error=None):
 
     print 'converting %s to %s using the assembly %s' %(path, dst, assembly_name)
-    track.convert(path, dst)
+    track.convert(_format and (path, _format) or path, dst)
     with track.load(dst, 'sql', readonly=False) as t:
         t.datatype = datatype
         t.assembly = assembly_name
@@ -236,70 +239,70 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, pr
         pass
 
 
-@task()
-def convert2(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, process_db=None, callback_on_error=None):
-
-    tfile = tempfile.NamedTemporaryFile(suffix='.sql', delete=True)
-    tmp_dst = tfile.name
-    tfile.close()
-    try:
-        
-        # normal convert
-        print 'converting %s to %s using the assembly %s' %(path, tmp_dst, assembly_name)
-        track.convert(path, tmp_dst)
-        # then tranform to GDV format
-        if datatype == constants.SIGNAL:
-            f = signal_fields
-            with track.load(tmp_dst, 'sql', readonly=True) as t:
-                with track.new(dst, 'sql') as t2:
-                    for chrom in t:
-                        
-                        t2.write(chrom, t.read(chrom, fields=signal_fields), fields=signal_fields)
-                    t2.datatype = constants.SIGNAL
-                    t2.assembly = assembly_name
-                    
-        elif datatype == constants.FEATURES:
-            f = simple_fields
-            with track.load(tmp_dst, 'sql', readonly=True) as t:
-                with track.new(dst, 'sql') as t2:
-                    for chrom in t:
-                        gen = t.aggregated_read(chrom, f)
-                        t2.write(chrom, gen, fields=f + (agg_field,))
-                    t2.datatype = constants.FEATURES
-                    t2.assembly = assembly_name
-
-
-        elif datatype == constants.RELATIONAL:
-            f = ext_fields
-            with track.load(tmp_dst, 'sql', readonly=True) as t:
-                with track.new(dst, 'sql') as t2:
-                    for chrom in t:
-                        gen = t.aggregated_read(chrom, f)
-                        t2.write(chrom, gen, fields=f + (agg_field,))
-                    t2.datatype = constants.RELATIONAL
-                    t2.assembly = assembly_name
-        
-        print 'removing tmp files'
-        try:
-            os.remove(os.path.abspath(path))
-        except OSError :
-            pass
-        try:
-            os.remove(os.path.abspath(tmp_dst))
-        except OSError :
-            pass
-
-        
-        if process_db :
-            return subtask(process_db).delay(datatype, assembly_name, dst, sha1, name, format)
-
-    except Exception as e:
-        etype, value, tb = sys.exc_info()
-        traceback.print_exception(etype, value, tb)
-        if callback_on_error :
-            subtask(callback_on_error).delay([e], sha1)
-            raise e
-    return 1
+#@task()
+#def convert2(path, dst, sha1, datatype, assembly_name, name, tmp_file, format, process_db=None, callback_on_error=None):
+#
+#    tfile = tempfile.NamedTemporaryFile(suffix='.sql', delete=True)
+#    tmp_dst = tfile.name
+#    tfile.close()
+#    try:
+#        
+#        # normal convert
+#        print 'converting %s to %s using the assembly %s' %(path, tmp_dst, assembly_name)
+#        track.convert(path, tmp_dst)
+#        # then tranform to GDV format
+#        if datatype == constants.SIGNAL:
+#            f = signal_fields
+#            with track.load(tmp_dst, 'sql', readonly=True) as t:
+#                with track.new(dst, 'sql') as t2:
+#                    for chrom in t:
+#                        
+#                        t2.write(chrom, t.read(chrom, fields=signal_fields), fields=signal_fields)
+#                    t2.datatype = constants.SIGNAL
+#                    t2.assembly = assembly_name
+#                    
+#        elif datatype == constants.FEATURES:
+#            f = simple_fields
+#            with track.load(tmp_dst, 'sql', readonly=True) as t:
+#                with track.new(dst, 'sql') as t2:
+#                    for chrom in t:
+#                        gen = t.aggregated_read(chrom, f)
+#                        t2.write(chrom, gen, fields=f + (agg_field,))
+#                    t2.datatype = constants.FEATURES
+#                    t2.assembly = assembly_name
+#
+#
+#        elif datatype == constants.RELATIONAL:
+#            f = ext_fields
+#            with track.load(tmp_dst, 'sql', readonly=True) as t:
+#                with track.new(dst, 'sql') as t2:
+#                    for chrom in t:
+#                        gen = t.aggregated_read(chrom, f)
+#                        t2.write(chrom, gen, fields=f + (agg_field,))
+#                    t2.datatype = constants.RELATIONAL
+#                    t2.assembly = assembly_name
+#        
+#        print 'removing tmp files'
+#        try:
+#            os.remove(os.path.abspath(path))
+#        except OSError :
+#            pass
+#        try:
+#            os.remove(os.path.abspath(tmp_dst))
+#        except OSError :
+#            pass
+#
+#        
+#        if process_db :
+#            return subtask(process_db).delay(datatype, assembly_name, dst, sha1, name, format)
+#
+#    except Exception as e:
+#        etype, value, tb = sys.exc_info()
+#        traceback.print_exception(etype, value, tb)
+#        if callback_on_error :
+#            subtask(callback_on_error).delay([e], sha1)
+#            raise e
+#    return 1
 
 
 @task()
@@ -439,14 +442,14 @@ def gfeatminer_request(user_id, project_id, req, job_description, job_name):
                 from pygdv.handler.track import create_track
                 task_id, track_id = create_track(user_id, project.sequence, f=path, trackname='%s %s' 
                                              % (job_name, job_description), project=project, session = session)
-                transaction.commit()
-                session.close()
-        
     except Exception as e:
         etype, value, tb = sys.exc_info()
         traceback.print_exception(etype, value, tb)
+        session.rollback()
         raise e
    
+    finally:
+        session.close()
 
 
 
@@ -479,33 +482,39 @@ def process_track(user_id, **kw):
     project = None
     session = model.DBSession()
     
-    admin = False
-    
-    if 'admin' in kw:
-        admin = kw['admin']
+    try :
+        admin = False
         
-    if 'project_id' in kw:
-        project = session.query(model.Project).filter(model.Project.id == kw['project_id']).first()
-        if project is None:
-            raise Exception('Project with id %s not found.' % kw['project_id'])
-        assembly_id = project.sequence_id
-
-    if not assembly_id:
-        raise Exception('Missing assembly parameters.')
+        if 'admin' in kw:
+            admin = kw['admin']
+            
+        if 'project_id' in kw:
+            project = session.query(model.Project).filter(model.Project.id == kw['project_id']).first()
+            if project is None:
+                raise Exception('Project with id %s not found.' % kw['project_id'])
+            assembly_id = project.sequence_id
     
-    force = False
-    if 'force' in kw:
-        force = kw['force']
+        if not assembly_id:
+            raise Exception('Missing assembly parameters.')
         
-    for filename, f in files:
-        sequence = session.query(model.Sequence).filter(model.Sequence.id == assembly_id).first()
-        from pygdv.handler.track import create_track
-        task_id, track_id = create_track(user_id, sequence, f=f.name, trackname=filename, project=project, session=session, admin=admin, force=force)
-        transaction.commit()
+            
+        for filename, f, extension in files:
+            sequence = session.query(model.Sequence).filter(model.Sequence.id == assembly_id).first()
+            from pygdv.handler.track import create_track
+            kw['extension'] = extension
+            task_id, track_id = create_track(user_id, sequence, f=f.name, trackname=filename, project=project, session=session, admin=admin, **kw)
+            
+            if task_id == constants.NOT_SUPPORTED_DATATYPE or task_id == constants.NOT_DETERMINED_DATATYPE:
+                raise Exception('format %s' % task_id)
+            
+    except Exception as e:
+        etype, value, tb = sys.exc_info()
+        traceback.print_exception(etype, value, tb)
+        session.rollback()        
+        raise e
+    
+    finally:
         session.close()
-        
-        if task_id == constants.NOT_SUPPORTED_DATATYPE or task_id == constants.NOT_DETERMINED_DATATYPE:
-            raise Exception('format %s' % task_id)
     
     
     
@@ -524,12 +533,12 @@ def process_sqlite_file(datatype, assembly_name, path, sha1, name, format):
         raise e
 
 @task()
-def process_text_file(datatype, assembly_name, path, sha1, name, format, tmp_file, destination):
+def process_text_file(datatype, assembly_name, path, sha1, name, _format, tmp_file, destination):
     '''
     Entry point of the text file.
     '''
     try :
-        convert(path, destination, sha1, datatype, assembly_name, name, tmp_file, format)
+        convert(path, destination, sha1, datatype, assembly_name, name, tmp_file, _format)
         dispatch = _sqlite_dispatch.get(datatype)
         dispatch(destination, sha1, name)
     except Exception as e:

@@ -16,6 +16,11 @@ from celery.task import task, chord, subtask, TaskSet
 from pygdv.lib.constants import json_directory, track_directory
 
 
+format_synonyms = {'db': 'sql',
+                   'bw': 'bigwig',
+                   'bwg': 'bigwig',
+                   'wiggle_0': 'wig',}
+
 
 def copy_track(user_id, track):
     to_copy = Track()
@@ -48,7 +53,7 @@ def delete(track_id, session=None):
         session.delete(track)
         session.flush()
 
-def create_track(user_id, sequence, trackname=None, f=None, project=None, session=None, admin=False, force=False):
+def create_track(user_id, sequence, trackname=None, f=None, project=None, session=None, admin=False, force=False, extension=None, **kw):
     if session is None:
         session = DBSession
     '''
@@ -63,7 +68,7 @@ def create_track(user_id, sequence, trackname=None, f=None, project=None, sessio
     @return : task_id, track_id    
     '''
     if f is not None:
-        _input = create_input(f,trackname, sequence.name, session, force=force)
+        _input = create_input(f,trackname, sequence.name, session, force=force, extension=extension)
         print 'create track : %s ' % _input
         if _input == constants.NOT_SUPPORTED_DATATYPE or _input == constants.NOT_DETERMINED_DATATYPE:
             try:
@@ -104,7 +109,7 @@ def create_track(user_id, sequence, trackname=None, f=None, project=None, sessio
     
     
 
-def create_input(f, trackname, sequence_name, session, force=False):
+def create_input(f, trackname, sequence_name, session, force=False, extension=None):
     '''
     Create an input if it's new, or simply return the id of an already inputed file 
     @param file : the file name
@@ -124,8 +129,11 @@ def create_input(f, trackname, sequence_name, session, force=False):
         file_path = os.path.abspath(f)
         out_dir = track_directory()
         
-        
-        fo = determine_format(file_path)
+        if extension is not None:
+            extension = extension.lower()
+            fo = format_synonyms.get(extension, extension)
+        else : 
+            fo = determine_format(file_path)
 
         dispatch = _process_dispatch.get(fo, constants.NOT_SUPPORTED_DATATYPE)
         if  dispatch == constants.NOT_SUPPORTED_DATATYPE:
@@ -151,7 +159,7 @@ def create_input(f, trackname, sequence_name, session, force=False):
             
         
         async_result = dispatch(datatype=datatype, assembly_name=sequence_name, path=file_path,
-                                sha1=sha1, name=trackname, tmp_file=f, format=fo)
+                                sha1=sha1, name=trackname, tmp_file=f, _format=fo)
         
         _input = Input()
         _input.sha1 = sha1
@@ -237,13 +245,13 @@ def move_database(datatype, assembly_name, path, sha1, name, tmp_file, format):
     t = tasks.process_sqlite_file.delay(datatype, assembly_name, dst, sha1, name, format);
     return t
 
-def convert_file(datatype, assembly_name, path, sha1, name, tmp_file, format):
+def convert_file(datatype, assembly_name, path, sha1, name, tmp_file, _format):
     '''
     Convert a genomic file to a SQLite one using ``track`` package.
     '''
     out_name = '%s.%s' % (sha1, 'sql')
     dst = os.path.join(track_directory(), out_name)
-    t = tasks.process_text_file.delay(datatype, assembly_name, path, sha1, name, format, out_name, dst)
+    t = tasks.process_text_file.delay(datatype, assembly_name, path, sha1, name, _format, out_name, dst)
     return t
 
 

@@ -50,7 +50,7 @@ def get_unique_tmp_directory():
 block_sz = 8192
 
 
-def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, file_names=None, **kw):
+def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, file_names=None, extension=None, extensions=None, **kw):
     '''
     Upload the file and make it temporary.
     @param file_upload : if the file is uploaded from a FileUpload HTML field.
@@ -61,13 +61,17 @@ def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, fil
     @param file_names : a list of file name, in the same order than the files uploaded.
     If there is differents parameters given, the first file uploaded will be file_upload, 
     then urls, url, fsys and finally fsys_list
-    @return a list of tuples : (filename, tmp_file).
+    @return a list of tuples : (filename, tmp_file, extension).
     '''
-    
     files = []  
     index = 0
+    index_ext = 0
     if file_names is not None:
         file_names = file_names.split()
+    if extensions is not None:
+        extensions = extensions.split()
+        
+        
     if file_upload is not None:
         filename = file_upload['filename']
         if file_names:
@@ -77,7 +81,7 @@ def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, fil
         tmp_file = tempfile.NamedTemporaryFile(suffix=filename, delete=False)
         tmp_file.write(file_value)
         tmp_file.close()
-        files.append((filename, tmp_file))
+        files.append((filename, tmp_file, extension))
 
     if urls is not None: 
         for u in urls.split():
@@ -87,9 +91,12 @@ def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, fil
                 if file_names:
                     filename = file_names[index]
                     index += 1
+                if extensions:
+                    extension = extensions[index_ext]
+                    index_ext += 1
                 filename, tmp_file = _download_from_url(u.geturl(), filename=filename)
                 if filename is not None :
-                    files.append((filename, tmp_file))
+                    files.append((filename, tmp_file, extension))
     
     if url is not None:
         u = urlparse.urlparse(url)
@@ -98,9 +105,12 @@ def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, fil
             if file_names:
                 filename = file_names[index]
                 index += 1
+            if extensions:
+                extension = extensions[index_ext]
+                index_ext += 1
             filename, tmp_file = _download_from_url(u.geturl(), filename=filename)
             if filename is not None :
-                files.append((filename, tmp_file))
+                files.append((filename, tmp_file, extension))
     
     if fsys is not None:
         filename = os.path.basename(fsys)
@@ -110,7 +120,7 @@ def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, fil
             
         tmp_file = tempfile.NamedTemporaryFile(suffix=filename, delete=False)
         shutil.copyfile(fsys, tmp_file.name)
-        files.append((filename, tmp_file))
+        files.append((filename, tmp_file, extension))
     
     if fsys_list is not None: 
         for f in fsys_list.split() :
@@ -118,9 +128,14 @@ def upload(file_upload=None, urls=None, url=None, fsys=None, fsys_list=None, fil
             if file_names:
                 filename = file_names[index]
                 index += 1
+            if extensions:
+                extension = extensions[index_ext]
+                index_ext += 1
             tmp_file = tempfile.NamedTemporaryFile(suffix=filename, delete=False)
             shutil.copyfile(f, tmp_file.name)
-            files.append((filename, tmp_file))
+            files.append((filename, tmp_file, extension))
+            
+            
     return files
         
 def _download_from_url(url, filename=None):
