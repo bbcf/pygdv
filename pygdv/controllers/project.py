@@ -125,7 +125,7 @@ class ProjectController(CrudRestController):
         track_list = [util.to_datagrid(track_in_project_grid, project.tracks, "Tracks associated", len(project.tracks)>0)]
 
         
-        return dict(page='projects', model='Project', info=data,
+        return dict(page='projects', model='Project detail', info=data,
                     track_list=track_list)
 
 
