@@ -1,4 +1,4 @@
-from pygdv.tests import tmp_dir, files, random_name, assertFileEquals
+from pygdv.tests import tmp_dir, files, _formats, _datatypes
 
 import shutil, os
 
@@ -17,28 +17,80 @@ class TestJsonify(unittest.TestCase):
     
     
     def setUp(self):
-        print '[x] setting up tests'
+        print '[x] setting up tests [x]'
         self.remove_tmp_dir = True # True : remove all files resulting of the test at the end. False : keep them.
         
         try:
             os.mkdir(tmp_dir)
         except OSError:
             pass
+    
+        
+    
+    
+    def test_create_track(self):
+        import os
+        from pygdv.lib import constants
+        import track
+        
+        
+        
+        formats_to_test = ['bed', 'wig', 'bedgraph', 'gtf']
+        assembly_name = 'mm9'
+        datatype = constants.FEATURES
+        print '[x] testing conversion text files to sql'
+        for f in formats_to_test:
+            print '[.]     %s' % f
+            datatype = _formats.get(f)
+            name = '%s.sql' % f
+            dst = os.path.join(tmp_dir, name)
+            track.convert(f and (files[f], f) or files[f], dst)
+            with track.load(dst, 'sql', readonly=False) as t:
+                t.datatype = datatype
+                t.assembly = assembly_name
+        print '[x] DONE'
+        
+        
+        
         
     def test_jsonify(self):
-        output_name = random_name(7)
-        print '[t] jsonify feature to %s' % output_name
-        jsongen.jsonify(files['feature'], 'aname', output_name, tmp_dir, 'pub_url', 'browser_url', False)
-        self.assertTrue(assertFileEquals(files['feature'], output_name))
-        
-        output_name = random_name(7)
-        print '[t] jsonify relational to %s' % output_name
-        jsongen.jsonify(files['relational'], 'aname', output_name, tmp_dir, 'pub_url', 'browser_url', True)
-        self.assertTrue(assertFileEquals(files['relational'], output_name))
-        
+        import subprocess
+        print '[x] testing processing of sqlite files'
+        tracks = ['feature', 'relational', 'signal']
+        for t_name in tracks:
+            dst = os.path.join(tmp_dir, t_name)
+            os.mkdir(dst)
+            if t_name == 'feature':
+                print '[.]     feature'
+                jsongen.jsonify(files[t_name], 'name', 'feature', dst, '/data/jbrowse', '', False)
+            elif t_name == 'relational':
+                print '[.]     relational'
+                jsongen.jsonify(files[t_name], 'name', 'relational', dst, '/data/jbrowse', '', True)
+            else:
+                print '[.]    signal'
+                bin_dir = '../bin'
+                script = 'psd.jar'
+                efile = os.path.join(bin_dir, script)
+                p = subprocess.Popen(['java', '-jar', efile, files[t_name], 'signal', dst], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                result = p.wait()
+                if result == 1:
+                    err = ', '.join(p.stderr)
+                    raise Exception(err)
+                jsongen.jsonify_quantitative('signal', dst,  files[t_name])
+
+
+#    '''        
+#    out_name = '%s.%s' % (sha1, 'sql')
+#    dst = os.path.join(track_directory(), out_name)
+#    t = tasks.process_text_file.delay(datatype, assembly_name, path, sha1, name, _format, out_name, dst)
+#    '''
+    
         
         
     def tearDown(self):
         if self.remove_tmp_dir:
             print '[x] removing tmp directory : %s' % tmp_dir
             shutil.rmtree(tmp_dir, ignore_errors = True)
+            
+            
+            

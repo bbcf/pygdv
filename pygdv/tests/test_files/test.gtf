@@ -1,0 +1,12 @@
+1  handwriting simple  10  20  10 +  .  gene_id "A"; gene_name "a"; exon_number 1;
+1  handwriting parent  20  100  10 +  .  gene_id "B"; gene_name "b"; exon_number 1;
+1  handwriting child  25  50  20 +  .  gene_id "B"; gene_name "b1"; exon_number 1;
+1  handwriting child  55  60  20 +  .  gene_id "B"; gene_name "b2"; exon_number 1;
+1  handwriting child  80  90  20 +  .  gene_id "B"; gene_name "b3"; exon_number 1;
+2  handwriting simple  10  20  10 +  .  gene_id "D"; gene_name "d"; exon_number 1;
+2  handwriting parent  20  100  10 +  .  gene_id "C"; gene_name "c"; exon_number 1;
+2  handwriting child  25  50  20 +  .  gene_id "C"; gene_name "c1"; exon_number 1;
+2  handwriting child  35  40  20 +  .  gene_id "C"; gene_name "c2"; exon_number 1;
+2  handwriting child  37  55  20 +  .  gene_id "C"; gene_name "c3"; exon_number 1;
+2  handwriting child  55  60  20 -  .  gene_id "C"; gene_name "c4"; exon_number 1;
+2  handwriting child  80  90  20 +  .  gene_id "C"; gene_name "c5"; exon_number 1;

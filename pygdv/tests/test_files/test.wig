@@ -1,0 +1,7 @@
+track type=wiggle_0 name="test file"
+variableStep chrom=chr1 span=1
+100 1
+101 2
+102 3
+103 4
+105 5

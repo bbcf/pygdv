@@ -234,7 +234,7 @@ _datatypes = {      constants.FEATURES : constants.FEATURES,
 #                  constants.RELATIONAL :  lambda *args, **kw : _relational2(*args, **kw)
 #                 }
 
-def move_database(datatype, assembly_name, path, sha1, name, tmp_file, format):
+def move_database(datatype, assembly_name, path, sha1, name, tmp_file, _format):
     '''
     Move the database to the right directory.
     Then process the database.
@@ -242,7 +242,7 @@ def move_database(datatype, assembly_name, path, sha1, name, tmp_file, format):
     out_name = '%s.%s' % (sha1, 'sql')
     dst = os.path.join(track_directory(), out_name)
     shutil.move(path, dst)
-    t = tasks.process_sqlite_file.delay(datatype, assembly_name, dst, sha1, name, format);
+    t = tasks.process_sqlite_file.delay(datatype, assembly_name, dst, sha1, name, _format);
     return t
 
 def convert_file(datatype, assembly_name, path, sha1, name, tmp_file, _format):
