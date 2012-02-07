@@ -70,6 +70,7 @@ def erase_data_from_public_user(delta=datetime.timedelta(days = 14)):
         session.rollback()
         raise e
     finally:
+        transaction.commit()
         session.close()
 
 
@@ -449,6 +450,7 @@ def gfeatminer_request(user_id, project_id, req, job_description, job_name):
         raise e
    
     finally:
+        transaction.commit()
         session.close()
 
 
@@ -515,6 +517,7 @@ def process_track(user_id, **kw):
         raise e
     
     finally:
+        transaction.commit()
         session.close()
     
     

@@ -33,12 +33,7 @@ class TrackController(CrudRestController):
     edit_filler = track_edit_filler
 
    
-    @require(has_permission('admin', msg='Only for admins'))
-    @expose('pygdv.templates.list')
-    def all(self, *args, **kw):
-        tracks = DBSession.query(Track).all()
-        data = [util.to_datagrid(track_grid, tracks, "Track Listing", len(tracks)>0)]
-        return dict(page='tracks', model='track', form_title="new track",items=data,value=kw)
+   
 
 
     
@@ -161,6 +156,13 @@ class TrackController(CrudRestController):
         return reply.normal(request, 'Copy successfull', './', {})
     
     
+    
+    
+    ##### for ADMINS #######
+    
+    
+    
+    
     @require(has_permission('admin', msg='Only for admins'))
     @expose('pygdv.templates.form')
     def default_tracks(self, **kw):
@@ -189,6 +191,13 @@ class TrackController(CrudRestController):
         
         return dict(page='tracks', model='track', form_title="admin tracks",items=data,value=kw)
     
-    
-    
+    @require(has_permission('admin', msg='Only for admins'))
+    @expose('pygdv.templates.list')
+    def all(self, *args, **kw):
+        if 'user_id' in kw:
+            tracks = DBSession.query(Track).filter(Track.user_id == kw['user_id']).all()
+        else :
+            tracks = DBSession.query(Track).all()
+        data = [util.to_datagrid(track_grid, tracks, "Track Listing", len(tracks)>0)]
+        return dict(page='tracks', model='track', form_title="new track",items=data,value=kw)
     
