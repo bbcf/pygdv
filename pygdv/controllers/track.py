@@ -117,7 +117,7 @@ class TrackController(CrudRestController):
     @expose('pygdv.templates.track_export')
     def export(self, track_id, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        if not checker.can_download_track(user.id, track_id):
+        if not checker.can_download_track(user.id, track_id)  and not checker.user_is_admin(user.id):
             flash("You haven't the right to export any tracks which is not yours")
             raise redirect('../')
         track = DBSession.query(Track).filter(Track.id == track_id).first()
@@ -133,7 +133,7 @@ class TrackController(CrudRestController):
     @expose()
     def link(self, track_id, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        if not checker.user_own_track(user.id, track_id):
+        if not checker.user_own_track(user.id, track_id)  and not checker.user_is_admin(user.id):
             flash("You haven't the right to download any tracks which is not yours")
         
         raise redirect('./')
@@ -142,7 +142,8 @@ class TrackController(CrudRestController):
     @expose()
     def traceback(self, track_id):
         user = handler.user.get_user_in_session(request)
-        if not checker.user_own_track(user.id, track_id):
+        if not checker.user_own_track(user.id, track_id) and not checker.user_is_admin(user.id):
+
             flash("You haven't the right to look at any tracks which is not yours")
             raise redirect('./')
         track = DBSession.query(Track).filter(Track.id == track_id).first()
