@@ -502,7 +502,8 @@ def process_track(user_id, **kw):
             sequence = session.query(model.Sequence).filter(model.Sequence.id == assembly_id).first()
             from pygdv.handler.track import create_track
             kw['extension'] = extension
-            task_id, track_id = create_track(user_id, sequence, f=f.name, trackname=filename, project=project, session=session, admin=admin, **kw)
+            kw['admin'] = admin
+            task_id, track_id = create_track(user_id, sequence, f=f.name, trackname=filename, project=project, session=session, **kw)
             
             if task_id == constants.NOT_SUPPORTED_DATATYPE or task_id == constants.NOT_DETERMINED_DATATYPE:
                 raise Exception('format %s' % task_id)
