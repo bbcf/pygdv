@@ -59,7 +59,6 @@ class ProjectController(CrudRestController):
             sp.append(ModelWithRight(project, {constants.right_read : constants.right_read in rights, 
                                                constants.right_download : constants.right_download in rights,
                                                constants.right_upload : constants.right_upload in rights}))
-        
         shared_projects = [util.to_datagrid(project_with_right, sp, "Shared projects", len(sp)>0)]
         #TODO check with permissions
         
@@ -102,7 +101,7 @@ class ProjectController(CrudRestController):
         user = handler.user.get_user_in_session(request)
         id = args[0]
         if not checker.check_permission_project(user.id, id, constants.right_upload_id):
-            flash('You must have %s permission to view the project.' % constants.right_upload, 'error')
+            flash('You must have %s permission to delete the project.' % constants.right_upload, 'error')
             raise redirect('./')
         return CrudRestController.post_delete(self, *args, **kw)
 

@@ -18,7 +18,8 @@ class ModelWithRight(object):
         self.rights = rights
 
 
-
+    def __repr__(self):
+        return '%s,  %s' % (self.dec, self.rights)
 
 
 

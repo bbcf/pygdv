@@ -43,7 +43,8 @@ def get_copy_project_link(obj_id, rights=None):
     '''
     Return a HTML export link.
     '''
-    if rights is not None:
+    
+    if rights.get(constants.right_download, False):
         return ''' <a class='action copy_link' title="%s" href="%s"></a>''' % ('copy in your profile', url('/projects/copy', params={'project_id':obj_id}))
     return ''
 
