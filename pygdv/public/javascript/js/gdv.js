@@ -4,8 +4,9 @@
  */
 
 //MODIFY HERE
-var _GDV_PROXY="http://localhost:8080";
-var _GDV_URL=_GDV_PROXY;
+var _GDV_PROXY = "http://paprika.epfl.ch";
+var _GDV_PREFIX = "/pygdv"
+var _GDV_URL=_GDV_PROXY + _GDV_PREFIX;
 
 //GLOBAL VARIABLES
 var _GDV_URL_DB = _GDV_URL + '/database';
