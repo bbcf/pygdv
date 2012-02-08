@@ -18,8 +18,6 @@ Track.prototype.load = function(url) {
 };
 
 Track.prototype.loadFail = function(error,url) {
-    //console.log("load fail "+url);
-    //console.log(error);
     this.empty = true;
     this.setLoaded();
 };
@@ -214,18 +212,21 @@ Track.prototype._showBlock = function(blockIndex, startBase, endBase, scale, con
         this.heightUpdate(this.blockHeights[blockIndex], blockIndex);
         return;
     }
-    if (this.empty) {
-        this.heightUpdate(this.labelHeight, blockIndex);
-        return;
-    }
+    
     var blockDiv = document.createElement("div");
     blockDiv.className = "block";
     blockDiv.style.left = (blockIndex * this.widthPct) + "%";
     blockDiv.style.width = this.widthPct + "%";
     blockDiv.startBase = startBase;
     blockDiv.endBase = endBase;
-    if (this.loaded) {
-    this.fillBlock(blockIndex,
+    
+    if (this.empty) {
+        this.heightUpdate(this.labelHeight, blockIndex);
+        blockDiv.appendChild(document.createTextNode("no data"));
+	blockDiv.style.backgroundColor = "#fff";
+	
+    } else if (this.loaded) {
+	this.fillBlock(blockIndex,
                        blockDiv,
                        this.blocks[blockIndex - 1],
                        this.blocks[blockIndex + 1],
@@ -236,9 +237,9 @@ Track.prototype._showBlock = function(blockIndex, startBase, endBase, scale, con
                        containerStart,
                        containerEnd);
     } else {
-    this._loadingBlock(blockDiv);
+	this._loadingBlock(blockDiv);
     }
-
+    
     this.blocks[blockIndex] = blockDiv;
     this.div.appendChild(blockDiv);
 };

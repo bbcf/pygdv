@@ -44,7 +44,7 @@ var Browser = function(params) {
     this.deferredFunctions = [];
 
     // Get tracks
-    this.names = new LazyTrie(this.dataRoot + "data/names/lazy-", this.dataRoot + "data/names/root.json");
+    //this.names = new LazyTrie(this.dataRoot + "data/names/lazy-", this.dataRoot + "data/names/root.json");
     this.tracks = [];
     var brwsr = this;
     brwsr.isInitialized = false;

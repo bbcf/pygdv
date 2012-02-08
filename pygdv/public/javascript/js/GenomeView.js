@@ -1190,10 +1190,7 @@ GenomeView.prototype.addTrack = function(track) {
     var tmp = this.getX() + 100;
     labelDiv.style.left = tmp + "px";
     trackDiv.appendChild(labelDiv);
-    // dojo.connect(trackDiv,"click",function(e){
-    // 	    console.log("##??##");
-
-    // });
+    
     //creating the scale and the zoom buttons
     //depending of the track type
     if(track instanceof ImageTrack){
@@ -1218,26 +1215,6 @@ GenomeView.prototype.addTrack = function(track) {
         container.appendChild(scale);
 	track.setScale(scale);
         
-	// // #zoom
-        // var zs = document.createElement("div");
-        // zs.style.position = "absolute";
-        // // zs.style.top = "0px";
-        // // zs.style.left = newPos - 70 +"px";
-        // // zs.style.width = "100px";
-        // // zs.style.height = "100px";
-        // // zs.style.zIndex=250;
-        // zs.className = "zs";
-        // var zp = document.createElement("div");
-        // zp.className = "zplus";
-        // zp.innerHTML = "+";
-        // zs.appendChild(zp);
-        // var zm = document.createElement("div");
-        // zm.className = "zmoins";
-        // zm.innerHTML = "-";
-        // zs.appendChild(zm);
-        // container.appendChild(zs);
-	//trackDiv.appendChild(zs);
-        //this.trackZooms.push(zs);
        
 	// #inputs
 
@@ -1262,19 +1239,6 @@ GenomeView.prototype.addTrack = function(track) {
         track.scale_container = container;
 	this.trackScales.push(container);
 
-	//connect the links
-        //var gv = this;
-        // dojo.connect(zp, "onclick", function(event) {
-        //     track.innerZoom(gv,scale,0.3);
-        //     dojo.stopEvent(event);
-        // });
-        // dojo.connect(zm, "onclick", function(event) {
-        //     track.innerZoom(gv,scale,-0.3);
-        //     dojo.stopEvent(event);
-        // });
-        // dojo.connect(zs,"ondblclick",function(event){
-        //     dojo.stopEvent(event);
-        // });
     }
 
     // A label starts unselected
@@ -1318,40 +1282,6 @@ GenomeView.prototype.addTrack = function(track) {
     //     });
     // }
 
-    //add arrow to fold & unfold a track
-    // var ar = document.createElement("span");
-    // ar.zIndex=5;
-    // ar.className="gdv_up_track";
-    // ar.folded=true;
-    // labelDiv.appendChild(ar);
-    // dojo.connect(ar, "onclick", function(event) {
-    //         if(ar.folded==true){
-    //         ar.folded=false;
-    //         ar.className="gdv_fold_track";
-    //         b.onVisibleTracksChanged();
-    //         } else {
-    //         ar.folded=true;
-    //         ar.className="gdv_up_track";
-    //         b.hTC(ar.parentNode.parentNode.track);
-    //         // var t = ar.parentNode.parentNode.track;
-    //         //     console.log(t);
-    //         //     var brwsr = b;
-    //         //     var replaceData = {refseq: brwsr.refSeq.name};
-    //         //     var url = t.url.replace(/\{([^}]+)\}/g, function(match, group) {return replaceData[group];});
-    //         // var klass = eval(t.type);
-    //         // var newTrack = new klass(t, url, brwsr.refSeq,
-    //         //                          {
-    //         //                              changeCallback: changeCallback,
-    //         //                              trackPadding: brwsr.view.trackPadding,
-    //         //                              baseUrl: brwsr.dataRoot,
-    //         //                              charWidth: brwsr.view.charWidth,
-    //         //                              seqHeight: brwsr.view.seqHeight
-    //         //                          });
-    //         // b.view.addTrack(newTrack);
-    //         }
-    //         dojo.stopEvent(event);
-    //     });
-        // Return the div object
         return trackDiv;
 };
 
