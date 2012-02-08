@@ -4,7 +4,7 @@ Contains method needed to build JSON files from SQLite files.
 from __future__ import absolute_import
 import os, sqlite3, json, math
 #from lib.jbrowse import higher_zoom, TYPE, zooms, JSON_HEIGHT, SUBLIST_INDEX, CHUNK_SIZE, LAZY_INDEX, ARROWHEAD_CLASS, CLASSNAME, HIST_CHUNK_SIZE
-from pygdv.lib.jbrowse import higher_zoom, TYPE, zooms, JSON_HEIGHT, SUBLIST_INDEX, CHUNK_SIZE, LAZY_INDEX, ARROWHEAD_CLASS, CLASSNAME, HIST_CHUNK_SIZE
+from pygdv.lib.jbrowse import higher_zoom, TYPE, zooms, JSON_HEIGHT, SUBLIST_INDEX, CHUNK_SIZE, LAZY_INDEX, ARROWHEAD_CLASS, CLASSNAME
 import numpy as np
 import track
 
@@ -95,7 +95,7 @@ def _prepare_histogram_meta(bases_per_bin, array_param):
     data = {}
     data['basesPerBin'] = bases_per_bin
     data['arrayParams'] = array_param
-    return [data]
+    return data
 
 def _prepare_hist_stats(bases, mean, _max):
     data = {}
@@ -257,6 +257,30 @@ def _generate_lazy_output(feature_generator):
         yield first, stop, chunk_number, buffer_list, chunk_size
         
 #########################################################################
+def write_histogram_meta(chr_length, threshold, array, resource_url, output_directory, zooms):
+    
+    json_array = []
+    for z in zooms:
+        
+       
+        bins = threshold * z 
+        print 'for zoom %s, bin = %s ' % (z, bins)
+        ###JSON
+        length = int(math.ceil(chr_length / bins)) 
+        
+        url_template = os.path.join(resource_url, 'hist-%s-{chunk}.json' % bins)
+        array_param = _prepare_histogram_meta(bins, _prepare_array_param(length, CHUNK_SIZE - 1, url_template))
+        json_array.append(array_param)
+        
+        ###WRITE ARRAY
+        _write_histo_stats(_generate_hist_outputs(array, bins, length), bins, output_directory)
+        
+        if bins * 100 > chr_length : break
+            
+        
+    return json_array
+
+
 def _histogram_meta(chr_length, threshold, resource_url):
     '''
     Output the histogram meta parameter.
@@ -265,12 +289,26 @@ def _histogram_meta(chr_length, threshold, resource_url):
     @param resource_url : the url where to fetch the resources
     '''
     
+    array = []
+    t = int(threshold * 0.1)
+    length = int(math.ceil(chr_length / t)) 
+    url_template = os.path.join(resource_url, 'hist-%s-{chunk}.json' % t)
+    array_param = _prepare_array_param(length, CHUNK_SIZE - 1, url_template)
+    array.append(array_param)
+    
     length = int(math.ceil(chr_length/threshold)) 
     url_template = os.path.join(resource_url, 'hist-%s-{chunk}.json' % threshold)
-    
     array_param = _prepare_array_param(length, CHUNK_SIZE - 1, url_template)
+    array.append(array_param)
     
-    return _prepare_histogram_meta(threshold, array_param)
+    t = int(threshold * 100)
+    length = int(math.ceil(chr_length / t )) 
+    url_template = os.path.join(resource_url, 'hist-%s-{chunk}.json' % t)
+    array_param = _prepare_array_param(length, CHUNK_SIZE - 1, url_template)
+    array.append(array_param)
+    
+    
+    return _prepare_histogram_meta(threshold, array)
 #######################################################################       
 
 def _write_histo_stats(generator, threshold, output):
@@ -303,12 +341,12 @@ def _calculate_histo_stats(array, threshold, chr_length):
     return data
 
 
-def _generate_hist_outputs(array, chr_length, coef=1):
+def _generate_hist_outputs(array, bins, array_length):
     '''
     Generate the hist-output. 
     '''
-    for i in xrange(1, int(math.ceil(chr_length/HIST_CHUNK_SIZE)), HIST_CHUNK_SIZE * coef):
-        yield array[i:i+HIST_CHUNK_SIZE * 100]      
+    for i in xrange(1, array_length, bins):
+        yield array[i:i + bins]      
     
     
 def _threshold(chr_length, feature_count):
@@ -495,17 +533,21 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
     threshold = _threshold(chr_length, feature_count)
     
     ## ' histogram meta %s, %s, %s' % (chr_length, threshold, url_output)
-    histogram_meta = _histogram_meta(chr_length, threshold, url_output)
+    
     
     cursor = t.cursor().execute("select * from '%s' ;" % (chr_name))
     array = _count_features(cursor, threshold, chr_length)
+    
     ## ' hists stats'
     hist_stats = _calculate_histo_stats(array, threshold, chr_length)
-    
-    ## ' write hist in output' 
-    _write_histo_stats(_generate_hist_outputs(array, chr_length), threshold, output_directory)
-    ## ' write hist in output' 
-    _write_histo_stats(_generate_hist_outputs(array, chr_length, 100), threshold * 100, output_directory)
+
+    histogram_meta = write_histogram_meta(chr_length, threshold, array, url_output, output_directory, zooms)
+    print 'XXX'
+    print histogram_meta
+    #histogram_meta = _histogram_meta(chr_length, threshold, url_output)
+#    _write_histo_stats(_generate_hist_outputs(array, chr_length, 0.1), int(threshold * 0.1), output_directory)
+#    _write_histo_stats(_generate_hist_outputs(array, chr_length), threshold, output_directory)
+#    _write_histo_stats(_generate_hist_outputs(array, chr_length, 100), threshold * 100, output_directory)
     
     data = _prepare_track_data(
                                headers, 
