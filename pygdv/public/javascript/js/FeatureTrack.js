@@ -226,6 +226,9 @@ FeatureTrack.prototype.fillBlock = function(blockIndex, block,
                                             leftBase, rightBase,
                                             scale, stripeWidth,
                                             containerStart, containerEnd) {
+        
+    scale = scale + scale;
+    
     if (scale < this.histScale) {
     this.fillHist(blockIndex, block, leftBase, rightBase, stripeWidth,
                       containerStart, containerEnd);

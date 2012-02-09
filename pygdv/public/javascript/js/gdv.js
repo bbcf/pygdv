@@ -126,9 +126,4 @@ function notify(mess){
 
     dojo.byId('gdv_notifier').innerHTML = str;
     
-}
-
-
-
-
-
+};

@@ -408,13 +408,19 @@ def jsonify_quantitative(sha1, output_root_directory, database_path):
         except OSError: 
             pass
         cur = conn.cursor()
-        result = cur.execute('select min(score), max(score) from "%s" ;' % chr_name).fetchone()
-        data = _prepare_quantitative_json(200, result[0], result[1], sha1, chr_name)
-        json_data = json.dumps(data)
-        output = os.path.join(out, 'trackData.json')
-        with open(output, 'w', -1) as f:
-            f.write(json_data)
-        cur.close()
+        result = None
+        try:
+            result = cur.execute('select min(score), max(score) from "%s" ;' % chr_name).fetchone()
+        except sqlite3.OperationalError as e:
+            pass
+        if result:
+            data = _prepare_quantitative_json(200, result[0], result[1], sha1, chr_name)
+            json_data = json.dumps(data)
+            output = os.path.join(out, 'trackData.json')
+            with open(output, 'w', -1) as f:
+                f.write(json_data)
+            cur.close()
+        
     cursor.close()
     conn.close()
     return 1
