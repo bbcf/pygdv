@@ -114,8 +114,8 @@ class UploadFrom(twf.TableForm):
               
     twf.FileField(label_text='Select a file in your computer ',id='file_upload',
     help_text = 'Browse the file to upload in your computer. It will be converted to a Track.'),
-    twf.TextArea(id='urls',label_text='Or enter url(s) to access your file(s)',
-                          help_text = 'You can enter multiple urls separated by space or "enter".'),
+    twf.TextArea(id='urls',label_text='Or enter url to access your file.',
+                          help_text = 'Just paste an URL here.'),
    twd.CascadingSingleSelectField(id='species', label_text='Species : ',options=get_species,
 help_text = 'Choose the species',cascadeurl=url('/sequences/get_assemblies_from_species_id')),
   twf.Spacer(),
