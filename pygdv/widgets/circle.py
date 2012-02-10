@@ -92,14 +92,21 @@ class SEditForm(DojoEditableForm):
     __omit_fields__ = ['creator_id', 'id']
 
 
-
+from pygdv.lib import constants
+from pygdv.lib.helpers import get_delete_link, get_circles_edit_link
 
 circle_grid = twf.DataGrid(fields=[
     ('Name', 'name'),
     ('Description', 'description'),
     ('Creator', 'creator'),
     ('Members', 'get_users'),
-    ])
+    ('Action', lambda obj:genshi.Markup(
+        '<div class=actions>'
+        + get_delete_link(obj.id, rights = constants.full_rights)
+        + get_circles_edit_link(obj.id)
+        + '</div>'
+        ))  
+])
 
 
 

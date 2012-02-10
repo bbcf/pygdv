@@ -83,6 +83,13 @@ def get_edit_link(obj_id, rights = None, link=''):
            ''' % ('edit', link, obj_id)
     return ''
 
+def get_circles_edit_link(obj_id):
+    return '''
+    <a class="action edit_link" title="%s" href="./%s/edit" style="text-decoration:none"></a>
+           ''' % ('edit', obj_id)
+
+
+
 def get_detail_link(obj_id, param, rights = None):
     
     if rights is not None and (constants.right_download in rights and rights[constants.right_download]):

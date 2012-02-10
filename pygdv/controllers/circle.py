@@ -39,8 +39,8 @@ class CircleController(CrudRestController):
     @validate(circle_new_form, error_handler=new)
     def post(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        handler.circle.create(kw['name'], kw['description'], user.id, kw['users'])
-        raise redirect('./') 
+        handler.circle.create(kw['name'], kw['description'], user, kw['users'])
+        raise redirect('./')
     
     
     @with_trailing_slash
@@ -65,9 +65,22 @@ class CircleController(CrudRestController):
     @expose('tgext.crud.templates.edit')
     def edit(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
+        tmpl_context.circle = DBSession.query(Circle).filter(Circle.id == args[0]).first()
+        return CrudRestController.edit(self, *args, **kw)
+    
+    @expose()
+    @validate(circle_edit_form, error_handler=edit)
+    def put(self, *args, **kw):
+        user = handler.user.get_user_in_session(request)
         circle_id = args[0]
+        circle = DBSession.query(Circle).filter(Circle.id == circle_id).first()
         if not checker.user_own_circle(user.id, circle_id):
             flash('you have no right to edit this circle : you are not the creator of it')
-            raise redirect('/circles') 
-        return CrudRestController.edit(self, circle_id)
+            raise redirect('/circles')
+        handler.circle.edit(circle, kw['name'], kw['description'], user, kw['users'])
+        raise redirect('/circles')
     
+    
+    
+    
+     
