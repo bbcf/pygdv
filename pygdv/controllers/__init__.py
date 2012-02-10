@@ -17,6 +17,6 @@ from pygdv.controllers.input import InputController
 from pygdv.controllers.database import DatabaseController
 from pygdv.controllers.job import JobController
 from pygdv.controllers.public import PublicController
-from pygdv.controllers.reflect import ReflectController
+from pygdv.controllers.help import HelpController
 
 from pygdv.controllers.root import RootController

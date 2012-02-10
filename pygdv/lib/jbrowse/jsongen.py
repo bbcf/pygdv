@@ -548,12 +548,6 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
     hist_stats = _calculate_histo_stats(array, threshold, chr_length)
 
     histogram_meta = write_histogram_meta(chr_length, threshold, array, url_output, output_directory, zooms)
-    print 'XXX'
-    print histogram_meta
-    #histogram_meta = _histogram_meta(chr_length, threshold, url_output)
-#    _write_histo_stats(_generate_hist_outputs(array, chr_length, 0.1), int(threshold * 0.1), output_directory)
-#    _write_histo_stats(_generate_hist_outputs(array, chr_length), threshold, output_directory)
-#    _write_histo_stats(_generate_hist_outputs(array, chr_length, 100), threshold * 100, output_directory)
     
     data = _prepare_track_data(
                                headers, 

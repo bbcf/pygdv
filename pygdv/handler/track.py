@@ -48,12 +48,12 @@ def delete(track_id, session=None):
     if track is not None:
         _input = track.input
         if len(_input.tracks) == 1:
-            tasks.del_input.delay(_input.sha1)
+            tasks.del_input(_input.sha1)
             session.delete(_input)
         session.delete(track)
         session.flush()
 
-def create_track(user_id, sequence, trackname=None, f=None, project=None, session=None, admin=False, force=False, extension=None, **kw):
+def create_track(user_id, sequence, f=None, trackname=None, project=None, session=None, admin=False, **kw):
     if session is None:
         session = DBSession
     '''
@@ -68,7 +68,7 @@ def create_track(user_id, sequence, trackname=None, f=None, project=None, sessio
     @return : task_id, track_id    
     '''
     if f is not None:
-        _input = create_input(f,trackname, sequence.name, session, force=force, extension=extension)
+        _input = create_input(f, trackname, sequence.name, session, force=kw.get('force', False), extension=kw.get('extension', None))
         print 'create track : %s ' % _input
         if _input == constants.NOT_SUPPORTED_DATATYPE or _input == constants.NOT_DETERMINED_DATATYPE:
             try:
@@ -86,7 +86,7 @@ def create_track(user_id, sequence, trackname=None, f=None, project=None, sessio
         track.input_id = _input.id
         session.add(track)
         session.flush()
-        
+        print track
         
         params = TrackParameters()
         params.track = track        
@@ -94,8 +94,10 @@ def create_track(user_id, sequence, trackname=None, f=None, project=None, sessio
         params.build_parameters()
         session.add(params)
         session.add(track)
+
         if project is not None:
             project.tracks.append(track)
+            project.user.tracks.append(track)
             session.add(project)
             
         if admin :

@@ -33,8 +33,14 @@ class DatabaseController(BaseController):
 
         data = {}
         db_data = {}
+        bool = False
         
         for im in imgs.split(',') :
+            if im == "26741":
+                print sha1
+                print chr_zoom
+                bool = True
+                
             im_data = []
             cur = conn.cursor()
             try :
@@ -44,8 +50,12 @@ class DatabaseController(BaseController):
             
             r = False
             for row in cur : 
+                if bool:
+                    print row
                 r = True
                 im_data += [row [0], row[1]]
+            
+            bool = False
             #print 'for image %s : %s' %(im, im_data)
             # if no result from previous query, put score from an image before
 #            if not r :
