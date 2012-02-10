@@ -214,7 +214,8 @@ def process_track(user_id, **kw):
             from pygdv.handler.track import create_track
             kw['extension'] = extension
             kw['admin'] = admin
-            del kw['trackname']
+            if 'trackname'in kw:
+                del kw['trackname']
             task_id, track_id = create_track(user_id, sequence, f=f.name, trackname=filename, project=project, session=session, **kw)
             
             if task_id == constants.NOT_SUPPORTED_DATATYPE or task_id == constants.NOT_DETERMINED_DATATYPE:
