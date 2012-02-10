@@ -264,7 +264,6 @@ def write_histogram_meta(chr_length, threshold, array, resource_url, output_dire
         
        
         bins = threshold * z 
-        print 'for zoom %s, bin = %s ' % (z, bins)
         ###JSON
         length = int(math.ceil(chr_length / bins)) 
         
