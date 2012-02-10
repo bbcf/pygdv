@@ -184,7 +184,6 @@ def process_track(user_id, **kw):
     assembly_id = kw.get('assembly', None)
     
     files = util.upload(**kw)
-    print files
         
     if files is None:
         raise Exception('No files to upload')
@@ -210,7 +209,6 @@ def process_track(user_id, **kw):
         
             
         for filename, f, extension in files:
-            print "file %s, f %s, ext %s " % (filename, f, extension)
             sequence = session.query(model.Sequence).filter(model.Sequence.id == assembly_id).first()
             from pygdv.handler.track import create_track
             kw['extension'] = extension

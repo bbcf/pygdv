@@ -50,7 +50,7 @@ def get_unique_tmp_directory():
 block_sz = 8192
 
 
-def upload(file_upload=None, url=None, urls=None, fsys=None, extension=None, **kw):
+def upload(file_upload=None, url=None, fsys=None, extension=None, **kw):
     '''
     Upload the file and make it temporary.
     @param file_upload : if the file is uploaded from a FileUpload HTML field.
