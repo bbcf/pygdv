@@ -50,7 +50,7 @@ def get_unique_tmp_directory():
 block_sz = 8192
 
 
-def upload(file_upload=None, url=None, fsys=None, extension=None, **kw):
+def upload(file_upload=None, url=None, urls=None, fsys=None, extension=None, **kw):
     '''
     Upload the file and make it temporary.
     @param file_upload : if the file is uploaded from a FileUpload HTML field.
@@ -63,7 +63,9 @@ def upload(file_upload=None, url=None, fsys=None, extension=None, **kw):
     then urls, url, fsys and finally fsys_list
     @return a list of tuples : (filename, tmp_file, extension).
     '''
-    files = []  
+    files = []
+    if urls:
+        url = urls  
     if file_upload is not None:
         filename = file_upload['filename']
         file_value = file_upload['value']
