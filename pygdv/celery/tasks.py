@@ -184,6 +184,7 @@ def process_track(user_id, **kw):
     assembly_id = kw.get('assembly', None)
     
     files = util.upload(**kw)
+    print files
         
     if files is None:
         raise Exception('No files to upload')

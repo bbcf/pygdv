@@ -64,8 +64,7 @@ def upload(file_upload=None, url=None, urls=None, fsys=None, extension=None, **k
     @return a list of tuples : (filename, tmp_file, extension).
     '''
     files = []
-    if urls:
-        url = urls  
+    url = kw.get('urls', url)
     if file_upload is not None:
         filename = file_upload['filename']
         file_value = file_upload['value']
