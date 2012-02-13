@@ -8,8 +8,7 @@ from celery.result import AsyncResult
 from celery.signals import worker_init
 
 from pygdv.lib import constants, util
-import track
-import transaction
+import track, transaction
 from pygdv.celery import model
 from sqlalchemy.sql.expression import except_
 
@@ -138,13 +137,13 @@ def gfeatminer_request(user_id, project_id, req, job_description, job_name):
     Launch a gFeatMiner request.
     '''
     print 'gfeatminer request %s : ' % req
+    session = model.DBSession()
     try :
-        
         data = gMiner.run(**req)
         print 'gMiner ended with %s ' % data
         for path in data:
             if os.path.splitext(path)[1] == '.sql':
-                session = model.DBSession()
+               
                 project = session.query(model.Project).filter(model.Project.id == project_id).first()
                 from pygdv.handler.track import create_track
                 task_id, track_id = create_track(user_id, project.sequence, f=path, trackname='%s %s' 
@@ -156,8 +155,7 @@ def gfeatminer_request(user_id, project_id, req, job_description, job_name):
         raise e
    
     finally:
-        session.flush()
-        transaction.commit()
+        session.commit()
         session.close()
        
 
@@ -227,8 +225,7 @@ def process_track(user_id, **kw):
         raise e
     
     finally:
-        session.flush()
-        transaction.commit()
+        session.commit()
         session.close()
     
     

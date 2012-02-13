@@ -12,8 +12,8 @@ from celery.conf import conf
 
 def init_model(url):
     engine = create_engine(url, echo=False)
-    Session = sessionmaker(autoflush=False, autocommit=False,
-                     extension=ZopeTransactionExtension(), bind=engine)
+    Session = sessionmaker(autoflush=False, autocommit=False, bind = engine)
+                   #  extension=ZopeTransactionExtension(), bind=engine)
     return Session
 
 # Import your model modules here.
