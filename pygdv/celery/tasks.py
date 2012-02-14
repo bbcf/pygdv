@@ -11,6 +11,7 @@ from pygdv.lib import constants, util
 import track, transaction
 from pygdv.celery import model
 from sqlalchemy.sql.expression import except_
+from pygdv.model.database import TMPTrack
 
 success = 1
 
@@ -182,7 +183,8 @@ def process_track(user_id, **kw):
     assembly_id = kw.get('assembly', None)
     
     files = util.upload(**kw)
-        
+    
+    
     if files is None:
         raise Exception('No files to upload')
     
@@ -190,6 +192,10 @@ def process_track(user_id, **kw):
     project = None
     session = model.DBSession()
     
+    if 'tmp_track_id' in kw:
+        tmp_track = session.query(TMPTrack).filter(TMPTrack.id == kw['tmp_track_id']).first()
+        session.delete(tmp_track)
+        session.flush()
     try :
         admin = False
         

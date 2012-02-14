@@ -26,15 +26,15 @@ __all__ = ['Right', 'Circle', 'Project',
            'Track', 'Task', 'Input',
            'Sequence',
            'Species',
-           'Job']
+           'Job', 'TMPTrack']
 
 
-statuses = Enum('SUCCESS', 'PENDING', 'ERROR', 'RUNNING', name='job_status')
+statuses = Enum('UPLOADING', 'FAILURE', name='track_status')
+
 image_types = Enum(constants.FEATURE_TRACK, constants.IMAGE_TRACK, name='image_type')
 datatypes = Enum(constants.FEATURES, constants.SIGNAL, constants.RELATIONAL, constants.NOT_DETERMINED_DATATYPE ,name="datatype")
 job_types = Enum('NEW_SELECTION', 'NEW_TRACK', 'GFEATMINER', 'NEW_PROJECT', name='job_type')
 job_outputs = Enum('RELOAD', 'IMAGE', name='job_output')
-
 
 
 
@@ -398,6 +398,10 @@ class Track(DeclarativeBase):
     @property
     def vizu(self):
         return self.input.datatype
+
+    @property
+    def tmp(self):
+        return False
     
     created = synonym('_created', descriptor=property(_get_date, _set_date))
     last_access = synonym('_last_access', descriptor=property(_get_last_access, _set_last_access))
@@ -412,6 +416,38 @@ class Track(DeclarativeBase):
     @property
     def path(self):
         return self.input.path
+    
+    
+    
+class TMPTrack(DeclarativeBase):
+    '''
+    Represent a track on the view.
+    '''
+    __tablename__ = 'TMPTrack'
+    
+    
+    # columns
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    name = Column(Unicode(255), nullable=False)
+    user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=True)
+    
+    status = Column(statuses, nullable=False, default='UPLOADING')
+    
+    sequence_id = Column(Integer, ForeignKey('Sequence.id', ondelete="CASCADE"), nullable=False)
+    sequence = relationship("Sequence")
+    
+    traceback = Column(Text)
+    
+    @property
+    def vizu(self):
+        return '-'
+    @property
+    def created(self):
+        return '-'
+    @property
+    def tmp(self):
+        return True
+    
     
 class TrackParameters(DeclarativeBase):
     '''

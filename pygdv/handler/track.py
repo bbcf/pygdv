@@ -86,7 +86,6 @@ def create_track(user_id, sequence, f=None, trackname=None, project=None, sessio
         track.input_id = _input.id
         session.add(track)
         session.flush()
-        print track
         
         params = TrackParameters()
         params.track = track        

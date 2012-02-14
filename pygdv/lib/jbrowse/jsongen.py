@@ -453,12 +453,16 @@ def _prepare_database(t, chr_name, gene_name_alias, gene_identifier_alias):
     Add a table that will reference all sub-features for a feature.
     :return: the table name to erase after
     '''
+    
+    
     table_name = 'tmp_%s' % chr_name
+    t.cursor().execute('drop table if exists "%s";' % table_name)
     ##  'create table tmp_%s' % chr_name
     t.cursor().execute('create table "%s"(id text, subs text, foreign key(id) references "%s"(id));' % (table_name, chr_name))
     t.write(table_name, _gen_gen(t, chr_name, gene_name_alias, gene_identifier_alias) , ('id', 'subs'))
     table_name2 = 'tmp_%s2' % chr_name
     ##  'create table tmp_%s2' % chr_name
+    t.cursor().execute('drop table if exists "%s";' % table_name2)
     t.cursor().execute('create table "%s"(start int, end int, score float, name text, strand int , type text, id text, attributes text);' % (table_name2))
     t.write(table_name2, _gen_gen2(t, chr_name, gene_name_alias, gene_identifier_alias) , ('start', 'end', 'score', 'name', 'strand', 'type', 'id', 'attributes'))
     
@@ -472,7 +476,6 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
     @param output_directory : where files will be write
     @param url_output : url access to the ressources
     '''
-    
     
     gene_name_alias =  t.find_column_name(['name', 'gene_name', 'gene name', 'gname', 'Name', 'product'])
     att_name = '%s' % gene_name_alias
@@ -586,16 +589,17 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
 
 
 
-#if __name__ == '__main__':
-#    import shutil
-#    f = 'mm9_chr7_overlapping_test.sql'
-#    database = '/Users/jarosz/Documents/epfl/flat_files/' + f
-#    name = 'mm9_chr7_genes'
-#    sha1 = 'nosha1'
-#    out_dir = '/Users/jarosz/Desktop/jsongen_test'
-#    try: 
-#        shutil.rmtree(out_dir)
-#    except OSError:
-#        pass
-#    os.mkdir(out_dir)
-#    jsonify(database, name, sha1, out_dir, 'public_url', 'browser_url', True)
+if __name__ == '__main__':
+    import shutil
+    out_dir = '/home/yo/Desktop/tests'
+    try: 
+        shutil.rmtree(out_dir)
+    except OSError:
+        pass
+    sha1 = 'nosha1'
+    os.mkdir(out_dir)
+    db = '/web/ass/tair10_m.sql'
+
+
+    jsonify(db, 'aname', sha1, out_dir, 'public_url', 'browser_url', True)
+   

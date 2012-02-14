@@ -11,7 +11,7 @@ def add_new_sequence(user_id, sequence):
     file_url = Assembly(sequence).get_sqlite_url()
     files = util.upload(url=file_url)
     if len(files) > 0:
-        filename, tmp_file = files[0]
+        filename, tmp_file, extension = files[0]
         track.create_track(user_id, sequence, trackname='Genes', f=tmp_file.name, admin=True)
     
     

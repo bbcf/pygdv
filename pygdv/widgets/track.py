@@ -10,7 +10,7 @@ import genshi
 from tg import url, tmpl_context
 
 from pygdv.model import DBSession, Track, Species, Sequence
-from pygdv.lib.helpers import get_delete_link, get_edit_link, get_task_status, get_export_link, get_copy_track_link
+from pygdv.lib.helpers import get_delete_link, get_edit_link, get_task_status, get_export_link, get_copy_track_link, get_track_delete_link
 from pygdv.lib import constants
 
 
@@ -54,7 +54,7 @@ track_grid = twf.DataGrid(fields=[
     ('Action', lambda obj:genshi.Markup(
         '<div class=actions>'
         + get_export_link(obj.id, rights = constants.full_rights)                               
-        + get_delete_link(obj.id, rights = constants.full_rights)
+        + get_track_delete_link(obj.id, obj.tmp, rights = constants.full_rights)
         + get_edit_link(obj.id, rights = constants.full_rights, link='./')
         + '</div>'
         ))

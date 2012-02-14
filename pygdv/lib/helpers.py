@@ -28,7 +28,23 @@ def get_delete_link(obj_id, rights = None):
     </form>
         ''' % (obj_id, 'delete')
     return ''
-        
+
+def get_track_delete_link(obj_id, tmp = False, rights = None):
+    if rights is not None and constants.right_upload in rights :
+        if rights[constants.right_upload]:
+            return '''
+    <form method="POST" action=%s class="button-to">
+    <input name="_method" value="DELETE" type="hidden"/>
+    <input name="tmp" value="%s" type="hidden"/>
+    <input class="action delete-button" title="%s" onclick="return confirm('Are you sure?');" 
+        value="delete" style="background-color: transparent; float:left; 
+        border:0; color: #286571; display: inline; margin: 0; padding: 0;" 
+    type="submit"/>
+    </form>
+        ''' % (obj_id, tmp, 'delete')
+    return ''
+    
+      
 def get_view_link(obj_id, param, rights = None):
     '''
     Return a HTML view link.

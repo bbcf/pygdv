@@ -1,24 +1,20 @@
 """Track Controller"""
 
-from pygdv.lib.base import BaseController
+
 from tgext.crud import CrudRestController
-from tgext.crud.decorators import registered_validate
+
 
 from repoze.what.predicates import not_anonymous, has_any_permission, has_permission
 
-from tg import expose, flash, require, request, tmpl_context, validate, request
-from tg import app_globals as gl
+from tg import expose, flash, require, tmpl_context, validate, request
 from tg.controllers import redirect
-from tg.decorators import paginate,with_trailing_slash
+from tg.decorators import with_trailing_slash
 
-from pygdv.model import DBSession, Track, Input, TrackParameters, Sequence, Task, Project
+from pygdv.model import DBSession, Track, Sequence, TMPTrack
 from pygdv.widgets.track import track_table, track_export, track_table_filler, track_new_form, track_edit_filler, track_edit_form, track_grid, default_track_form
 from pygdv import handler
 from pygdv.lib import util, constants, checker, reply
-import os
-import transaction
 from pygdv.celery import tasks
-import pickle
 
 __all__ = ['TrackController']
 
@@ -44,8 +40,11 @@ class TrackController(CrudRestController):
     #@paginate('items', items_per_page=10)
     def get_all(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        data = [util.to_datagrid(track_grid, user.tracks, "Track Listing", len(user.tracks)>0)]
-        return dict(page='tracks', model='track', form_title="new track",items=data,value=kw)
+        
+        tracks = DBSession.query(TMPTrack).filter(TMPTrack.user_id == user.id).all()
+        tracks.extend(user.tracks)
+        data = [util.to_datagrid(track_grid, tracks, "Track Listing", len(tracks)>0)]
+        return dict(page='tracks', model='track', form_title="new track", items=data, value=kw)
     
     
     
@@ -67,19 +66,37 @@ class TrackController(CrudRestController):
     @expose('json')
     @validate(track_new_form, error_handler=new)
     def post(self, *args, **kw):
-        raise self.create(*args, **kw) 
+        user = handler.user.get_user_in_session(request)
+        if 'file_upload' in kw:
+            filename = kw ['file_upload'].filename
+        elif 'url' in kw :
+            filename = kw['url'].split('/')[-1]
+        
+        tmp_track = TMPTrack()
+        tmp_track.name = filename
+        tmp_track.sequence_id = kw['assembly']
+        tmp_track.user_id = user.id
+        DBSession.add(tmp_track)
+        DBSession.flush()
+        
+        kw['tmp_track_id'] = tmp_track.id
+        print tmp_track.id
+        return self.create(*args, **kw) 
     
 
     @expose('genshi:tgext.crud.templates.post_delete')
     def post_delete(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
         _id = args[0]
-        
-        if not checker.can_edit_track(user, _id) and not checker.user_is_admin(user.id):
+        if kw.get('tmp', False):
+            tmp_track = DBSession.query(TMPTrack).filter(TMPTrack.id == _id).first()
+            DBSession.delete(tmp_track)
+            DBSession.flush()
+        elif not checker.can_edit_track(user, _id) and not checker.user_is_admin(user.id):
             flash("You haven't the right to edit any tracks which is not yours")
             raise redirect('../')
-        
-        handler.track.delete(_id)
+        else :
+            handler.track.delete(_id)
         raise redirect('./')
     
     
