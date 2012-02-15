@@ -323,7 +323,7 @@ class ProjectController(CrudRestController):
         
         refSeqs = 'refSeqs = %s' % json.dumps(jb.ref_seqs(project.sequence_id))
         
-        trackInfo = 'trackInfo = %s' % json.dumps(jb.track_info(all_tracks))
+        trackInfo = 'trackInfo = %s' % json.dumps(jb.track_info(all_tracks, assembly_id=project.sequence_id))
         parameters = 'var b = new Browser(%s)' % jb.browser_parameters(
                         constants.data_root(), constants.style_root(), constants.image_root(), ','.join([track.name for track in all_tracks]))
         

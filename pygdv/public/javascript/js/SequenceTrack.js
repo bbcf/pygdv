@@ -82,7 +82,6 @@ SequenceTrack.prototype.getRange = function(start, end, callback) {
     var callbackInfo = {start: start, end: end, callback: callback};
     var chunkSize = this.chunkSize;
     var chunk;
-
     for (var i = firstChunk; i <= lastChunk; i++) {
         //console.log("working on chunk %d for %d .. %d", i, start, end);
         chunk = this.chunks[i];
@@ -102,8 +101,12 @@ SequenceTrack.prototype.getRange = function(start, end, callback) {
                 callbacks: [callbackInfo]
             };
             this.chunks[i] = chunk;
-            dojo.xhrGet({
-                            url: this.baseUrl + i + ".txt",
+	    var chr_name = dojo.byId("GenomeBrowser").genomeBrowser.refSeq.name;
+	    var url = _GDV_GR_URL + '/adn?ass=' + _gdv_info['sequence_id'] + '&chr=' + chr_name + '&id=' + i;
+            console.log(url);
+	    dojo.xhrGet({
+                            //url: this.baseUrl + i + ".txt",
+		url : url,
                             load: function (response) {
                                 var ci;
                                 chunk.sequence = response;

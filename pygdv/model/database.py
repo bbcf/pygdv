@@ -475,6 +475,7 @@ class TrackParameters(DeclarativeBase):
         if self.color:
             d['color'] = self.color
         return d
+    
     def build_parameters(self):
         self.url = os.path.join(self.track.input.sha1, '{refseq}' ,constants.track_data)
         self.label = self.track.name

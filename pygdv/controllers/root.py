@@ -16,7 +16,7 @@ from pygdv.controllers import PermissionController, UserController, TrackControl
 from pygdv.controllers import SequenceController, ProjectController, CircleController
 from pygdv.controllers import RightController, WorkerController, TaskController
 from pygdv.controllers import InputController, DatabaseController, JobController
-from pygdv.controllers import PublicController, HelpController
+from pygdv.controllers import PublicController, HelpController, GenRepController
 
 import pygdv
 
@@ -81,7 +81,7 @@ class RootController(BaseController):
     workers = WorkerController()
    
     help = HelpController()
-    
+    genrep = GenRepController()
     # database controller
     database = DatabaseController()
     

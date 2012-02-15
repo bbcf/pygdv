@@ -133,6 +133,7 @@ var Browser = function(params) {
         dojo.connect(brwsr.chromList, "onchange", function(event) {
 	    var oldLocMap = dojo.fromJson(dojo.cookie(brwsr.container.id + "-location")) || {};
             var newRef = brwsr.allRefs[brwsr.chromList.options[brwsr.chromList.selectedIndex].value];
+	    
             if (oldLocMap[newRef.name]){
 		var oldLoc = oldLocMap[newRef.name];
 		if (oldLoc == 'NaN .. NaN'){
