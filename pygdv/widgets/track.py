@@ -53,9 +53,9 @@ track_grid = twf.DataGrid(fields=[
     ('Status', lambda obj: get_task_status(obj)),
     ('Action', lambda obj:genshi.Markup(
         '<div class=actions>'
-        + get_export_link(obj.id, rights = constants.full_rights)                               
+        + get_export_link(obj.id, rights = constants.full_rights, tmp=obj.tmp)                               
         + get_track_delete_link(obj.id, obj.tmp, rights = constants.full_rights)
-        + get_edit_link(obj.id, rights = constants.full_rights, link='./')
+        + get_edit_link(obj.id, rights = constants.full_rights, link='./', tmp=obj.tmp)
         + '</div>'
         ))
 ])

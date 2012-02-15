@@ -182,15 +182,24 @@ def process_track(user_id, **kw):
         raise Exception('Missing assembly parameters.')
     assembly_id = kw.get('assembly', None)
     
-    files = util.upload(**kw)
-    
+    try :
+        files = util.upload(**kw)
+    except Exception as e:
+        if 'tmp_track_id' in kw:
+            session = model.DBSession()
+            tmp_track = session.query(TMPTrack).filter(TMPTrack.id == kw['tmp_track_id']).first()
+            tmp_track.status="FAILURE"
+            tmp_track.traceback = 'Cannot download data.'
+            session.commit()
+            raise e
+    finally:
+        session.close()
     
     if files is None:
         raise Exception('No files to upload')
     
     
     project = None
-    session = model.DBSession()
     
     if 'tmp_track_id' in kw:
         tmp_track = session.query(TMPTrack).filter(TMPTrack.id == kw['tmp_track_id']).first()

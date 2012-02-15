@@ -73,11 +73,13 @@ def get_copy_track_link(obj_id, rights=None):
     return ''
 
 
-def get_export_link(obj_id, param='track_id', rights=None):
+def get_export_link(obj_id, param='track_id', rights=None, tmp=False):
     '''
     Return a HTML export link.
     '''
-    if rights is not None:
+    if tmp:
+        return '' 
+    elif rights is not None:
         return ''' <a class='action export_link' title="%s" href="%s"></a>''' % ('export', url('/tracks/export', params={param:obj_id}))
     return ''
 
@@ -90,7 +92,9 @@ def get_share_link(obj_id, param, rights = None):
             return ''' <a class='action share_link' title="%s" href="%s"></a>''' % ('share with others', url('./share', params={param:obj_id}))
     return ''
                                                         
-def get_edit_link(obj_id, rights = None, link=''):
+def get_edit_link(obj_id, rights = None, link='', tmp=False):
+    if tmp:
+        return ''
     edit = url('%s%s/edit' % (link, obj_id))
     if rights is not None and constants.right_upload in rights :
         if rights[constants.right_upload]:
@@ -192,7 +196,7 @@ def get_task_status(track=None):
     '''
     obj = track
     if obj.status != constants.ERROR: return obj.status
-    return genshi.Markup('<a href="%s">%s</a>' % (url('./traceback', params={'track_id':obj.id}),
+    return genshi.Markup('<a href="%s">%s</a>' % (url('./traceback', params={'track_id':obj.id, 'tmp':obj.tmp}),
                                                   constants.ERROR
                                                   ))
 

@@ -112,7 +112,6 @@ def _download_from_url(url, filename=None):
     except HTTPError as e:
         print '%s : %s' % (url, e)
         raise e
-        return None, None
 
 
 

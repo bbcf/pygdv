@@ -67,10 +67,20 @@ class TrackController(CrudRestController):
     @validate(track_new_form, error_handler=new)
     def post(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        if 'file_upload' in kw:
+        if 'file_upload' in kw and kw['file_upload'] is not None:
             filename = kw ['file_upload'].filename
-        elif 'url' in kw :
-            filename = kw['url'].split('/')[-1]
+        elif 'urls' in kw :
+            import urlparse
+            filename = kw['urls'].split('/')[-1]
+            u = urlparse.urlparse(kw['urls'])
+            if not u.hostname:
+                url = 'http://%s' % kw['urls']
+                u = urlparse.urlparse(url)
+                if u.hostname:
+                    kw['urls'] = url
+                else :
+                    flash("Bad file/url", 'error')
+                    raise redirect('./')
         
         tmp_track = TMPTrack()
         tmp_track.name = filename
@@ -152,9 +162,13 @@ class TrackController(CrudRestController):
         return 'not implemented'
     
     @expose()
-    def traceback(self, track_id):
+    def traceback(self, track_id, tmp):
         user = handler.user.get_user_in_session(request)
-        if not checker.user_own_track(user.id, track_id) and not checker.user_is_admin(user.id):
+        if tmp in ['True']:
+            return DBSession.query(TMPTrack).filter(TMPTrack.id == track_id).first().traceback
+        
+        
+        elif not checker.user_own_track(user.id, track_id) and not checker.user_is_admin(user.id):
 
             flash("You haven't the right to look at any tracks which is not yours")
             raise redirect('./')
