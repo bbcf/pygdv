@@ -14,6 +14,8 @@ from pygdv.lib import constants, reply
 from pygdv.celery import tasks
 import json
 from sqlalchemy import and_, not_
+from bbcflib.genrep import GenRep
+
 __all__ = ['LoginController']
 
 
@@ -32,6 +34,10 @@ class PublicController(BaseController):
             flash('wrong link', 'error')
             raise redirect(url('/home'))
         mode = None
+        
+        if not GenRep().is_up():
+            raise redirect(url('/error', {'m': 'Genrep service is down. Please try again later.'}))
+        
         
         if k == project.key : mode = 'read'
         elif k == project.download_key : mode = 'download'

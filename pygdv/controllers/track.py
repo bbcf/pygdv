@@ -90,7 +90,6 @@ class TrackController(CrudRestController):
         DBSession.flush()
         
         kw['tmp_track_id'] = tmp_track.id
-        print tmp_track.id
         return self.create(*args, **kw) 
     
 

@@ -14,12 +14,6 @@
 <body>
 <h1>Error ${code}</h1>
 
-<?python
-import re
-mf = re.compile(r'(</?)script', re.IGNORECASE)
-def fixmessage(message):
-    return mf.sub(r'\1noscript', message)
-?>
-<div>${XML(fixmessage(message))}</div>
+<div py:replace="message"></div>
 </body>
 </html>
