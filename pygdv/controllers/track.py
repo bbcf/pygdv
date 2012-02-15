@@ -88,7 +88,8 @@ class TrackController(CrudRestController):
     def post_delete(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
         _id = args[0]
-        if kw.get('tmp', False):
+        tmp = kw.get('tmp', 'False')
+        if tmp in ['True']:
             tmp_track = DBSession.query(TMPTrack).filter(TMPTrack.id == _id).first()
             DBSession.delete(tmp_track)
             DBSession.flush()
