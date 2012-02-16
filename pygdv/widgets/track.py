@@ -62,6 +62,7 @@ track_grid = twf.DataGrid(fields=[
 track_in_project_grid = twf.DataGrid(fields=[
     ('Name', 'name'),
     ('Created', 'created'),
+    ('Accessed', 'last_access'),
     ('Assembly', 'sequence'),
     ('Type', 'vizu'),
     ('Status', lambda obj: get_task_status(obj)),
@@ -70,7 +71,7 @@ track_in_project_grid = twf.DataGrid(fields=[
         + get_export_link(obj.id, rights = constants.full_rights)
         + get_copy_track_link(obj.id, rights = constants.full_rights)                               
         + get_delete_link(obj.id, rights = constants.full_rights)
-        + get_edit_link(obj.id, rights = constants.full_rights, link='tracks/')
+        + get_edit_link(obj.id, rights = constants.full_rights, link='/tracks/')
         + '</div>'
         ))
 ])

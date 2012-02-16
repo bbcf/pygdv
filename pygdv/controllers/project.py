@@ -315,8 +315,8 @@ class ProjectController(CrudRestController):
                 if ind > 0:
                     tmp_name = t.name[:-ind]
                 t.name = tmp_name + str(cpt)
-                
-                
+            
+            t.accessed
             DBSession.add(t)
             DBSession.flush()
             trackNames.append(t.name)
