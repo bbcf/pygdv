@@ -26,7 +26,7 @@ __all__ = ['Right', 'Circle', 'Project',
            'Track', 'Task', 'Input',
            'Sequence',
            'Species',
-           'Job', 'TMPTrack']
+           'Job', 'TMPTrack', 'Selection', 'Location']
 
 
 statuses = Enum('UPLOADING', 'FAILURE', name='track_status')
@@ -482,8 +482,8 @@ class TrackParameters(DeclarativeBase):
         self.key = self.track.name
         '''
         RELATIONAL = 'relational'
-SIGNAL = 'signal'
-FEATURES = 'features'
+        SIGNAL = 'signal'
+        FEATURES = 'features'
         '''
         if self.track.vizu == constants.RELATIONAL or self.track.vizu == constants.FEATURES :
             self.type = constants.FEATURE_TRACK
@@ -545,5 +545,40 @@ class Job(DeclarativeBase):
         return 'Job < id : %s, name %s, desc: %s, data : %s , task_id : %s, output : %s>' % (
                         self.id, self.name, self.description, self.data, self.task_id, self.output)
         
-        
+    
+
+class Location(DeclarativeBase):
+    '''
+    Represent the Location a Selection can have.
+    '''
+    __tablename__='Location'
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    chromosome = Column(Text(255), nullable=False) 
+    start =  Column(Integer, nullable=False)
+    end =  Column(Integer, nullable=False)
+    description = Column(Text(), nullable=True)
+    selection_id = Column(Integer, ForeignKey('Selection.id',  onupdate='CASCADE', ondelete="CASCADE"), 
+                           nullable=False)
+    
+class Selection(DeclarativeBase):
+    '''
+    Represent all selections that are submitted to GDV.
+    '''
+    __tablename__='Selection'
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    project_id = Column(Integer, ForeignKey('Project.id', ondelete="CASCADE"), nullable=False)
+    description = Column(Text(), nullable=True)
+    color = Column(Unicode(255), nullable=True)
+    locations = relationship('Location', uselist=False, backref='selection', cascade='delete')
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
         

@@ -16,6 +16,7 @@ var _GDV_GR_URL = _GDV_URL + '/genrep';
 var _POST_URL_NAMES = _GDV_URL_DB + "/search";
 var _GDV_WORKER_URL = _GDV_URL + '/workers';
 var _GDV_JOB_URL = _GDV_URL + '/jobs';
+var _GDV_SEL_URL = _GDV_URL + '/selections';
 
 var _GDV_FORM_URL = _GDV_URL + '/forms';
 

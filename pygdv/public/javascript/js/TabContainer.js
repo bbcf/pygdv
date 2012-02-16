@@ -174,7 +174,7 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
             var act = new dijit.layout.ContentPane({region: "right",id:'tab_selections_act'});
             //button : make a new track
             var button = new dijit.form.Button({
-                label: "Save selection 'as a track'",
+                label: "Save selection",
                 onClick: function() {
                     var sels = tabcontainer.tab_selections.selections;
                     if(sels){
