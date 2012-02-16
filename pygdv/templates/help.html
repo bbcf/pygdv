@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <xi:include href="master.html" />
+  <xi:include href="definitions.html"/>
+
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
+  <title py:replace="page"></title>
+</head>
+<style>
+#menu_items {
+  padding:0px 12px 0px 2px;
+  list-style-type:None
+}
+</style>
+
+<body class="tundra">
+  
+  <div class="getting_started">
+    <h2><a name="Upload" href="#Upload">Upload file</a></h2>
+    <p>
+      We call genomic files <span class="imp"><a href="${tg.url('/tracks')}">Tracks</a></span>. 
+      To upload a new one, select <a href="${tg.url('/tracks')}">Tracks</a> tab and use the form to upload your data. You can enter URL or simply select it from your filesystem.
+    </p>
+    <p>
+      Don't forget to choose the right assembly for your file. See <a href="#Assembly"> how to add an assembly</a>
+.
+    </p>
+    
+
+    
+  <h2><a name="Project" href="#Project">See the data uploaded</a></h2>
+  <p>
+    You will be able to see the track(s) you uploaded by making <span class="imp"><a href="${tg.url('/projects')}">Projects</a></span>.
+    Create one form the <a href="${tg.url('/projects')}">Projects</a> tab, and add the track(s) with the <a class="action edit_link"></a> button.
+</p>
+
+
+<h2><a name="Share" href="#Share">Share data</a></h2>
+    <p>
+      You can share <span class="imp">projects</span> with the <a class="action share_link"></a> button.
+      You have two possibilities :
+      <ul>
+	<li>You have two <span class="imp">links</span> with <span class="imp">read</span> and <span class="imp">download</span> permissions that you can give to people that will be able to see the project and download data associated to the project respectivly (download permission includes read one). </li>
+	<li>You can share with just a group of persons. Select a <span class="imp">circle</span> and add it. You have one more permissions : <span class="imp">upload</span> that will give to this circle of person to upload data on the same project.</li>
+	</ul>
+    </p>
+    
+
+<h2><a name="Circle" href="#Circle">Create a circle</a></h2>
+    <p>
+      Go on <span class="imp"><a href="${tg.url('/circles')}">Circles</a></span> tab, and select the person(s) you want to add in it.
+    </p>
+
+    <h2><a name="Assembly" href="#Assembly">Assemblies</a></h2>
+    <p>
+      If the assembly you want to use is missing, use <a href="mailto:webmaster.bbcf@epfl.ch?subject=[GDV] Ask for a new assembly">contact</a>. Specify in the mail which assembly you want to have and it will be added. If the assembly is not very usual, contact us. It can be added very easily.
+    </p>
+
+<h2><a name="API" href="#API">Access with an API</a></h2>
+    <p>
+      You can access GDV with a simple programming interface. Based on HTTP request, you can create projects, add tracks, and prepare view without the web interface. The simplest if the data you generate is at the end of an analysis pipeline. For more information on it you should read <a href="https://github.com/bbcf/bbcflib/blob/master/bbcflib/gdv.py">the python file</a> that resume the requests to send to GDV.
+    </p>
+    In order to use it, you will need a <span class="imp">key</span> that you can <a href="mailto:webmaster.bbcf@epfl.ch?subject=[GDV] Ask for an API key">ask</a>.
+  </div>
+
+</body>
+</html>
