@@ -290,7 +290,9 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
 
     // If you click on the minimap somewhere outside of
     // the locationThumb, you want to move there.
-    dojo.connect(this.overview, "onmousedown", this, function(e) {this.centerAtBase(Math.round((e.layerX/e.target.offsetWidth)*this.ref.end));});
+    dojo.connect(this.overview, "onmousedown", this, function(e) {
+	this.centerAtBase(Math.round((e.layerX / this.overviewBox.w) * this.ref.end));
+    });
 
     // Copy the self object
     var view = this;
