@@ -178,10 +178,10 @@ def process_track(user_id, **kw):
     '''
     Entry point for uploading and processing tracks.
     '''
-   
+    session = model.DBSession()
     if not GenRep().is_up():
         if 'tmp_track_id' in kw:
-            session = model.DBSession()
+            
             tmp_track = session.query(TMPTrack).filter(TMPTrack.id == kw['tmp_track_id']).first()
             tmp_track.status="FAILURE"
             tmp_track.traceback = 'GenRep service is down. Please Try again later'
