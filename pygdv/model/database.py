@@ -561,6 +561,7 @@ class Location(DeclarativeBase):
                            nullable=False)
     def __repr__(self):
         return '<Location %s chr : %s, start: %s, end : %s, description : %s>' % (self.id, self.chromosome, self.start, self.end, self.description)
+    
 class Selection(DeclarativeBase):
     '''
     Represent all selections that are submitted to GDV.
