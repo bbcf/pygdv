@@ -238,6 +238,8 @@ def process_track(user_id, **kw):
             
         for filename, f, extension in files:
             sequence = session.query(model.Sequence).filter(model.Sequence.id == assembly_id).first()
+            if sequence is None:
+                raise Exception('Sequence not found on GDV.')
             from pygdv.handler.track import create_track
             kw['extension'] = extension
             kw['admin'] = admin

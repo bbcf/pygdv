@@ -30,7 +30,7 @@ var _tc;//the tab container
 var _jh;//the job handler
 var _menub;//the menubar
 var _lp;//the link panel
-
+var _zs;//zone selection
 var _gdv_info = {};
 
 /**

@@ -178,11 +178,11 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
                 onClick: function() {
                     var sels = tabcontainer.tab_selections.selections;
                     if(sels){
-			var selname="";
+			var selname = "";
 			dojo.forEach(sels, function(sel, i){
-                            selname+=sel.chr+'('+sel.start+','+sel.end+')_';
+                            selname += sel.chr + '(' + sel.start + ',' + sel.end + ')_';
 			});
-			selname+='.db';
+			selname += '.db';
 			var selections_json = dojo.toJson(sels);
 			_jh.new_selection(sels);
                     } else {
@@ -205,40 +205,39 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
      * @param{zoneSel} - the zone selection object
      * @param{handler} - the handler of all marquees
      */
-    updateSelectionTab : function(zoneSel,handler,selections){
-        var tabcontainer=this;
-        var tab=this.tab_selections;
-        tab.selections=selections;
+    updateSelectionTab : function(zoneSel, handler, selections){
+        var tabcontainer = this;
+        var tab = this.tab_selections;
+        tab.selections = selections;
         //remove previous
-        var store=dojo.byId('selections_store');
+        var store = dojo.byId('selections_store');
         if(store){
             tab.domNode.removeChild(store);
         }
         //create new
-        var seldiv=document.createElement('div');
-        seldiv.id=('selections_store');
+        var seldiv = document.createElement('div');
+        seldiv.id = ('selections_store');
         var tmp_dom = {};
         //fetch all marquees and build tmp DOM
         dojo.forEach(selections, function(sel, i){
             //build tree
             var chr = sel.chr;
-            var parent=tmp_dom[chr];
+            var parent = tmp_dom[chr];
             if(!parent){
-                parent=document.createElement('div');
+                parent = document.createElement('div');
                 parent.className='selection_parent';
                 parent.innerHTML='Chromosome : '+chr;
             }
             var child = document.createElement('div');
-            child.innerHTML='( '+sel.start+' , '+sel.end+' ) ';
-            child.className='selection_child';
+            child.innerHTML = '( '+sel.start+' , '+sel.end+' ) ';
+            child.className = 'selection_child';
             //add a delete selection link
             var del = document.createElement('a');
-            del.innerHTML=" delete ";
+            del.innerHTML = " delete ";
             tabcontainer.connectSel(del,zoneSel,selections,sel);
             child.appendChild(del);
             parent.appendChild(child);
-	    
-            tmp_dom[chr]=parent
+	    tmp_dom[chr] = parent;
         });
 	
         //build html
@@ -310,7 +309,7 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
         form.domNode.appendChild(closer);
         //form body
         var bd = document.createElement("div");
-        bd.id="gm_form_body";
+        bd.id = "gm_form_body";
         var ctx=this;
         //a list that will contains drop containes
         //as their are not 'standards' form inputs

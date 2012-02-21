@@ -559,7 +559,8 @@ class Location(DeclarativeBase):
     description = Column(Text(), nullable=True)
     selection_id = Column(Integer, ForeignKey('Selection.id',  onupdate='CASCADE', ondelete="CASCADE"), 
                            nullable=False)
-    
+    def __repr__(self):
+        return '<Location %s chr : %s, start: %s, end : %s, description : %s>' % (self.id, self.chromosome, self.start, self.end, self.description)
 class Selection(DeclarativeBase):
     '''
     Represent all selections that are submitted to GDV.
@@ -569,7 +570,7 @@ class Selection(DeclarativeBase):
     project_id = Column(Integer, ForeignKey('Project.id', ondelete="CASCADE"), nullable=False)
     description = Column(Text(), nullable=True)
     color = Column(Unicode(255), nullable=True)
-    locations = relationship('Location', uselist=False, backref='selection', cascade='delete')
+    locations = relationship('Location', uselist=True, backref='selection', cascade='delete')
     
     
     

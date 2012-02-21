@@ -19,9 +19,9 @@ function ZoneSelection(gv) {
     this.canvas.style.zIndex   = 0;
     gv.elem.parentNode.appendChild(this.canvas);
     gv.setCursorToSelect(this.canvas);
-
+    
     // Create a new marquee handler
-    handler = new MarqueeHandler(this.canvas, gv,this);
+    handler = new MarqueeHandler(this.canvas, gv, this);
     this.handler = handler;
     // Connect
     dojo.connect(this.canvas, "onmousedown", handler, handler.start);
@@ -34,11 +34,40 @@ function ZoneSelection(gv) {
     // Create a connector to handle update events
     this.connector = new SelConnector();
 
+    // Add selections stored by GDV.
+    if (selections){
+	console.log(selections);
+	var ctx = this;
+	dojo.addOnLoad(function(){
+	    ctx.addStoredSelections(selections, gv, handler);
+	});
+		      
+    }
+	
     // //create an DOM node that will sore all selections
     // var store = document.createElement("span");
     // store.id="store_selections";
     // store.style.display="none";
     // dojo.body().appendChild(store);
+};
+
+/**
+* Add the selections stored by GDV.
+*/
+ZoneSelection.prototype.addStoredSelections = function(selection, gv, handler){
+    var l = selections.length;
+    var lb = gv.minVisible();
+    var fc = gv.pxPerBp;
+    for (var i = 0; i<l ; i++){
+	var selection = selections[i];
+	var marquees = selection['locations'];
+	var lm = marquees.length;
+	for(var j =0;j<lm;j++){
+	    handler.add_marquee(marquees[j], lb, fc);
+	}
+    };
+    handler.position();
+    this.connector.afterUpdate(this, handler, handler.marquees);
 };
 
 /**
@@ -49,11 +78,12 @@ ZoneSelection.prototype.get = function() {
     var cur = this.handler.current;
     this.handler.marquees.sort(MarqueeSort);
     if(cur){
-    return this.handler.marquees.map(function(m) {
-        return m.chr + ':' + m.start + ' .. ' + m.end}).join(';')+";"+cur.chr+":"+cur.start+" .. "+cur.end;
+	return this.handler.marquees.map(function(m) {
+            return m.chr + ':' + m.start + ' .. ' + m.end}).join(';') + 
+	    ";" + cur.chr + ":" + cur.start + " .. " + cur.end;
     } else {
-    return this.handler.marquees.map(function(m) {
-        return m.chr + ':' + m.start + ' .. ' + m.end}).join(';');
+	return this.handler.marquees.map(function(m) {
+            return m.chr + ':' + m.start + ' .. ' + m.end}).join(';');
     }
 };
 
@@ -67,7 +97,9 @@ ZoneSelection.prototype.enableSel = function(event) {
     dojo.byId("disableSel").style.backgroundImage = "url('" + window.picsPathRoot + "bkgnd_light.png')";
     this.gv.disconnectMouse();
     this.handler.position();
-    if (_tc) _tc.selections();
+    if (_tc) {
+	_tc.selections();
+    }
 };
 
 /**
@@ -94,8 +126,8 @@ ZoneSelection.prototype.update = function(gv) {
 ZoneSelection.prototype.updatedSelection = function(){
     var handler = this.handler;
     var marquees = handler.marquees
-    marquees.sort(MarqueeSort);
-    this.connector.afterUpdate(this,handler,marquees);
+    //marquees.sort(MarqueeSort);
+    this.connector.afterUpdate(this, handler, marquees);
 };
 
 /**
@@ -103,11 +135,11 @@ ZoneSelection.prototype.updatedSelection = function(){
  * @params {x1} the start of the selection in pixels
  * @params {x2} the end   of the selection in pixels
  */
-function Marquee(x1, x2) {
+function Marquee(x1, x2, chr) {
     this.x1 = x1;      // Start in pixels
     this.x2 = x2;      // End in pixels
     this.alpha = 0.15; // Transparancy
-    this.chr   = null; // The chromosome
+    this.chr   = chr; // The chromosome
     this.start = null; // Start in basepairs
     this.end   = null; // End in basepairs
 };
@@ -138,13 +170,13 @@ Marquee.prototype.fixate = function(gv) {
     this.alpha = 0.35
     // A selection must be at least one pixel thick
     if (this.x1 == this.x2) {
-    this.x2 = this.x1 + 1;
+	this.x2 += 1;
     }
     // What are the coordinates of the selection
-    factor = gv.pxPerBp
-    leftbase = gv.minVisible()
-    this.start = Math.round(leftbase + (this.x1 / factor))
-    this.end   = Math.round(leftbase + (this.x2 / factor))
+    factor = gv.pxPerBp;
+    leftbase = gv.minVisible();
+    this.start = Math.round(leftbase + (this.x1 / factor));
+    this.end   = Math.round(leftbase + (this.x2 / factor));
     // Save the chromosome
     this.chr = gv.ref.name
 };
@@ -198,12 +230,11 @@ function MarqueeHandler(canvas, gv, zoneSelection) {
 MarqueeHandler.prototype.delete = function(marquee){
     var marquees = this.marquees;
     for(i in marquees){
-    var m = marquees[i];
-    if(m.chr==marquee.chr &&
-       m.start==marquee.start){
-        marquees.splice(i,1);
-        return;
-    }
+	var m = marquees[i];
+	if(m.chr == marquee.chr && m.start == marquee.start){
+            marquees.splice(i,1);
+            return;
+	} 
     }
 };
 
@@ -241,17 +272,37 @@ MarqueeHandler.prototype.position = function() {
  */
 MarqueeHandler.prototype.start = function(event) {
     this.current = this.getMarquee(event.layerX);
-    this.draw(this.marquees.filter(function(m) {
-        return MarqueeFilter(m, this.gv)
-            }
-        ).concat(this.current));
+    this.draw(this.marquees.filter(
+	function(m) {
+            return MarqueeFilter(m, this.gv)
+	}
+    ).concat(this.current));
     dojo.forEach(this.connections, function(c) {
         dojo.disconnect(c);
     });
     this.connections =
-    [dojo.connect(this.canvas, "onmousemove", this, this.moving),
-     dojo.connect(this.canvas, "onmouseout",  this, this.stop)];
+	[dojo.connect(this.canvas, "onmousemove", this, this.moving),
+	 dojo.connect(this.canvas, "onmouseout",  this, this.stop)];
 };
+
+/**
+ * Add a marquee.
+ */
+MarqueeHandler.prototype.add_marquee = function(selection, leftbase, factor) {
+    var start = selection['start'];
+    var end = selection['end'];
+    var mid = selection['id'];
+    
+    var x1 = (start - leftbase) * factor;
+    var x2 = (end - leftbase ) * factor;
+    var m = new Marquee(x1, x2, selection['chr']);
+    m.start = start;
+    m.end = end;
+    m.id = mid;
+    this.mergeMarquee(m);
+    this.marquees.push(m);
+};
+
 
 /**
  * Returns the current marquee if the cursor
@@ -265,15 +316,15 @@ MarqueeHandler.prototype.getMarquee = function(x0) {
         if (m.chr != this.gv.ref.name) {
         continue;
     }
-    // not the right chr
+	// not the right chr
         if ((m.x1 <= x0) && (x0 <= m.x2)) {        // the cursor is on a marquee
             m.alpha = 0.15;                        // change transparency
             if (x0-m.x1 > m.x2-x0) {
-        m.x2 = x0;
-        }    // closer to left edge
+		m.x2 = x0;
+            }    // closer to left edge
             else {
-        m.x1 = m.x2; m.x2 = x0;
-        }         // closer to right edge
+		m.x1 = m.x2; m.x2 = x0;
+            }         // closer to right edge
             return this.marquees.splice(i, 1)[0];  // remove that marquee
          }
     }
@@ -288,7 +339,10 @@ MarqueeHandler.prototype.moving = function(event) {
     // Update current marquee
     this.current.x2 = event.layerX;
     // Redraw both existing and current marquee
-    this.draw(this.marquees.filter(function(m) {return MarqueeFilter(m, this.gv)}).concat(this.current))
+    this.draw(this.marquees.filter(
+	function(m) {
+	    return MarqueeFilter(m, this.gv)
+	}).concat(this.current))
 };
 
 /**
@@ -361,8 +415,9 @@ MarqueeHandler.prototype.mergeMarquee = function(current) {
 MarqueeHandler.prototype.update = function(factor, leftbase, rightbase) {
     // Update the coordinates in pixels of every marquee
     // and draw only those that can be seen
+    var ctx = this;
     this.draw(this.marquees.filter(function(m) {
-        if (m.chr != this.gv.ref.name) {return false;}
+        if (m.chr != ctx.gv.ref.name) {return false;}
         m.update(factor, leftbase);
         return ((m.end > leftbase) && (m.start < rightbase));
     }));
@@ -390,9 +445,10 @@ function SelConnector(){
  * @param{handler} - the handler of all marquees
  * @param{selections} - the marquees
  */
-SelConnector.prototype.afterUpdate = function(zoneSel,handler,selections){
+SelConnector.prototype.afterUpdate = function(zoneSel, handler, selections){
     //update selection tab
-    _tc.updateSelectionTab(zoneSel,handler,selections);
+    _tc.updateSelectionTab(zoneSel, handler, selections);
+    
 };
 
 

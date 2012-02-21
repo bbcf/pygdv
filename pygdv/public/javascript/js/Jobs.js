@@ -31,14 +31,15 @@ dojo.declare("ch.epfl.bbcf.gdv.JobHandler",null,{
      * @param {selection} - the selections
      */
     new_selection : function(selections){
+	console.log('new selection');
+	console.log(selections);
 	var sorted = {};
         /* build description & sort the marquees like {chr : [marquees]}*/
 	var desc = '';
 	var cur_chr;
-	console.log(selections);
 	var xhrArgs = {
 	    url : _GDV_SEL_URL + '/save',
-	    postData : 'project_id=' + _gdv_info.project_id + '&color=grey&description="desc crip tion"&locations=' + selections 
+	    postData : 'project_id=' + _gdv_info.project_id + '&color=grey&description="desc crip tion"&locations=' + dojo.toJson(selections)
 	};
 	dojo.xhrPost(xhrArgs);
 	

@@ -7,7 +7,7 @@ from repoze.what.predicates import not_anonymous, has_any_permission, has_permis
 from tg import expose, flash, require, error, request, tmpl_context, validate, url
 from tg import app_globals as gl
 from tg.controllers import redirect
-from tg.decorators import paginate, with_trailing_slash,without_trailing_slash
+from tg.decorators import paginate, with_trailing_slash, without_trailing_slash
 import tg
 
 from pygdv.model import DBSession, Project, User, RightCircleAssociation, Track, Job
@@ -335,6 +335,7 @@ class ProjectController(CrudRestController):
         ''' % jb.features_style(all_tracks)
         
         
+        selections = 'selections = %s' % handler.selection.selections(project_id)
         
         info = {}
         prefix = tg.config.get('prefix')
@@ -372,6 +373,7 @@ class ProjectController(CrudRestController):
                     parameters = parameters,
                     style_control = style_control,
                     control = control,
+                    selections = selections,
                     page='view')
     
     @expose()
