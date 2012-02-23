@@ -191,28 +191,25 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
         tabcontainer.tab_selections=sels;
         return cp;
     },
-    /**
-     * Update the selection tab when a selection event occurs
-     * Selections are accessible via _tc.tab_selections.selections
-     * @param{selections} - the sorted selections
-     * @param{zoneSel} - the zone selection object
-     * @param{handler} - the handler of all marquees
-     */
 
-    // If the Enter description field is clicked, an input field appears to enter custom text.
-    editDescriptionOnClick : function(x){
+    /**
+     * If the Enter description field is clicked, an input field appears to enter custom text.
+     * param{node} : the HTML node
+     * param{loc} : the location associated
+     */
+     editDescriptionOnClick : function(node, location){
         var ctx = this; 
-	var handle = dojo.connect(x,'click', function(e){
-             var textfield = dojo.query(".description_field",x)[0];
+	var handle = dojo.connect(node, 'click', function(e){
+             var textfield = dojo.query(".description_field", node)[0];
              var txt = textfield.innerHTML;
              var input = dojo.create("input", {type:"text", value:txt}, textfield, "replace");
-             input.focus(); 
+            input.focus(); 
 	    input.select();
-            dojo.connect(input,'blur', function(ee){
-                 txt = input.value;
-                 var newtextfield = dojo.create("td", {innerHTML:txt, class:"description_field"}, input, "replace");
-                 ctx.editDescriptionOnClick(newtextfield.parentNode);
-                 dojo.stopEvent(ee);
+            dojo.connect(input, 'blur', function(ee){
+		location.desc = input.value;
+                var newtextfield = dojo.create("td", {innerHTML:txt, class:"description_field"}, input, "replace");
+                ctx.editDescriptionOnClick(newtextfield.parentNode, location);
+                dojo.stopEvent(ee);
              });
              dojo.stopEvent(e);
              dojo.disconnect(handle);
@@ -253,8 +250,8 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
         var dtable = dojo.create("table",null,seldiv);
         var locs_len = selections.length;
         dojo.create("tr",null,dtable);
-        dojo.create("td",{innerHTML:"Chr\tstart\tend"},dtable.firstChild);
-        dojo.create("td",{innerHTML:"Description"},dtable.firstChild);
+        dojo.create("td",{innerHTML : "Chr\tstart\tend"},dtable.firstChild);
+        dojo.create("td",{innerHTML : "Description"},dtable.firstChild);
         dojo.create("td",null,dtable.firstChild);
         for (var i=0; i<locs_len; i++){
             var ttr = dojo.create("tr", null, dtable);
@@ -264,10 +261,10 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
             var del = dojo.create("td",null,ttr);
             dojo.create("a",{innerHTML:"Delete", class:"delete_field",
                              style:{textDecoration:"underline", color:"blue"}},del);
-            dojo.create("div",{innerHTML:"Enter description", class:"description_field",
+            dojo.create("div",{innerHTML : loc.desc, class:"description_field",
                                style: {color: "grey"}}, desc);
             this.locationOnDblClick(ttd);
-            this.editDescriptionOnClick(desc);
+            this.editDescriptionOnClick(desc, loc);
             this.removeSelectionOnClick(del, loc, zoneSel, handler);
         }
         //// end of Julien's code
