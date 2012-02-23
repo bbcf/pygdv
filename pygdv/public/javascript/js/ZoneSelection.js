@@ -450,5 +450,3 @@ SelConnector.prototype.afterUpdate = function(zoneSel, handler, selections){
     _tc.updateSelectionTab(zoneSel, handler, selections);
     
 };
-
-
