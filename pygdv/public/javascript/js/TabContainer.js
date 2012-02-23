@@ -62,7 +62,7 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
     initHider : function(){
         //TODO
     },
-    
+
     /* ################################################################ */
     /* ########################### JOBS ############################### */
     /* ################################################################ */
@@ -75,7 +75,7 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
 	var name = job.job_name;
 	var desc = job.job_description;
 	var status = job.status;
-	
+
 	console.log('add job');
 	console.log(job);
 	/* get the job div */
@@ -84,11 +84,11 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
             job_div = document.createElement("DIV");
             job_div.id = 'job_' + job_id;
         }
-	
-	
+
+
 	/* customize the display */
 	job_div.innerHTML='job : ' + name + '  (' + desc + ')';
-	
+
         if(status == 'success' || status == 'SUCCESS'){
             job_div.className="job job_success";
             console.log('joob');
@@ -103,7 +103,7 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
 		    link.href = _GDV_PROJECT_VIEW + '?project_id=' + _gdv_info.project_id;
 		    d.appendChild(link);
 		    job_div.appendChild(d);
-		    
+
 		} else if(output == 'image' || output == 'IMAGE'){
 		    var d = document.createElement('span');
                     var link = document.createElement('a');
@@ -114,10 +114,10 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
                     job_div.appendChild(d);
 		}
 	    }
-	    
+
         } else if(status == 'running' || status == 'RUNNING'){
             job_div.className="job job_running";
-	    
+
         } else if(status == 'failure' || status == 'FAILURE' || status == 'error' || status == 'ERROR'){
             job_div.className="job job_error";
 	    var err = job.error;
@@ -132,15 +132,15 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
 
 	    }
         }
-	
-	
+
+
         this.tab_jobs.domNode.appendChild(job_div);
     },
     /**
      * This will update the status of the jobs when the jobs tab is selected
      */
     connectJobUpdateEvents : function(){
-	
+
         var tabs = dijit.byId("tabcontainer");
         dojo.connect(tabs,"_transition", function(newPage, oldPage){
             var reload = false;
@@ -194,7 +194,7 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
             cp.addChild(act);
         }
         cp.addChild(sels);
-	
+
         tabcontainer.tab_selections=sels;
         return cp;
     },
@@ -205,6 +205,43 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
      * @param{zoneSel} - the zone selection object
      * @param{handler} - the handler of all marquees
      */
+
+    // If the Enter description field is clicked, an input field appears to enter custom text.
+    function editDescriptionOnClick(x){
+        var handle = dojo.connect(x,'click', function(e){
+             var textfield = dojo.query(".description_field",x)[0];
+             var txt = textfield.innerHTML;
+             var input = dojo.create("input", {type:"text", value:txt}, textfield, "replace");
+             input.focus(); input.select();
+             dojo.connect(input,'blur', function(ee){
+                 txt = input.value;
+                 var newtextfield = dojo.create("td", {innerHTML:txt, class:"description_field"}, input, "replace");
+                 editDescriptionOnClick(newtextfield.parentNode);
+                 dojo.stopEvent(ee);
+             });
+             dojo.stopEvent(e);
+             dojo.disconnect(handle);
+        });
+    },
+
+    // If the `delete` link is clicked, the Location is deleted in x and in the handler
+    function removeSelectionOnClick(x,sel,zoneSel,handler){
+        dojo.connect(x,"click", function(e){
+            dojo.destroy(x.parentNode);
+            handler.delete(sel);
+            handler.position();
+            zoneSel.updatedSelection();
+            dojo.stopEvent(e);
+        });
+    },
+
+    // Whatever has to be done if a Location is double clicked.
+    function locationOnDblClick(x){
+        var handle = dojo.connect(x,"dblclick",function(e){
+            alert("Do something")
+        });
+    },
+
     updateSelectionTab : function(zoneSel,handler,selections){
         var tabcontainer=this;
         var tab=this.tab_selections;
@@ -217,36 +254,35 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
         //create new
         var seldiv=document.createElement('div');
         seldiv.id=('selections_store');
-        var tmp_dom = {};
-        //fetch all marquees and build tmp DOM
+        //// Julien's code
         dojo.forEach(selections, function(sel, i){
-            //build tree
-            var chr = sel.chr;
-            var parent=tmp_dom[chr];
-            if(!parent){
-                parent=document.createElement('div');
-                parent.className='selection_parent';
-                parent.innerHTML='Chromosome : '+chr;
+            var dtable = dojo.create("table",null,seldiv);
+            var locs_len = sel.locs.length;
+            dojo.create("tr",null,dtable);
+            dojo.create("td",{innerHTML:"Chr\tstart\tend"},dtable.firstChild);
+            dojo.create("td",{innerHTML:"Description"},dtable.firstChild);
+            dojo.create("td",null,dtable.firstChild);
+            for (var i=0; i<locs_len; i++){
+                var ttr = dojo.create("tr", null, dtable);
+                var loc = sel.locs[i];
+                var ttd = dojo.create("td", {innerHTML: "chr"+loc.chr+"\t("+loc.start+","+loc.end+")" }, ttr);
+                var desc = dojo.create("td",{class:"description"},ttr);
+                var del = dojo.create("td",null,ttr);
+                dojo.create("a",{innerHTML:"Delete", class:"delete_field",
+                                 style:{textDecoration:"underline", color:"blue"}},del);
+                dojo.create("div",{innerHTML:"Enter description", class:"description_field",
+                                   style: {color: "grey"}}, desc);
+                locationOnDblClick(ttd);
+                editDescriptionOnClick(desc);
+                removeSelectionOnClick(del,sel,zoneSel,handler);
             }
-            var child = document.createElement('div');
-            child.innerHTML='( '+sel.start+' , '+sel.end+' ) ';
-            child.className='selection_child';
-            //add a delete selection link
-            var del = document.createElement('a');
-            del.innerHTML=" delete ";
-            tabcontainer.connectSel(del,zoneSel,selections,sel);
-            child.appendChild(del);
-            parent.appendChild(child);
-	    
-            tmp_dom[chr]=parent
-        });
-	
+        })
+        //// end of Julien's code
         //build html
         for(i in tmp_dom){
             seldiv.appendChild(tmp_dom[i]);
         }
         tab.domNode.appendChild(seldiv);
-	
     },
     /**
      * Get the selections as a JSON
@@ -268,18 +304,7 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
         });
         return tmp_dom;
     },
-    /**
-     * Connect the delete link to the deletion of the marquee
-     * Externalized to avoid disclosure events
-     */
-    connectSel : function(del,zoneSel,selections,sel){
-        dojo.connect(del, "onclick",function(e){
-            handler.delete(sel);
-            handler.position();
-            zoneSel.updatedSelection();
-            dojo.stopEvent(e);
-        });
-    },
+
     /* ################################################################ */
     /* ########################### FORM ############################### */
     /* ################################################################ */
@@ -288,10 +313,10 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
      *@param{item} containing the properties
      */
     addFormTab : function(item){
-	
+
         /* destroy previous form */
         this.destroyForm();
-	
+
         /* build the form */
         var form = new dijit.form.Form({id:"gfm_form"});
         form.zIndex=70;
@@ -326,13 +351,13 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
         //reference additionnal parameters */
         form.additionnals_parameters=item.parameters;
         form.domNode.appendChild(bd);
-	
+
         /* make it a new tab */
         var lay = new dijit.layout.LayoutContainer({title: "Form",id:'tab_form'});
         lay.addChild(form);
         this.container.addChild(lay);
         this.tab_form=lay;
-	
+
         /* submit process */
         var dd = document.createElement('div');
         bd.appendChild(dd);
@@ -351,7 +376,7 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
             if (form.validate()) {
 		/* get the form parameters */
 		var jsonform = form.attr("value");
-		
+
 		//add drop container, parameters
 		if(form.drop_containers.length>0){
 		    var len=form.drop_containers.length;
@@ -359,8 +384,8 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
 			ctx.addTrackParameter(form.drop_containers[i],jsonform);
 		    }
 		}
-		
-		
+
+
 		/* get other parameters from the json tree */
 		var adds=form.additionnals_parameters;
 		for(k in adds){
@@ -373,8 +398,8 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
 		ctx.jobs();
             }
         });
-	
-	
+
+
     },
     /**
      * Add the track information to the JSON.
@@ -410,7 +435,7 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
         var name = item['name'];
         var item_id = item['id']
         var el;
-	
+
         switch(type){
         case "radio_choice":
             el = document.createElement("div");
@@ -438,7 +463,7 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
 		el.appendChild(cont);
             }
             break;
-	    
+
         case 'boolean':
             el = document.createElement("div");
             el.innerHTML = item["name"];
@@ -450,7 +475,7 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
             });
             el.appendChild(foo.domNode);
             break;
-	    
+
         case 'drop_container':
             el = document.createElement("div");//base element
             el.className="gm_container";
@@ -469,13 +494,13 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
             //trash
             var widget2 = new dojo.dnd.Source(
 		div2,{creator:ctx.deleteTrack,accept: ["track-filter"],withHandles: false});
-	    
+
             widget1.drop_type=item_id;
-	    
+
             el.appendChild(div1);el.appendChild(div2);
             form.drop_containers.push(widget1);
             break;
-	    
+
         case 'number':
             el = document.createElement("div");
             el.innerHTML = item["name"];
@@ -488,11 +513,11 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
             el.appendChild(foo.domNode);
             break;
             break;
-	    
-	    
-	    
-	    
-	    
+
+
+
+
+
             //     //TRACKS
             // case "ntracks":
             //                 el = document.createElement("div");//base element
@@ -510,24 +535,24 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
             //     div2.className='gm_drop_trash';
             //     var widget2 = new dojo.dnd.Source(div2,{creator:ctx.deleteTrack,accept: ["track-selection"],withHandles: false});//drop container
             //     el.appendChild(div1);el.appendChild(div2);
-	    
+
             //     form.dnd_selection=widget1;
             //     form.dnd_selection.id=type;
-	    
+
             //     break;
-	    
+
         default: el = document.createElement("span");
             console.warn("type "+type+" not recognized");
-	    
+
         }
         return el;
     },
-    
+
     /**
      * destroy the created form
      */
     destroyForm : function(){
-	
+
         var tab_form = dijit.byId("tab_form");
         if(tab_form){
             this.container.removeChild(tab_form);
@@ -545,7 +570,7 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
         node.innerHTML = track.label;
         node.id = dojo.dnd.getUniqueId();
         return {node: node,data: track, type: ["track-filter"]};
-	
+
     },
     /**
      * Idem than @function{copyFilterTrack}
