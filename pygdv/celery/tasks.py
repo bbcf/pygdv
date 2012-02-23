@@ -192,7 +192,7 @@ def process_track(user_id, **kw):
     if not 'assembly' in kw and not 'project_id' in kw:
         raise Exception('Missing assembly parameters.')
     assembly_id = kw.get('assembly', None)
-    
+    files = None
     try :
         files = util.upload(**kw)
     except Exception as e:
@@ -320,7 +320,7 @@ def _signal_database(path, sha1, name):
     print '[t] starting task ``compute scores`` : db (%s), sha1(%s)' % (path, sha1)
     script = 'psd.jar'
     efile = os.path.join(bin_dir, script)
-    p = subprocess.Popen(['java', '-jar', efile, path, sha1, output_dir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(['java', '-jar', efile, path, sha1, output_dir, 'DEBUG'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     result = p.wait()
     if result == 1:
         err = ', '.join(p.stderr)

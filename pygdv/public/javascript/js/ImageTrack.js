@@ -287,6 +287,7 @@ ImageTrack.prototype.draw = function(){
 	    // ctx.strokeRect(0,0,canvas.width, canvas.height);
 	    // ctx.font = "bold 12px sans-serif";
 	    // ctx.fillText(this.nb,canvas.width/2,canvas.height/2);
+
 	    ctx.beginPath();
 	    var prev_pos;
 	    var prev_score;

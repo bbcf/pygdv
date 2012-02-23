@@ -40,7 +40,19 @@ class ProjectController(CrudRestController):
 
     
 
-
+    @with_trailing_slash
+    @expose('json')
+    def get(self, project_key, **kw):
+        project = DBSession.query(Project).filter(Project.key == project_key).first()
+        if project is None:
+            return reply.error(request, 'You cannot add track on this project', './', {})
+        user = handler.user.get_user_in_session(request)
+        if not checker.check_permission_project(user.id, project.id, constants.right_upload_id):
+            return reply.error(request, 'You cannot add track on this project', './', {})
+        else :
+            return reply.normal(request, 'You can upload track on this project', './', {'project' : project})
+        
+        
     @with_trailing_slash
     @expose('pygdv.templates.project')
     @expose('json')

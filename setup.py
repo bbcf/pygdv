@@ -33,11 +33,11 @@ setup(
     author_email='',
     #url='',
     install_requires=[
-        "TurboGears2 >= 2.1.2",
+        "TurboGears2 == 2.1.2",
         "Genshi",
         "zope.sqlalchemy >= 0.4",
         "repoze.tm2 >= 1.0a5",
-	"sqlalchemy",
+	    "sqlalchemy",
         "sqlalchemy-migrate",
         "repoze.what-quickstart",
         "repoze.what >= 1.0.8",
@@ -51,7 +51,8 @@ setup(
         "psycopg2",
         "tg.devtools",
         "tw.dojo",
-        "tw.dynforms",
+        "tw.dynforms"
+        "WebOb==1.1.1",
         ],
     setup_requires=["PasteScript >= 1.7"],
     paster_plugins=['PasteScript', 'Pylons', 'TurboGears2', 'tg.devtools'],

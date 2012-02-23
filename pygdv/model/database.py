@@ -150,9 +150,9 @@ class Project(DeclarativeBase):
     
     is_public = Column(Boolean, nullable=False)
     
-    key = Column(Unicode(255), unique=True,default=setdefaultkey, nullable=False)
+    key = Column(Unicode(255), unique=True, default=setdefaultkey, nullable=False)
     
-    download_key = Column(Unicode(255), unique=True,default=setdefaultkey, nullable=False)
+    download_key = Column(Unicode(255), unique=True, default=setdefaultkey, nullable=False)
     
     def _get_date(self):
         return self._created.strftime(constants.date_format);
@@ -164,7 +164,7 @@ class Project(DeclarativeBase):
     
     # special methods
     def __repr__(self):
-        return '<Project: id=%r, name=%r, created=%r>' % (self.id,self.name,self.created)
+        return '<Project: id=%r, name=%r, key=%r>' % (self.id,self.name,self.key)
     def __unicode__(self):
         return self.name
     @property
