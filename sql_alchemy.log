@@ -1617,3 +1617,349 @@ WHERE "User".key = %(key_1)s
 13:56:45,483    INFO  [sqlalchemy.engine.base.Engine] {'name': u'project_track'}
 13:56:45,484    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
 13:56:45,484    DEBUG [sqlalchemy.engine.base.Engine] Row (u'project_track',)
+14:33:33,643    INFO  [sqlalchemy.engine.base.Engine] select version()
+14:33:33,660    INFO  [sqlalchemy.engine.base.Engine] {}
+14:33:33,662    DEBUG [sqlalchemy.engine.base.Engine] Col ('version',)
+14:33:33,662    DEBUG [sqlalchemy.engine.base.Engine] Row (u'PostgreSQL 9.0.4 on x86_64-redhat-linux-gnu, compiled by GCC gcc (GCC) 4.6.0 20110530 (Red Hat 4.6.0-9), 64-bit',)
+14:33:33,663    INFO  [sqlalchemy.engine.base.Engine] select current_schema()
+14:33:33,663    INFO  [sqlalchemy.engine.base.Engine] {}
+14:33:33,664    DEBUG [sqlalchemy.engine.base.Engine] Col ('current_schema',)
+14:33:33,664    DEBUG [sqlalchemy.engine.base.Engine] Row (u'public',)
+14:33:33,670    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:33:33,670    INFO  [sqlalchemy.engine.base.Engine] {'name': u'celery_taskmeta'}
+14:33:33,673    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:33:33,674    DEBUG [sqlalchemy.engine.base.Engine] Row (u'celery_taskmeta',)
+14:33:33,675    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:33:33,675    INFO  [sqlalchemy.engine.base.Engine] {'name': u'group'}
+14:33:33,676    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:33:33,676    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Group',)
+14:33:33,677    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:33:33,677    INFO  [sqlalchemy.engine.base.Engine] {'name': u'user'}
+14:33:33,679    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:33:33,679    DEBUG [sqlalchemy.engine.base.Engine] Row (u'User',)
+14:33:33,680    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:33:33,680    INFO  [sqlalchemy.engine.base.Engine] {'name': u'permission'}
+14:33:33,681    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:33:33,681    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Permission',)
+14:33:33,681    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:33:33,682    INFO  [sqlalchemy.engine.base.Engine] {'name': u'location'}
+14:33:33,683    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:33:33,683    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:33:33,683    INFO  [sqlalchemy.engine.base.Engine] {'name': u'right'}
+14:33:33,684    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:33:33,691    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Right',)
+14:33:33,692    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:33:33,692    INFO  [sqlalchemy.engine.base.Engine] {'name': u'species'}
+14:33:33,693    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:33:33,694    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Species',)
+14:33:33,694    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:33:33,694    INFO  [sqlalchemy.engine.base.Engine] {'name': u'input'}
+14:33:33,695    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:33:33,696    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Input',)
+14:33:33,696    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:33:33,697    INFO  [sqlalchemy.engine.base.Engine] {'name': u'sequence'}
+14:33:33,698    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:33:33,698    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Sequence',)
+14:33:33,699    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:33:33,699    INFO  [sqlalchemy.engine.base.Engine] {'name': u'grouppermissions'}
+14:33:33,700    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:33:33,701    DEBUG [sqlalchemy.engine.base.Engine] Row (u'GroupPermissions',)
+14:33:33,701    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:33:33,701    INFO  [sqlalchemy.engine.base.Engine] {'name': u'circle'}
+14:33:33,702    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:33:33,702    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Circle',)
+14:33:33,703    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:33:33,703    INFO  [sqlalchemy.engine.base.Engine] {'name': u'usergroup'}
+14:33:33,704    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:33:33,704    DEBUG [sqlalchemy.engine.base.Engine] Row (u'UserGroup',)
+14:33:33,705    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:33:33,705    INFO  [sqlalchemy.engine.base.Engine] {'name': u'track'}
+14:33:33,706    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:33:33,706    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Track',)
+14:33:33,707    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:33:33,707    INFO  [sqlalchemy.engine.base.Engine] {'name': u'project'}
+14:33:33,708    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:33:33,708    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Project',)
+14:33:33,708    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:33:33,708    INFO  [sqlalchemy.engine.base.Engine] {'name': u'user_circle'}
+14:33:33,709    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:33:33,710    DEBUG [sqlalchemy.engine.base.Engine] Row (u'user_circle',)
+14:33:33,710    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:33:33,710    INFO  [sqlalchemy.engine.base.Engine] {'name': u'tmptrack'}
+14:33:33,711    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:33:33,711    DEBUG [sqlalchemy.engine.base.Engine] Row (u'TMPTrack',)
+14:33:33,712    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:33:33,712    INFO  [sqlalchemy.engine.base.Engine] {'name': u'trackparameters'}
+14:33:33,714    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:33:33,714    DEBUG [sqlalchemy.engine.base.Engine] Row (u'TrackParameters',)
+14:33:33,714    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:33:33,715    INFO  [sqlalchemy.engine.base.Engine] {'name': u'rightcircleassociation'}
+14:33:33,715    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:33:33,716    DEBUG [sqlalchemy.engine.base.Engine] Row (u'RightCircleAssociation',)
+14:33:33,716    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:33:33,716    INFO  [sqlalchemy.engine.base.Engine] {'name': u'job'}
+14:33:33,717    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:33:33,717    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Job',)
+14:33:33,718    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:33:33,718    INFO  [sqlalchemy.engine.base.Engine] {'name': u'selection'}
+14:33:33,719    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:33:33,720    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:33:33,720    INFO  [sqlalchemy.engine.base.Engine] {'name': u'default_tracks'}
+14:33:33,721    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:33:33,721    DEBUG [sqlalchemy.engine.base.Engine] Row (u'default_tracks',)
+14:33:33,721    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:33:33,721    INFO  [sqlalchemy.engine.base.Engine] {'name': u'project_track'}
+14:33:33,722    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:33:33,723    DEBUG [sqlalchemy.engine.base.Engine] Row (u'project_track',)
+14:33:33,724    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Location" (
+	id SERIAL NOT NULL, 
+	chromosome TEXT NOT NULL, 
+	start INTEGER NOT NULL, 
+	"end" INTEGER NOT NULL, 
+	description TEXT, 
+	PRIMARY KEY (id)
+)
+
+
+14:33:33,724    INFO  [sqlalchemy.engine.base.Engine] {}
+14:33:34,215    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+14:33:34,226    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Selection" (
+	id SERIAL NOT NULL, 
+	project_id INTEGER NOT NULL, 
+	description TEXT, 
+	color VARCHAR(255), 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(project_id) REFERENCES "Project" (id) ON DELETE CASCADE
+)
+
+
+14:33:34,226    INFO  [sqlalchemy.engine.base.Engine] {}
+14:33:34,358    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+14:35:29,118    INFO  [sqlalchemy.engine.base.Engine] select version()
+14:35:29,118    INFO  [sqlalchemy.engine.base.Engine] {}
+14:35:29,119    DEBUG [sqlalchemy.engine.base.Engine] Col ('version',)
+14:35:29,120    DEBUG [sqlalchemy.engine.base.Engine] Row (u'PostgreSQL 9.0.4 on x86_64-redhat-linux-gnu, compiled by GCC gcc (GCC) 4.6.0 20110530 (Red Hat 4.6.0-9), 64-bit',)
+14:35:29,121    INFO  [sqlalchemy.engine.base.Engine] select current_schema()
+14:35:29,121    INFO  [sqlalchemy.engine.base.Engine] {}
+14:35:29,121    DEBUG [sqlalchemy.engine.base.Engine] Col ('current_schema',)
+14:35:29,121    DEBUG [sqlalchemy.engine.base.Engine] Row (u'public',)
+14:35:29,126    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:35:29,126    INFO  [sqlalchemy.engine.base.Engine] {'name': u'group'}
+14:35:29,128    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:35:29,128    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Group',)
+14:35:29,129    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:35:29,129    INFO  [sqlalchemy.engine.base.Engine] {'name': u'user'}
+14:35:29,130    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:35:29,130    DEBUG [sqlalchemy.engine.base.Engine] Row (u'User',)
+14:35:29,131    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:35:29,131    INFO  [sqlalchemy.engine.base.Engine] {'name': u'permission'}
+14:35:29,132    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:35:29,132    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Permission',)
+14:35:29,133    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:35:29,133    INFO  [sqlalchemy.engine.base.Engine] {'name': u'species'}
+14:35:29,134    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:35:29,134    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Species',)
+14:35:29,134    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:35:29,134    INFO  [sqlalchemy.engine.base.Engine] {'name': u'input'}
+14:35:29,135    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:35:29,136    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Input',)
+14:35:29,136    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:35:29,136    INFO  [sqlalchemy.engine.base.Engine] {'name': u'celery_taskmeta'}
+14:35:29,137    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:35:29,137    DEBUG [sqlalchemy.engine.base.Engine] Row (u'celery_taskmeta',)
+14:35:29,138    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:35:29,138    INFO  [sqlalchemy.engine.base.Engine] {'name': u'right'}
+14:35:29,139    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:35:29,139    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Right',)
+14:35:29,139    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:35:29,140    INFO  [sqlalchemy.engine.base.Engine] {'name': u'usergroup'}
+14:35:29,140    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:35:29,141    DEBUG [sqlalchemy.engine.base.Engine] Row (u'UserGroup',)
+14:35:29,141    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:35:29,141    INFO  [sqlalchemy.engine.base.Engine] {'name': u'sequence'}
+14:35:29,142    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:35:29,142    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Sequence',)
+14:35:29,143    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:35:29,143    INFO  [sqlalchemy.engine.base.Engine] {'name': u'circle'}
+14:35:29,144    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:35:29,144    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Circle',)
+14:35:29,144    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:35:29,145    INFO  [sqlalchemy.engine.base.Engine] {'name': u'grouppermissions'}
+14:35:29,145    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:35:29,146    DEBUG [sqlalchemy.engine.base.Engine] Row (u'GroupPermissions',)
+14:35:29,146    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:35:29,146    INFO  [sqlalchemy.engine.base.Engine] {'name': u'track'}
+14:35:29,147    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:35:29,147    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Track',)
+14:35:29,148    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:35:29,148    INFO  [sqlalchemy.engine.base.Engine] {'name': u'project'}
+14:35:29,149    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:35:29,149    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Project',)
+14:35:29,150    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:35:29,150    INFO  [sqlalchemy.engine.base.Engine] {'name': u'user_circle'}
+14:35:29,151    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:35:29,151    DEBUG [sqlalchemy.engine.base.Engine] Row (u'user_circle',)
+14:35:29,151    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:35:29,151    INFO  [sqlalchemy.engine.base.Engine] {'name': u'tmptrack'}
+14:35:29,152    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:35:29,152    DEBUG [sqlalchemy.engine.base.Engine] Row (u'TMPTrack',)
+14:35:29,153    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:35:29,153    INFO  [sqlalchemy.engine.base.Engine] {'name': u'selection'}
+14:35:29,154    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:35:29,154    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Selection',)
+14:35:29,155    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:35:29,155    INFO  [sqlalchemy.engine.base.Engine] {'name': u'default_tracks'}
+14:35:29,156    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:35:29,156    DEBUG [sqlalchemy.engine.base.Engine] Row (u'default_tracks',)
+14:35:29,156    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:35:29,156    INFO  [sqlalchemy.engine.base.Engine] {'name': u'project_track'}
+14:35:29,157    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:35:29,158    DEBUG [sqlalchemy.engine.base.Engine] Row (u'project_track',)
+14:35:29,158    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:35:29,158    INFO  [sqlalchemy.engine.base.Engine] {'name': u'job'}
+14:35:29,159    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:35:29,159    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Job',)
+14:35:29,160    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:35:29,160    INFO  [sqlalchemy.engine.base.Engine] {'name': u'trackparameters'}
+14:35:29,161    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:35:29,161    DEBUG [sqlalchemy.engine.base.Engine] Row (u'TrackParameters',)
+14:35:29,162    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:35:29,162    INFO  [sqlalchemy.engine.base.Engine] {'name': u'rightcircleassociation'}
+14:35:29,166    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:35:29,166    DEBUG [sqlalchemy.engine.base.Engine] Row (u'RightCircleAssociation',)
+14:35:29,167    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:35:29,167    INFO  [sqlalchemy.engine.base.Engine] {'name': u'location'}
+14:35:29,168    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:35:29,169    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Location',)
+14:35:29,207    INFO  [sqlalchemy.engine.base.Engine] BEGIN (implicit)
+14:35:29,242    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Group" (name, _created) VALUES (%(name)s, %(_created)s) RETURNING "Group".id
+14:35:29,243    INFO  [sqlalchemy.engine.base.Engine] {'_created': datetime.datetime(2012, 2, 16, 14, 35, 29, 242248), 'name': 'Admins'}
+14:35:29,256    INFO  [sqlalchemy.engine.base.Engine] ROLLBACK
+14:36:28,726    INFO  [sqlalchemy.engine.base.Engine] select version()
+14:36:28,726    INFO  [sqlalchemy.engine.base.Engine] {}
+14:36:28,727    DEBUG [sqlalchemy.engine.base.Engine] Col ('version',)
+14:36:28,728    DEBUG [sqlalchemy.engine.base.Engine] Row (u'PostgreSQL 9.0.4 on x86_64-redhat-linux-gnu, compiled by GCC gcc (GCC) 4.6.0 20110530 (Red Hat 4.6.0-9), 64-bit',)
+14:36:28,728    INFO  [sqlalchemy.engine.base.Engine] select current_schema()
+14:36:28,729    INFO  [sqlalchemy.engine.base.Engine] {}
+14:36:28,729    DEBUG [sqlalchemy.engine.base.Engine] Col ('current_schema',)
+14:36:28,729    DEBUG [sqlalchemy.engine.base.Engine] Row (u'public',)
+14:36:28,733    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:36:28,734    INFO  [sqlalchemy.engine.base.Engine] {'name': u'permission'}
+14:36:28,736    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:36:28,736    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Permission',)
+14:36:28,737    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:36:28,737    INFO  [sqlalchemy.engine.base.Engine] {'name': u'group'}
+14:36:28,738    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:36:28,738    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Group',)
+14:36:28,738    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:36:28,739    INFO  [sqlalchemy.engine.base.Engine] {'name': u'user'}
+14:36:28,739    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:36:28,740    DEBUG [sqlalchemy.engine.base.Engine] Row (u'User',)
+14:36:28,740    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:36:28,740    INFO  [sqlalchemy.engine.base.Engine] {'name': u'celery_taskmeta'}
+14:36:28,741    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:36:28,741    DEBUG [sqlalchemy.engine.base.Engine] Row (u'celery_taskmeta',)
+14:36:28,742    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:36:28,742    INFO  [sqlalchemy.engine.base.Engine] {'name': u'right'}
+14:36:28,743    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:36:28,743    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Right',)
+14:36:28,743    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:36:28,744    INFO  [sqlalchemy.engine.base.Engine] {'name': u'species'}
+14:36:28,745    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:36:28,745    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Species',)
+14:36:28,745    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:36:28,745    INFO  [sqlalchemy.engine.base.Engine] {'name': u'input'}
+14:36:28,746    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:36:28,746    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Input',)
+14:36:28,747    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:36:28,747    INFO  [sqlalchemy.engine.base.Engine] {'name': u'circle'}
+14:36:28,748    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:36:28,748    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Circle',)
+14:36:28,749    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:36:28,749    INFO  [sqlalchemy.engine.base.Engine] {'name': u'sequence'}
+14:36:28,750    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:36:28,750    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Sequence',)
+14:36:28,750    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:36:28,750    INFO  [sqlalchemy.engine.base.Engine] {'name': u'grouppermissions'}
+14:36:28,751    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:36:28,751    DEBUG [sqlalchemy.engine.base.Engine] Row (u'GroupPermissions',)
+14:36:28,752    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:36:28,752    INFO  [sqlalchemy.engine.base.Engine] {'name': u'usergroup'}
+14:36:28,753    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:36:28,753    DEBUG [sqlalchemy.engine.base.Engine] Row (u'UserGroup',)
+14:36:28,754    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:36:28,754    INFO  [sqlalchemy.engine.base.Engine] {'name': u'track'}
+14:36:28,755    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:36:28,755    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Track',)
+14:36:28,755    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:36:28,755    INFO  [sqlalchemy.engine.base.Engine] {'name': u'project'}
+14:36:28,756    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:36:28,757    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Project',)
+14:36:28,757    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:36:28,757    INFO  [sqlalchemy.engine.base.Engine] {'name': u'user_circle'}
+14:36:28,758    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:36:28,758    DEBUG [sqlalchemy.engine.base.Engine] Row (u'user_circle',)
+14:36:28,759    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:36:28,759    INFO  [sqlalchemy.engine.base.Engine] {'name': u'tmptrack'}
+14:36:28,760    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:36:28,760    DEBUG [sqlalchemy.engine.base.Engine] Row (u'TMPTrack',)
+14:36:28,760    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:36:28,760    INFO  [sqlalchemy.engine.base.Engine] {'name': u'trackparameters'}
+14:36:28,761    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:36:28,762    DEBUG [sqlalchemy.engine.base.Engine] Row (u'TrackParameters',)
+14:36:28,762    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:36:28,762    INFO  [sqlalchemy.engine.base.Engine] {'name': u'selection'}
+14:36:28,763    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:36:28,763    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:36:28,764    INFO  [sqlalchemy.engine.base.Engine] {'name': u'job'}
+14:36:28,764    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:36:28,765    DEBUG [sqlalchemy.engine.base.Engine] Row (u'Job',)
+14:36:28,765    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:36:28,765    INFO  [sqlalchemy.engine.base.Engine] {'name': u'rightcircleassociation'}
+14:36:28,766    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:36:28,766    DEBUG [sqlalchemy.engine.base.Engine] Row (u'RightCircleAssociation',)
+14:36:28,767    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:36:28,767    INFO  [sqlalchemy.engine.base.Engine] {'name': u'default_tracks'}
+14:36:28,768    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:36:28,768    DEBUG [sqlalchemy.engine.base.Engine] Row (u'default_tracks',)
+14:36:28,769    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:36:28,769    INFO  [sqlalchemy.engine.base.Engine] {'name': u'project_track'}
+14:36:28,770    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:36:28,770    DEBUG [sqlalchemy.engine.base.Engine] Row (u'project_track',)
+14:36:28,771    INFO  [sqlalchemy.engine.base.Engine] select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and lower(relname)=%(name)s
+14:36:28,771    INFO  [sqlalchemy.engine.base.Engine] {'name': u'location'}
+14:36:28,772    DEBUG [sqlalchemy.engine.base.Engine] Col ('relname',)
+14:36:28,773    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Selection" (
+	id SERIAL NOT NULL, 
+	project_id INTEGER NOT NULL, 
+	description TEXT, 
+	color VARCHAR(255), 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(project_id) REFERENCES "Project" (id) ON DELETE CASCADE
+)
+
+
+14:36:28,773    INFO  [sqlalchemy.engine.base.Engine] {}
+14:36:28,828    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+14:36:28,838    INFO  [sqlalchemy.engine.base.Engine] 
+CREATE TABLE "Location" (
+	id SERIAL NOT NULL, 
+	chromosome TEXT NOT NULL, 
+	start INTEGER NOT NULL, 
+	"end" INTEGER NOT NULL, 
+	description TEXT, 
+	selection_id INTEGER NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(selection_id) REFERENCES "Selection" (id) ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+
+14:36:28,838    INFO  [sqlalchemy.engine.base.Engine] {}
+14:36:28,890    INFO  [sqlalchemy.engine.base.Engine] COMMIT
+14:36:28,976    INFO  [sqlalchemy.engine.base.Engine] BEGIN (implicit)
+14:36:28,978    INFO  [sqlalchemy.engine.base.Engine] INSERT INTO "Group" (name, _created) VALUES (%(name)s, %(_created)s) RETURNING "Group".id
+14:36:28,978    INFO  [sqlalchemy.engine.base.Engine] {'_created': datetime.datetime(2012, 2, 16, 14, 36, 28, 977696), 'name': 'Admins'}
+14:36:28,979    INFO  [sqlalchemy.engine.base.Engine] ROLLBACK

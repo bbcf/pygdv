@@ -9,7 +9,11 @@ def add_new_sequence(user_id, sequence):
     It should import fast from JBrowsoR
     '''
     file_url = Assembly(sequence).get_sqlite_url()
-    files = util.upload(url=file_url)
+    files = []
+    try :
+        files = util.upload(url=file_url)
+    except Exception as e:
+        print e
     if len(files) > 0:
         filename, tmp_file, extension = files[0]
         track.create_track(user_id, sequence, trackname='Genes', f=tmp_file.name, admin=True)

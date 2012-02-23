@@ -174,15 +174,15 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
             var act = new dijit.layout.ContentPane({region: "right",id:'tab_selections_act'});
             //button : make a new track
             var button = new dijit.form.Button({
-                label: "Save selection 'as a track'",
+                label: "Save selection",
                 onClick: function() {
                     var sels = tabcontainer.tab_selections.selections;
                     if(sels){
-			var selname="";
+			var selname = "";
 			dojo.forEach(sels, function(sel, i){
-                            selname+=sel.chr+'('+sel.start+','+sel.end+')_';
+                            selname += sel.chr + '(' + sel.start + ',' + sel.end + ')_';
 			});
-			selname+='.db';
+			selname += '.db';
 			var selections_json = dojo.toJson(sels);
 			_jh.new_selection(sels);
                     } else {
@@ -242,12 +242,12 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
         });
     },
 
-    updateSelectionTab : function(zoneSel,handler,selections){
-        var tabcontainer=this;
-        var tab=this.tab_selections;
-        tab.selections=selections;
+    updateSelectionTab : function(zoneSel, handler, selections){
+        var tabcontainer = this;
+        var tab = this.tab_selections;
+        tab.selections = selections;
         //remove previous
-        var store=dojo.byId('selections_store');
+        var store = dojo.byId('selections_store');
         if(store){
             tab.domNode.removeChild(store);
         }
@@ -335,7 +335,7 @@ dojo.declare("ch.epfl.bbcf.gdv.TabContainer",null,{
         form.domNode.appendChild(closer);
         //form body
         var bd = document.createElement("div");
-        bd.id="gm_form_body";
+        bd.id = "gm_form_body";
         var ctx=this;
         //a list that will contains drop containes
         //as their are not 'standards' form inputs

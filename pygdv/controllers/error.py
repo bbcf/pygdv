@@ -19,6 +19,13 @@ class ErrorController(object):
     """
 
     @expose('pygdv.templates.error')
+    def index(self, *args, **kw):
+        code = kw.get('code', 500)
+        message = kw.get('m', 'Internal Server Error')
+        
+        return {'code': code, 'message':message}
+
+    @expose('pygdv.templates.error')
     def document(self, *args, **kwargs):
         """Render the error document"""
         resp = request.environ.get('pylons.original_response')

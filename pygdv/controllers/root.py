@@ -16,7 +16,8 @@ from pygdv.controllers import PermissionController, UserController, TrackControl
 from pygdv.controllers import SequenceController, ProjectController, CircleController
 from pygdv.controllers import RightController, WorkerController, TaskController
 from pygdv.controllers import InputController, DatabaseController, JobController
-from pygdv.controllers import PublicController, HelpController
+from pygdv.controllers import PublicController, HelpController, GenRepController
+from pygdv.controllers import SelectionController
 
 import pygdv
 
@@ -61,29 +62,22 @@ class RootController(BaseController):
    
     
     
-    # admin controllers
     groups = GroupController(DBSession, menu_items=models)
     permissions = PermissionController(DBSession, menu_items=models)
     users = UserController(DBSession, menu_items=models)
     sequences = SequenceController(DBSession, menu_items=models)
-    #rights = RightController(DBSession, menu_items=models)
     tasks = TaskController(DBSession, menu_items=models)
     inputs = InputController(DBSession, menu_items=models)
-    
-    # users controllers
     tracks = TrackController(DBSession)
     projects = ProjectController(DBSession)
     circles = CircleController(DBSession)
     jobs = JobController(DBSession)
-    
     public = PublicController()
-    # tasks controller
     workers = WorkerController()
-   
     help = HelpController()
-    
-    # database controller
+    genrep = GenRepController()
     database = DatabaseController()
+    selections = SelectionController()
     
     @expose('pygdv.templates.index')
     def index(self,*args,**kw):

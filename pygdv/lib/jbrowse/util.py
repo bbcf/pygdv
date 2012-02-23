@@ -8,12 +8,20 @@ Contains utility methods for buildings JSON informations that the browser need.
 '''
 
 
-def track_info(tracks):
+def track_info(tracks, assembly_id=None):
     '''
     Build ``trackInfo`` variable.
     '''
-    ##TODO add DNA track
-    return [track.parameters.jb_dict for track in tracks]
+    l = []
+    if assembly_id is not None:
+        ass = Assembly(assembly_id)
+        l = [{'url':'tinfo_url',
+                  'args': { 'chunkSize' : 20000},
+                  'label':'DNA',
+                  'type':'SequenceTrack',
+                  'key':'DNA'}]
+    l += [track.parameters.jb_dict for track in tracks]
+    return l
         
         
         

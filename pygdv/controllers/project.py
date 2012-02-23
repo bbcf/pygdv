@@ -7,7 +7,7 @@ from repoze.what.predicates import not_anonymous, has_any_permission, has_permis
 from tg import expose, flash, require, error, request, tmpl_context, validate, url
 from tg import app_globals as gl
 from tg.controllers import redirect
-from tg.decorators import paginate, with_trailing_slash,without_trailing_slash
+from tg.decorators import paginate, with_trailing_slash, without_trailing_slash
 import tg
 
 from pygdv.model import DBSession, Project, User, RightCircleAssociation, Track, Job
@@ -21,6 +21,7 @@ import transaction
 from pygdv.lib import checker
 from pygdv.lib.jbrowse import util as jb
 from pygdv.lib import constants, reply
+from bbcflib.genrep import GenRep
 
 from sqlalchemy.sql import and_, or_, not_
 import re
@@ -281,6 +282,11 @@ class ProjectController(CrudRestController):
 
     @expose('pygdv.templates.view')
     def view(self, project_id, *args, **kw):
+        
+        if not GenRep().is_up():
+            raise redirect(url('/error', {'m': 'Genrep service is down. Please try again later.'}))
+        
+        
         user = handler.user.get_user_in_session(request)
         if not checker.check_permission_project(user.id, project_id, constants.right_read_id):
             flash('You must have %s permission to view the project.' % constants.right_read, 'error')
@@ -309,15 +315,15 @@ class ProjectController(CrudRestController):
                 if ind > 0:
                     tmp_name = t.name[:-ind]
                 t.name = tmp_name + str(cpt)
-                
-                
+            
+            t.accessed
             DBSession.add(t)
             DBSession.flush()
             trackNames.append(t.name)
         
         refSeqs = 'refSeqs = %s' % json.dumps(jb.ref_seqs(project.sequence_id))
         
-        trackInfo = 'trackInfo = %s' % json.dumps(jb.track_info(all_tracks))
+        trackInfo = 'trackInfo = %s' % json.dumps(jb.track_info(all_tracks, assembly_id=project.sequence_id))
         parameters = 'var b = new Browser(%s)' % jb.browser_parameters(
                         constants.data_root(), constants.style_root(), constants.image_root(), ','.join([track.name for track in all_tracks]))
         
@@ -329,6 +335,7 @@ class ProjectController(CrudRestController):
         ''' % jb.features_style(all_tracks)
         
         
+        selections = 'selections = %s' % handler.selection.selections(project_id)
         
         info = {}
         prefix = tg.config.get('prefix')
@@ -366,6 +373,7 @@ class ProjectController(CrudRestController):
                     parameters = parameters,
                     style_control = style_control,
                     control = control,
+                    selections = selections,
                     page='view')
     
     @expose()

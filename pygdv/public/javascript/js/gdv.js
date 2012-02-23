@@ -12,10 +12,11 @@ var _GDV_URL=_GDV_PROXY + _GDV_PREFIX;
 var _GDV_URL_DB = _GDV_URL + '/database';
 var _GDV_URL_SCORES = _GDV_URL_DB + '/scores'
 var _GDV_PROJECT_VIEW = _GDV_URL + '/projects/view';
-
+var _GDV_GR_URL = _GDV_URL + '/genrep';
 var _POST_URL_NAMES = _GDV_URL_DB + "/search";
 var _GDV_WORKER_URL = _GDV_URL + '/workers';
 var _GDV_JOB_URL = _GDV_URL + '/jobs';
+var _GDV_SEL_URL = _GDV_URL + '/selections';
 
 var _GDV_FORM_URL = _GDV_URL + '/forms';
 
@@ -29,7 +30,7 @@ var _tc;//the tab container
 var _jh;//the job handler
 var _menub;//the menubar
 var _lp;//the link panel
-
+var _zs;//zone selection
 var _gdv_info = {};
 
 /**

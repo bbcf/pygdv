@@ -31,20 +31,28 @@ dojo.declare("ch.epfl.bbcf.gdv.JobHandler",null,{
      * @param {selection} - the selections
      */
     new_selection : function(selections){
+	console.log('new selection');
+	console.log(selections);
 	var sorted = {};
         /* build description & sort the marquees like {chr : [marquees]}*/
 	var desc = '';
 	var cur_chr;
-	dojo.forEach(selections, function(entry, index){
-	    cur_chr = entry['chr'];
-	    if (!(cur_chr in sorted)) sorted[cur_chr] = [];
-	    sorted[cur_chr].push({'start' : entry.start, 'end' : entry.end});
-	    desc += '( ' + entry.display() + ' )';
-	});
-	/* build job */
-	//console.log('new sel');
-	this.new_job('selection', desc, '/new_selection', 
-		     'project_id=' + _gdv_info.project_id + '&s='+ dojo.toJson(sorted));
+	var xhrArgs = {
+	    url : _GDV_SEL_URL + '/save',
+	    postData : 'project_id=' + _gdv_info.project_id + '&color=grey&description="desc crip tion"&locations=' + dojo.toJson(selections)
+	};
+	dojo.xhrPost(xhrArgs);
+	
+	// dojo.forEach(selections, function(entry, index){
+	//     cur_chr = entry['chr'];
+	//     if (!(cur_chr in sorted)) sorted[cur_chr] = [];
+	//     sorted[cur_chr].push({'start' : entry.start, 'end' : entry.end});
+	//     desc += '( ' + entry.display() + ' )';
+	// });
+	// /* build job */
+	// //console.log('new sel');
+	// this.new_job('selection', desc, '/new_selection', 
+	// 	     'project_id=' + _gdv_info.project_id + '&s='+ dojo.toJson(sorted));
     },
 
     /**

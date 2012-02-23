@@ -14,6 +14,9 @@ from pygdv.lib import constants, reply
 from pygdv.celery import tasks
 import json
 from sqlalchemy import and_, not_
+from bbcflib.genrep import GenRep
+from pygdv import handler
+
 __all__ = ['LoginController']
 
 
@@ -32,6 +35,10 @@ class PublicController(BaseController):
             flash('wrong link', 'error')
             raise redirect(url('/home'))
         mode = None
+        
+        if not GenRep().is_up():
+            raise redirect(url('/error', {'m': 'Genrep service is down. Please try again later.'}))
+        
         
         if k == project.key : mode = 'read'
         elif k == project.download_key : mode = 'download'
@@ -65,17 +72,19 @@ class PublicController(BaseController):
                     tmp_name = t.name[:-ind]
                 t.name = tmp_name + str(cpt)
                 
-                
+            t.accessed
             DBSession.add(t)
             DBSession.flush()
             trackNames.append(t.name)
         
         refSeqs = 'refSeqs = %s' % json.dumps(jb.ref_seqs(project.sequence_id))
         
-        trackInfo = 'trackInfo = %s' % json.dumps(jb.track_info(all_tracks))
+        trackInfo = 'trackInfo = %s' % json.dumps(jb.track_info(all_tracks, assembly_id=project.sequence_id))
         parameters = 'var b = new Browser(%s)' % jb.browser_parameters(
                         constants.data_root(), constants.style_root(), constants.image_root(), ','.join([track.name for track in all_tracks]))
         
+        selections = 'selections = %s' % handler.selection.selections(id)
+         
         style_control = '''function getFeatureStyle(type, div){
         div.style.backgroundColor='#3333D7';div.className='basic';
         switch(type){
@@ -118,6 +127,7 @@ class PublicController(BaseController):
                     parameters = parameters,
                     style_control = style_control,
                     control = control,
+                    selections = selections,
                     page='view')
         
         

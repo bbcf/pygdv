@@ -26,7 +26,7 @@ __all__ = ['Right', 'Circle', 'Project',
            'Track', 'Task', 'Input',
            'Sequence',
            'Species',
-           'Job', 'TMPTrack']
+           'Job', 'TMPTrack', 'Selection', 'Location']
 
 
 statuses = Enum('UPLOADING', 'FAILURE', name='track_status')
@@ -475,14 +475,15 @@ class TrackParameters(DeclarativeBase):
         if self.color:
             d['color'] = self.color
         return d
+    
     def build_parameters(self):
         self.url = os.path.join(self.track.input.sha1, '{refseq}' ,constants.track_data)
         self.label = self.track.name
         self.key = self.track.name
         '''
         RELATIONAL = 'relational'
-SIGNAL = 'signal'
-FEATURES = 'features'
+        SIGNAL = 'signal'
+        FEATURES = 'features'
         '''
         if self.track.vizu == constants.RELATIONAL or self.track.vizu == constants.FEATURES :
             self.type = constants.FEATURE_TRACK
@@ -544,5 +545,42 @@ class Job(DeclarativeBase):
         return 'Job < id : %s, name %s, desc: %s, data : %s , task_id : %s, output : %s>' % (
                         self.id, self.name, self.description, self.data, self.task_id, self.output)
         
-        
+    
+
+class Location(DeclarativeBase):
+    '''
+    Represent the Location a Selection can have.
+    '''
+    __tablename__='Location'
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    chromosome = Column(Text(255), nullable=False) 
+    start =  Column(Integer, nullable=False)
+    end =  Column(Integer, nullable=False)
+    description = Column(Text(), nullable=True)
+    selection_id = Column(Integer, ForeignKey('Selection.id',  onupdate='CASCADE', ondelete="CASCADE"), 
+                           nullable=False)
+    def __repr__(self):
+        return '<Location %s chr : %s, start: %s, end : %s, description : %s>' % (self.id, self.chromosome, self.start, self.end, self.description)
+    
+class Selection(DeclarativeBase):
+    '''
+    Represent all selections that are submitted to GDV.
+    '''
+    __tablename__='Selection'
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    project_id = Column(Integer, ForeignKey('Project.id', ondelete="CASCADE"), nullable=False)
+    description = Column(Text(), nullable=True)
+    color = Column(Unicode(255), nullable=True)
+    locations = relationship('Location', uselist=True, backref='selection', cascade='delete')
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
         
