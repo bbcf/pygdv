@@ -162,12 +162,10 @@ def _generate_nested_features(cursor, keep_field, start_index, end_index):
     '''
     Generate features that has to be written in JSON
     '''
-    nb_feature = 1
     field_number_list = range(keep_field)
     for row in cursor:
         feature = [row[i] for i in field_number_list]
-        yield feature, nb_feature
-        nb_feature += 1
+        yield feature, 1
         
 
         

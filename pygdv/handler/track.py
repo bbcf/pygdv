@@ -135,7 +135,6 @@ def create_input(f, trackname, sequence_name, session, force=False, extension=No
             fo = format_synonyms.get(extension, extension)
         else : 
             fo = determine_format(file_path)
-
         dispatch = _process_dispatch.get(fo, constants.NOT_SUPPORTED_DATATYPE)
         if  dispatch == constants.NOT_SUPPORTED_DATATYPE:
             return dispatch
