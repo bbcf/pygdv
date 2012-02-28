@@ -639,22 +639,22 @@ div#static_track {
 }
 
 div.track-label {
-    background-color: rgba(200, 200, 200, 0.8);
+    /* background-color: rgba(200, 200, 200, 0.8); */
     font-family: sans-serif;
     font-weight: bold;
     z-index: 110;
-    border: 1px #2b434c dotted;
+    border: 1px solid;
     padding: 5px;
     cursor: pointer;
 }
 
-div.track-label.unselected {
-    background-color: rgba(200, 200, 200, 0.8);
-}
+/* div.track-label.unselected { */
+/*     background-color: rgba(200, 200, 200, 0.8); */
+/* } */
 
-div.track-label.selected {
-    background-color: rgba(181, 213, 255, 0.8);
-}
+/* div.track-label.selected { */
+/*     background-color: rgba(181, 213, 255, 0.8); */
+/* } */
 
 /* ----------------------------- */
 /* Top tool pane                 */

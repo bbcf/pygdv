@@ -92,11 +92,13 @@ Track.prototype.clear = function() {
 
 Track.prototype.setLabel = function(newHTML) {
     if (this.label === undefined) return;
-
     if (this.labelHTML == newHTML) return;
     this.labelHTML = newHTML;
     this.label.innerHTML = newHTML;
     this.labelHeight = this.label.offsetHeight;
+    if (this.color){
+	this.label.style.borderColor= this.color;
+    }
 };
 
 Track.prototype.transfer = function() {};

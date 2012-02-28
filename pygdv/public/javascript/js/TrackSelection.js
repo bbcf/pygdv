@@ -8,9 +8,9 @@ function TrackSelection_get() {
     // New list contains only labels with a true selected proprety
     var list = new Array();
     for (label in labels) {
-    if (labels[label].selected) {
-        list.push(labels[label].innerHTML);
-    }
+	if (labels[label].selected) {
+            list.push(labels[label].innerHTML);
+	}
     }
     return list;
 };
@@ -22,29 +22,24 @@ function TrackSelection_get() {
  */
 
 function trackSelection_getTracks(){
-    console.log("get tracks");
     // Get a list of all track labels
     labels = dojo.query(".track-label");
     // New list contains only labels with a true selected proprety
     var json = {};
     for (i in labels) {
-    var label=labels[i];
-    if (label.selected) {
-            console.log(label.innerHTML);
+	var label=labels[i];
+	if (label.selected) {
             for(k in trackInfo){
-        var track = trackInfo[k];
-        if(track.label==label.innerHTML){
-            var tmp={};
-            console.log(track);
+		var track = trackInfo[k];
+		if(track.label==label.innerHTML){
+		    var tmp={};
+		    console.log(track);
                     tmp[track.label]=track.url.slice(3,track.url.length-14);
-            json[i]=tmp;
-        }
-        }
+		    json[i]=tmp;
+		}
+            }
+	}
     }
-    }
-    console.log("JSON");
-    console.log(json);
-    koopa=json;
     return json;
 };
 
