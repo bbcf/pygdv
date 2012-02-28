@@ -211,6 +211,12 @@ def process_track(user_id, **kw):
         
     
     if files is None:
+        if 'tmp_track_id' in kw:
+            session = model.DBSession()
+            tmp_track = session.query(TMPTrack).filter(TMPTrack.id == kw['tmp_track_id']).first()
+            tmp_track.status="FAILURE"
+            tmp_track.traceback = 'Cannot download data.'
+            session.commit()
         raise Exception('No files to upload')
     
     
@@ -283,6 +289,10 @@ def process_text_file(datatype, assembly_name, path, sha1, name, _format, tmp_fi
     '''
     try :
         convert(path, destination, sha1, datatype, assembly_name, name, tmp_file, _format)
+        try:
+            os.remove(path)
+        except OSError:
+            pass
         dispatch = _sqlite_dispatch.get(datatype)
         dispatch(destination, sha1, name)
     except Exception as e:

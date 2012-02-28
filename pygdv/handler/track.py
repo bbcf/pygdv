@@ -118,7 +118,11 @@ def create_input(f, trackname, sequence_name, session, force=False, extension=No
     '''
     sha1 = util.get_file_sha1(os.path.abspath(f))
     _input = session.query(Input).filter(Input.sha1 == sha1).first()
-    if _input is not None and not force: 
+    if _input is not None and not force:
+        try:
+            os.remove(os.path.abspath(f));
+        except OSError:
+            pass
         print "file already exist"
     
     else :
@@ -135,6 +139,8 @@ def create_input(f, trackname, sequence_name, session, force=False, extension=No
             fo = format_synonyms.get(extension, extension)
         else : 
             fo = determine_format(file_path)
+            
+            
         dispatch = _process_dispatch.get(fo, constants.NOT_SUPPORTED_DATATYPE)
         if  dispatch == constants.NOT_SUPPORTED_DATATYPE:
             return dispatch
@@ -145,6 +151,7 @@ def create_input(f, trackname, sequence_name, session, force=False, extension=No
         if datatype == constants.NOT_SUPPORTED_DATATYPE:
             return datatype
         
+        # format is sql => datatype can be signal or feature or extended
         elif datatype == constants.NOT_DETERMINED_DATATYPE:
             with track.load(file_path) as t:
                 if t.datatype is not None:
