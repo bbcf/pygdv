@@ -112,10 +112,11 @@ class ProjectController(CrudRestController):
     @expose('genshi:tgext.crud.templates.post_delete')
     def post_delete(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        id = args[0]
-        if not checker.check_permission_project(user.id, id, constants.right_upload_id):
+        project_id = args[0]
+        if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
             flash('You must have %s permission to delete the project.' % constants.right_upload, 'error')
             raise redirect('./')
+        handler.project.remove_sharing(project_id)
         return CrudRestController.post_delete(self, *args, **kw)
 
 

@@ -44,7 +44,14 @@ def edit(project, name, user_id, sequence_id=None, tracks=None, isPublic=False, 
     DBSession.flush()
     return project
 
-
+def remove_sharing(project_id):
+    project = DBSession.query(Project).filter(Project.id == project_id).first()
+    rc_assocs = DBSession.query(RightCircleAssociation).filter(
+                        RightCircleAssociation.project_id == project_id).all()
+    for rc in rc_assocs:
+        project._circle_right.remove(rc)
+        DBSession.delete(rc)
+        DBSession.flush()
 
 def change_rights(project_id, circle_id, rights=None):
     '''
