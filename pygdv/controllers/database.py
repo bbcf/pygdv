@@ -75,7 +75,10 @@ class DatabaseController(BaseController):
     def search(self, project_id, term, *args, **kw):
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         sequence = project.sequence
-        t = sequence.default_tracks[0]
+        default = sequence.default_tracks
+        if default is None or len(default) < 1:
+            return {}
+        t = default[0]
         chrs = {}
         with track.load(t.path, 'sql', readonly=True) as t:
             gene_name_alias =  t.find_column_name(['name', 'gene_name', 'gene name', 'gname', 'Name', 'product'])
