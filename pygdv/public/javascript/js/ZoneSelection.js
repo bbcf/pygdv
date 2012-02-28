@@ -36,7 +36,6 @@ function ZoneSelection(gv) {
 
     // Add selections stored by GDV.
     if (selections){
-	console.log(selections);
 	var ctx = this;
 	dojo.addOnLoad(function(){
 	    ctx.addStoredSelections(selections, gv, handler);
