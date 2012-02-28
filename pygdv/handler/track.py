@@ -220,26 +220,7 @@ _datatypes = {      constants.FEATURES : constants.FEATURES,
                     'qualitative_extended' : constants.RELATIONAL,
                     'QUALITATIVE_EXTENDED' : constants.RELATIONAL,
                     }
-#_sql_dispatch = {'quantitative' : lambda *args, **kw : _signal2(*args, **kw),
-#                 constants.SIGNAL : lambda *args, **kw : _signal2(*args, **kw),
-#                 
-#                 'qualitative' :  lambda *args, **kw : _features2(*args, **kw),
-#                 constants.FEATURES :  lambda *args, **kw : _features2(*args, **kw),
-#                 
-#                 'extended' :  lambda *args, **kw : _relational2(*args, **kw),
-#                  constants.RELATIONAL :  lambda *args, **kw : _relational2(*args, **kw)
-#                 }
-#
-#
-#_sql_dispatch2 = {'quantitative' : lambda *args, **kw : _signal2(*args, **kw),
-#                 constants.SIGNAL : lambda *args, **kw : _signal2(*args, **kw),
-#                 
-#                 'qualitative' :  lambda *args, **kw : _features2(*args, **kw),
-#                 constants.FEATURES :  lambda *args, **kw : _features2(*args, **kw),
-#                 
-#                 'extended' :  lambda *args, **kw : _relational2(*args, **kw),
-#                  constants.RELATIONAL :  lambda *args, **kw : _relational2(*args, **kw)
-#                 }
+
 
 def move_database(datatype, assembly_name, path, sha1, name, tmp_file, _format):
     '''
@@ -261,99 +242,4 @@ def convert_file(datatype, assembly_name, path, sha1, name, tmp_file, _format):
     t = tasks.process_text_file.delay(datatype, assembly_name, path, sha1, name, _format, out_name, dst)
     return t
 
-
-
-#
-#def process_database(datatype, path, sha1, name):
-#    '''
-#    Process the input as a SQLite database already build by the ``track`` package.
-#    @param datatype : the ``datatype`` of the file.
-#    @param path : the path of the database
-#    @param sha1 : the sha1 of the file
-#    @param name : the name of the track
-#    @return the task associated
-#    '''
-#    
-#    
-#    return _sql_dispatch.get(datatype, lambda *args, **kw : not_recognized(*args, **kw))(path, sha1, name)
-
-
-
-
-
-#def _signal2(path, sha1, name):
-#    '''
-#    Task for a ``signal`` database.
-#    @return the subtask associated
-#    '''
-#    output_dir = json_directory()
-#    callback_on_error = subtask(task=tasks.del_file_on_error, args=(sha1,))
-#    t1 = tasks._compute_scores.delay(path, sha1, output_dir, callback=subtask(tasks._jsonify_signal, del_tmp=tasks.del_tmp_file), 
-#                                     callback_on_error=callback_on_error)
-#    return t1
-#    
-#    
-#    
-#    
-#    return tasks.process_signal(path, sha1, name)
-#
-#def _features2(path, sha1, name):
-#    '''
-#    Task for a ``feature`` database.
-#    @return the subtask associated
-#    '''
-#    output_dir = json_directory()
-#    callback_on_error = subtask(task=tasks.del_file_on_error, args=(sha1,))
-#    
-#    t1 = tasks._jsonify_features.delay(path, name, sha1, output_dir, '/data/jbrowse', '', False,
-#                            callback_on_error=callback_on_error)
-#    return t1
-#    
-#    
-#    return tasks.process_features(path, sha1, name, False)
-#
-#def _relational2(path, sha1, name):
-#    '''
-#    Task for a ``relational`` database
-#    @return the subtask associated
-#    '''
-#    output_dir = json_directory()
-#    callback_on_error = subtask(task=tasks.del_file_on_error, args=(sha1,))
-#    
-#    t1 = tasks._jsonify_features.delay(path, name, sha1, output_dir, '/data/jbrowse', '', True,
-#                            callback_on_error=callback_on_error)
-#    return t1
-
-
-#def _signal(path, sha1, name):
-#    '''
-#    Process a ``signal`` database.
-#    @return the task associated
-#    '''
-#    return tasks.process_signal(path, sha1, name)
-#
-#def _features(path, sha1, name):
-#    '''
-#    Process a ``feature`` database.
-#    @return the task associated
-#    '''
-#    return tasks.process_features(path, sha1, name, False)
-#
-#def _relational(path, sha1, name):
-#    '''
-#    Process a ``relational`` database
-#    @return the task associated
-#    '''
-#    return tasks.process_features(path, sha1, name, True)
-#    
-#
-#
-#def not_recognized(datatype=None, **kw):
-#    '''
-#    Format not recognized
-#    '''
-#    pass
-#
-#def not_impl():
-#    raise NotImplementedError
 
