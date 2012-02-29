@@ -62,10 +62,12 @@ ImageTrack.prototype.getZoom = function(scale) {
     this.zoomCache[scale] = result;
     return result;
 };
+
 //CHANGES (adding scale)
 ImageTrack.prototype.setScale = function(scale){
     this.scale = scale;
-}
+};
+
 /**
  * init the scale
  *@param{inzoom} the zoom on the track

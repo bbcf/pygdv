@@ -930,3 +930,9 @@ width: 3em;
     text-decoration: underline;
     cursor: pointer;
 }
+
+div.trackmover {
+    background: url("../images/mover.png") no-repeat;
+    cursor : pointer;
+    z-index : 300;
+}

@@ -1173,102 +1173,29 @@ GenomeView.prototype.showVisibleBlocks = function(updateHeight, pos, startX, end
 };
 
 /**
- * Undocumented
+ * Add a track to the view.
  */
 GenomeView.prototype.addTrack = function(track) {
-    var trackNum = this.tracks.length;
-    var labelDiv = document.createElement("div");
-    labelDiv.id = "label_" + track.name;
-    this.trackLabels.push(labelDiv);
-    var trackDiv = document.createElement("div");
-    trackDiv.className = "track";
-    trackDiv.id = "track_" + track.name;
-    trackDiv.track = track;
-    var view = this;
-    var heightUpdate = function(height) {view.trackHeightUpdate(track.name, height);};
-    track.setViewInfo(heightUpdate, this.stripeCount, trackDiv, labelDiv,  this.stripePercent, this.stripeWidth, this.pxPerBp);
-    labelDiv.style.position = "absolute";
-    labelDiv.style.top = "0px";
-    var tmp = this.getX() + 100;
-    labelDiv.style.left = tmp + "px";
-    trackDiv.appendChild(labelDiv);
+    var twidgt = new TrackWidget();
     
-    //creating the scale and the zoom buttons
-    //depending of the track type
-    if(track instanceof ImageTrack){
-        // #scale
-	var container = document.createElement('DIV');
-        container.style.position = "absolute";
-        container.style.top = "0px";
-        var newPos = this.getX() ;
-        container.style.left = newPos + "px";
-        container.style.width = "200px";
-        container.style.height = "100px";
-	
-	var scale = document.createElement("canvas");
-        scale.className = "track_scale";
-        scale.style.position = "absolute";
-        scale.style.top = "0px";
-        // var newPos = this.getX() ;
-        // scale.style.left = newPos+"px";
-	scale.style.width = "15px";
-        scale.style.height = "100px";
-        scale.id = "scale_"+track.name;
-        container.appendChild(scale);
-	track.setScale(scale);
-        
-       
-	// #inputs
-
-	var input_max = document.createElement('input');
-	input_max.className = 'score_input';
-	input_max.type = 'text';
-	input_max.name = 'max_score';
-	input_max.id = track.name + '_max_input';
-	container.max = input_max;
-	container.appendChild(input_max);
-	var input_min = document.createElement('input');
-	input_min.className = 'score_input';
-	input_min.type = 'text';
-	input_min.name = 'min_score'
-	input_min.style.bottom = '0px';
-	container.min = input_min;
-	container.appendChild(input_min);
-		
+    var trackDiv = twidgt.label(track, this);
     
-	
-	trackDiv.appendChild(container);
-        track.scale_container = container;
-	this.trackScales.push(container);
+    var cont = twidgt.principal(track, this, trackDiv);
+    twidgt.scale(track, this, cont);
+    twidgt.mover(track, this, cont, trackDiv);
+    
+    
+    track.twidget = twidgt;
+    
 
-    }
 
-    // A label starts unselected
-    labelDiv.className = "track-label dojoDndHandle unselected";
 
-    // When you click the label of a track
-    // you select it or unselect it
-    dojo.connect(labelDiv, "click", function(event){
-        // Change the background color
-        if (labelDiv.selected) {labelDiv.className = "track-label dojoDndHandle unselected"}
-        else                   {labelDiv.className = "track-label dojoDndHandle selected"}
-        // Flip the selected boolean
-        labelDiv.selected = (labelDiv.selected == false);
 
-        //update gfm form if one
-        var textarea = dijit.byId("gfm_tracks");
-        if(textarea){
-            textarea.setValue(TrackSelection_get().join("; "));
-        }
-        dojo.stopEvent(event);
-    });
-    //TrackSelection_flip);
 
-    // At first it is unselected
-    labelDiv.selected = false;
 
-    //add the right click menu context
-    var gdv_id=track.gdv_id;
+    
+    // //add the right click menu context
+    // var gdv_id=track.gdv_id;
     // if(gdv_id){
     //     dojo.addOnLoad(function() {
     //         var pMenu = new dijit.Menu({

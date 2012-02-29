@@ -45,10 +45,10 @@ class ProjectController(CrudRestController):
     def get(self, project_key, **kw):
         project = DBSession.query(Project).filter(Project.key == project_key).first()
         if project is None:
-            return reply.error(request, 'You cannot add track on this project', './', {})
+            return reply.error(request, 'Wrong key', './', {})
         user = handler.user.get_user_in_session(request)
         if not checker.check_permission_project(user.id, project.id, constants.right_upload_id):
-            return reply.error(request, 'You cannot add track on this project', './', {})
+            return reply.error(request, 'Wrong key', './', {})
         else :
             return reply.normal(request, 'You can upload track on this project', './', {'project' : project})
         

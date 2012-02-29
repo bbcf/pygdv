@@ -377,7 +377,6 @@ ImageDrawer.prototype.putScore = function(images, data){
  * draw the scale next to each quantitative tracks
  */
 function drawScale(canvas, track){
-        
     
     
     if (canvas.getContext) {

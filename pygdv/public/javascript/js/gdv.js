@@ -43,6 +43,7 @@ function initGDV(browser, project_id, gdv_info, readonly){
     dojo.require("dijit.form.CheckBox");
     dojo.require("dijit.form.Textarea");
     dojo.require("dijit.form.Form");
+    dojo.require("dojo.dnd.Moveable");
     
     /* init global parameters */
     _gdv_info = gdv_info;
