@@ -250,7 +250,7 @@ def _generate_lazy_output(feature_generator):
             yield first, stop, chunk_number, buffer_list, nb_feature
             buffer_list = []
             first = None
-    if first :
+    if first is not None:
         chunk_number += 1
         yield first, stop, chunk_number, buffer_list, chunk_size
         
