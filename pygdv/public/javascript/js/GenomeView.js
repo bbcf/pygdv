@@ -1177,41 +1177,8 @@ GenomeView.prototype.showVisibleBlocks = function(updateHeight, pos, startX, end
  */
 GenomeView.prototype.addTrack = function(track) {
     var twidgt = new TrackWidget();
-    
-    var trackDiv = twidgt.label(track, this);
-    
-    var cont = twidgt.principal(track, this, trackDiv);
-    twidgt.scale(track, this, cont);
-    twidgt.mover(track, this, cont, trackDiv);
-    
-    
-    track.twidget = twidgt;
-    
-
-
-
-
-
-
-    
-    // //add the right click menu context
-    // var gdv_id=track.gdv_id;
-    // if(gdv_id){
-    //     dojo.addOnLoad(function() {
-    //         var pMenu = new dijit.Menu({
-    //         targetNodeIds: [labelDiv.id]
-    //         });
-    //         pMenu.addChild(new dijit.MenuItem({
-    //         label: "Configure track",
-    //         onClick: function() {
-    //                 window.open(_GDV_URL+"/configure_track?id="+gdv_id);
-    //         }
-    //         }));
-    //         pMenu.startup();
-    //     });
-    // }
-
-        return trackDiv;
+    var trackDiv = twidgt.enable(track, this);
+    return trackDiv;
 };
 
 

@@ -2,6 +2,33 @@ function TrackWidget(){
     this.container = null;
 };
 
+
+
+/**
+* Construct the track Widget
+* @param{track} - the track
+* @param{view} - the view
+*/
+TrackWidget.prototype.enable = function(track, view){
+    // construct the label
+    var trackDiv = this.label(track, view);
+    
+    // construct the principal ontainer for the rest of the widget
+    var cont = this.principal(track, view, trackDiv);
+    
+    // construct the scale if the track is a signal
+    this.scale(track, view, cont);
+
+    // construct a mover for the track
+    this.mover(track, view, cont, trackDiv);
+    
+    
+    track.twidget = this;
+    return trackDiv;
+};
+
+
+
 /**
 * Construct the HTML track label and update the view
 * @param{track} - the track
@@ -58,7 +85,7 @@ var boundaries = function(){
     b['l'] = 0;
     b['t'] = 0;
     b['w'] = 0;
-    b['h'] = 300;
+    b['h'] = 1000;
     return b;
 };
 
