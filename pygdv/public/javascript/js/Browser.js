@@ -24,6 +24,7 @@ var Browser = function(params) {
     dojo.require("dojo.dnd.move");
     dojo.require("dijit.layout.ContentPane");
     dojo.require("dijit.layout.BorderContainer");
+    dojo.require("dijit.layout.AccordionContainer");
     dojo.require("dijit.form.Slider");
 
     // Copy params variables
@@ -79,14 +80,14 @@ var Browser = function(params) {
 
         // menu at the left
         var menuleft = document.createElement('div');
-        menuleft.id='gdv_menu';
+        menuleft.id ='gdv_menu';
         brwsr.container.appendChild(menuleft);
 
         // container at bottom
-        var bottomPane = document.createElement('div');
-        bottomPane.id='bottomPane';
-        bottomPane.className='bottomPane';
-        brwsr.container.appendChild(bottomPane);
+        // var bottomPane = document.createElement('div');
+        // bottomPane.id='bottomPane';
+        // bottomPane.className='bottomPane';
+        // brwsr.container.appendChild(bottomPane);
 
         // Set up page layout
         var containerWidget = new dijit.layout.BorderContainer({
@@ -97,7 +98,7 @@ var Browser = function(params) {
         var contentWidget = new dijit.layout.ContentPane({region: "top"}, topPane);
         var browserWidget = new dijit.layout.ContentPane({region: "center"}, viewElem);
         var menuWidget = new dijit.layout.ContentPane({region: "left",splitter:false,style : {overflow:'hidden'}},menuleft);
-        var bottomWidget = new dijit.layout.ContentPane({region: "bottom",splitter:true}, bottomPane);
+        //var bottomWidget = new dijit.layout.ContentPane({region: "bottom",splitter:true}, bottomPane);
 
         // This creates the permalink to the current chr and loc
         if (params.bookmark) {
@@ -171,11 +172,15 @@ var Browser = function(params) {
         dojo.connect(gv, "onCoarseMove", brwsr, "onCoarseMove");
         // Set up the menu at the left
         brwsr.buildLeftMenu(menuleft);
-        // Set up tab container at the bottom
-        brwsr.createTabContainer(bottomPane);
+
+        // Set up principal container
+	_gdv_pc = new PrincipalContainer();
+        _gdv_pc.createContainer(brwsr, menuleft);
+	
         // Set up track list
         brwsr.createTrackList(brwsr.container,brwsr.tab_tracks.domNode, params);
-        containerWidget.startup();
+        
+	containerWidget.startup();
         brwsr.isInitialized = true;
 
         // Set initial location
@@ -261,60 +266,6 @@ Browser.prototype.buildMenuItem = function(link_end, link_name){
 };
 
 
-/**
- * Create an HTML tab panel that will contains
- * the tracks list, the selections, & more
- * MUST be called before createTrackList(container,params)
- */
-Browser.prototype.createTabContainer = function(container){
-    //_tc.init(this,container);
-    // the div containing the tab container
-    var tabcontainer = document.createElement('div');
-    tabcontainer.id='tabcontainer';
-    container.appendChild(tabcontainer);
-
-
-    // // the div containing tabcontainer div
-    // var bottomPane = document.createElement("div");
-    // bottomPane.id = "bottomPane"
-    // bottomPane.appendChild(tabcontainer);
-
-    // container.appendChild(bottomPane);
-    // var leftWidget = new dijit.layout.ContentPane({region: "bottom", splitter:true}, bottomPane);
-
-
-    // the tab container
-    var tc = new dijit.layout.TabContainer({
-            style: "height: 100%; width: 100%;"
-        },
-        tabcontainer);
-    // tracks tab
-    var cp1 = new dijit.layout.ContentPane({
-            title: "Tracks",
-        id:'tab_tracks'
-    });
-    tc.addChild(cp1);
-    //selection tab
-    // var cp2 = new dijit.layout.ContentPane({
-    //         title: "Selections",
-    //         id:'tab_selections'
-    //     });
-    // tc.addChild(cp2);
-    // //jobs tab
-    // var cp3 = new dijit.layout.ContentPane({
-    //         title: "Jobs",
-    //         id:'tab_jobs'
-    //     });
-    // tc.addChild(cp3);
-    tc.startup();
-    this.tabContainer = tc;
-    this.tab_tracks=cp1;
-    //this.tab_selections=cp2;
-    //this.tab_jobs=cp3;
-    //var seldiv = document.createElement('div');
-    //seldiv.id='selections_store';
-    //cp2.domNode.appendChild(seldiv);
-};
 
 /**
  * Create the HTML panel that will contains
@@ -324,38 +275,12 @@ Browser.prototype.createTabContainer = function(container){
  * bottom with a div which can show or hide the panel
  */
 Browser.prototype.createTrackList = function(container,tab, params) {
-    // Create a bar on the left
-    //var leftPane = document.createElement("div");
-    //leftPane.id = "leftPane"
-    //leftPane.style.cssText="width: 10em"
-    //container.appendChild(leftPane);
-    //var leftWidget = new dijit.layout.ContentPane({region: "bottom", splitter:false}, leftPane);
-
-    // The div that contains the hidden tracks
-    // and only child of leftPane
     var trackListDiv = document.createElement("div");
     trackListDiv.id = "tracksAvail";
     trackListDiv.className = "container handles";
     trackListDiv.style.cssText = "width: 80%; height: 80%; overflow-x: hidden; overflow-y: auto;";
     tab.appendChild(trackListDiv);
-    // //add mecanism to show/hide panel
-    // var sh = document.createElement("div");
-    // sh.className = "lpunfolded";
-    // sh.folded=false;
-    // dojo.connect(sh, "onclick", function(event) {
-    //         if(sh.folded==true){
-    //         sh.folded=false;
-    //         sh.className="lpunfolded";
-    //         leftPane.style.display="inline";
-    //         } else {
-    //         sh.folded=true;
-    //         sh.className="lpfolded";
-    //         leftPane.style.display="none";
-    //         //sh.style.diplay=block;
-    //         }
-    //         dojo.stopEvent(event);
-    //     });
-    // container.appendChild(sh);
+
     //add an explanation on the panel
     var exp = document.createElement("div");
     exp.id="dnd_exp";
@@ -419,11 +344,11 @@ Browser.prototype.createTrackList = function(container,tab, params) {
     // Drag and drop stuff
     this.viewDndWidget = new dojo.dnd.Source(this.view.zoomContainer,
                          {copyState:function(keyPressed,self){
-                             if(_tc.tab_form){
-                             if(_tc.tab_form.selected){
-                                 return true;
-                             }
-                             }
+                             // if(_tc.tab_form){
+			     // 	 if(_tc.tab_form.selected){
+                             //         return true;
+			     // 	 }
+                             // }
                              return false;
                          },creator: trackCreate, accept: ["track"], withHandles: true});
     dojo.subscribe("/dnd/drop", function(source,nodes,iscopy) {

@@ -70,6 +70,16 @@ ZoneSelection.prototype.addStoredSelections = function(selection, gv, handler){
 };
 
 /**
+* Delete a selection
+*/
+ZoneSelection.prototype.delete = function(selection) {
+    var handler = this.handler;
+    handler.delete(selection);
+    handler.position();
+    this.updatedSelection();
+};
+
+/**
  * Returns a list of user made selections
  * Will print something like "chr1:32712159 .. 218256629;chr2:101637029 .. 118236351"
  */
@@ -96,8 +106,8 @@ ZoneSelection.prototype.enableSel = function(event) {
     dojo.byId("disableSel").style.backgroundImage = "url('" + window.picsPathRoot + "bkgnd_light.png')";
     this.gv.disconnectMouse();
     this.handler.position();
-    if (_tc) {
-	_tc.selections();
+    if (_gdv_pc) {
+	_gdv_pc.show_selections();
     }
 };
 
@@ -445,7 +455,5 @@ function SelConnector(){
  * @param{selections} - the marquees
  */
 SelConnector.prototype.afterUpdate = function(zoneSel, handler, selections){
-    //update selection tab
-    _tc.updateSelectionTab(zoneSel, handler, selections);
-    
+      zoneSel.sel_pane.update(selections);
 };
