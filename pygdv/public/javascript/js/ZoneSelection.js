@@ -212,6 +212,11 @@ Marquee.prototype.fixate = function(gv) {
     this.chr = gv.ref.name
 };
 
+Marquee.prototype.navigateTo = function() {
+    var c = (this.end - this.start) / 2
+    return this.chr + ':' + (this.start - c) + '..' + (this.end + c);
+}
+
 /**
  * Used for sorting marquees
  */

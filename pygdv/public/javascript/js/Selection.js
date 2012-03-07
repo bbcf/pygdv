@@ -62,8 +62,7 @@ SelectionPane.prototype.draw = function(store, selections){
 SelectionPane.prototype.connect_location = function(domNode, location){
     if(location){
 	dojo.connect(domNode, "dblclick", function(e){
-            //dojo.byId("genomeBrowser").genomeBrowser.navigateTo();
-	    console.log(location);
+            _gdv_info.gb.navigateTo(location.navigateTo());
 	    dojo.stopEvent(e);
         });
     }
