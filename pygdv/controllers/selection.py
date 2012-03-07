@@ -33,7 +33,7 @@ class SelectionController(object):
             return {'save' : 'failed'}
             
         print "save %s, color %s, desc %s loc %s" % (project_id, color, description, locations)
-        ''' For the momenet, there is only one selection per project'''
+        ''' For the moment, there is only one selection per project'''
         sel = DBSession.query(Selection).filter(Selection.project_id == project_id).first()
         if sel is None:
             sel = Selection()
@@ -46,7 +46,6 @@ class SelectionController(object):
         
         locations_ids = []
         # add locations
-        
         for loc in json.loads(locations):
             obj = None
             if loc.has_key('id'):
@@ -67,6 +66,7 @@ class SelectionController(object):
         # remove not saved ones
         loc_toremove = DBSession.query(Location).filter(not_(Location.id.in_(locations_ids))).all()
         for l in loc_toremove:
+            print l
             DBSession.delete(l)
         DBSession.flush()
         return {'saved' : 'ok'}

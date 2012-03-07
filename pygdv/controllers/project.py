@@ -348,7 +348,7 @@ class ProjectController(CrudRestController):
         ''' % jb.features_style(all_tracks)
         
         
-        selections = 'selections = %s' % handler.selection.selections(project_id)
+        selections = 'init_locations = %s' % handler.selection.selections(project_id)
         
         info = {}
         prefix = tg.config.get('prefix')

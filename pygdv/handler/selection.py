@@ -11,7 +11,8 @@ def selections(project_id):
             loc_list.append({'chr' : loc.chromosome,
                       'start' : loc.start,
                       'end' : loc.end,
-                      'id' : loc.id})
+                      'id' : loc.id,
+                      'desc' : loc.description})
         sel_obj['locations'] = loc_list
         sel_list.append(sel_obj)
     return json.dumps(sel_list)

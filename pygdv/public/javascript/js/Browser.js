@@ -97,7 +97,7 @@ var Browser = function(params) {
         }, brwsr.container);
         var contentWidget = new dijit.layout.ContentPane({region: "top"}, topPane);
         var browserWidget = new dijit.layout.ContentPane({region: "center"}, viewElem);
-        var menuWidget = new dijit.layout.ContentPane({region: "left",splitter:false,style : {overflow:'hidden'}},menuleft);
+        var menuWidget = new dijit.layout.ContentPane({region: "left",splitter:false, splitter:true, style : {overflow:'hidden'}}, menuleft);
         //var bottomWidget = new dijit.layout.ContentPane({region: "bottom",splitter:true}, bottomPane);
 
         // This creates the permalink to the current chr and loc

@@ -83,8 +83,8 @@ class PublicController(BaseController):
         parameters = 'var b = new Browser(%s)' % jb.browser_parameters(
                         constants.data_root(), constants.style_root(), constants.image_root(), ','.join([track.name for track in all_tracks]))
         
-        selections = 'selections = %s' % handler.selection.selections(id)
-         
+        selections = 'init_locations = %s' % handler.selection.selections(id)
+
         style_control = '''function getFeatureStyle(type, div){
         div.style.backgroundColor='#3333D7';div.className='basic';
         switch(type){

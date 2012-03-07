@@ -35,10 +35,11 @@ function ZoneSelection(gv) {
     this.connector = new SelConnector();
 
     // Add selections stored by GDV.
-    if (selections){
+    // take the global variable "init_locations"
+    if (init_locations){
 	var ctx = this;
 	dojo.addOnLoad(function(){
-	    ctx.addStoredSelections(selections, gv, handler);
+	    ctx.addStoredSelections(init_locations, gv, handler);
 	});
 		      
     }
@@ -53,7 +54,7 @@ function ZoneSelection(gv) {
 /**
 * Add the selections stored by GDV.
 */
-ZoneSelection.prototype.addStoredSelections = function(selection, gv, handler){
+ZoneSelection.prototype.addStoredSelections = function(selections, gv, handler){
     var l = selections.length;
     var lb = gv.minVisible();
     var fc = gv.pxPerBp;
@@ -81,7 +82,7 @@ ZoneSelection.prototype.delete = function(selection) {
 
 /**
  * Returns a list of user made selections
- * Will print something like "chr1:32712159 .. 218256629;chr2:101637029 .. 118236351"
+ * Will print somethinig like "chr1:32712159 .. 218256629;chr2:101637029 .. 118236351"
  */
 ZoneSelection.prototype.get = function() {
     var cur = this.handler.current;
@@ -137,7 +138,28 @@ ZoneSelection.prototype.updatedSelection = function(){
     var marquees = handler.marquees
     //marquees.sort(MarqueeSort);
     this.connector.afterUpdate(this, handler, marquees);
+    
 };
+
+
+/**
+* Update the selection on the server
+*/
+ZoneSelection.prototype.update_on_server = function(){
+    var xhrArgs = {
+	url : _GDV_SEL_URL + '/save',
+	postData : 'project_id=' + _gdv_info.project_id + '&color=grey&description="desc crip tion"&locations=' + dojo.toJson(this.handler.marquees),
+	error : function(data){
+	    console.error(data);
+	}
+    };
+    dojo.xhrPost(xhrArgs);
+};
+
+
+
+
+
 
 /**
  * Represents a selection
@@ -300,14 +322,14 @@ MarqueeHandler.prototype.start = function(event) {
 MarqueeHandler.prototype.add_marquee = function(selection, leftbase, factor) {
     var start = selection['start'];
     var end = selection['end'];
-    var mid = selection['id'];
     
     var x1 = (start - leftbase) * factor;
     var x2 = (end - leftbase ) * factor;
     var m = new Marquee(x1, x2, selection['chr']);
     m.start = start;
     m.end = end;
-    m.id = mid;
+    m.id = selection['id'];
+    m.desc = selection['desc'];
     this.mergeMarquee(m);
     this.marquees.push(m);
 };
@@ -411,10 +433,13 @@ MarqueeHandler.prototype.mergeMarquee = function(current) {
     }
     // Find largest overlaping interval
     x1 = current.x1; x2 = current.x2
+    var desc = [];
     dojo.forEach(overlapping, function(m) {
-        if (m.x1 < x1) {x1 = m.x1;}
+        if(m.desc){desc.push(m.desc);}
+	if (m.x1 < x1) {x1 = m.x1;}
         if (m.x2 > x2) {x2 = m.x2;}
     });
+    if(desc){current.desc = desc.join(' | ');}
     current.x1 = x1; current.x2 = x2
 };
 

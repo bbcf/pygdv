@@ -17,6 +17,7 @@ SelectionPane.prototype.update = function(selections){
     var store = this.store;
     dojo.empty(store);
     this.draw(store, selections);
+    this.handler.update_on_server();
 };
 
 
@@ -26,7 +27,6 @@ SelectionPane.prototype.update = function(selections){
 * Draw the selections on the given store.
 */
 SelectionPane.prototype.draw = function(store, selections){
-
     var dtable = dojo.create("table", null, store);
     var locs_len = selections.length;
     dojo.create("tr", null, dtable);
@@ -82,6 +82,7 @@ SelectionPane.prototype.connect_description = function(description, location){
 		location.desc = input.value;
 		dojo.create("td", {innerHTML: location.desc, class:"description_field"}, input, "replace");
                 ctx.connect_description(description, location);
+		ctx.handler.update_on_server();
                 dojo.stopEvent(ee);
             });
             dojo.stopEvent(e);
@@ -91,11 +92,15 @@ SelectionPane.prototype.connect_description = function(description, location){
 };
 
 SelectionPane.prototype.connect_delete = function(domNode, location, handler){
+    var ctx = this;
     dojo.connect(domNode, "click", function(e){
         handler.delete(location);
-        dojo.stopEvent(e);
+	dojo.stopEvent(e);
     });
+    
 };
+
+
 
 
 
