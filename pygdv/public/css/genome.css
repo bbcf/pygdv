@@ -837,6 +837,24 @@ input#disableSel {
     background-color: #C14C4C;
 }
 
+#selections_table{}
+#selections_table .selection_subtable {}
+#selections_table td.position {}
+#selections_table td.description {}
+#selections_table td.delete {
+    background: url("../images/delete.png") no-repeat;
+}
+#selections_table td.delete .delete_img_field {
+    height: 16px; width: 16px;
+    text-decoration: none;
+    color: blue;
+}
+#selections_table td.delete .delete_img_field:hover {
+    /*background: url("../images/delete_red.png") no-repeat;*/
+    height: 14px; width: 14px;
+    border: 1px solid black;
+}
+
 
 /* SUBMIT JOBS FORM */
 #gm_form_title{font-size:140%;font-weight:bold;padding:1em;};

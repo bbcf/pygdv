@@ -48,7 +48,6 @@ setup(
         "repoze.who==1.0.19",
         "tgext.admin >= 0.3.9",
         "tw.forms",
-        "psycopg2",
         "tg.devtools",
         "tw.dojo",
         "tw.dynforms"
@@ -66,7 +65,7 @@ setup(
                             'public/images/*',
                             'public/img/*',
                             'public/javascript/js/*',
-                            
+
                             ]},
     message_extractors={'pygdv': [
             ('**.py', 'python', None),
