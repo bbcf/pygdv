@@ -37,11 +37,10 @@ function ZoneSelection(gv) {
     // Add selections stored by GDV.
     // take the global variable "init_locations"
     if (init_locations){
-	var ctx = this;
-	dojo.addOnLoad(function(){
-	    ctx.addStoredSelections(init_locations, gv, handler);
-	});
-
+        var ctx = this;
+        dojo.addOnLoad(function(){
+            ctx.addStoredSelections(init_locations, gv, handler);
+        });
     }
 
     // //create an DOM node that will sore all selections
@@ -59,12 +58,12 @@ ZoneSelection.prototype.addStoredSelections = function(selections, gv, handler){
     var lb = gv.minVisible();
     var fc = gv.pxPerBp;
     for (var i = 0; i<l ; i++){
-	var selection = selections[i];
-	var marquees = selection['locations'];
-	var lm = marquees.length;
-	for(var j =0;j<lm;j++){
-	    handler.add_marquee(marquees[j], lb, fc);
-	}
+        var selection = selections[i];
+        var marquees = selection['locations'];
+        var lm = marquees.length;
+        for(var j =0;j<lm;j++){
+            handler.add_marquee(marquees[j], lb, fc);
+        }
     };
     handler.position();
     this.connector.afterUpdate(this, handler, handler.marquees);
@@ -88,11 +87,11 @@ ZoneSelection.prototype.get = function() {
     var cur = this.handler.current;
     this.handler.marquees.sort(MarqueeSort);
     if(cur){
-	return this.handler.marquees.map(function(m) {
+        return this.handler.marquees.map(function(m) {
             return m.chr + ':' + m.start + ' .. ' + m.end}).join(';') +
-	    ";" + cur.chr + ":" + cur.start + " .. " + cur.end;
+                    ";" + cur.chr + ":" + cur.start + " .. " + cur.end;
     } else {
-	return this.handler.marquees.map(function(m) {
+        return this.handler.marquees.map(function(m) {
             return m.chr + ':' + m.start + ' .. ' + m.end}).join(';');
     }
 };
@@ -108,7 +107,7 @@ ZoneSelection.prototype.enableSel = function(event) {
     this.gv.disconnectMouse();
     this.handler.position();
     if (_gdv_pc) {
-	_gdv_pc.show_selections();
+        _gdv_pc.show_selections();
     }
 };
 
@@ -135,10 +134,9 @@ ZoneSelection.prototype.update = function(gv) {
  */
 ZoneSelection.prototype.updatedSelection = function(){
     var handler = this.handler;
-    var marquees = handler.marquees
+    var marquees = handler.marquees;
     //marquees.sort(MarqueeSort);
     this.connector.afterUpdate(this, handler, marquees);
-
 };
 
 
@@ -147,11 +145,11 @@ ZoneSelection.prototype.updatedSelection = function(){
 */
 ZoneSelection.prototype.update_on_server = function(){
     var xhrArgs = {
-	url : _GDV_SEL_URL + '/save',
-	postData : 'project_id=' + _gdv_info.project_id + '&color=grey&description="desc crip tion"&locations=' + dojo.toJson(this.handler.marquees),
-	error : function(data){
-	    console.error(data);
-	}
+    url : _GDV_SEL_URL + '/save',
+    postData : 'project_id=' + _gdv_info.project_id + '&color=grey&description="desc crip tion"&locations=' + dojo.toJson(this.handler.marquees),
+    error : function(data){
+        console.error(data);
+    }
     };
     dojo.xhrPost(xhrArgs);
 };
@@ -180,9 +178,9 @@ function Marquee(x1, x2, chr) {
  */
 Marquee.prototype.order = function() {
     if (this.x1 > this.x2) {
-    tmp = this.x1;
-    this.x1 = this.x2;
-    this.x2 = tmp;
+        tmp = this.x1;
+        this.x1 = this.x2;
+        this.x2 = tmp;
     }
 };
 
@@ -191,17 +189,16 @@ Marquee.prototype.order = function() {
  */
 Marquee.prototype.display = function() {
     return this.chr + '(' + this.start + ', ' + this.end + ')';
-
 };
 /**
  * Changes alpha and finds base pairs
  */
 Marquee.prototype.fixate = function(gv) {
     // Change transparency
-    this.alpha = 0.35
+    this.alpha = 0.35;
     // A selection must be at least one pixel thick
     if (this.x1 == this.x2) {
-	this.x2 += 1;
+        this.x2 += 1;
     }
     // What are the coordinates of the selection
     factor = gv.pxPerBp;
@@ -209,11 +206,11 @@ Marquee.prototype.fixate = function(gv) {
     this.start = Math.round(leftbase + (this.x1 / factor));
     this.end   = Math.round(leftbase + (this.x2 / factor));
     // Save the chromosome
-    this.chr = gv.ref.name
+    this.chr = gv.ref.name;
 };
 
 Marquee.prototype.navigateTo = function() {
-    var c = (this.end - this.start) / 2
+    var c = (this.end - this.start) / 2;
     return this.chr + ':' + (this.start - c) + '..' + (this.end + c);
 }
 
@@ -226,7 +223,7 @@ Marquee.prototype.update = function(factor, leftbase) {
     this.x2 = Math.round((this.end   - leftbase) * factor)
     // A selection must be at least one base pair thick
     if (this.x1 == this.x2) {
-    this.x2 = this.x1 + 1;
+        this.x2 = this.x1 + 1;
     }
 };
 
@@ -254,11 +251,11 @@ function MarqueeHandler(canvas, gv, zoneSelection) {
 MarqueeHandler.prototype.delete = function(marquee){
     var marquees = this.marquees;
     for(i in marquees){
-	var m = marquees[i];
-	if(m.chr == marquee.chr && m.start == marquee.start){
+        var m = marquees[i];
+        if(m.chr == marquee.chr && m.start == marquee.start){
             marquees.splice(i,1);
             return;
-	}
+        }
     }
 };
 
@@ -268,21 +265,21 @@ MarqueeHandler.prototype.delete = function(marquee){
  */
 MarqueeHandler.prototype.position = function() {
     // Find the coordinates of the viewElem
-    gv = this.gv
-    mywidth  = gv.elem.clientWidth
-    myheight = gv.elem.clientHeight
-    myleft   = gv.elem.offsetLeft
-    mytop    = gv.elem.offsetTop
+    gv = this.gv;
+    mywidth  = gv.elem.clientWidth;
+    myheight = gv.elem.clientHeight;
+    myleft   = gv.elem.offsetLeft;
+    mytop    = gv.elem.offsetTop;
     // Set the height and width
-    this.canvas.width  = mywidth
-    this.canvas.height = myheight
-    this.canvas.style.width  = mywidth  + 'px'
-    this.canvas.style.height = myheight + 'px'
+    this.canvas.width  = mywidth;
+    this.canvas.height = myheight;
+    this.canvas.style.width  = mywidth  + 'px';
+    this.canvas.style.height = myheight + 'px';
     // Top and left
     this.canvas.style.top  = mytop  + 'px';
     this.canvas.style.left = myleft + 'px';
     // Record the height
-    this.height = myheight
+    this.height = myheight;
     // Redraw
     this.update(gv.pxPerBp, gv.minVisible(), gv.maxVisible());
 };
@@ -297,16 +294,16 @@ MarqueeHandler.prototype.position = function() {
 MarqueeHandler.prototype.start = function(event) {
     this.current = this.getMarquee(event.layerX);
     this.draw(this.marquees.filter(
-	function(m) {
+        function(m) {
             return MarqueeFilter(m, this.gv)
-	}
+        }
     ).concat(this.current));
     dojo.forEach(this.connections, function(c) {
         dojo.disconnect(c);
     });
     this.connections =
-	[dojo.connect(this.canvas, "onmousemove", this, this.moving),
-	 dojo.connect(this.canvas, "onmouseout",  this, this.stop)];
+    [dojo.connect(this.canvas, "onmousemove", this, this.moving),
+     dojo.connect(this.canvas, "onmouseout",  this, this.stop)];
 };
 
 /**
@@ -315,7 +312,6 @@ MarqueeHandler.prototype.start = function(event) {
 MarqueeHandler.prototype.add_marquee = function(selection, leftbase, factor) {
     var start = selection['start'];
     var end = selection['end'];
-
     var x1 = (start - leftbase) * factor;
     var x2 = (end - leftbase ) * factor;
     var m = new Marquee(x1, x2, selection['chr']);
@@ -340,14 +336,14 @@ MarqueeHandler.prototype.getMarquee = function(x0) {
         if (m.chr != this.gv.ref.name) {
         continue;
     }
-	// not the right chr
+    // not the right chr
         if ((m.x1 <= x0) && (x0 <= m.x2)) {        // the cursor is on a marquee
             m.alpha = 0.15;                        // change transparency
             if (x0-m.x1 > m.x2-x0) {
-		m.x2 = x0;
+        m.x2 = x0;
             }    // closer to left edge
             else {
-		m.x1 = m.x2; m.x2 = x0;
+        m.x1 = m.x2; m.x2 = x0;
             }         // closer to right edge
             return this.marquees.splice(i, 1)[0];  // remove that marquee
          }
@@ -364,9 +360,9 @@ MarqueeHandler.prototype.moving = function(event) {
     this.current.x2 = event.layerX;
     // Redraw both existing and current marquee
     this.draw(this.marquees.filter(
-	function(m) {
-	    return MarqueeFilter(m, this.gv)
-	}).concat(this.current))
+        function(m) {
+            return MarqueeFilter(m, this.gv)
+        }).concat(this.current))
 };
 
 /**
@@ -382,7 +378,7 @@ MarqueeHandler.prototype.draw = function(list) {
     context.clearRect(0, 0, canvas.width, canvas.height)
     dojo.forEach(list, function(m) {
         context.fillStyle = 'rgba(0,0,0,0.2);'
-	context.globalAlpha = 0.2;
+        context.globalAlpha = 0.2;
         if (m.x1 < m.x2) {context.fillRect(m.x1, 0, m.x2-m.x1, height);}
         else             {context.fillRect(m.x2, 0, m.x1-m.x2, height);}
     });
@@ -403,7 +399,7 @@ MarqueeHandler.prototype.stop = function(event) {
     // A final draw of the visible ones
     this.draw(this.marquees.filter(function(m) {
         return MarqueeFilter(m, this.gv);
-        }));
+    }));
     // Free the mouse actions
     dojo.forEach(this.connections, function(c) {
         dojo.disconnect(c);
@@ -422,14 +418,14 @@ MarqueeHandler.prototype.mergeMarquee = function(current) {
     for (var i = this.marquees.length - 1; i >=0; i--) {
         m = this.marquees[i]
         if ((m.chr == this.gv.ref.name) && (m.x1 <= current.x2) && (m.x2 >= current.x1))
-        {overlapping.push(this.marquees.splice(i,1)[0])}
+            {overlapping.push(this.marquees.splice(i,1)[0])}
     }
     // Find largest overlaping interval
     x1 = current.x1; x2 = current.x2
     var desc = [];
     dojo.forEach(overlapping, function(m) {
-        if(m.desc){desc.push(m.desc);}
-	if (m.x1 < x1) {x1 = m.x1;}
+        if (m.desc) {desc.push(m.desc);}
+        if (m.x1 < x1) {x1 = m.x1;}
         if (m.x2 > x2) {x2 = m.x2;}
     });
     if(desc){current.desc = desc.join(' | ');}
@@ -456,7 +452,7 @@ MarqueeHandler.prototype.update = function(factor, leftbase, rightbase) {
  * It needs the genome view as an input
  */
 MarqueeFilter = function(m, gv) {
-    return (m.end > this.gv.minVisible()) && (m.start < this.gv.maxVisible()) && (m.chr == this.gv.ref.name)
+    return (m.end > this.gv.minVisible()) && (m.start < this.gv.maxVisible()) && (m.chr == this.gv.ref.name);
 };
 
 /**
@@ -473,9 +469,6 @@ function SelConnector(){
  * @param{selections} - the marquees
  */
 SelConnector.prototype.afterUpdate = function(zoneSel, handler, selections){
-    sortSelections = function(a,b){
-
-    }
     selections.sort(MarqueeSort);
     zoneSel.sel_pane.update(selections);
 };
@@ -485,24 +478,24 @@ SelConnector.prototype.afterUpdate = function(zoneSel, handler, selections){
  * Used for sorting marquees
  */
 MarqueeSort = function(a, b) {
-    var chroms = _gdv_info.gb.chromList.childNodes
-    L = chroms.length
+    var chroms = _gdv_info.gb.chromList.childNodes;
+    L = chroms.length;
     var chromlist = []
     for (var i=0; i<L; i++){
-        chromlist.push(chroms[i].value)
+        chromlist.push(chroms[i].value);
     }
-    var achr = chromlist.indexOf(a.chr)
-    var bchr = chromlist.indexOf(b.chr)
+    var achr = chromlist.indexOf(a.chr);
+    var bchr = chromlist.indexOf(b.chr);
     if (achr == bchr) {
         if (a.x1 == b.x1) return 0;
         else if (a.x1 < b.x1) return -1;
-        else return  1;
+        else return 1;
     }
     else if (achr <  bchr) return -1;
     else return  1;
     return  0;
 }
-/*
+/* Old version, sorts by numbers present in the chr name - cannot work well for us anyway
 MarqueeSort = function(a, b) {
     achr = parseInt(a.chr.match(/(\d+)$/), 10); //'chr12' -> '12'
     bchr = parseInt(b.chr.match(/(\d+)$/), 10);
