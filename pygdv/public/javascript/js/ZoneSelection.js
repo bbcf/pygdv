@@ -19,7 +19,7 @@ function ZoneSelection(gv) {
     this.canvas.style.zIndex   = 0;
     gv.elem.parentNode.appendChild(this.canvas);
     gv.setCursorToSelect(this.canvas);
-    
+
     // Create a new marquee handler
     handler = new MarqueeHandler(this.canvas, gv, this);
     this.handler = handler;
@@ -41,9 +41,9 @@ function ZoneSelection(gv) {
 	dojo.addOnLoad(function(){
 	    ctx.addStoredSelections(init_locations, gv, handler);
 	});
-		      
+
     }
-	
+
     // //create an DOM node that will sore all selections
     // var store = document.createElement("span");
     // store.id="store_selections";
@@ -89,7 +89,7 @@ ZoneSelection.prototype.get = function() {
     this.handler.marquees.sort(MarqueeSort);
     if(cur){
 	return this.handler.marquees.map(function(m) {
-            return m.chr + ':' + m.start + ' .. ' + m.end}).join(';') + 
+            return m.chr + ':' + m.start + ' .. ' + m.end}).join(';') +
 	    ";" + cur.chr + ":" + cur.start + " .. " + cur.end;
     } else {
 	return this.handler.marquees.map(function(m) {
@@ -138,7 +138,7 @@ ZoneSelection.prototype.updatedSelection = function(){
     var marquees = handler.marquees
     //marquees.sort(MarqueeSort);
     this.connector.afterUpdate(this, handler, marquees);
-    
+
 };
 
 
@@ -217,18 +217,6 @@ Marquee.prototype.navigateTo = function() {
     return this.chr + ':' + (this.start - c) + '..' + (this.end + c);
 }
 
-/**
- * Used for sorting marquees
- */
-MarqueeSort = function(a, b) {
-    achr = parseInt(a.chr.match(/(\d+)$/), 10);
-    bchr = parseInt(b.chr.match(/(\d+)$/), 10);
-    if (achr <  bchr) return -1;
-    if (achr >  bchr) return  1;
-    if (a.x1 <  b.x1) return -1;
-    if (a.x1 >  b.x1) return  1;
-    return  0;
-}
 
 /**
  * Updates x1 and x2 using this.start and this.end
@@ -270,7 +258,7 @@ MarqueeHandler.prototype.delete = function(marquee){
 	if(m.chr == marquee.chr && m.start == marquee.start){
             marquees.splice(i,1);
             return;
-	} 
+	}
     }
 };
 
@@ -327,7 +315,7 @@ MarqueeHandler.prototype.start = function(event) {
 MarqueeHandler.prototype.add_marquee = function(selection, leftbase, factor) {
     var start = selection['start'];
     var end = selection['end'];
-    
+
     var x1 = (start - leftbase) * factor;
     var x2 = (end - leftbase ) * factor;
     var m = new Marquee(x1, x2, selection['chr']);
@@ -485,5 +473,46 @@ function SelConnector(){
  * @param{selections} - the marquees
  */
 SelConnector.prototype.afterUpdate = function(zoneSel, handler, selections){
-      zoneSel.sel_pane.update(selections);
+    sortSelections = function(a,b){
+
+    }
+    selections.sort(MarqueeSort);
+    zoneSel.sel_pane.update(selections);
 };
+
+
+/**
+ * Used for sorting marquees
+ */
+MarqueeSort = function(a, b) {
+    var chroms = _gdv_info.gb.chromList.childNodes
+    L = chroms.length
+    var chromlist = []
+    for (var i=0; i<L; i++){
+        chromlist.push(chroms[i].value)
+    }
+    var achr = chromlist.indexOf(a.chr)
+    var bchr = chromlist.indexOf(b.chr)
+    if (achr == bchr) {
+        if (a.x1 == b.x1) return 0;
+        else if (a.x1 < b.x1) return -1;
+        else return  1;
+    }
+    else if (achr <  bchr) return -1;
+    else return  1;
+    return  0;
+}
+/*
+MarqueeSort = function(a, b) {
+    achr = parseInt(a.chr.match(/(\d+)$/), 10); //'chr12' -> '12'
+    bchr = parseInt(b.chr.match(/(\d+)$/), 10);
+    if (achr <  bchr) return -1;
+    if (achr >  bchr) return  1;
+    if (a.x1 <  b.x1) return -1;
+    if (a.x1 >  b.x1) return  1;
+    return  0;
+}
+*/
+
+
+
