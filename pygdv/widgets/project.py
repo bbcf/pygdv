@@ -72,11 +72,9 @@ class NewProjectFrom(twf.TableForm):
               twf.Spacer(),
                 twf.SingleSelectField(id='assembly', label_text='Assembly : ',options=assemblies,
             help_text = 'Choose the assembly.'),
-              
-             
-              
-              
-]              
+              ]
+    
+                  
     def update_params(self, d):
         super(NewProjectFrom,self).update_params(d)
         species=get_species()

@@ -8,6 +8,7 @@ test_dir = 'tests'
 data_dir = 'pygdv.public.data'
 json_dir = 'jbrowse'
 tracks_dir = 'tracks'
+plugin_dir = 'plugins'
 gfeatminer_dir = 'gfeatminer'
 
 public_user_email = 'public@pygdv.ch'
@@ -43,7 +44,8 @@ def bin_directory():
 def test_directory():
     return os.path.join(resource_filename(mother_dir, test_dir))
 
-
+def plugin_directory():
+    return os.path.join(resource_filename(mother_dir, plugin_dir))
 
 
 # URLS TO PUT IN JSON

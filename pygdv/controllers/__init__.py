@@ -20,5 +20,6 @@ from pygdv.controllers.public import PublicController
 from pygdv.controllers.help import HelpController
 from pygdv.controllers.genrep import GenRepController
 from pygdv.controllers.selection import SelectionController
+from pygdv.controllers.plugin import PluginController
 
 from pygdv.controllers.root import RootController

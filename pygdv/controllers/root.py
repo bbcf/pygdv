@@ -17,7 +17,7 @@ from pygdv.controllers import SequenceController, ProjectController, CircleContr
 from pygdv.controllers import RightController, WorkerController, TaskController
 from pygdv.controllers import InputController, DatabaseController, JobController
 from pygdv.controllers import PublicController, HelpController, GenRepController
-from pygdv.controllers import SelectionController
+from pygdv.controllers import SelectionController, PluginController
 
 import pygdv
 
@@ -78,6 +78,7 @@ class RootController(BaseController):
     genrep = GenRepController()
     database = DatabaseController()
     selections = SelectionController()
+    plugins = PluginController()
     
     @expose('pygdv.templates.index')
     def index(self,*args,**kw):
