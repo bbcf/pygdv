@@ -7,35 +7,48 @@ from repoze.what.predicates import has_any_permission
 from yapsy.PluginManager import PluginManager
 from pylons import tmpl_context
 from pygdv.widgets.plugins.form import exampleform
+from formencode import Invalid
 
 
-def get_form(*args, **kw):
-    print 'sdsdsd'
-    from tw.forms import validators as twv
-    return exampleform
 
 class PluginController(BaseController):
     
     
-    @expose()
     def index(self, *args, **kw):
         return 'got *args (%s), **kw(%s)' % (args, kw)
     
     
     @expose('pygdv.templates.plugin_form')
-    def test(self, *args, **kw):
-        plug = gl.plugin_manager.getPluginByName('TestPlugin')
-        if not plug:
+    def get_form(self, name, *args, **kw):
+        plug = gl.plugin_manager.getPluginByName(name)
+        if plug is None:
             raise redirect(url('./'))
-        
-        tmpl_context.form = exampleform
-        
-        kw['_plugin_name'] = 'TestPlugin'
-        
+
+        tmpl_context.form = plug.plugin_object.output()(action='validation')
+        kw['_plugin_name'] = name
         return {'page' : 'form', 'value' : kw}
-    
-    @validate(validators=get_form, error_handler=test)
+
     @expose()
-    def validation(self, *args, **kw):
-        print 'validation'
-        raise redirect(url('test'))
+    def validation(self, _plugin_name, *args, **kw):
+        plug = gl.plugin_manager.getPluginByName(_plugin_name)
+        kw['_plugin_name'] = _plugin_name
+        if plug is None:
+            flash('Validation failed', 'error')
+            raise redirect(url('./get_form'))
+
+        form = plug.plugin_object.output()(action='validation')
+        try:
+            form.validate(kw, use_request_local=True)
+        except Invalid as e:
+            flash(e, 'error')
+            raise redirect(url('./get_form', {'name':_plugin_name}))
+        
+        raise redirect(url('./ok', **kw))
+
+
+    @expose()
+    def ok(self, *args, **kw):
+        return 'got %s, %s'% (args, kw)
+
+
+

@@ -7,7 +7,6 @@ class ExampleForm(twf.TableForm):
     submit_text = 'This is a test' # text of the submit button
     hover_help = True              # show help_text with mouse onHover
     show_errors = True             # show red labels when validators failed
-    action = url('./validation')
     fields = [
               twf.HiddenField('_plugin_name'),
               twf.TextField(label_text='Simple textfield',id='text',
