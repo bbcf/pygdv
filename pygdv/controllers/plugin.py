@@ -6,7 +6,6 @@ from pygdv.model import DBSession, Project, Track, Sequence
 from repoze.what.predicates import has_any_permission
 from yapsy.PluginManager import PluginManager
 from pylons import tmpl_context
-from pygdv.widgets.plugins.form import exampleform
 from formencode import Invalid
 
 
@@ -23,7 +22,6 @@ class PluginController(BaseController):
         plug = gl.plugin_manager.getPluginByName(name)
         if plug is None:
             raise redirect(url('./'))
-
         tmpl_context.form = plug.plugin_object.output()(action='validation')
         kw['_plugin_name'] = name
         return {'page' : 'form', 'value' : kw}
