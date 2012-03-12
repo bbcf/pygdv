@@ -13,10 +13,11 @@ def mix_plugin_paths(plugins):
     Mix all plugin paths to make one in order to draw hierarchy buttons on the interface.
     '''
     
-    paths = []
+    nodes = []
     for plug in plugins:
-        paths.append(plug.plugin_object.path())
-    return pathify(paths)
+        o = plug.plugin_object
+        nodes.append(o)
+    return pathify(nodes)
             
             
           
@@ -26,7 +27,8 @@ class Node(object):
     def __init__(self, key):
         self.childs = []
         self.key = key
-    
+        self.id = None
+        
     def add(self, child):
         self.childs.append(child)
     
@@ -47,11 +49,11 @@ def encode_tree(obj):
     JSON function to make recursive nodes being JSON serializable
     '''
     if not isinstance(obj, Node):
-        raise TypeError("%r is not JSON serializable" % (o,))
+        raise TypeError("%r is not JSON serializable" % (obj,))
     return obj.__dict__
 
 
-def mix(node, path, index):
+def mix(node, path, index, uid=None):
     '''
     Mix path with the node
     '''
@@ -62,16 +64,17 @@ def mix(node, path, index):
         else :
             new = p
             node.add(p)
-        mix(new, path, index + 1)
-    
+        mix(new, path, index + 1, uid)
+    else :
+        node.id = uid
 
-def pathify(paths):
+def pathify(nodes):
     '''
     Mix a list of paths together
     '''
     root = Node(root_key)
-    for path in paths:
-        mix(root, path, 0)
+    for n in nodes:
+        mix(root, n.path(), 0, n.unique_id())
     return root
 
 

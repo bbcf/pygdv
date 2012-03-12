@@ -415,5 +415,4 @@ class ProjectController(CrudRestController):
     def admin(self):
         projects = DBSession.query(Project).all()
         data_projects = [util.to_datagrid(project_admin_grid, projects, "All projects", len(projects)>0)]
-        
         return dict(page='projects', model='project',form_title="new project", projects=data_projects, value={})

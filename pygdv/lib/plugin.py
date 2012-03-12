@@ -1,10 +1,13 @@
+import uuid
+
 root_key = 'Operation'
 
 class OperationPlugin(object):
+    
+    uid = None
     '''
     Inherit form this class to build your plugin.
     '''    
-    
     def path(self):
         '''
         Here define the path of your plugin : the succession of buttons which leads to the form apparition.
@@ -37,5 +40,12 @@ class OperationPlugin(object):
         raise NotImplementedError('you must override this method in your plugin.')
         
 
-
-
+    
+    def unique_id(self):
+        '''
+        It's an unique identifier for your plugin.
+        '''
+        if not self.uid:
+            self.uid = uuid.uuid4()
+        return self.uid.urn.split(':')[2]
+    

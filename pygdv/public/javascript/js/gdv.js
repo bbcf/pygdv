@@ -17,15 +17,10 @@ var _POST_URL_NAMES = _GDV_URL_DB + "/search";
 var _GDV_WORKER_URL = _GDV_URL + '/workers';
 var _GDV_JOB_URL = _GDV_URL + '/jobs';
 var _GDV_SEL_URL = _GDV_URL + '/selections';
-
+var _GDV_PLUG_URL = _GDV_URL + '/pugins';
 var _GDV_FORM_URL = _GDV_URL + '/forms';
-
 var _GDV_LINK_URL = _GDV_URL + '/reflect/links';
-
 var _GENREP_URL = 'http://bbcftools.vital-it.ch/genrep';
-
-console.log(_GDV_URL);
-console.log("sdsdiosdioio");
 
 var _GDV_JOB_STATUS_WAIT = 8000;
 var _gdvls;//the live search

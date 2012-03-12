@@ -174,9 +174,9 @@ var Browser = function(params) {
         brwsr.buildLeftMenu(menuleft);
 
         // Set up principal container
-        _gdv_pc = new PrincipalContainer();
-        _gdv_pc.createContainer(brwsr, menuleft);
-
+	_gdv_pc = new PrincipalContainer();
+        _gdv_pc.createContainer(brwsr, menuleft, brwsr.container);
+	
         // Set up track list
         brwsr.createTrackList(brwsr.container,brwsr.tab_tracks.domNode, params);
 

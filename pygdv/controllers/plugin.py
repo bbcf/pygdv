@@ -7,6 +7,7 @@ from repoze.what.predicates import has_any_permission
 from yapsy.PluginManager import PluginManager
 from pylons import tmpl_context
 from formencode import Invalid
+from pygdv.widgets.plugins.form import ExampleForm
 
 
 
@@ -18,12 +19,13 @@ class PluginController(BaseController):
     
     
     @expose('pygdv.templates.plugin_form')
-    def get_form(self, name, *args, **kw):
-        plug = gl.plugin_manager.getPluginByName(name)
-        if plug is None:
-            raise redirect(url('./'))
-        tmpl_context.form = plug.plugin_object.output()(action='validation')
-        kw['_plugin_name'] = name
+    def get_form(self, *args, **kw):
+#        plug = gl.plugin_manager.getPluginByName(name)
+#        if plug is None:
+#            raise redirect(url('./'))
+        tmpl_context.form = ExampleForm(action='validation')
+        #plug.plugin_object.output()(action='validation')
+        kw['_plugin_name'] = 'name'
         return {'page' : 'form', 'value' : kw}
 
     @expose()

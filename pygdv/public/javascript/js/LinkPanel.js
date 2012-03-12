@@ -34,7 +34,7 @@ LinkPanel.prototype.genRepPanel = function(node, event, assembly_id, feat, field
     /* remove panel if one */
     if(this._lp_showed){
 	dojo.query('#' + this.id).orphan();
-    };
+             };
     this._lp_showed = true;
     this.wait(pnode, node);
     
