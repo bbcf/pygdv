@@ -17,6 +17,10 @@ PrincipalContainer.prototype.show_tracks = function(){
 PrincipalContainer.prototype.show_navigation = function(){
     this.principal_dijit.selectChild('tab_navigation');
 };
+PrincipalContainer.prototype.show_operations = function(){
+    this.principal_dijit.selectChild('tab_ops');
+};
+
 
 
 /**
@@ -33,11 +37,24 @@ PrincipalContainer.prototype.createContainer = function(browser, container){
     this.principal = principal;
     this.principal_dijit = principal_dijit;
     
+    // init some parameters 
+    var menu_nav = ['Home', 'Tracks', 'Projects', 'Circles'];
+    if (!_gdv_info.admin){
+	init_operations = ['You must be logged in to use operations'];
+	if (_gdv_info.mode == 'download'){
+	    menu_nav = ['Home', 'Copy']
+	} else {
+	    menu_nav = ['Home']
+	}
+    };
     
-    this.navigationContainer(principal, principal_dijit);
+    // create additionnal childs containers
+ 
+    this.navigationContainer(principal, principal_dijit, menu_nav);
     this.trackContainer(browser);
     this.selectionContainer(principal, principal_dijit);
-    
+    this.operationContainer(principal, principal_dijit, init_operations);
+
     return principal;
 };
 
@@ -60,8 +77,8 @@ PrincipalContainer.prototype.trackContainer = function(browser){
 /**
 * Add the Navigation tab
 */
-PrincipalContainer.prototype.navigationContainer = function(DomNode, DijitNode){
-    var menu_nav = ['Home', 'Tracks', 'Projects', 'Circles']
+PrincipalContainer.prototype.navigationContainer = function(DomNode, DijitNode, menu_nav){
+    
     var cont = dojo.create('div', {}, DomNode);
     var nav_container = new dijit.layout.ContentPane({
             title: "Navigation",
@@ -110,3 +127,51 @@ PrincipalContainer.prototype.selectionContainer = function(DomNode, DijitNode){
 };
 
 
+/**
+* Add the Operations tab
+*/
+PrincipalContainer.prototype.operationContainer = function(DomNode, DijitNode, paths){
+    var cont = dojo.create('div', {}, DomNode);
+    
+    var ops_container = new dijit.layout.ContentPane({
+            title: "Operations",
+        id:'tab_ops'
+    }, cont);
+    DijitNode.addChild(ops_container);
+    this.operations = ops_container;
+
+    // initialize the operations
+    var menu = new dijit.Menu({colspan : 1,
+			       style : {width : '10em' 
+				       }});
+    var c = paths.childs;
+    var l = c.length;
+    for(var i=0;i<l;i++){
+	op_add_child(menu, menu, c[i]);
+    }
+    menu.placeAt('tab_ops');
+};
+
+
+
+function op_add_child(menu, parent, node){
+    var c = node.childs;
+    var l = c.length;
+    if(l>0){
+	// node has childs (build a menu & add childs to it)
+	var m = new dijit.Menu({});
+
+	for(var i=0;i<l;i++){
+	    op_add_child(menu, m, c[i]);
+	}
+	var p = new dijit.PopupMenuItem({label : node.key,
+					 popup : m 
+					});
+	parent.addChild(p);
+    } else {
+	// it's the end (must connect to the form apparition)
+	var m = new dijit.MenuItem({label : node.key,
+				   });
+	parent.addChild(m);
+    }
+};

@@ -39,7 +39,6 @@ class ProjectController(CrudRestController):
     edit_filler = project_edit_filler
 
     
-
     @with_trailing_slash
     @expose('json')
     def get(self, project_key, **kw):
@@ -304,6 +303,8 @@ class ProjectController(CrudRestController):
         if not checker.check_permission_project(user.id, project_id, constants.right_read_id):
             flash('You must have %s permission to view the project.' % constants.right_read, 'error')
             raise redirect(url('/'))
+
+        # get the project
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         tracks = project.tracks
         
@@ -311,6 +312,7 @@ class ProjectController(CrudRestController):
         default_tracks = seq.default_tracks
         all_tracks = tracks + default_tracks
         
+        # test if all track names are differents
         trackNames = []
         for t in all_tracks:
             while t.name in trackNames:
@@ -334,6 +336,7 @@ class ProjectController(CrudRestController):
             DBSession.flush()
             trackNames.append(t.name)
         
+        # prepare some different parameters
         refSeqs = 'refSeqs = %s' % json.dumps(jb.ref_seqs(project.sequence_id))
         
         trackInfo = 'trackInfo = %s' % json.dumps(jb.track_info(all_tracks, assembly_id=project.sequence_id))
@@ -350,19 +353,21 @@ class ProjectController(CrudRestController):
         
         selections = 'init_locations = %s' % handler.selection.selections(project_id)
         
+        # prepare _gdv_info
         info = {}
         prefix = tg.config.get('prefix')
         if prefix : info['prefix'] = prefix
         info['sequence_id'] = project.sequence_id
         info['admin'] = True
         info = json.dumps(info)
+
         control = 'b.showTracks();initGDV(b, %s, %s);' % (project.id, info)
         
         
         if 'loc' in kw:
             control += 'b.navigateTo("%s");' % kw['loc']
         
-        
+        # get jobs
         jobs = DBSession.query(Job).filter(and_(Job.project_id == project.id, not_(Job.output == constants.job_output_reload))).all()
         
         jobs_output = [{'job_id' : job.id, 
@@ -374,7 +379,8 @@ class ProjectController(CrudRestController):
                       for job in jobs
                       ]
         
-        
+        # get operations 
+        operations_path = 'init_operations = %s' % json.dumps(handler.plugin.get_operations_paths(), default=handler.plugin.encode_tree)
         
         return dict(species_name=project.species.name, 
                     nr_assembly_id=project.sequence_id, 
@@ -387,7 +393,8 @@ class ProjectController(CrudRestController):
                     style_control = style_control,
                     control = control,
                     selections = selections,
-                    page='view')
+                    operations_path = operations_path,
+                    page = 'view')
     
     @expose()
     def copy(self, project_id, **kw):

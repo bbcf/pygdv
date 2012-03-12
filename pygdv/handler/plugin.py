@@ -1,5 +1,12 @@
+from tg import app_globals as gl
 
 root_key = 'Operations'
+
+
+def get_operations_paths():
+    plugs = gl.plugin_manager.getAllPlugins()
+    return mix_plugin_paths(plugs)
+
 
 def mix_plugin_paths(plugins):
     '''
@@ -8,17 +15,17 @@ def mix_plugin_paths(plugins):
     
     paths = []
     for plug in plugins:
-        paths.append(plug.plugin_object.path)
+        paths.append(plug.plugin_object.path())
     return pathify(paths)
             
             
-            
+          
 
 class Node(object):
     
     def __init__(self, key):
         self.childs = []
-        self.key = str(key)
+        self.key = key
     
     def add(self, child):
         self.childs.append(child)
@@ -32,10 +39,17 @@ class Node(object):
     def __eq__(self, o):
         return self.key == o.key
     
-    def __repr__(self, *args, **kwargs):
-        return '<%s childs : %s >' % (self.key ,self.childs)
+    # def __repr__(self, *args, **kwargs):
+    #     return '<%s childs : %s >' % (self.key ,self.childs)
     
-root = Node(root_key)
+def encode_tree(obj):
+    '''
+    JSON function to make recursive nodes being JSON serializable
+    '''
+    if not isinstance(obj, Node):
+        raise TypeError("%r is not JSON serializable" % (o,))
+    return obj.__dict__
+
 
 def mix(node, path, index):
     '''
@@ -53,7 +67,7 @@ def mix(node, path, index):
 
 def pathify(paths):
     '''
-    Mis a list of paths together
+    Mix a list of paths together
     '''
     root = Node(root_key)
     for path in paths:
