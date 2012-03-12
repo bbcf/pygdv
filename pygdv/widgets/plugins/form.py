@@ -14,7 +14,7 @@ class ExampleForm(twf.TableForm):
                             help_text = 'This is some additional help.'),
               twf.Spacer(),                                                                                     # a spacer between two field
               twf.TextField(label_text='Simple textfield that must not be empty', id='text_not_empty',           # a textfield with a simple validator (this field must be filled)
-                            help_text = '', validator=twv.NotEmpty()),
+                            help_text = ''),
               twf.Spacer(),                                                                                     # a spacer between two field
               twf.TextArea(label_text='Drop tracks here', id='signal_track',
               help_text='Here put one signal track', validator=gdvv.TrackValidator(datatype='signal'))

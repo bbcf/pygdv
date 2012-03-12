@@ -4,7 +4,7 @@
  */
 
 //MODIFY HERE
-var _GDV_PROXY = "http://paprika.epfl.ch";
+var _GDV_PROXY = window.location.hostname;
 var _GDV_PREFIX = "/pygdv"
 var _GDV_URL=_GDV_PROXY + _GDV_PREFIX;
 
