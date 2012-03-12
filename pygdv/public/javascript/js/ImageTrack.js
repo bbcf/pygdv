@@ -243,7 +243,7 @@ ImageTrack.prototype.redraw = function(){
 ImageTrack.prototype.draw = function(){
     /* default color*/
     if(!this.color){
-    this.color = "rgb(200,0,0)";
+        this.color = "rgb(200,0,0)";
     };
 
     var data = this.scores();
@@ -251,72 +251,72 @@ ImageTrack.prototype.draw = function(){
     // console.log(this.nb);
     // console.log(data);
     if (data){
-    var canvas = this;
-    var track = this.track;
-    var min = track.input_min;
-    var max = track.input_max;
+        var canvas = this;
+        var track = this.track;
+        var min = track.input_min;
+        var max = track.input_max;
 
-    if(null == min & null == max){
-        min = canvas.min - 1;
-        max = canvas.max
-    };
-    var inZoom = canvas.inzoom;
-    if (canvas.getContext) {
-        /* get canvas & clear old if one */
-        var baseWidth = b.view.pxPerBp;
-        var ctx = canvas.getContext("2d");
-        var cnvs_height = canvas.height;
-        var cnvs_width = canvas.width;
-        ctx.clearRect(0, 0, cnvs_width, cnvs_height);
-        /* prepare drawing */
-        var d = max - min; // distance between min & max
-        var Z = max * cnvs_height / d; // where the zero line is
-        /* draw zero line */
-        ctx.fillStyle = 'black';
-        ctx.beginPath();
-        ctx.closePath();
-        ctx.fill();
-        ctx.fillStyle = this.color;
-        //////////////////////////////////////////////////
-        // ctx.strokeRect(0,0,canvas.width, canvas.height);
-        // ctx.font = "bold 12px sans-serif";
-        // ctx.fillText(this.nb,canvas.width/2,canvas.height/2);
+        if(null == min & null == max){
+            min = canvas.min - 1;
+            max = canvas.max
+        };
+        var inZoom = canvas.inzoom;
+        if (canvas.getContext) {
+            /* get canvas & clear old if one */
+            var baseWidth = b.view.pxPerBp;
+            var ctx = canvas.getContext("2d");
+            var cnvs_height = canvas.height;
+            var cnvs_width = canvas.width;
+            ctx.clearRect(0, 0, cnvs_width, cnvs_height);
+            /* prepare drawing */
+            var d = max - min; // distance between min & max
+            var Z = max * cnvs_height / d; // where the zero line is
+            /* draw zero line */
+            ctx.fillStyle = 'black';
+            ctx.beginPath();
+            ctx.closePath();
+            ctx.fill();
+            ctx.fillStyle = this.color;
+            //////////////////////////////////////////////////
+            // ctx.strokeRect(0,0,canvas.width, canvas.height);
+            // ctx.font = "bold 12px sans-serif";
+            // ctx.fillText(this.nb,canvas.width/2,canvas.height/2);
 
-        ctx.beginPath();
-        var prev_pos;
-        var prev_score;
-        var i;
-        var len = data.length;
-        var end_pos = 100;
+            ctx.beginPath();
+            var prev_pos;
+            var prev_score;
+            var i;
+            var len = data.length;
+            var end_pos = 100;
 
-        /* DRAW SCORES */
-        for(i=0; i<=len - 1 ; i+=2){
-            var pos = data[i];
-            var conv_pos = cnvs_width * pos / end_pos;
-            var real_score = data[i+1];
-            if (prev_pos != null){
-                var width = (conv_pos - prev_pos);
-                var trans_score = - ( prev_score * cnvs_height / d * inZoom );
-                ctx.rect(prev_pos, Z , width, trans_score);
-                //console.log('x: ' + prev_pos + ' y: ' + Z + ' w: ' + width + ' h: ' + trans_score + ' => ' + (Z + trans_score));
-            };
-            if (pos!= null){
-                prev_pos = conv_pos;
-                prev_score = real_score;
+            /* DRAW SCORES */
+            for(i=0; i<=len - 1 ; i+=2){
+                var pos = data[i];
+                var conv_pos = cnvs_width * pos / end_pos;
+                var real_score = data[i+1];
+                if (prev_pos != null){
+                    var width = (conv_pos - prev_pos);
+                    var trans_score = - ( prev_score * cnvs_height / d * inZoom );
+                    ctx.rect(prev_pos, Z , width, trans_score);
+                    //console.log('x: ' + prev_pos + ' y: ' + Z + ' w: ' + width + ' h: ' + trans_score + ' => ' + (Z + trans_score));
+                };
+                if (pos!= null){
+                    prev_pos = conv_pos;
+                    prev_score = real_score;
+                }
             }
-        }
 
-        if(prev_pos != null){
-            var width = (cnvs_width - prev_pos);
-            var trans_score = - ( prev_score * cnvs_height / d * inZoom );
-            //ctx.rect(prev_pos * baseWidth, Z , width, trans_score);
-            ctx.rect(prev_pos, Z , width, trans_score);
-            //console.log('x: ' + prev_pos + ' y: ' + Z + ' w: ' + width + ' h: ' + trans_score);
+            if(prev_pos != null){
+                var width = (cnvs_width - prev_pos);
+                var trans_score = - ( prev_score * cnvs_height / d * inZoom );
+                //ctx.rect(prev_pos * baseWidth, Z , width, trans_score);
+                ctx.rect(prev_pos, Z , width, trans_score);
+                //console.log('x: ' + prev_pos + ' y: ' + Z + ' w: ' + width + ' h: ' + trans_score);
+            }
+            ctx.closePath();
+            ctx.fill();
+            canvas.style.zIndex = 50;
         }
-        ctx.closePath();
-        ctx.fill();
-        canvas.style.zIndex = 50;
-        //}
     }
 };
 

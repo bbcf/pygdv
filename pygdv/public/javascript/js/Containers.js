@@ -10,15 +10,19 @@ function PrincipalContainer(){};
 */
 PrincipalContainer.prototype.show_selections = function(){
     this.principal_dijit.selectChild('tab_sels');
+    dojo.cookie("menu_current_state", "selections");
 };
 PrincipalContainer.prototype.show_tracks = function(){
     this.principal_dijit.selectChild('tab_tracks');
+    dojo.cookie("menu_current_state", "tracks");
 };
 PrincipalContainer.prototype.show_navigation = function(){
     this.principal_dijit.selectChild('tab_navigation');
+    dojo.cookie("menu_current_state", "navigation");
 };
 PrincipalContainer.prototype.show_operations = function(){
     this.principal_dijit.selectChild('tab_ops');
+    dojo.cookie("menu_current_state", "operations");
 };
 
 
@@ -40,20 +44,27 @@ PrincipalContainer.prototype.createContainer = function(browser, container){
     // init some parameters
     var menu_nav = ['Home', 'Tracks', 'Projects', 'Circles'];
     if (!_gdv_info.admin){
-    init_operations = ['You must be logged in to use operations'];
-    if (_gdv_info.mode == 'download'){
-        menu_nav = ['Home', 'Copy']
-    } else {
-        menu_nav = ['Home']
+        init_operations = ['You must be logged in to use operations'];
+        if (_gdv_info.mode == 'download'){
+            menu_nav = ['Home', 'Copy']
+        } else {
+            menu_nav = ['Home']
+        }
     }
-    };
 
-    // create additionnal childs containers
-
+    // create additionnal children containers
     this.navigationContainer(principal, principal_dijit, menu_nav);
     this.trackContainer(browser);
     this.selectionContainer(principal, principal_dijit);
     this.operationContainer(principal, principal_dijit, init_operations);
+
+    // Retrieve from a cookie the last element of menu selected
+    if (dojo.cookie("menu_current_state")) {
+        this.menu_current_state = dojo.cookie("menu_current_state");
+    } else { //create a new cookie
+        this.menu_current_state = "navigation";
+        dojo.cookie("menu_current_state", this.menu_current_state);
+    }
 
     return principal;
 };
@@ -66,8 +77,8 @@ PrincipalContainer.prototype.createContainer = function(browser, container){
 PrincipalContainer.prototype.trackContainer = function(browser){
     // add the tracks container
     var track_container = new dijit.layout.ContentPane({
-            title: "Tracks",
-        id:'tab_tracks'
+        title: "Tracks",
+        id: 'tab_tracks'
     });
     this.principal_dijit.addChild(track_container);
     browser.tab_tracks = track_container;
@@ -84,7 +95,6 @@ PrincipalContainer.prototype.navigationContainer = function(DomNode, DijitNode, 
         title: "Navigation",
         id:'tab_navigation'
     }, cont);
-
 
     var len = menu_nav.length;
     for (var i=0; i<len; i++){

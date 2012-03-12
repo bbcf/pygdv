@@ -13,7 +13,7 @@ Track.prototype.load = function(url) {
     dojo.xhrGet({url: url,
                  handleAs: "json",
                  load: function(o) { curTrack.loadSuccess(o); },
-        error: function(o) { curTrack.loadFail(o,url); }
+                 error: function(o) { curTrack.loadFail(o,url); }
             });
 };
 
@@ -214,19 +214,19 @@ Track.prototype._showBlock = function(blockIndex, startBase, endBase, scale, con
         this.heightUpdate(this.blockHeights[blockIndex], blockIndex);
         return;
     }
-    
+
     var blockDiv = document.createElement("div");
     blockDiv.className = "block";
     blockDiv.style.left = (blockIndex * this.widthPct) + "%";
     blockDiv.style.width = this.widthPct + "%";
     blockDiv.startBase = startBase;
     blockDiv.endBase = endBase;
-    
+
     if (this.empty) {
         this.heightUpdate(this.labelHeight, blockIndex);
         blockDiv.appendChild(document.createTextNode("no data"));
 	blockDiv.style.backgroundColor = "#fff";
-	
+
     } else if (this.loaded) {
 	this.fillBlock(blockIndex,
                        blockDiv,
@@ -241,7 +241,7 @@ Track.prototype._showBlock = function(blockIndex, startBase, endBase, scale, con
     } else {
 	this._loadingBlock(blockDiv);
     }
-    
+
     this.blocks[blockIndex] = blockDiv;
     this.div.appendChild(blockDiv);
 };

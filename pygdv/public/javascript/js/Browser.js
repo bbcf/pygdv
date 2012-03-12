@@ -132,25 +132,25 @@ var Browser = function(params) {
 
         // Connect something
         dojo.connect(brwsr.chromList, "onchange", function(event) {
-	    var oldLocMap = dojo.fromJson(dojo.cookie(brwsr.container.id + "-location")) || {};
+            var oldLocMap = dojo.fromJson(dojo.cookie(brwsr.container.id + "-location")) || {};
             var newRef = brwsr.allRefs[brwsr.chromList.options[brwsr.chromList.selectedIndex].value];
 
             if (oldLocMap[newRef.name]){
-		var oldLoc = oldLocMap[newRef.name];
-		if (oldLoc == 'NaN .. NaN'){
-		    brwsr.navigateTo(newRef.name + ":"
-                                     + (((newRef.start + newRef.end) * 0.4) | 0)
-                                     + " .. "
-                                     + (((newRef.start + newRef.end) * 0.6) | 0));
-		} else {
-                    brwsr.navigateTo(newRef.name + ":" + oldLoc);
-		}
-	    } else {
-                brwsr.navigateTo(newRef.name + ":"
+                var oldLoc = oldLocMap[newRef.name];
+                if (oldLoc == 'NaN .. NaN'){
+                    brwsr.navigateTo(newRef.name + ":"
                                  + (((newRef.start + newRef.end) * 0.4) | 0)
                                  + " .. "
                                  + (((newRef.start + newRef.end) * 0.6) | 0));
-	    }
+                } else {
+                        brwsr.navigateTo(newRef.name + ":" + oldLoc);
+                }
+            } else {
+                        brwsr.navigateTo(newRef.name + ":"
+                                 + (((newRef.start + newRef.end) * 0.4) | 0)
+                                 + " .. "
+                                 + (((newRef.start + newRef.end) * 0.6) | 0));
+            }
         });
 
         // Hook up GenomeView
@@ -176,6 +176,18 @@ var Browser = function(params) {
         // Set up principal container
         _gdv_pc = new PrincipalContainer();
         _gdv_pc.createContainer(brwsr, menuleft);
+
+        //console.log(_gdv_pc.menu_current_state)
+        //_gdv_pc.show_navigation();
+
+        //switch (_gdv_pc.menu_current_state){
+        //    case "navigation": console.log("n"); _gdv_pc.show_navigation(); console.log("n");break;
+        //    case "selections": _gdv_pc.show_selections(); break;
+        //    case "operations": _gdv_pc.show_operations(); break;
+        //    case "tracks"    : _gdv_pc.show_tracks(); break;
+        //    default: console.log("Cannot retrieve menu_current_state from cookie.")
+        //}
+
 
         // Set up track list
         brwsr.createTrackList(brwsr.container,brwsr.tab_tracks.domNode, params);
@@ -315,14 +327,14 @@ Browser.prototype.createTrackList = function(container,tab, params) {
     // Undocumented
     this.trackListWidget = new dojo.dnd.Source(trackListDiv,
                        {creator: trackListCreate,
-            accept: ["track"],
-            selfAccept:false,
+                        accept: ["track"],
+                        selfAccept:false,
                         withHandles: false});
 
     // Undocumented
     var trackCreate = function(track, hint) {
-    var node;
-    if ("avatar" == hint) {
+        var node;
+        if ("avatar" == hint) {
             return trackListCreate(track, hint);
         } else {
             var replaceData = {refseq: brwsr.refSeq.name};
@@ -345,9 +357,9 @@ Browser.prototype.createTrackList = function(container,tab, params) {
     this.viewDndWidget = new dojo.dnd.Source(this.view.zoomContainer,
                          {copyState:function(keyPressed,self){
                              // if(_tc.tab_form){
-			     // 	 if(_tc.tab_form.selected){
+                 //      if(_tc.tab_form.selected){
                              //         return true;
-			     // 	 }
+                 //      }
                              // }
                              return false;
                          },creator: trackCreate, accept: ["track"], withHandles: true});
@@ -392,7 +404,7 @@ Browser.prototype.addTracks = function(trackList, replace) {
         this.deferredFunctions.push(
             function() {brwsr.addTracks(trackList, show); }
         );
-    return;
+        return;
     }
 
     this.tracks.concat(trackList);
@@ -524,16 +536,16 @@ Browser.prototype.showTracks = function(trackNameList) {
     for (var n = 0; n < trackNames.length; n++) {
         this.trackListWidget.forInItems(function(obj, id, map) {
             if (trackNames[n] == obj.data.label) {
-		brwsr.viewDndWidget.insertNodes(false, [obj.data]);
+                brwsr.viewDndWidget.insertNodes(false, [obj.data]);
                 removeFromList.push(id);
             }
         });
     }
     var movedNode;
     for (var i = 0; i < removeFromList.length; i++) {
-	this.trackListWidget.delItem(removeFromList[i]);
-	movedNode = dojo.byId(removeFromList[i]);
-	if (movedNode) movedNode.parentNode.removeChild(movedNode);
+    this.trackListWidget.delItem(removeFromList[i]);
+    movedNode = dojo.byId(removeFromList[i]);
+    if (movedNode) movedNode.parentNode.removeChild(movedNode);
     }
     this.onVisibleTracksChanged();
 };
@@ -688,9 +700,8 @@ Browser.prototype.createNavBox = function(params) {
     this.locationBox.id="location";
     this.locationBox.style.cssText = "width: 130px; vertical-align: top;";
     dojo.connect(this.locationBox, "keydown", function(event) {
-	if (event.keyCode == dojo.keys.ENTER) {
+    if (event.keyCode == dojo.keys.ENTER) {
             brwsr.navigateTo(brwsr.locationBox.value);
-
             brwsr.goButton.disabled = true;
             dojo.stopEvent(event);
         } else {

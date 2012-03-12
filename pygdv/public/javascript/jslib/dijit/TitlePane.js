@@ -81,7 +81,7 @@ dojo.declare(
 
 	postCreate: function(){
 		this.inherited(arguments);
-		
+
 		// Hover and focus effect on title bar, except for non-toggleable TitlePanes
 		// This should really be controlled from _setToggleableAttr() but _CssStateMixin
 		// doesn't provide a way to disconnect a previous _trackMouseState() call

@@ -4,8 +4,8 @@
  */
 
 //MODIFY HERE
-var _GDV_PROXY = 'http://' + window.location.hostname;
-var _GDV_PREFIX = "/pygdv"
+var _GDV_PROXY = 'http://' + window.location.host;
+var _GDV_PREFIX = "";
 var _GDV_URL=_GDV_PROXY + _GDV_PREFIX;
 
 //GLOBAL VARIABLES
@@ -48,67 +48,67 @@ function initGDV(browser, project_id, gdv_info, readonly){
     dojo.require("dijit.form.Textarea");
     dojo.require("dijit.form.Form");
     dojo.require("dojo.dnd.Moveable");
-    
+
     /* init global parameters */
     _gdv_info = gdv_info;
     _gdv_info.project_id = project_id;
     _gdv_info.gb = browser;
 
     /* if it's a public view, parameters must be instancied diferrently */
-    
+
     if (!_gdv_info.admin){
-	gminer = {};
-	if (_gdv_info.mode == 'download'){
-	    menu_nav = ['Home', 'Copy']
-	} else {
-	    menu_nav = ['Home']
-	}
+    gminer = {};
+    if (_gdv_info.mode == 'download'){
+        menu_nav = ['Home', 'Copy']
+    } else {
+        menu_nav = ['Home']
+    }
     };
-    
+
     dojo.addOnLoad(function(){
-	/* the menu on the left */
-	// try {
-	//     var bool = 
-	//     _menub = new ch.epfl.bbcf.gdv.GDVMenuBar(
-	// 	{'toolbar' : gminer, 'menu_navigation' : menu_nav , 'browser' : browser});
-	// } catch(err) {console.error(err);}
-	
-	/* the search field on top right */
-//	try {
-//	    _gdv_pc.navigationContainer();
-//	} catch(err) {console.error(err);}
-		
-	// /* the tab container on bottom */
-	// try {
-	//     _tc = new ch.epfl.bbcf.gdv.TabContainer({'browser':browser,'readonly':readonly});
-	// } catch(err) {console.error(err);}
-	
-	/* a handler for the jobs */
-	// try {
-	//     _jh = new ch.epfl.bbcf.gdv.JobHandler({});
-	// } catch(err) {console.error(err);}
-	
-	_lp = new LinkPanel();
-	
-	// if(!_menub) console.error('menu bar failed');
-	// if(!_gdvls) console.error('tab container failed');
-	// if(!_gdvls) console.error('search field initialization failed');
-	// if(!_jh) console.error('job handler failed');
-	
-	/* hack for the copy menu */
-	if(!gdv_info.admin){
-	    var copy_link = dojo.byId('menu_Copy');
-	    var uri = document.URL;
-	    var query = uri.substring(uri.indexOf('?') + 1, uri.length);
-	    var queryO = dojo.queryToObject(query);
-	    if ('k' in queryO){
-		copy_link.href= _GDV_URL + '/projects/copy?k=' + queryO['k'] + '&project_id=' + _gdv_info.project_id;
-	    } else {console.fatal('you will not be able to copy the project')};
-	};
-	
+    /* the menu on the left */
+    // try {
+    //     var bool =
+    //     _menub = new ch.epfl.bbcf.gdv.GDVMenuBar(
+    //     {'toolbar' : gminer, 'menu_navigation' : menu_nav , 'browser' : browser});
+    // } catch(err) {console.error(err);}
+
+    /* the search field on top right */
+//    try {
+//        _gdv_pc.navigationContainer();
+//    } catch(err) {console.error(err);}
+
+    // /* the tab container on bottom */
+    // try {
+    //     _tc = new ch.epfl.bbcf.gdv.TabContainer({'browser':browser,'readonly':readonly});
+    // } catch(err) {console.error(err);}
+
+    /* a handler for the jobs */
+    // try {
+    //     _jh = new ch.epfl.bbcf.gdv.JobHandler({});
+    // } catch(err) {console.error(err);}
+
+    _lp = new LinkPanel();
+
+    // if(!_menub) console.error('menu bar failed');
+    // if(!_gdvls) console.error('tab container failed');
+    // if(!_gdvls) console.error('search field initialization failed');
+    // if(!_jh) console.error('job handler failed');
+
+    /* hack for the copy menu */
+    if(!gdv_info.admin){
+        var copy_link = dojo.byId('menu_Copy');
+        var uri = document.URL;
+        var query = uri.substring(uri.indexOf('?') + 1, uri.length);
+        var queryO = dojo.queryToObject(query);
+        if ('k' in queryO){
+        copy_link.href= _GDV_URL + '/projects/copy?k=' + queryO['k'] + '&project_id=' + _gdv_info.project_id;
+        } else {console.fatal('you will not be able to copy the project')};
+    };
+
     });
 
-    
+
 
 
 };
@@ -128,9 +128,9 @@ function notify(mess){
     gdv_notifier.push(mess);
     str = '';
     dojo.forEach(gdv_notifier, function(entry, i){
-	str += entry + '\n';
+    str += entry + '\n';
     });
 
     dojo.byId('gdv_notifier').innerHTML = str;
-    
+
 };
