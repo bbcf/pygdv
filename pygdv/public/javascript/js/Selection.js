@@ -74,7 +74,6 @@ SelectionPane.prototype.connect_description = function(description, location){
             updateDescription = function(ee){
                 var key=ee.keyCode || ee.which;
                 if (key==13 || key==undefined){
-                    console.log("entered")
                     location.desc = input.value;
                     dojo.create("td", {innerHTML: location.desc, class:"description_field"}, input, "replace");
                     ctx.connect_description(description, location);

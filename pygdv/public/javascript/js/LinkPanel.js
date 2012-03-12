@@ -20,7 +20,6 @@ LinkPanel.prototype.showPanelInfo = function(node, event, assembly_id, feat, fie
 LinkPanel.prototype.parent_node = function(event){
     var p = document.createElement("div");
     p.style.position = 'fixed'; 
-    console.log(event);
     p.style.top =  event.pageY + 'px';
     p.style.left = event.pageX + 'px';
     document.body.appendChild(p);

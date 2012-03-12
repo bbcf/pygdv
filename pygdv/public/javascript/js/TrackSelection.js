@@ -33,8 +33,7 @@ function trackSelection_getTracks(){
 		var track = trackInfo[k];
 		if(track.label==label.innerHTML){
 		    var tmp={};
-		    console.log(track);
-                    tmp[track.label]=track.url.slice(3,track.url.length-14);
+		    tmp[track.label]=track.url.slice(3,track.url.length-14);
 		    json[i]=tmp;
 		}
             }
@@ -49,7 +48,6 @@ function trackSelection_getTracks(){
  * @param {event} the dojo event
  */
 function TrackSelection_flip(event) {
-    console.log("flip");
     // Get the div object
     labelDiv = event.target;
     // Change the background color
@@ -59,7 +57,6 @@ function TrackSelection_flip(event) {
     labelDiv.selected = (labelDiv.selected == false);
 
     //update gfm form if one
-    console.log(TrackSelection_get());
     var textarea = dijit.byId("gfm_tracks");
     if(textarea){
         textarea.setValue(TrackSelection_get().join(";"));

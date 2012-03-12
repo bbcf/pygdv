@@ -78,7 +78,6 @@ class NewProjectFrom(twf.TableForm):
     def update_params(self, d):
         super(NewProjectFrom,self).update_params(d)
         species=get_species()
-        print species
         d['species']=species
         d['assembly']=get_assemblies(species)
         return d
