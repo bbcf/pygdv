@@ -30,7 +30,7 @@ var Browser = function(params) {
     // Copy params variables
     var refSeqs   = params.refSeqs;
     var trackData = params.trackData;
-    
+
     // Two different roots for data and for img/css files
     if ("dataRoot" in params)  {this.dataRoot  = params.dataRoot;}
     else                       {this.dataRoot  = "";}
@@ -134,7 +134,7 @@ var Browser = function(params) {
         dojo.connect(brwsr.chromList, "onchange", function(event) {
 	    var oldLocMap = dojo.fromJson(dojo.cookie(brwsr.container.id + "-location")) || {};
             var newRef = brwsr.allRefs[brwsr.chromList.options[brwsr.chromList.selectedIndex].value];
-	    
+
             if (oldLocMap[newRef.name]){
 		var oldLoc = oldLocMap[newRef.name];
 		if (oldLoc == 'NaN .. NaN'){
@@ -174,13 +174,13 @@ var Browser = function(params) {
         brwsr.buildLeftMenu(menuleft);
 
         // Set up principal container
-	_gdv_pc = new PrincipalContainer();
+        _gdv_pc = new PrincipalContainer();
         _gdv_pc.createContainer(brwsr, menuleft);
-	
+
         // Set up track list
         brwsr.createTrackList(brwsr.container,brwsr.tab_tracks.domNode, params);
-        
-	containerWidget.startup();
+
+        containerWidget.startup();
         brwsr.isInitialized = true;
 
         // Set initial location
@@ -218,7 +218,7 @@ var Browser = function(params) {
  * @param{container} - the HTML div containing the menu
  */
 Browser.prototype.buildLeftMenu = function(container){
-    
+
     // /* Navigation menu */
     // var navig = document.createElement('div');
     // navig.innerHTML='Navigation';
@@ -690,7 +690,7 @@ Browser.prototype.createNavBox = function(params) {
     dojo.connect(this.locationBox, "keydown", function(event) {
 	if (event.keyCode == dojo.keys.ENTER) {
             brwsr.navigateTo(brwsr.locationBox.value);
-	    
+
             brwsr.goButton.disabled = true;
             dojo.stopEvent(event);
         } else {

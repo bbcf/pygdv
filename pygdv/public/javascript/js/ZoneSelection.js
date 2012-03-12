@@ -139,17 +139,14 @@ ZoneSelection.prototype.updatedSelection = function(){
     this.connector.afterUpdate(this, handler, marquees);
 };
 
-
 /**
 * Update the selection on the server
 */
 ZoneSelection.prototype.update_on_server = function(){
     var xhrArgs = {
-    url : _GDV_SEL_URL + '/save',
-    postData : 'project_id=' + _gdv_info.project_id + '&color=grey&description="desc crip tion"&locations=' + dojo.toJson(this.handler.marquees),
-    error : function(data){
-                console.error(data);
-            }
+        url : _GDV_SEL_URL + '/save',
+        postData : 'project_id=' + _gdv_info.project_id + '&color=grey&description="desc crip tion"&locations=' + dojo.toJson(this.handler.marquees),
+        error : function(data){ console.error(data); }
     };
     dojo.xhrPost(xhrArgs);
 };
@@ -323,7 +320,6 @@ MarqueeHandler.prototype.add_marquee = function(selection, leftbase, factor) {
     this.marquees.push(m);
 };
 
-
 /**
  * Returns the current marquee if the cursor
  * is on a drawed marquee, else creates a new marquee
@@ -331,22 +327,19 @@ MarqueeHandler.prototype.add_marquee = function(selection, leftbase, factor) {
  * Strange: without the "return false", the function gets called twice ?
  */
 MarqueeHandler.prototype.getMarquee = function(x0) {
-    for(var i=0; i<this.marquees.length; i++){
+    len = this.marquees.length
+    for(var i=0; i<len; i++){
         m = this.marquees[i]
         if (m.chr != this.gv.ref.name) {
-        continue;
-    }
-    // not the right chr
+            continue;
+        }
+        // not the right chr
         if ((m.x1 <= x0) && (x0 <= m.x2)) {        // the cursor is on a marquee
             m.alpha = 0.15;                        // change transparency
-            if (x0-m.x1 > m.x2-x0) {
-        m.x2 = x0;
-            }    // closer to left edge
-            else {
-        m.x1 = m.x2; m.x2 = x0;
-            }         // closer to right edge
+            if (x0-m.x1 > m.x2-x0) { m.x2 = x0; }    // closer to left edge
+            else { m.x1 = m.x2; m.x2 = x0; }         // closer to right edge
             return this.marquees.splice(i, 1)[0];  // remove that marquee
-         }
+        }
     }
     return new Marquee(x0, x0);
 };
@@ -495,17 +488,5 @@ MarqueeSort = function(a, b) {
     else return  1;
     return  0;
 }
-/* Old version, sorts by numbers present in the chr name - cannot work well for us anyway
-MarqueeSort = function(a, b) {
-    achr = parseInt(a.chr.match(/(\d+)$/), 10); //'chr12' -> '12'
-    bchr = parseInt(b.chr.match(/(\d+)$/), 10);
-    if (achr <  bchr) return -1;
-    if (achr >  bchr) return  1;
-    if (a.x1 <  b.x1) return -1;
-    if (a.x1 >  b.x1) return  1;
-    return  0;
-}
-*/
-
 
 

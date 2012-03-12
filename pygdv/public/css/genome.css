@@ -766,13 +766,13 @@ input#disableSel {
 /* Left sidebar                  */
 /* ----------------------------- */
 
-#gdv_menu{
+#gdv_menu{;
     z-index:50;
     left:0em;
     position:fixed;
     bottom:0em;
     top:0em;
-    width:10em;
+    width:14em;
     height:100%;
     padding:0em;
     line-height:200%;
@@ -837,7 +837,7 @@ input#disableSel {
     background-color: #C14C4C;
 }
 
-#selections_table{}
+#selections_table{ float:left; }
 #selections_table table.selection_subtable {}
 #selections_table td.position {}
 #selections_table td.description {}
