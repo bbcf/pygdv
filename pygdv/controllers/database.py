@@ -36,10 +36,6 @@ class DatabaseController(BaseController):
         bool = False
         
         for im in imgs.split(',') :
-            if im == "26741":
-                print sha1
-                print chr_zoom
-                bool = True
                 
             im_data = []
             cur = conn.cursor()

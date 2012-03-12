@@ -24,9 +24,6 @@ class ReflectController(BaseController):
 
     @expose()
     def links(self, name, assembly_id):
-        print 'links'
         url = '%s/%s/%s?name=%s' % (reflect_server, reflect_api, reflect_popup, name)
-        print url
         u = urllib2.urlopen(url)
-        print u
         return u

@@ -32,7 +32,7 @@ class SelectionController(object):
             flash('You must have %s permission to delete the project.' % constants.right_upload, 'error')
             return {'save' : 'failed'}
             
-        #print "save %s, color %s, desc %s loc %s" % (project_id, color, description, locations)
+        print "save %s, color %s, desc %s loc %s" % (project_id, color, description, locations)
         ''' For the moment, there is only one selection per project'''
         sel = DBSession.query(Selection).filter(Selection.project_id == project_id).first()
         if sel is None:
