@@ -32,10 +32,8 @@ SelectionPane.prototype.draw = function(store, selections){
 
         var postr = dojo.create("tr", null, selection_subtable);
         var pos = dojo.create("td", {class:"position", innerHTML: loc.chr+":"+loc.start+"-"+loc.end }, postr);
-
         var desctr = dojo.create("tr", null, selection_subtable);
         var desc = dojo.create("td", {class:"description"}, desctr);
-
         var deltr = dojo.create("tr", null, selection_subtable);
         var del = dojo.create("td", {class:"delete"}, deltr);
         dojo.create("div", {innerHTML:"&nbsp", class:"delete_img_field"}, del);

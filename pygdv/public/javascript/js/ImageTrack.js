@@ -26,9 +26,6 @@ ImageTrack.prototype.loadSuccess = function(o) {
     this.max = o.max;
     this.getScale(this.inzoom);
     drawScale(this.scale, this);
-
-
-
     //tileWidth: width, in pixels, of the tiles
     this.tileWidth = o.tileWidth;
     //zoomLevels: array of {basesPerTile, scale, height, urlPrefix} hashes
@@ -58,7 +55,7 @@ ImageTrack.prototype.getZoom = function(scale) {
         if (Math.abs(this.zoomLevels[i].basesPerTile - desiredBases)
             < Math.abs(result.basesPerTile - desiredBases)){
             result = this.zoomLevels[i];
-    }
+        }
     }
     this.zoomCache[scale] = result;
     return result;
@@ -96,38 +93,35 @@ ImageTrack.prototype.getImages = function(zoom, startBase, endBase, inzoom) {
     var result = [];
     var im;
     for (var i = startTile; i <= endTile; i++) {
-    im = this.tileToImage[i];
-
-    if (!im) {
-        im = document.createElement("canvas");
-        im.className = "track_scores";
-        im.db = zoom.urlPrefix;
-        im.nb = i+1;
-        im.min = this.min;
-        im.max = this.max;
-        im.track = this;
-
-        im.color = this.color;
-    //        im = document.createElement("img");
-        dojo.connect(im, "onerror", this.imgErrorHandler);
-        ////prepend this.baseUrl if zoom.urlPrefix is relative
-        //var absUrl = new RegExp("^(([^/]+:)|\/)");
-        //im.src = (zoom.urlPrefix.match(absUrl) ? "" : this.baseUrl)
-        //        + zoom.urlPrefix + i + ".png";
-        ////TODO: need image coord systems that don't start at 0?
-        im.startBase = (i * zoom.basesPerTile); // + this.refSeq.start;
-        im.baseWidth = zoom.basesPerTile;
-        im.tileNum = i;
-        this.tileToImage[i] = im;
+        im = this.tileToImage[i];
+        if (!im) {
+            im = document.createElement("canvas");
+            im.className = "track_scores";
+            im.db = zoom.urlPrefix;
+            im.nb = i+1;
+            im.min = this.min;
+            im.max = this.max;
+            im.track = this;
+            im.color = this.color;
+        //        im = document.createElement("img");
+            dojo.connect(im, "onerror", this.imgErrorHandler);
+            ////prepend this.baseUrl if zoom.urlPrefix is relative
+            //var absUrl = new RegExp("^(([^/]+:)|\/)");
+            //im.src = (zoom.urlPrefix.match(absUrl) ? "" : this.baseUrl)
+            //        + zoom.urlPrefix + i + ".png";
+            ////TODO: need image coord systems that don't start at 0?
+            im.startBase = (i * zoom.basesPerTile); // + this.refSeq.start;
+            im.baseWidth = zoom.basesPerTile;
+            im.tileNum = i;
+            this.tileToImage[i] = im;
+            im.inzoom = inzoom;
+            im.draw = this.draw;
+            im.scores = this.scores;
+            im.track = this;
+        }
         im.inzoom = inzoom;
-        im.draw = this.draw;
-        im.scores = this.scores;
-        im.track = this;
-    };
-    im.inzoom = inzoom;
-    result.push(im);
-
-    };
+        result.push(im);
+    }
     return result;
 };
 
@@ -139,7 +133,7 @@ ImageTrack.prototype.fillBlock = function(blockIndex, block,
     var zoom = this.getZoom(scale);
     var blockWidth = rightBase - leftBase;
     if(!this.inzoom){
-    this.inzoom = 1;
+        this.inzoom = 1;
     }
     var images = this.getImages(zoom, leftBase, rightBase, this.inzoom);
     var im;
@@ -147,10 +141,9 @@ ImageTrack.prototype.fillBlock = function(blockIndex, block,
     var imd = new ImageDrawer();
     imd.getAllScores(images);
 
-
     for (var i = 0; i < images.length; i++) {
-    im = images[i];
-    if (!(im.parentNode && im.parentNode.parentNode)) {
+        im = images[i];
+        if (!(im.parentNode && im.parentNode.parentNode)) {
             im.style.position = "absolute";
         //console.log(im);
             im.style.left = (100 * ((im.startBase - leftBase) / blockWidth)) + "%";
@@ -158,9 +151,8 @@ ImageTrack.prototype.fillBlock = function(blockIndex, block,
             //im.style.top = "0px";
             im.style.height = zoom.height + "px";
             block.appendChild(im);
+        };
     };
-    };
-
     this.heightUpdate(zoom.height, blockIndex);
 };
 
@@ -188,18 +180,18 @@ ImageTrack.prototype.transfer = function(sourceBlock, destBlock, scale,
     var destRight = destBlock.endBase;
     var im;
     for (var i = 0; i < children.length; i++) {
-    im = children[i];
-    if ("startBase" in im) {
-        //if sourceBlock contains an image that overlaps destBlock,
-        if ((im.startBase < destRight)
-        && ((im.startBase + im.baseWidth) > destLeft)) {
-        //move image from sourceBlock to destBlock
-        im.style.left = (100 * ((im.startBase - destLeft) / (destRight - destLeft))) + "%";
-        destBlock.appendChild(im);
-        } else {
-        delete this.tileToImage[im.tileNum];
+        im = children[i];
+        if ("startBase" in im) {
+            //if sourceBlock contains an image that overlaps destBlock,
+            if ((im.startBase < destRight)
+            && ((im.startBase + im.baseWidth) > destLeft)) {
+                //move image from sourceBlock to destBlock
+                im.style.left = (100 * ((im.startBase - destLeft) / (destRight - destLeft))) + "%";
+                destBlock.appendChild(im);
+            } else {
+                delete this.tileToImage[im.tileNum];
+            }
         }
-    }
     }
 };
 
@@ -276,15 +268,14 @@ ImageTrack.prototype.draw = function(){
         var cnvs_height = canvas.height;
         var cnvs_width = canvas.width;
         ctx.clearRect(0, 0, cnvs_width, cnvs_height);
-        /* prepare drawing*/
-            var d = max - min; // distance between min & max
-        var Z = max * cnvs_height / d; // where is the zero line
-        // draw zero line
-            ctx.fillStyle = 'black';
-            ctx.beginPath();
-            ctx.closePath();
-            ctx.fill();
-
+        /* prepare drawing */
+        var d = max - min; // distance between min & max
+        var Z = max * cnvs_height / d; // where the zero line is
+        /* draw zero line */
+        ctx.fillStyle = 'black';
+        ctx.beginPath();
+        ctx.closePath();
+        ctx.fill();
         ctx.fillStyle = this.color;
         //////////////////////////////////////////////////
         // ctx.strokeRect(0,0,canvas.width, canvas.height);
@@ -300,35 +291,34 @@ ImageTrack.prototype.draw = function(){
 
         /* DRAW SCORES */
         for(i=0; i<=len - 1 ; i+=2){
-        var pos = data[i];
-        var conv_pos = cnvs_width * pos / end_pos;
-        var real_score = data[i+1];
-        if(prev_pos != null){
-            var width = (conv_pos - prev_pos);
-            var trans_score = - ( prev_score * cnvs_height / d * inZoom );
-            ctx.rect(prev_pos, Z , width, trans_score);
-            //console.log('x: ' + prev_pos + ' y: ' + Z + ' w: ' + width + ' h: ' + trans_score + ' => ' + (Z + trans_score));
-        };
-        if (pos!= null){
-            prev_pos = conv_pos;
-            prev_score = real_score;
-        }
+            var pos = data[i];
+            var conv_pos = cnvs_width * pos / end_pos;
+            var real_score = data[i+1];
+            if (prev_pos != null){
+                var width = (conv_pos - prev_pos);
+                var trans_score = - ( prev_score * cnvs_height / d * inZoom );
+                ctx.rect(prev_pos, Z , width, trans_score);
+                //console.log('x: ' + prev_pos + ' y: ' + Z + ' w: ' + width + ' h: ' + trans_score + ' => ' + (Z + trans_score));
+            };
+            if (pos!= null){
+                prev_pos = conv_pos;
+                prev_score = real_score;
+            }
         }
 
         if(prev_pos != null){
-        var width = (cnvs_width - prev_pos);
-        var trans_score = - ( prev_score * cnvs_height / d * inZoom );
-        //ctx.rect(prev_pos * baseWidth, Z , width, trans_score);
-        ctx.rect(prev_pos, Z , width, trans_score);
-        //console.log('x: ' + prev_pos + ' y: ' + Z + ' w: ' + width + ' h: ' + trans_score);
+            var width = (cnvs_width - prev_pos);
+            var trans_score = - ( prev_score * cnvs_height / d * inZoom );
+            //ctx.rect(prev_pos * baseWidth, Z , width, trans_score);
+            ctx.rect(prev_pos, Z , width, trans_score);
+            //console.log('x: ' + prev_pos + ' y: ' + Z + ' w: ' + width + ' h: ' + trans_score);
         }
         ctx.closePath();
-            ctx.fill();
+        ctx.fill();
         canvas.style.zIndex = 50;
-    }
+        //}
     }
 };
-
 
 
 /**
@@ -337,9 +327,10 @@ ImageTrack.prototype.draw = function(){
 */
 ImageTrack.prototype.scores = function(){
     var sc = dojo.byId('sq_' + this.db + '_' + this.nb);
-    if(sc) return dojo.fromJson(sc.innerHTML);
+    if (sc) return dojo.fromJson(sc.innerHTML);
     return false
 };
+
 /*
 
 Copyright (c) 2007-2011 The Evolutionary Software Foundation
