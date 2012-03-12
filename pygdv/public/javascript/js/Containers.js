@@ -141,37 +141,20 @@ PrincipalContainer.prototype.operationContainer = function(DomNode, DijitNode, p
     this.operations = ops_container;
 
     // initialize the operations
+    var op = new Operations();
+    op.pane = cont;
+    _gdv_info.operations = op;
+
     var menu = new dijit.Menu({colspan : 1,
 			       style : {width : '10em' 
 				       }});
     var c = paths.childs;
     var l = c.length;
     for(var i=0;i<l;i++){
-	op_add_child(menu, menu, c[i]);
+	op.menu_add_child(menu, c[i]);
     }
     menu.placeAt('tab_ops');
 };
 
 
 
-function op_add_child(menu, parent, node){
-    var c = node.childs;
-    var l = c.length;
-    if(l>0){
-	// node has childs (build a menu & add childs to it)
-	var m = new dijit.Menu({});
-
-	for(var i=0;i<l;i++){
-	    op_add_child(menu, m, c[i]);
-	}
-	var p = new dijit.PopupMenuItem({label : node.key,
-					 popup : m 
-					});
-	parent.addChild(p);
-    } else {
-	// it's the end (must connect to the form apparition)
-	var m = new dijit.MenuItem({label : node.key,
-				   });
-	parent.addChild(m);
-    }
-};
