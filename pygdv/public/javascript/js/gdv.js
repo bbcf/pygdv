@@ -4,7 +4,7 @@
  */
 
 //MODIFY HERE
-var _GDV_PROXY = window.location.hostname;
+var _GDV_PROXY = 'http://' + window.location.hostname;
 var _GDV_PREFIX = "/pygdv"
 var _GDV_URL=_GDV_PROXY + _GDV_PREFIX;
 
@@ -23,6 +23,9 @@ var _GDV_FORM_URL = _GDV_URL + '/forms';
 var _GDV_LINK_URL = _GDV_URL + '/reflect/links';
 
 var _GENREP_URL = 'http://bbcftools.vital-it.ch/genrep';
+
+console.log(_GDV_URL);
+console.log("sdsdiosdioio");
 
 var _GDV_JOB_STATUS_WAIT = 8000;
 var _gdvls;//the live search
