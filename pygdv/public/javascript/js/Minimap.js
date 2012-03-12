@@ -45,12 +45,11 @@ Minimap.prototype.update = function() {
     this.chr_length = this.gv.ref['length'];
     // Get the cytosomal bands
     callback = dojo.hitch(this, function(bands) {
-       	this.bands = bands;
+        this.bands = bands;
         this.count = this.bands.length;
-
-	if(this.count === 0){
-	    console.info('GenRep is telling there is no bands on this chromosome.');
-	};
+        if(this.count === 0){
+            console.info('GenRep is telling there is no bands on this chromosome.');
+        };
         dojo.byId('overview').style.backgroundImage = "";
         this.draw();
     });
