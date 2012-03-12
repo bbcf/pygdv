@@ -838,20 +838,19 @@ input#disableSel {
 }
 
 #selections_table{}
-#selections_table .selection_subtable {}
+#selections_table table.selection_subtable {}
 #selections_table td.position {}
 #selections_table td.description {}
-#selections_table td.delete {
+#selections_table td.delete {}
+#selections_table td.delete div.delete_img_field {
+    position: relative;
+    height: 17px; width: 17px;
     background: url("../images/delete.png") no-repeat;
-}
-#selections_table td.delete .delete_img_field {
-    height: 16px; width: 16px;
-    text-decoration: none;
-    color: blue;
 }
 #selections_table td.delete .delete_img_field:hover {
     /*background: url("../images/delete_red.png") no-repeat;*/
-    height: 14px; width: 14px;
+    height: 15px; width: 15px;
+    top: -1px; left: -1px;
     border: 1px solid black;
 }
 

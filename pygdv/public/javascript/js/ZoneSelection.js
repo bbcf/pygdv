@@ -148,8 +148,8 @@ ZoneSelection.prototype.update_on_server = function(){
     url : _GDV_SEL_URL + '/save',
     postData : 'project_id=' + _gdv_info.project_id + '&color=grey&description="desc crip tion"&locations=' + dojo.toJson(this.handler.marquees),
     error : function(data){
-        console.error(data);
-    }
+                console.error(data);
+            }
     };
     dojo.xhrPost(xhrArgs);
 };

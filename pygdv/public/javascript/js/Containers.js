@@ -36,20 +36,20 @@ PrincipalContainer.prototype.createContainer = function(browser, container){
         principal);
     this.principal = principal;
     this.principal_dijit = principal_dijit;
-    
-    // init some parameters 
+
+    // init some parameters
     var menu_nav = ['Home', 'Tracks', 'Projects', 'Circles'];
     if (!_gdv_info.admin){
-	init_operations = ['You must be logged in to use operations'];
-	if (_gdv_info.mode == 'download'){
-	    menu_nav = ['Home', 'Copy']
-	} else {
-	    menu_nav = ['Home']
-	}
+    init_operations = ['You must be logged in to use operations'];
+    if (_gdv_info.mode == 'download'){
+        menu_nav = ['Home', 'Copy']
+    } else {
+        menu_nav = ['Home']
+    }
     };
-    
+
     // create additionnal childs containers
- 
+
     this.navigationContainer(principal, principal_dijit, menu_nav);
     this.trackContainer(browser);
     this.selectionContainer(principal, principal_dijit);
@@ -78,29 +78,29 @@ PrincipalContainer.prototype.trackContainer = function(browser){
 * Add the Navigation tab
 */
 PrincipalContainer.prototype.navigationContainer = function(DomNode, DijitNode, menu_nav){
-    
+
     var cont = dojo.create('div', {}, DomNode);
     var nav_container = new dijit.layout.ContentPane({
             title: "Navigation",
         id:'tab_navigation'
     }, cont);
-    
-    
+
+
     var len = menu_nav.length;
     for (var i=0; i<len; i++){
-	link_name = menu_nav[i];
-	link_end = link_name.toLowerCase();
-	
-	var link = dojo.create('a', {href : _GDV_URL + '/' + link_end,
-				     className : 'hl',
-				     id : 'menu_' + link_name
-				    }, cont);
-	dojo.create('img', {src : window.picsPathRoot + "menu_" + link_end + ".png",
-			    className : 'gdv_menu_image'
-			   }, link);
-	dojo.create('span', {innerHTML : link_name,
-			     className : 'gdv_menu_item'
-			    }, link);
+    link_name = menu_nav[i];
+    link_end = link_name.toLowerCase();
+
+    var link = dojo.create('a', {href : _GDV_URL + '/' + link_end,
+                     className : 'hl',
+                     id : 'menu_' + link_name
+                    }, cont);
+    dojo.create('img', {src : window.picsPathRoot + "menu_" + link_end + ".png",
+                className : 'gdv_menu_image'
+               }, link);
+    dojo.create('span', {innerHTML : link_name,
+                 className : 'gdv_menu_item'
+                }, link);
     }
     DijitNode.addChild(nav_container);
     this.navigation = nav_container;
@@ -112,7 +112,7 @@ PrincipalContainer.prototype.navigationContainer = function(DomNode, DijitNode, 
 */
 PrincipalContainer.prototype.selectionContainer = function(DomNode, DijitNode){
     var cont = dojo.create('div', {}, DomNode);
-    
+
     var sel_container = new dijit.layout.ContentPane({
             title: "Selections",
         id:'tab_sels'
@@ -132,9 +132,9 @@ PrincipalContainer.prototype.selectionContainer = function(DomNode, DijitNode){
 */
 PrincipalContainer.prototype.operationContainer = function(DomNode, DijitNode, paths){
     var cont = dojo.create('div', {}, DomNode);
-    
+
     var ops_container = new dijit.layout.ContentPane({
-            title: "Operations",
+        title: "Operations",
         id:'tab_ops'
     }, cont);
     DijitNode.addChild(ops_container);
@@ -146,12 +146,12 @@ PrincipalContainer.prototype.operationContainer = function(DomNode, DijitNode, p
     _gdv_info.operations = op;
 
     var menu = new dijit.Menu({colspan : 1,
-			       style : {width : '10em' 
-				       }});
+                   style : {width : '10em'
+                       }});
     var c = paths.childs;
     var l = c.length;
     for(var i=0;i<l;i++){
-	op.menu_add_child(menu, c[i]);
+    op.menu_add_child(menu, c[i]);
     }
     menu.placeAt('tab_ops');
 };

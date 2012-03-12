@@ -32,17 +32,16 @@ SelectionPane.prototype.draw = function(store, selections){
 
         var postr = dojo.create("tr", null, selection_subtable);
         var pos = dojo.create("td", {class:"position", innerHTML: loc.chr+":"+loc.start+"-"+loc.end }, postr);
+        var del = dojo.create("td", {class:"delete"}, postr);
         var desctr = dojo.create("tr", null, selection_subtable);
-        var desc = dojo.create("td", {class:"description"}, desctr);
-        var deltr = dojo.create("tr", null, selection_subtable);
-        var del = dojo.create("td", {class:"delete"}, deltr);
+        var desc = dojo.create("td", {class:"description", colspan:2}, desctr);
         dojo.create("div", {innerHTML:"&nbsp", class:"delete_img_field"}, del);
         dojo.create("div", {innerHTML:"Enter description", class:"description_field",
                            style: {color: "grey"}}, desc);
 
-    this.connect_location(pos, loc);
-    this.connect_description(desc, loc);
-    this.connect_delete(del, loc, this.handler);
+        this.connect_location(pos, loc);
+        this.connect_description(desc, loc);
+        this.connect_delete(del, loc, this.handler);
     }
 };
 
@@ -54,7 +53,7 @@ SelectionPane.prototype.connect_location = function(domNode, location){
     if(location){
     dojo.connect(domNode, "dblclick", function(e){
             _gdv_info.gb.navigateTo(location.navigateTo());
-        dojo.stopEvent(e);
+            dojo.stopEvent(e);
         });
     }
 };
