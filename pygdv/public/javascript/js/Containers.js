@@ -10,19 +10,19 @@ function PrincipalContainer(){};
 */
 PrincipalContainer.prototype.show_selections = function(){
     this.principal_dijit.selectChild('tab_sels');
-    dojo.cookie("menu_current_state", "selections");
+    dojo.cookie("menu_current_state", "Selections");
 };
 PrincipalContainer.prototype.show_tracks = function(){
     this.principal_dijit.selectChild('tab_tracks');
-    dojo.cookie("menu_current_state", "tracks");
+    dojo.cookie("menu_current_state", "Tracks");
 };
 PrincipalContainer.prototype.show_navigation = function(){
     this.principal_dijit.selectChild('tab_navigation');
-    dojo.cookie("menu_current_state", "navigation");
+    dojo.cookie("menu_current_state", "Navigation");
 };
 PrincipalContainer.prototype.show_operations = function(){
     this.principal_dijit.selectChild('tab_ops');
-    dojo.cookie("menu_current_state", "operations");
+    dojo.cookie("menu_current_state", "Operations");
 };
 
 
@@ -62,13 +62,37 @@ PrincipalContainer.prototype.createContainer = function(browser, container){
     if (dojo.cookie("menu_current_state")) {
         this.menu_current_state = dojo.cookie("menu_current_state");
     } else { //create a new cookie
-        this.menu_current_state = "navigation";
+        this.menu_current_state = "Navigation";
         dojo.cookie("menu_current_state", this.menu_current_state);
     }
 
     return principal;
 };
 
+
+/*
+* Switch to the last visited menu element
+* Updates the cookie on click on a new menu element
+*/
+PrincipalContainer.prototype.switchTab = function(){
+    var ctx = this;
+    var buttons = dojo.query(".dijitAccordionTitle", this.principal);
+    var bl = buttons.length;
+    for (var i=0; i<bl; i++) {
+        dojo.connect(buttons[i], "click", function(e){
+            ctx.menu_current_state = this.firstElementChild.lastElementChild.innerHTML;
+            dojo.cookie("menu_current_state", ctx.menu_current_state);
+            dojo.stopEvent(e);
+        });
+    }
+    switch (ctx.menu_current_state){
+        case "Navigation": ctx.show_navigation(); break;
+        case "Selections": ctx.show_selections(); break;
+        case "Operations": ctx.show_operations(); break;
+        case "Tracks"    : ctx.show_tracks(); break;
+        default: console.log("ProgrammingError: cannot retrieve menu_current_state from cookie.");
+    }
+}
 
 
 /**

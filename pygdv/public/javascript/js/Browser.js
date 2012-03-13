@@ -143,10 +143,10 @@ var Browser = function(params) {
                                  + " .. "
                                  + (((newRef.start + newRef.end) * 0.6) | 0));
                 } else {
-                        brwsr.navigateTo(newRef.name + ":" + oldLoc);
+                    brwsr.navigateTo(newRef.name + ":" + oldLoc);
                 }
             } else {
-                        brwsr.navigateTo(newRef.name + ":"
+                    brwsr.navigateTo(newRef.name + ":"
                                  + (((newRef.start + newRef.end) * 0.4) | 0)
                                  + " .. "
                                  + (((newRef.start + newRef.end) * 0.6) | 0));
@@ -177,23 +177,14 @@ var Browser = function(params) {
         _gdv_pc = new PrincipalContainer();
         _gdv_pc.createContainer(brwsr, menuleft);
 
-        //console.log(_gdv_pc.menu_current_state)
-        //_gdv_pc.show_navigation();
-
-        //switch (_gdv_pc.menu_current_state){
-        //    case "navigation": console.log("n"); _gdv_pc.show_navigation(); console.log("n");break;
-        //    case "selections": _gdv_pc.show_selections(); break;
-        //    case "operations": _gdv_pc.show_operations(); break;
-        //    case "tracks"    : _gdv_pc.show_tracks(); break;
-        //    default: console.log("Cannot retrieve menu_current_state from cookie.")
-        //}
-
-
         // Set up track list
         brwsr.createTrackList(brwsr.container,brwsr.tab_tracks.domNode, params);
 
         containerWidget.startup();
         brwsr.isInitialized = true;
+
+        // Switch to the last visited menu element
+        _gdv_pc.switchTab();
 
         // Set initial location
         var oldLocMap = dojo.fromJson(dojo.cookie(brwsr.container.id + "-location")) || {};
