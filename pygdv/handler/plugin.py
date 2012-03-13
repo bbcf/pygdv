@@ -3,6 +3,14 @@ from tg import app_globals as gl
 root_key = 'Operations'
 
 
+
+
+def get_plugin_byId(_id):
+    if(_id):
+        plugs = gl.plugin_manager.getAllPlugins()
+        for p in plugs :
+            if p.plugin_object.unique_id() == str(_id) : return p
+
 def get_operations_paths():
     plugs = gl.plugin_manager.getAllPlugins()
     return mix_plugin_paths(plugs)

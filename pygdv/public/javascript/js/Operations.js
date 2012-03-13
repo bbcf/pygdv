@@ -28,9 +28,13 @@ Operations.prototype.menu_add_child = function(parent, node){
 	parent.addChild(p);
     } else {
 	// it's the end (must connect to the form apparition)
+	var ctx = this;
 	var m = new dijit.MenuItem({label : node.key,
-				   });
-	this.connect_menu(m, node);
+				    onClick : function(e){
+					ctx.serv_get_form(node.id);
+					ctx.show_form();
+					dojo.stopEvent(e);
+				    }});
 	parent.addChild(m);
     }
 };
@@ -39,23 +43,47 @@ Operations.prototype.menu_add_child = function(parent, node){
 
 
 /**
-* Create the iframe of the serv
+* OP FORM
+* Create the iframe of the serv (will contains the form)
 */
-Operations.prototype.create_frame = function(container){
+Operations.prototype.create_frame = function(container, fwdgt, bwdgt){
     this.ifr = dojo.io.iframe.create(this.ifr_id, '_gdv_info.operations.iframe_loaded()', _GDV_PLUG_URL + '/get_form');
     container.appendChild(this.ifr);
+    this.container = container;
+    this.fwdgt = fwdgt;
+    this.bwdgt = bwdgt;
+    this.form_showed = true;
+    this.hide_form();
 };
 
 /**
-* Connect the menu item to show the form
+* OP FORM
+* Show the operation form
 */
-Operations.prototype.connect_menu = function(menu, node){
-    var ctx = this;
-    dojo.connect(menu, 'onclick', function(e){
-	ctx.serv_get_form(node.id);
-	ctx.show_iframe();
-	dojo.stopEvent(e);
-    });
+Operations.prototype.show_form = function(){
+    if (!(this.form_showed)){
+	
+	this.bwdgt.addChild(this.fwdgt);
+	this.form_showed = true;
+	var ifr = dojo.style(this.ifr, {visibility:'visible', height:'100%', width:'100%', zIndex:'500', backgroundColor: 'white'});
+	var closer = dojo.create('img', {src:'../images/delete.png', style : {zIndex:1000, position:'absolute'}}, this.container);
+	var ctx = this;
+	dojo.connect(closer, 'click', function(e){
+	    ctx.hide_form();
+	});
+
+
+    };
+};
+/**
+* OP FORM
+* Hide the operation form
+*/
+Operations.prototype.hide_form = function(){
+    if (this.form_showed){
+	this.bwdgt.removeChild(this.fwdgt);
+	this.form_showed = false;
+    };
 };
 
 /**
@@ -64,26 +92,8 @@ Operations.prototype.connect_menu = function(menu, node){
 */
 Operations.prototype.serv_get_form = function(form_id){
     this.ifr.src = _GDV_PLUG_URL + '/get_form?form_id=' + form_id;
+    console.log(_GDV_PLUG_URL + '/get_form?form_id=' + form_id);
 };
-
-
-/**
-* OP SERV
-*
-*/
-Operations.prototype.show_iframe = function(){
-    if (this.ifr_loaded){
-	var ifr = dojo.style(this.ifr, {visibility:'visible', height:'100%', width:'100%', zIndex:'500', backgroundColor: 'white'});
-	dojo.query('#' + this.id + ' >').forEach(function(node, i, arr){
-     	    node.style.display='block';
-	});
-    }
-};
-
-Operations.prototype.hide_iframe = function(){
-    
-};
-
 
 Operations.prototype.iframe_loaded = function(){
     this.ifr_loaded = true;

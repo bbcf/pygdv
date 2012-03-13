@@ -18,18 +18,23 @@ from bbcflib.genrep import GenRep
 success = 1
 
 
-
+manager = None
 
 def session_connection(*args, **kw):
     print 'init of sessions args : %s, kw : %s' %(args, kw)
     import pygdv.celery.model
-   
+    manager = init_plugins()
     
     
 worker_init.connect(session_connection)
 
 
-
+def init_plugins():
+    from yapsy.PluginManager import PluginManager
+    manager = PluginManager()
+    manager.setPluginPlaces([constants.plugin_directory()])
+    manager.collectPlugins()
+    return manager  
 
 
 import subprocess
@@ -37,6 +42,7 @@ import subprocess
 
 @task()
 def test(x):
+    print manager.get
     print 'this is a test %s' % x
     return x
 

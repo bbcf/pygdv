@@ -39,6 +39,14 @@ class OperationPlugin(object):
         
         raise NotImplementedError('you must override this method in your plugin.')
         
+    def process(self, **kw):
+        '''
+        Here you must define your function that will process the form parameters. 
+        ex : a simple method that add two parameters :
+        return kw.get('param1', 0) + kw.get('param2', 0)
+        '''
+        
+        raise NotImplementedError('you must override this method in your plugin.')
 
     
     def unique_id(self):
@@ -46,6 +54,6 @@ class OperationPlugin(object):
         It's an unique identifier for your plugin.
         '''
         if not self.uid:
-            self.uid = uuid.uuid4()
-        return self.uid.urn.split(':')[2]
+            self.uid = uuid.uuid4().urn.split(':')[2]
+        return self.uid
     

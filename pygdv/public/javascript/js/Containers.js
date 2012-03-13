@@ -27,9 +27,9 @@ PrincipalContainer.prototype.show_operations = function(){
 * Create the CONTAINER for tracks, selections, operation, ...
 * Will create the Accordion container.
 */
-PrincipalContainer.prototype.createContainer = function(browser, container, viewContainer){
+PrincipalContainer.prototype.createContainer = function(browser, menuLeftContainer, viewContainer, formwidget, browserwidget){
     // the principal container and the corresponding dijit container
-    var principal = dojo.create('div', {id : 'principal_cont'}, container);
+    var principal = dojo.create('div', {id : 'principal_cont'}, menuLeftContainer);
     var principal_dijit = new dijit.layout.AccordionContainer({
             style: "height: 100%; width: 100%;"
         },
@@ -52,7 +52,7 @@ PrincipalContainer.prototype.createContainer = function(browser, container, view
     this.navigationContainer(principal, principal_dijit, menu_nav);
     this.trackContainer(browser);
     this.selectionContainer(principal, principal_dijit);
-    this.operationContainer(principal, principal_dijit, init_operations, viewContainer);
+    this.operationContainer(principal, principal_dijit, init_operations, viewContainer, formwidget, browserwidget);
 
     // Retrieve from a cookie the last element of menu selected
     if (dojo.cookie("menu_current_state")) {
@@ -165,7 +165,7 @@ PrincipalContainer.prototype.selectionContainer = function(DomNode, DijitNode){
 /**
 * Add the Operations tab
 */
-PrincipalContainer.prototype.operationContainer = function(DomNode, DijitNode, paths, viewContainer){
+PrincipalContainer.prototype.operationContainer = function(DomNode, DijitNode, paths, viewContainer, fwdgt, bwdgt){
     var cont = dojo.create('div', {}, DomNode);
 
     var ops_container = new dijit.layout.ContentPane({
@@ -193,9 +193,7 @@ PrincipalContainer.prototype.operationContainer = function(DomNode, DijitNode, p
 
     // initialize the iframe that will be showed 
     // if an user click on an Operation button
-    var c = dojo.create('div', {}, viewContainer)
-    var menuWidget = new dijit.layout.ContentPane({region: "right",splitter:false, splitter:true, style : {overflow:'hidden'}}, c);
-    op.create_frame(c);
+    op.create_frame(viewContainer, fwdgt, bwdgt);
 };
 
 

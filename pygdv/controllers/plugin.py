@@ -7,6 +7,7 @@ from repoze.what.predicates import has_any_permission
 from yapsy.PluginManager import PluginManager
 from pylons import tmpl_context
 from formencode import Invalid
+from pygdv import handler
 from pygdv.widgets.plugins.form import ExampleForm
 
 
@@ -17,31 +18,39 @@ class PluginController(BaseController):
     def index(self, *args, **kw):
         return 'got *args (%s), **kw(%s)' % (args, kw)
     
+    @expose()
+    def bad_form(self, *args, **kw):
+        return 'bad form : got *args (%s), **kw(%s)' % (args, kw)
+    
     
     @expose('pygdv.templates.plugin_form')
     def get_form(self, *args, **kw):
-#        plug = gl.plugin_manager.getPluginByName(name)
-#        if plug is None:
-#            raise redirect(url('./'))
-        tmpl_context.form = ExampleForm(action='validation')
-        #plug.plugin_object.output()(action='validation')
-        kw['_plugin_name'] = 'name'
-        return {'page' : 'form', 'value' : kw}
+        plug = handler.plugin.get_plugin_byId(kw.get('form_id', False))
+        if plug is None:
+            raise redirect(url('./bad_form'))
+        obj = plug.plugin_object
+        tmpl_context.form = obj.output()(action='./validation')
+        kw['form_id'] = kw.get('form_id')
+        return {'page' : 'form', 'title' : obj.title(), 'value' : kw}
 
     @expose()
-    def validation(self, _plugin_name, *args, **kw):
-        plug = gl.plugin_manager.getPluginByName(_plugin_name)
-        kw['_plugin_name'] = _plugin_name
+    def validation(self, form_id, *args, **kw):
+        plug = handler.plugin.get_plugin_byId(form_id)
+        print plug
+        kw['form_id'] = form_id
         if plug is None:
             flash('Validation failed', 'error')
             raise redirect(url('./get_form'))
-
+        
+        
+        
         form = plug.plugin_object.output()(action='validation')
+        
         try:
             form.validate(kw, use_request_local=True)
         except Invalid as e:
             flash(e, 'error')
-            raise redirect(url('./get_form', {'name':_plugin_name}))
+            raise redirect(url('./get_form', {'form_id':form_id}))
         
         raise redirect(url('./ok', **kw))
 

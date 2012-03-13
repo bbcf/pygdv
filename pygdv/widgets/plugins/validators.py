@@ -6,11 +6,12 @@ class TrackValidator(formencode.api.FancyValidator):
     Validate a track datatype.
     ex : TrackValidator(datatype='signal')
     '''
-    datatype = 'features'
+    datatype = 'features' # datatype of a track
+    not_empty = False     # if the field can be empty
     
     messages = { 'dt' : 'Wrong track datatype : %(dt)s.',
                  'overlapping' : 'You give a track with overlapping scores'
-        }
+        }                       # messages to give to user if validation fail
     
     def _to_python(self, value, state):
         '''
@@ -29,3 +30,4 @@ class TrackValidator(formencode.api.FancyValidator):
         if False:
             raise formencode.Invalid(self.message('overlaping'))
         
+    

@@ -95,10 +95,15 @@ var Browser = function(params) {
             design: "sidebar",
             gutters: false
         }, brwsr.container);
-        var contentWidget = new dijit.layout.ContentPane({region: "top"}, topPane);
+        
+	var contentWidget = new dijit.layout.ContentPane({region: "top"}, topPane);
         var browserWidget = new dijit.layout.ContentPane({region: "center"}, viewElem);
-        var menuWidget = new dijit.layout.ContentPane({region: "left",splitter:false, splitter:true, style : {overflow:'hidden'}}, menuleft);
-        //var bottomWidget = new dijit.layout.ContentPane({region: "bottom",splitter:true}, bottomPane);
+        var menuWidget = new dijit.layout.ContentPane({region: "left", splitter:true, style : {overflow:'hidden'}}, menuleft);
+	
+	//add a layout for the operation form
+	var formElem = dojo.create('div', {id:'op_form'}, brwsr.container);
+	var formWidget = new dijit.layout.ContentPane({region: "right", splitter:false, style : {overflow:'hidden'}}, formElem);
+	//var bottomWidget = new dijit.layout.ContentPane({region: "bottom",splitter:true}, bottomPane);
 
         // This creates the permalink to the current chr and loc
         if (params.bookmark) {
@@ -175,7 +180,7 @@ var Browser = function(params) {
 
         // Set up principal container
 	_gdv_pc = new PrincipalContainer();
-        _gdv_pc.createContainer(brwsr, menuleft, brwsr.container);
+        _gdv_pc.createContainer(brwsr, menuleft, formElem, formWidget, containerWidget);
 	
         // Set up track list
         brwsr.createTrackList(brwsr.container,brwsr.tab_tracks.domNode, params);

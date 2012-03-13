@@ -782,6 +782,22 @@ input#disableSel {
     background-color:#EDEDED;
 }
 
+#op_form{
+    z-index:50;
+    position:fixed;
+    bottom:0em;
+    top:0em;
+    right:0em;
+    width:30em;
+    height:100%;
+    padding:0em;
+    line-height:200%;
+    border-width:0em 0.1em 0em 0em;
+    border-style:outset;
+    border-color:#FFFFFF;
+    background-color:#EDEDED;   
+
+}
 .menu_entry{
     font-weight: bold;
     text-transform: uppercase;

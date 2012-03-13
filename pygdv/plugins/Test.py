@@ -16,6 +16,9 @@ class TestPlugin(IPlugin, OperationPlugin):
     
     def output(self):
         return form.ExampleForm
+    
+    def process(self, **kw):
+        return 0
 
 
   
