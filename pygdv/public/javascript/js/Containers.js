@@ -10,19 +10,15 @@ function PrincipalContainer(){};
 */
 PrincipalContainer.prototype.show_selections = function(){
     this.principal_dijit.selectChild('tab_sels');
-    dojo.cookie("menu_current_state", "Selections");
 };
 PrincipalContainer.prototype.show_tracks = function(){
     this.principal_dijit.selectChild('tab_tracks');
-    dojo.cookie("menu_current_state", "Tracks");
 };
 PrincipalContainer.prototype.show_navigation = function(){
     this.principal_dijit.selectChild('tab_navigation');
-    dojo.cookie("menu_current_state", "Navigation");
 };
 PrincipalContainer.prototype.show_operations = function(){
     this.principal_dijit.selectChild('tab_ops');
-    dojo.cookie("menu_current_state", "Operations");
 };
 
 
@@ -71,10 +67,9 @@ PrincipalContainer.prototype.createContainer = function(browser, container){
 
 
 /*
-* Switch to the last visited menu element
-* Updates the cookie on click on a new menu element
+* Updates the 'menu_current_state' cookie on click on a menu element
 */
-PrincipalContainer.prototype.switchTab = function(){
+PrincipalContainer.prototype.setOnclickMenuElement = function(){
     var ctx = this;
     var buttons = dojo.query(".dijitAccordionTitle", this.principal);
     var bl = buttons.length;
@@ -85,11 +80,17 @@ PrincipalContainer.prototype.switchTab = function(){
             dojo.stopEvent(e);
         });
     }
-    switch (ctx.menu_current_state){
-        case "Navigation": ctx.show_navigation(); break;
-        case "Selections": ctx.show_selections(); break;
-        case "Operations": ctx.show_operations(); break;
-        case "Tracks"    : ctx.show_tracks(); break;
+}
+
+/*
+* Switch to the last visited menu element
+*/
+PrincipalContainer.prototype.switchMenuElement = function(){
+    switch (this.menu_current_state){
+        case "Navigation": this.show_navigation(); break;
+        case "Selections": this.show_selections(); break;
+        case "Operations": this.show_operations(); break;
+        case "Tracks"    : this.show_tracks(); break;
         default: console.log("ProgrammingError: cannot retrieve menu_current_state from cookie.");
     }
 }

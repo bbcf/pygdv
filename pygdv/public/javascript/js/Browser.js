@@ -184,7 +184,8 @@ var Browser = function(params) {
         brwsr.isInitialized = true;
 
         // Switch to the last visited menu element
-        _gdv_pc.switchTab();
+        _gdv_pc.setOnclickMenuElement();
+        _gdv_pc.switchMenuElement();
 
         // Set initial location
         var oldLocMap = dojo.fromJson(dojo.cookie(brwsr.container.id + "-location")) || {};
