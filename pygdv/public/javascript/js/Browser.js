@@ -95,15 +95,17 @@ var Browser = function(params) {
             design: "sidebar",
             gutters: false
         }, brwsr.container);
-        
-	var contentWidget = new dijit.layout.ContentPane({region: "top"}, topPane);
+
+        var contentWidget = new dijit.layout.ContentPane({region: "top"}, topPane);
         var browserWidget = new dijit.layout.ContentPane({region: "center"}, viewElem);
-        var menuWidget = new dijit.layout.ContentPane({region: "left", splitter:true, style : {overflow:'hidden'}}, menuleft);
-	
-	//add a layout for the operation form
-	var formElem = dojo.create('div', {id:'op_form'}, brwsr.container);
-	var formWidget = new dijit.layout.ContentPane({region: "right", splitter:false, style : {overflow:'hidden'}}, formElem);
-	//var bottomWidget = new dijit.layout.ContentPane({region: "bottom",splitter:true}, bottomPane);
+        var menuWidget = new dijit.layout.ContentPane({region: "left", splitter:true,
+                                                       style : {overflow:'hidden'}}, menuleft);
+
+        //add a layout for the operation form
+        var formElem = dojo.create('div', {id:'op_form'}, brwsr.container);
+        var formWidget = new dijit.layout.ContentPane({region: "right", splitter:false,
+                                                       style : {overflow:'hidden'}}, formElem);
+        //var bottomWidget = new dijit.layout.ContentPane({region: "bottom",splitter:true}, bottomPane);
 
         // This creates the permalink to the current chr and loc
         if (params.bookmark) {
@@ -128,10 +130,10 @@ var Browser = function(params) {
         var refCookie = dojo.cookie(params.containerID + "-refseq");
         brwsr.refSeq = refSeqs[0];
         for (i = 0; i < refSeqs.length; i++) {
-                brwsr.chromList.options[i] = new Option(refSeqs[i].name, refSeqs[i].name);
+            brwsr.chromList.options[i] = new Option(refSeqs[i].name, refSeqs[i].name);
             if (refSeqs[i].name.toUpperCase() == String(refCookie).toUpperCase()) {
-                    brwsr.refSeq = brwsr.allRefs[refSeqs[i].name];
-                    brwsr.chromList.selectedIndex = i;
+                brwsr.refSeq = brwsr.allRefs[refSeqs[i].name];
+                brwsr.chromList.selectedIndex = i;
             }
          }
 
@@ -179,9 +181,9 @@ var Browser = function(params) {
         brwsr.buildLeftMenu(menuleft);
 
         // Set up principal container
-	_gdv_pc = new PrincipalContainer();
+        _gdv_pc = new PrincipalContainer();
         _gdv_pc.createContainer(brwsr, menuleft, formElem, formWidget, containerWidget);
-	
+
         // Set up track list
         brwsr.createTrackList(brwsr.container,brwsr.tab_tracks.domNode, params);
 
@@ -283,18 +285,31 @@ Browser.prototype.buildMenuItem = function(link_end, link_name){
  * N.B : the leftPanel is now on the
  * bottom with a div which can show or hide the panel
  */
-Browser.prototype.createTrackList = function(container,tab, params) {
-    var trackListDiv = document.createElement("div");
-    trackListDiv.id = "tracksAvail";
-    trackListDiv.className = "container handles";
-    trackListDiv.style.cssText = "width: 80%; height: 80%; overflow-x: hidden; overflow-y: auto;";
-    tab.appendChild(trackListDiv);
+Browser.prototype.createTrackList = function(container,tab_tracks, params) {
+    // Buttons to sort tracks
+    var sort = dojo.create("table",
+            { id: "tracksSort",
+              style: {width:"100%"} },
+            tab_tracks);
+    var sorttr = dojo.create("tr", null, sort);
+    var sortByName = dojo.create("td", {innerHTML: "By name"}, sorttr);
+    var sortByDate = dojo.create("td", {innerHTML: "By date"}, sorttr);
+    //dojo.connect(sortByName, function(e){});
+    //dojo.connect(sortByDate, function(e){});
 
-    //add an explanation on the panel
-    var exp = document.createElement("div");
-    exp.id="dnd_exp";
-    exp.innerHTML = "Drag and Drop tracks to view/hide";
-    tab.appendChild(exp);
+    // Container of tracks (little blocks)
+    var trackListDiv = dojo.create("div",
+            { id: "tracksAvail",
+              class: "container handles" },
+            tab_tracks);
+    trackListDiv.style.cssText = "width: 80%; height: 80%; overflow-x: hidden; overflow-y: auto;";
+
+    // Add an explanation on the panel
+    var exp = dojo.create("div",
+            { id: "dnd_exp",
+              innerHTML: "Drag and Drop tracks to view/hide" },
+            tab_tracks);
+
     //tab.style.cssText="background-color:lightsteelgrey;height:7em;";
 
     // Copy self object
@@ -305,19 +320,18 @@ Browser.prototype.createTrackList = function(container,tab, params) {
 
     // Populates tracksAvail with divs
     var trackListCreate = function(track, hint) {
-    var node = document.createElement("div");
-        node.className = "tracklist-label";
-        node.innerHTML = track.key;
+        // The little block containing the track name
+        var node = dojo.create("div",
+                { id: dojo.dnd.getUniqueId(),
+                  class: "tracklist-label",
+                  innerHTML: track.key } );
         // In the list, wrap the list item in a container for
         // border drag-insertion-point monkeying
         if ("avatar" != hint) {
-            var container = document.createElement("div");
-            container.className = "tracklist-container";
+            var container = dojo.create("div", {class: "tracklist-container"});
             container.appendChild(node);
             node = container;
         }
-        // Generates names like "dojoUnique9"
-        node.id = dojo.dnd.getUniqueId();
         return {node: node, data: track, type: ["track"]};
     };
 
@@ -330,7 +344,6 @@ Browser.prototype.createTrackList = function(container,tab, params) {
 
     // Undocumented
     var trackCreate = function(track, hint) {
-        var node;
         if ("avatar" == hint) {
             return trackListCreate(track, hint);
         } else {
@@ -345,7 +358,7 @@ Browser.prototype.createTrackList = function(container,tab, params) {
                                          charWidth: brwsr.view.charWidth,
                                          seqHeight: brwsr.view.seqHeight
                                      });
-        node = brwsr.view.addTrack(newTrack);
+        var node = brwsr.view.addTrack(newTrack);
         }
         return {node: node, data: track, type: ["track"]};
     };
