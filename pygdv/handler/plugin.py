@@ -5,11 +5,15 @@ root_key = 'Operations'
 
 
 
-def get_plugin_byId(_id):
+def get_plugin_byId(_id, manager=None):
+    '''
+    Get a plugin by it's id
+    '''
     if(_id):
-        plugs = gl.plugin_manager.getAllPlugins()
+        if not manager : manager = gl.plugin_manager
+        plugs = manager.getAllPlugins()
         for p in plugs :
-            if p.plugin_object.unique_id() == str(_id) : return p
+            if p.plugin_object.unique_id() == _id : return p
 
 def get_operations_paths():
     plugs = gl.plugin_manager.getAllPlugins()

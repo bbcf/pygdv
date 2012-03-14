@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from celery.task import task, chord, subtask
 from celery.task.sets import TaskSet
-import shutil, os, sys, traceback
+import shutil, os, sys, traceback, json
 from pygdv.lib.jbrowse import jsongen, scores
 from pygdv.lib.constants import json_directory, track_directory
 from celery.result import AsyncResult
@@ -12,7 +12,6 @@ import track, transaction
 from pygdv.celery import model
 from sqlalchemy.sql.expression import except_
 from pygdv.model.database import TMPTrack
-
 from bbcflib.genrep import GenRep
 
 success = 1
@@ -23,26 +22,38 @@ manager = None
 def session_connection(*args, **kw):
     print 'init of sessions args : %s, kw : %s' %(args, kw)
     import pygdv.celery.model
-    manager = init_plugins()
     
     
 worker_init.connect(session_connection)
 
 
-def init_plugins():
-    from yapsy.PluginManager import PluginManager
-    manager = PluginManager()
-    manager.setPluginPlaces([constants.plugin_directory()])
-    manager.collectPlugins()
-    return manager  
 
 
 import subprocess
 
 
+
+
+
+@task()
+def plugin_process(plugin_id, _private_params, *args, **kw):
+    from pygdv.handler.plugin import get_plugin_byId
+    plug = get_plugin_byId(plugin_id, model.Manager)
+    if plug :
+        _private_params = json.loads(_private_params)
+        session = model.DBSession()
+        _private_params['session'] = session 
+        _private_params['project'] = session.query(model.Project).filter(model.Project.id == _private_params['project_id']).first()
+        kw.update(_private_params)
+        value = plug.plugin_object.process(*args, **kw)
+        session.commit()
+        session.close()
+        return value
+    return 0
+
+
 @task()
 def test(x):
-    print manager.get
     print 'this is a test %s' % x
     return x
 

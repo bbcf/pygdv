@@ -1,48 +1,57 @@
 from tg import expose, flash, require, request, redirect, url, validate
 from tg import app_globals as gl
-from pygdv.lib import constants
+from pygdv.lib import constants, checker
 from pygdv.lib.base import BaseController
 from pygdv.model import DBSession, Project, Track, Sequence
 from repoze.what.predicates import has_any_permission
-from yapsy.PluginManager import PluginManager
 from pylons import tmpl_context
 from formencode import Invalid
 from pygdv import handler
-from pygdv.widgets.plugins.form import ExampleForm
-
+from pygdv.celery import tasks
+import json
 
 
 class PluginController(BaseController):
-    
-    
-    def index(self, *args, **kw):
-        return 'got *args (%s), **kw(%s)' % (args, kw)
+    allow_only = has_any_permission(constants.perm_admin, constants.perm_user)
     
     @expose()
     def bad_form(self, *args, **kw):
-        return 'bad form : got *args (%s), **kw(%s)' % (args, kw)
-    
-    
+        return 'bad form : %s' %  kw
+    @expose()
+    def test(self):
+        tasks.test.delay((3,))
+        return ''
     @expose('pygdv.templates.plugin_form')
-    def get_form(self, *args, **kw):
-        plug = handler.plugin.get_plugin_byId(kw.get('form_id', False))
+    def get_form(self, form_id, project_id, *args, **kw):
+        
+        plug = handler.plugin.get_plugin_byId(form_id)
         if plug is None:
-            raise redirect(url('./bad_form'))
+            kw['error'] = 'form not found'
+            raise redirect(url('./bad_form', kw))
+        
+        user = handler.user.get_user_in_session(request)
+        project = DBSession.query(Project).filter(Project.id == project_id).first()
+        if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
+            kw['error'] = "you don't have permission to work on this project"
+            raise redirect(url('./bad_form', kw))
+        
+        private_params={'user_id' : user.id,
+                        'form_id' : form_id,
+                        'project_id' : project_id}
+        
+        kw['_private_params'] = json.dumps(private_params)
         obj = plug.plugin_object
         tmpl_context.form = obj.output()(action='./validation')
-        kw['form_id'] = kw.get('form_id')
+
         return {'page' : 'form', 'title' : obj.title(), 'value' : kw}
 
     @expose()
-    def validation(self, form_id, *args, **kw):
-        plug = handler.plugin.get_plugin_byId(form_id)
-        print plug
-        kw['form_id'] = form_id
-        if plug is None:
-            flash('Validation failed', 'error')
-            raise redirect(url('./get_form'))
+    def validation(self, *args, **kw):
+        private_params = json.loads(kw.get('_private_params', False))
+        if not private_params:
+            raise redirect(url('./bad_form', kw))
         
-        
+        plug = handler.plugin.get_plugin_byId(private_params.get('form_id', False))
         
         form = plug.plugin_object.output()(action='validation')
         
@@ -50,14 +59,19 @@ class PluginController(BaseController):
             form.validate(kw, use_request_local=True)
         except Invalid as e:
             flash(e, 'error')
-            raise redirect(url('./get_form', {'form_id':form_id}))
+            kw['form_id']=private_params.get('form_id')
+            kw['project_id']=private_params.get('project_id')
+            raise redirect(url('./get_form', kw))
         
-        raise redirect(url('./ok', **kw))
+        kw['plugin_id'] = private_params.get('form_id')
+        tasks.plugin_process.delay(**kw)
+        flash('Job launched')
+        
+        kw['form_id']=private_params.get('form_id')
+        kw['project_id']=private_params.get('project_id')
+        raise redirect(url('./get_form',  kw))
 
 
-    @expose()
-    def ok(self, *args, **kw):
-        return 'got %s, %s'% (args, kw)
 
 
 

@@ -31,6 +31,7 @@ Operations.prototype.menu_add_child = function(parent, node){
 	var ctx = this;
 	var m = new dijit.MenuItem({label : node.key,
 				    onClick : function(e){
+					console.log(node.id);
 					ctx.serv_get_form(node.id);
 					ctx.show_form();
 					dojo.stopEvent(e);
@@ -91,8 +92,8 @@ Operations.prototype.hide_form = function(){
 * Get the form from the server with the uid.
 */
 Operations.prototype.serv_get_form = function(form_id){
-    this.ifr.src = _GDV_PLUG_URL + '/get_form?form_id=' + form_id;
-    console.log(_GDV_PLUG_URL + '/get_form?form_id=' + form_id);
+    this.ifr.src = _GDV_PLUG_URL + '/get_form?form_id=' + form_id + '&project_id=' + _gdv_info.project_id;
+    console.log(_GDV_PLUG_URL + '/get_form?form_id=' + form_id + '&project_id=' + _gdv_info.project_id);
 };
 
 Operations.prototype.iframe_loaded = function(){
