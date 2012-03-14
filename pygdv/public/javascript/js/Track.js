@@ -1,3 +1,4 @@
+
 function Track(name, key, loaded, changeCallback) {
     this.name = name;
     this.key = key;
@@ -97,7 +98,7 @@ Track.prototype.setLabel = function(newHTML) {
     this.label.innerHTML = newHTML;
     this.labelHeight = this.label.offsetHeight;
     if (this.color){
-	this.label.style.borderColor= this.color;
+    this.label.style.borderColor= this.color;
     }
 };
 
@@ -225,21 +226,21 @@ Track.prototype._showBlock = function(blockIndex, startBase, endBase, scale, con
     if (this.empty) {
         this.heightUpdate(this.labelHeight, blockIndex);
         blockDiv.appendChild(document.createTextNode("no data"));
-	blockDiv.style.backgroundColor = "#fff";
+        blockDiv.style.backgroundColor = "#fff";
 
     } else if (this.loaded) {
-	this.fillBlock(blockIndex,
-                       blockDiv,
-                       this.blocks[blockIndex - 1],
-                       this.blocks[blockIndex + 1],
-                       startBase,
-                       endBase,
-                       scale,
-                       this.widthPx,
-                       containerStart,
-                       containerEnd);
+        this.fillBlock(blockIndex,
+                   blockDiv,
+                   this.blocks[blockIndex - 1],
+                   this.blocks[blockIndex + 1],
+                   startBase,
+                   endBase,
+                   scale,
+                   this.widthPx,
+                   containerStart,
+                   containerEnd);
     } else {
-	this._loadingBlock(blockDiv);
+        this._loadingBlock(blockDiv);
     }
 
     this.blocks[blockIndex] = blockDiv;
