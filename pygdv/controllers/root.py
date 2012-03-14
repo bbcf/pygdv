@@ -73,7 +73,7 @@ class RootController(BaseController):
     circles = CircleController(DBSession)
     jobs = JobController(DBSession)
     public = PublicController()
-    workers = WorkerController()
+    #workers = WorkerController()
     help = HelpController()
     genrep = GenRepController()
     database = DatabaseController()

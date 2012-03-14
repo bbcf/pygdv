@@ -8,7 +8,7 @@ class ExampleForm(twf.TableForm):
     hover_help = True              # show help_text with mouse onHover
     show_errors = True             # show red labels when validators failed
     fields = [                     # define the fields you need in your form
-              twf.HiddenField('form_id'),                          # field needed to transfert information to the validation system
+              twf.HiddenField('_private_params'),                          # field needed to transfert information to the validation system
              
               twf.TextField(label_text='Simple textfield', id='param1',        # a simple input field
                             help_text = 'This is some additional help.'),

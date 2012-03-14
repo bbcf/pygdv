@@ -1,6 +1,39 @@
-import uuid
 
-root_key = 'Operation'
+import hashlib
+
+root_key = 'Operations'
+
+
+
+
+
+def new_track(_private_params=None, _file=None, trackname=None, **kw):
+    from pygdv.handler.track import create_track
+    if _private_params is not None:
+        session = _private_params['session']
+        project = _private_params['project']
+        create_track(_private_params['user_id'],project.sequence, f=_file, trackname=trackname, project=project, session=session)
+
+
+
+
+def get_sequence(_private_params=None):
+    if _private_params is not None:
+        project = _private_params['project']
+        return project.sequence
+
+
+def get_project(_private_params=None):
+    if _private_params is not None:
+        return _private_params['project']
+
+
+
+
+
+
+
+
 
 class OperationPlugin(object):
     
@@ -48,12 +81,18 @@ class OperationPlugin(object):
         
         raise NotImplementedError('you must override this method in your plugin.')
 
+    def description(self):
+        '''
+        Here you can give a description to your job.
+        '''
+        raise NotImplementedError('you must override this method in your plugin.')
     
     def unique_id(self):
         '''
         It's an unique identifier for your plugin.
+        Do not override
         '''
         if not self.uid:
-            self.uid = uuid.uuid4().urn.split(':')[2]
+            self.uid = hashlib.sha1(self.path().__str__()).hexdigest()
         return self.uid
     
