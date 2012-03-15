@@ -1,9 +1,0 @@
-[Core]
-Name = SecondPlugin
-Module = Second
-
-[Documentation]
-Author = Jarosz Yohan
-Version = 0.1
-Website = http://github.com/yjarosz
-Description = Second Test plugin

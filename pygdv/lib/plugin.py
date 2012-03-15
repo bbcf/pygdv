@@ -1,5 +1,5 @@
-
 import hashlib
+from tg import tmpl_context
 
 root_key = 'Operations'
 
@@ -16,17 +16,30 @@ def new_track(_private_params=None, _file=None, trackname=None, **kw):
 
 
 
-
-def get_sequence(_private_params=None):
+def retrieve_sequence(_private_params=None):
     if _private_params is not None:
         project = _private_params['project']
         return project.sequence
 
 
-def get_project(_private_params=None):
+def retrieve_project(_private_params=None):
     if _private_params is not None:
         return _private_params['project']
 
+
+def retrieve_track(_private_params=None, track_id=None):
+    if _private_params is not None:
+        project = _private_params['project']
+        for track in project.tracks:
+            if track.id == int(track_id):
+                return track
+
+from tw import forms as twf
+from tw.forms import validators as twv
+from pygdv.widgets.plugins import validators as gdvv
+
+
+   
 
 
 

@@ -21,9 +21,10 @@ class PluginController(BaseController):
     def test(self):
         tasks.test.delay((3,))
         return ''
+    
+    
     @expose('pygdv.templates.plugin_form')
     def get_form(self, form_id, project_id, *args, **kw):
-        
         plug = handler.plugin.get_plugin_byId(form_id)
         if plug is None:
             kw['error'] = 'form not found'
@@ -42,7 +43,9 @@ class PluginController(BaseController):
         kw['_private_params'] = json.dumps(private_params)
         obj = plug.plugin_object
         tmpl_context.form = obj.output()(action='./validation')
-
+        
+        tmpl_context.tracks = project.tracks
+        
         return {'page' : 'form', 'title' : obj.title(), 'value' : kw}
 
     @expose()

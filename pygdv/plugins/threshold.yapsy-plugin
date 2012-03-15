@@ -1,9 +1,9 @@
 [Core]
 Name = TestPlugin
-Module = Test
+Module = Threshold
 
 [Documentation]
 Author = Jarosz Yohan
 Version = 0.1
 Website = http://github.com/yjarosz
-Description = Test plugin
+Description = Test plugin to put a threshold on a track
