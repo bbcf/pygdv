@@ -293,24 +293,18 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
             tab_tracks);
     var sorttr = dojo.create("tr", null, sort);
     var sortByName = dojo.create("td", {innerHTML: "By name"}, sorttr);
+    var sortByDate = dojo.create("td", {innerHTML: "By type"}, sorttr);
     var sortByDate = dojo.create("td", {innerHTML: "By date"}, sorttr);
     //dojo.connect(sortByName, function(e){});
+    //dojo.connect(sortByType, function(e){});
     //dojo.connect(sortByDate, function(e){});
 
-    // Container of tracks (little blocks)
+    // Container of tracks
     var trackListDiv = dojo.create("div",
             { id: "tracksAvail",
-              class: "container handles" },
+              className: "container handles",
+              innerHTML: "Drag and Drop tracks to view/hide"},
             tab_tracks);
-    trackListDiv.style.cssText = "width: 80%; height: 80%; overflow-x: hidden; overflow-y: auto;";
-
-    // Add an explanation on the panel
-    var exp = dojo.create("div",
-            { id: "dnd_exp",
-              innerHTML: "Drag and Drop tracks to view/hide" },
-            tab_tracks);
-
-    //tab.style.cssText="background-color:lightsteelgrey;height:7em;";
 
     // Copy self object
     var brwsr = this;
@@ -323,12 +317,17 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
         // The little block containing the track name
         var node = dojo.create("div",
                 { id: dojo.dnd.getUniqueId(),
-                  class: "tracklist-label",
+                  className: "tracklist-label",
                   innerHTML: track.key } );
+        var node_inner = dojo.create("table",null,node);
+        var node_inner_tr = dojo.create("tr",null,node_inner);
+        var node_name = dojo.create("td",{className:"node_inner_td"},node_inner_tr);
+        var node_type = dojo.create("td",{className:"node_inner_td"},node_inner_tr);
+        var node_data = dojo.create("td",{className:"node_inner_td"},node_inner_tr);
         // In the list, wrap the list item in a container for
         // border drag-insertion-point monkeying
         if ("avatar" != hint) {
-            var container = dojo.create("div", {class: "tracklist-container"});
+            var container = dojo.create("div", {className: "tracklist-container"});
             container.appendChild(node);
             node = container;
         }

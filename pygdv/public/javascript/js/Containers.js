@@ -121,25 +121,39 @@ PrincipalContainer.prototype.navigationContainer = function(DomNode, DijitNode, 
         id:'tab_navigation'
     }, cont);
 
+    var nav_table = dojo.create("table", {
+                         id:"nav_table",
+                         style: {width:"100%"}
+                      }, cont);
+    var new_tr;
     var len = menu_nav.length;
     for (var i=0; i<len; i++){
-    link_name = menu_nav[i];
-    link_end = link_name.toLowerCase();
-
-    var link = dojo.create('a', {href : _GDV_URL + '/' + link_end,
-                     className : 'hl',
-                     id : 'menu_' + link_name
-                    }, cont);
-    dojo.create('img', {src : window.picsPathRoot + "menu_" + link_end + ".png",
-                className : 'gdv_menu_image'
-               }, link);
-    dojo.create('span', {innerHTML : link_name,
-                 className : 'gdv_menu_item'
-                }, link);
+        link_name = menu_nav[i];
+        link_end = link_name.toLowerCase();
+        if (i%2==0){ new_tr = dojo.create("tr", null, nav_table); }
+        var new_button = dojo.create("td", {className:"nav_table_td"}, new_tr);
+        var link = dojo.create('a',{
+                         href : _GDV_URL + '/' + link_end,
+                         className:"nav_cell",
+                         id : 'menu_' + link_name,
+                      }, new_button);
+        var item = dojo.create("table",{class: "gdv_menu_item"}, link);
+        var item_label_tr = dojo.create("tr",null,item);
+        var item_img_tr = dojo.create("tr",null,item);
+        var item_label = dojo.create("td",null,item_label_tr);
+        var item_img = dojo.create("td",null,item_img_tr);
+        dojo.create("span", {innerHTML: link_name,
+                         className: 'gdv_menu_span',
+                      }, item_label);
+        dojo.create('img', {src : window.picsPathRoot + "menu_" + link_end + ".png",
+                         className : 'gdv_menu_image',
+                      }, item_img);
     }
     DijitNode.addChild(nav_container);
     this.navigation = nav_container;
 };
+
+
 
 
 /**
@@ -191,7 +205,7 @@ PrincipalContainer.prototype.operationContainer = function(DomNode, DijitNode, p
     menu.placeAt('tab_ops');
 
 
-    // initialize the iframe that will be showed 
+    // initialize the iframe that will be showed
     // if an user click on an Operation button
     op.create_frame(viewContainer, fwdgt, bwdgt);
 };

@@ -124,33 +124,96 @@ div.sequence {
     padding-left: 2px;
 }
 
-div.tracklist-label {
+
+/*******************
+ **** Left menu ****
+ *******************/
+
+/* Common */
+#tab_tracks div.tracklist-label, #tab_sels table.selection_subtable, #tab_ops td, #tab_navigation .nav_cell {
     font-family: sans-serif;
     z-index: 20;
-    background-color: #BDD7FF;
-    border: 2px #2b434c solid;
+    background-color: #CFCFCF;/*#BDD7FF;*/
+    border: 1px #2b434c solid;
     color: #2b434c;
     cursor: pointer;
     padding: 3px;
-    display:inline;
+}
+#nav_table .nav_table_td{
+    border: 1px #2b434c solid;
+}
+#tab_navigation .nav_cell{
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0px;
+    border: none;
+}
+#tab_ops #dijit_PopupMenuItem_0_text{
+    margin-top: -2px;
+}
+.menu_entry{
+    vertical-align:middle;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #54575D; /*dark grey*/
+    padding:0.5em 0.5em 0em;
+}
+.gdv_menu_item{
+    width: 50%;         /*center it*/
+    margin: 0px auto;   /* '''     */
+    line-height:200%;
+    color:black;
+}
+.gdv_menu_item:hover{
+    color: #A9A9A9;
+}
+.gdv_menu_span, gdv_menu_image{
+    vertical-align:middle;
 }
 
-div.tracklist-container {
-    padding:4px;
-    display:block;
-    float:left;
-    margin:6px 0px 3px;
+
+/* Selections */
+
+#selections_table{ float:left; }
+#selections_table table.selection_subtable {}
+#selections_table td.position {}
+#selections_table td.description {}
+#selections_table td.delete {}
+#selections_table td.delete div.delete_img_field {
+    position: relative;
+    height: 17px; width: 17px;
+    background: url("../images/delete.png") no-repeat;
+}
+#selections_table td.delete .delete_img_field:hover {
+    height: 15px; width: 15px;
+    top: -1px; left: -1px;
+    border: 1px solid black;
 }
 
+/* Tracks */
+
+#tracksAvail{ /*container of tracks*/
+    width: 90%; height: 85%;
+    margin:0; padding:0;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+div.tracklist-container { /*container for drag & drop*/
+    display: block;
+    float: left;
+    margin: 6px 0px 3px;
+}
 .tracklist-container.dojoDndItemBefore {
     border-top: 3px solid #999;
     padding-top: 2px;
 }
-
 .tracklist-container.dojoDndItemAfter {
     border-bottom: 3px solid #999;
     padding-bottom: 2px;
 }
+
+/* Navigation */
 
 .feature-label {
     position: absolute;
@@ -754,7 +817,7 @@ input#disableSel {
     margin:0.5em;
 }
 
-#tab_selections_act, #tab_tracks, #tab_jobs, #tab_form{
+#tab_selections_act, #tab_tracks, #tab_jobs, #tab_form, #tab_sels, #tab_ops, #tab_navigation {
     background-image: linear-gradient(bottom, rgb(122,132,149) 9%, rgb(79,87,101) 55%);
     background-image: -o-linear-gradient(bottom, rgb(122,132,149) 9%, rgb(79,87,101) 55%);
     background-image: -moz-linear-gradient(bottom, rgb(122,132,149) 9%, rgb(79,87,101) 55%);
@@ -795,33 +858,8 @@ input#disableSel {
     border-width:0em 0.1em 0em 0em;
     border-style:outset;
     border-color:#FFFFFF;
-    background-color:#EDEDED;   
+    background-color:#EDEDED;
 
-}
-.menu_entry{
-    font-weight: bold;
-    text-transform: uppercase;
-    color: #54575D;
-    padding:0.5em 0.5em 0em;
-}
-
-.gdv_menu_item{
-    margin:0.5em 0em 0.5em 0em;
-    line-height:200%;
-    color:black;
-}
-
-.gdv_menu_item:hover{
-    color:#A9A9A9;
-}
-
-.gdv_menu_image{
-    padding:0em 0.5em 0em 1.5em;
-    vertical-align:middle;
-}
-
-.hl{
-    text-decoration:none;
 }
 
 #gdv_notifier{
@@ -852,24 +890,6 @@ input#disableSel {
 .job_error{
     background-color: #C14C4C;
 }
-
-#selections_table{ float:left; }
-#selections_table table.selection_subtable {}
-#selections_table td.position {}
-#selections_table td.description {}
-#selections_table td.delete {}
-#selections_table td.delete div.delete_img_field {
-    position: relative;
-    height: 17px; width: 17px;
-    background: url("../images/delete.png") no-repeat;
-}
-#selections_table td.delete .delete_img_field:hover {
-    /*background: url("../images/delete_red.png") no-repeat;*/
-    height: 15px; width: 15px;
-    top: -1px; left: -1px;
-    border: 1px solid black;
-}
-
 
 /* SUBMIT JOBS FORM */
 #gm_form_title{font-size:140%;font-weight:bold;padding:1em;};
