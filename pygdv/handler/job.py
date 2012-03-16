@@ -1,11 +1,23 @@
 from pygdv.handler.track import create_track
-
+from pygdv.model
 
 def new_track():
     '''
     Create a new track.
     '''
     create_track(user_id, sequence, f, trackname, project, session, admin)
+
+
+
+def new_job(name, description, user_id, project_id):
+    
+    job = Job()
+    job.name = name
+    job.description = description
+    job.user_id = user_id
+    job.project_id = project_id
+    
+    pass
 
 
 #def new_sel(user_id, project_id, job_description, job_name, task_id=None):
