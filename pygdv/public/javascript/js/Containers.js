@@ -195,12 +195,12 @@ PrincipalContainer.prototype.operationContainer = function(DomNode, DijitNode, p
     _gdv_info.operations = op;
 
     var menu = new dijit.Menu({colspan : 1,
-                   style : {width : '10em'
-                       }});
+                   style : {width : '10em'}
+               });
     var c = paths.childs;
     var l = c.length;
     for(var i=0;i<l;i++){
-    op.menu_add_child(menu, c[i]);
+        op.menu_add_child(menu, c[i]);
     }
     menu.placeAt('tab_ops');
 
