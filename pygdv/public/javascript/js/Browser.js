@@ -287,9 +287,8 @@ Browser.prototype.buildMenuItem = function(link_end, link_name){
  */
 Browser.prototype.createTrackList = function(container,tab_tracks, params) {
     // Buttons to sort tracks
-    var sort = dojo.create("table",
-            { id: "tracksSort",
-              style: {width:"100%"} },
+    var sort = dojo.create("table", { id: "tracksSort",
+                 style: {width:"100%"} },
             tab_tracks);
     var sorttr = dojo.create("tr", null, sort);
     var sortByName = dojo.create("td", {innerHTML: "By name"}, sorttr);

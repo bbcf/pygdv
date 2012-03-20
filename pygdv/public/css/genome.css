@@ -140,11 +140,13 @@ div.sequence {
     cursor: pointer;
     padding: 3px;
 }
+#tab_fake_button{ display: none;}
 
 /* Navigation */
 
 #nav_table .nav_table_td{
     width: 50%;
+    height: 55px;
 }
 #tab_navigation .nav_cell{
     display: block;
@@ -177,7 +179,10 @@ div.sequence {
 
 /* Selections */
 
-#selections_table{ float:left; }
+#selections_table{
+    float:left;
+    width: 100%;
+}
 #selections_table table.selection_subtable {}
 #selections_table td.position {}
 #selections_table td.description {}

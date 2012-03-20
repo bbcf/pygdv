@@ -20,6 +20,9 @@ PrincipalContainer.prototype.show_navigation = function(){
 PrincipalContainer.prototype.show_operations = function(){
     this.principal_dijit.selectChild('tab_ops');
 };
+PrincipalContainer.prototype.reset = function(){
+    this.principal_dijit.selectChild('tab_fake');
+};
 
 
 
@@ -53,6 +56,7 @@ PrincipalContainer.prototype.createContainer = function(browser, menuLeftContain
     this.trackContainer(browser);
     this.selectionContainer(principal, principal_dijit);
     this.operationContainer(principal, principal_dijit, init_operations, viewContainer, formwidget, browserwidget);
+    this.fakeContainer(principal, principal_dijit);
 
     // Retrieve from a cookie the last element of menu selected
     if (dojo.cookie("menu_current_tab")) {
@@ -95,7 +99,8 @@ PrincipalContainer.prototype.setOnclickMenuElement = function(){
             //        this.open = 1;
             //    }
                 if (this.open == 1){
-                    ctx.show_operations();
+                    ctx.reset();
+                    dojo.cookie("menu_current_tab", "Fake");
                     this.open = 0;
                 } else {
                     this.open = 1;
@@ -118,6 +123,7 @@ PrincipalContainer.prototype.switchMenuElement = function(){
         case "Selections": this.show_selections(); break;
         case "Operations": this.show_operations(); break;
         case "Tracks"    : this.show_tracks(); break;
+        case "Fake"      : this.reset(); break;
         default: console.log("ProgrammingError: cannot retrieve menu_current_tab from cookie.");
     }
 }
@@ -238,4 +244,15 @@ PrincipalContainer.prototype.operationContainer = function(DomNode, DijitNode, p
 };
 
 
-
+/**
+* Add a fake tab for the "reset" effect if a menu item is clicked twice
+*/
+PrincipalContainer.prototype.fakeContainer = function(DomNode, DijitNode){
+    var fake = dojo.create('div', {}, DomNode);
+    var fake_container = new dijit.layout.ContentPane({
+        title: "Fake",
+        id:'tab_fake',
+    }, fake);
+    DijitNode.addChild(fake_container);
+    this.fake = fake_container;
+}
