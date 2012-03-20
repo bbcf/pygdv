@@ -55,11 +55,11 @@ PrincipalContainer.prototype.createContainer = function(browser, menuLeftContain
     this.operationContainer(principal, principal_dijit, init_operations, viewContainer, formwidget, browserwidget);
 
     // Retrieve from a cookie the last element of menu selected
-    if (dojo.cookie("menu_current_state")) {
-        this.menu_current_state = dojo.cookie("menu_current_state");
+    if (dojo.cookie("menu_current_tab")) {
+        this.menu_current_tab = dojo.cookie("menu_current_tab");
     } else { //create a new cookie
-        this.menu_current_state = "Navigation";
-        dojo.cookie("menu_current_state", this.menu_current_state);
+        this.menu_current_tab = "Navigation";
+        dojo.cookie("menu_current_tab", this.menu_current_tab);
     }
 
     return principal;
@@ -67,16 +67,43 @@ PrincipalContainer.prototype.createContainer = function(browser, menuLeftContain
 
 
 /*
-* Updates the 'menu_current_state' cookie on click on a menu element
+* Updates the 'menu_current_tab' cookie on click on a menu element
 */
 PrincipalContainer.prototype.setOnclickMenuElement = function(){
     var ctx = this;
     var buttons = dojo.query(".dijitAccordionTitle", this.principal);
     var bl = buttons.length;
     for (var i=0; i<bl; i++) {
-        dojo.connect(buttons[i], "click", function(e){
-            ctx.menu_current_state = this.firstElementChild.lastElementChild.innerHTML;
-            dojo.cookie("menu_current_state", ctx.menu_current_state);
+        b = buttons[i];
+        b.tab = dojo.query(".dijitContentPane", b.parentNode)[0];
+        b.open = 1;
+        dojo.connect(b, "click", function(e){
+            ctx.menu_current_tab = this.firstElementChild.lastElementChild.innerHTML;
+            if (dojo.cookie("menu_current_tab") == ctx.menu_current_tab){ // if active tab is clicked again
+            //// Trial to hide a tab if it is clicked twice, show again if clicked again
+            //    if (this.open == undefined){
+            //        this.tab.past_height = this.tab.offsetHeight+"px";
+            //        this.open = 1;
+            //    } else if (this.open == 1) { // if open, close it
+            //        this.tab.style.cssText = "display: none !important";
+            //        this.open = 0;
+            //    } else { // if already close or 'undefined', open it
+            //        ctx.principal_dijit.selectChild(this.tab.id)
+            //            //this.tab.style.display = "block";
+            //            //this.tab.style.height = this.tab.past_height;
+            //                //ctx.show_operations();
+            //        this.open = 1;
+            //    }
+                if (this.open == 1){
+                    ctx.show_operations();
+                    this.open = 0;
+                } else {
+                    this.open = 1;
+                }
+            } else { // if a different tab is clicked
+                dojo.cookie("menu_current_tab", ctx.menu_current_tab);
+                this.open = 1;
+            }
             dojo.stopEvent(e);
         });
     }
@@ -86,12 +113,12 @@ PrincipalContainer.prototype.setOnclickMenuElement = function(){
 * Switch to the last visited menu element
 */
 PrincipalContainer.prototype.switchMenuElement = function(){
-    switch (this.menu_current_state){
+    switch (this.menu_current_tab){
         case "Navigation": this.show_navigation(); break;
         case "Selections": this.show_selections(); break;
         case "Operations": this.show_operations(); break;
         case "Tracks"    : this.show_tracks(); break;
-        default: console.log("ProgrammingError: cannot retrieve menu_current_state from cookie.");
+        default: console.log("ProgrammingError: cannot retrieve menu_current_tab from cookie.");
     }
 }
 
