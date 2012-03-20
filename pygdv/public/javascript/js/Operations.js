@@ -16,27 +16,27 @@ Operations.prototype.menu_add_child = function(parent, node){
     var c = node.childs;
     var l = c.length;
     if(l>0){
-	// node has childs (build a menu & add childs to it)
-	var m = new dijit.Menu({});
+    // node has childs (build a menu & add childs to it)
+    var m = new dijit.Menu({});
 
-	for(var i=0;i<l;i++){
-	    this.menu_add_child(m, c[i]);
-	}
-	var p = new dijit.PopupMenuItem({label : node.key,
-					 popup : m 
-					});
-	parent.addChild(p);
+    for(var i=0;i<l;i++){
+        this.menu_add_child(m, c[i]);
+    }
+    var p = new dijit.PopupMenuItem({label : node.key,
+                     popup : m
+                    });
+    parent.addChild(p);
     } else {
-	// it's the end (must connect to the form apparition)
-	var ctx = this;
-	var m = new dijit.MenuItem({label : node.key,
-				    onClick : function(e){
-					console.log(node.id);
-					ctx.serv_get_form(node.id);
-					ctx.show_form();
-					dojo.stopEvent(e);
-				    }});
-	parent.addChild(m);
+    // it's the end (must connect to the form apparition)
+    var ctx = this;
+    var m = new dijit.MenuItem({label : node.key,
+                    onClick : function(e){
+                    console.log(node.id);
+                    ctx.serv_get_form(node.id);
+                    ctx.show_form();
+                    dojo.stopEvent(e);
+                    }});
+    parent.addChild(m);
     }
 };
 
@@ -63,15 +63,16 @@ Operations.prototype.create_frame = function(container, fwdgt, bwdgt){
 */
 Operations.prototype.show_form = function(){
     if (!(this.form_showed)){
-	
-	this.bwdgt.addChild(this.fwdgt);
-	this.form_showed = true;
-	var ifr = dojo.style(this.ifr, {visibility:'visible', height:'100%', width:'100%', zIndex:'500', backgroundColor: 'white'});
-	var closer = dojo.create('img', {src:'../images/delete.png', style : {zIndex:1000, position:'absolute'}}, this.container);
-	var ctx = this;
-	dojo.connect(closer, 'click', function(e){
-	    ctx.hide_form();
-	});
+        this.bwdgt.addChild(this.fwdgt);
+        this.form_showed = true;
+        var ifr = dojo.style(this.ifr, {visibility:'visible', height:'100%', width:'100%',
+                                        zIndex:'500', backgroundColor: 'white'});
+        var closer = dojo.create('img', {src:'../images/delete.png', style : {zIndex:1000, position:'absolute'}},
+                                 this.container);
+        var ctx = this;
+        dojo.connect(closer, 'click', function(e){
+            ctx.hide_form();
+    });
 
 
     };
@@ -82,8 +83,8 @@ Operations.prototype.show_form = function(){
 */
 Operations.prototype.hide_form = function(){
     if (this.form_showed){
-	this.bwdgt.removeChild(this.fwdgt);
-	this.form_showed = false;
+    this.bwdgt.removeChild(this.fwdgt);
+    this.form_showed = false;
     };
 };
 
