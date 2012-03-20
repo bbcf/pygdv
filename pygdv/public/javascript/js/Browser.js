@@ -300,11 +300,12 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
     //dojo.connect(sortByDate, function(e){});
 
     // Container of tracks
-    var trackListDiv = dojo.create("div",
-            { id: "tracksAvail",
-              className: "container handles",
-              innerHTML: "Drag and Drop tracks to view/hide"},
-            tab_tracks);
+    var trackListDiv = dojo.create("div", {id: "tracksAvail",
+                className: "container handles"},
+                tab_tracks);
+    dojo.create("div", {id:"tracksExplain",
+                innerHTML: "Drag and Drop tracks to view/hide"},
+                trackListDiv);
 
     // Copy self object
     var brwsr = this;

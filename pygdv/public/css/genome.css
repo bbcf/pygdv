@@ -130,17 +130,21 @@ div.sequence {
  *******************/
 
 /* Common */
+
 #tab_tracks div.tracklist-label, #tab_sels table.selection_subtable, #tab_ops td, #tab_navigation .nav_cell {
     font-family: sans-serif;
     z-index: 20;
-    background-color: #CFCFCF;/*#BDD7FF;*/
+    background-color: #CFCFCF;
     border: 1px #2b434c solid;
     color: #2b434c;
     cursor: pointer;
     padding: 3px;
 }
+
+/* Navigation */
+
 #nav_table .nav_table_td{
-    border: 1px #2b434c solid;
+    width: 50%;
 }
 #tab_navigation .nav_cell{
     display: block;
@@ -148,9 +152,6 @@ div.sequence {
     height: 100%;
     padding: 0px;
     border: none;
-}
-#tab_ops #dijit_PopupMenuItem_0_text{
-    margin-top: -2px;
 }
 .menu_entry{
     vertical-align:middle;
@@ -162,14 +163,14 @@ div.sequence {
 .gdv_menu_item{
     width: 50%;         /*center it*/
     margin: 0px auto;   /* '''     */
-    line-height:200%;
     color:black;
 }
 .gdv_menu_item:hover{
     color: #A9A9A9;
 }
-.gdv_menu_span, gdv_menu_image{
+.gdv_menu_td{
     vertical-align:middle;
+    text-align:center;
 }
 
 
@@ -199,21 +200,32 @@ div.sequence {
     overflow-x: hidden;
     overflow-y: auto;
 }
-div.tracklist-container { /*container for drag & drop*/
+#tab_tracks div.tracklist-container { /*virtual container for drag & drop*/
     display: block;
     float: left;
     margin: 6px 0px 3px;
 }
-.tracklist-container.dojoDndItemBefore {
+#tab_tracks .tracklist-container.dojoDndItemBefore {
     border-top: 3px solid #999;
     padding-top: 2px;
 }
-.tracklist-container.dojoDndItemAfter {
+#tab_tracks .tracklist-container.dojoDndItemAfter {
     border-bottom: 3px solid #999;
     padding-bottom: 2px;
 }
+#tab_tracks div.tracklist-label{ /*miniblock representing the track*/
+    /*float: left;
+    clear: both;*/
+    background-color: #BDD7FF;
+    line-height: 100%;
+}
 
-/* Navigation */
+/* Operations */
+
+#tab_ops #dijit_PopupMenuItem_0_text{
+    margin-top: -2px;
+}
+
 
 .feature-label {
     position: absolute;

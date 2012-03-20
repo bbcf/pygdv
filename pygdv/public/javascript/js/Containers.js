@@ -137,11 +137,11 @@ PrincipalContainer.prototype.navigationContainer = function(DomNode, DijitNode, 
                          className:"nav_cell",
                          id : 'menu_' + link_name,
                       }, new_button);
-        var item = dojo.create("table",{class: "gdv_menu_item"}, link);
+        var item = dojo.create("table",{className: "gdv_menu_item"}, link);
         var item_label_tr = dojo.create("tr",null,item);
         var item_img_tr = dojo.create("tr",null,item);
-        var item_label = dojo.create("td",null,item_label_tr);
-        var item_img = dojo.create("td",null,item_img_tr);
+        var item_label = dojo.create("td",{className:'gdv_menu_td'},item_label_tr);
+        var item_img = dojo.create("td",{className:'gdv_menu_td'},item_img_tr);
         dojo.create("span", {innerHTML: link_name,
                          className: 'gdv_menu_span',
                       }, item_label);

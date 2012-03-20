@@ -63,8 +63,17 @@ SelectionPane.prototype.connect_description = function(description, location){
     var ctx = this;
     var handle = dojo.connect(description, 'click', function(e){
             var textfield = dojo.query(".description_field", description)[0];
-            var txt = textfield.innerHTML;
-            var input = dojo.create("input", {type:"text", value:txt}, textfield, "replace");
+            var textfield_content = textfield.innerHTML;
+            var textfield_width = textfield.parentNode.offsetWidth;
+            var textfield_height = textfield.parentNode.offsetHeight;
+            console.log(parseInt(textfield.parentNode.offsetWidth))
+            var input = dojo.create("input",
+                            { type:"text",
+                              value:textfield_content,
+                              style: {width: (textfield_width-6)+"px",
+                                      height: (textfield_height-6)+"px"},
+                            }, textfield, "replace");
+            console.log(input.style.width)
             input.focus();
             input.select();
 
