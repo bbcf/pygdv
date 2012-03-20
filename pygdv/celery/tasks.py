@@ -3,7 +3,7 @@ from celery.task import task, chord, subtask
 from celery.task.sets import TaskSet
 import shutil, os, sys, traceback, json
 from pygdv.lib.jbrowse import jsongen, scores
-from pygdv.lib.constants import json_directory, track_directory
+from pygdv.lib.constants import json_directory, track_directory, extra_directory
 from celery.result import AsyncResult
 from celery.signals import worker_init
 
@@ -30,8 +30,6 @@ worker_init.connect(session_connection)
 
 
 import subprocess
-
-
 
 
 
@@ -83,8 +81,19 @@ def erase_data_from_public_user(delta=datetime.timedelta(days = 14)):
 
 
 
-
-
+@task()
+def copy_file(file_path, path_to):
+    session = model.DBSession()
+    try :
+        shutil.copy(file_path, path_to)
+    except Exception as e:
+        session.rollback()
+        raise e
+    finally:
+        session.flush()
+        session.close()
+    
+    
 
 #############################################################################################################
 #        FILE PROCESSING

@@ -1,5 +1,5 @@
-import hashlib
-from tg import tmpl_context
+import hashlib, os
+from pygdv.lib import constants, util
 
 root_key = 'Operations'
 
@@ -8,38 +8,69 @@ root_key = 'Operations'
 
 
 def new_track(_private_params=None, _file=None, trackname=None, **kw):
+    '''
+    Create a new track in GDV.
+    param _file : the track path
+    param trackname : the name of the track
+    '''
     from pygdv.handler.track import create_track
+    from pygdv.handler.job import new_job
     if _private_params is not None:
         session = _private_params['session']
         project = _private_params['project']
-        create_track(_private_params['user_id'],project.sequence, f=_file, trackname=trackname, project=project, session=session)
+        task_id, track = create_track(_private_params['user_id'],project.sequence, 
+                                      f=_file, trackname=trackname, project=project, session=session)
+        return new_job('new track', kw.get('description'), project.user_id, project.id, constants.JOB_TRACK, task_id, session=session)
+        
+def new_file(_private_params, _file, description, **kw):
+    '''
+    Create a new file in GDV.
+    param _file : the file path
+    param name : the file name
+    '''
+    from pygdv.handler.job import new_job
+    from pygdv.celery import tasks
+    if _private_params is not None:
+        project = _private_params['project']
+        session = _private_params['session']
+        sha1 = util.get_file_sha1(_file)
+        path_to = os.path.join(constants.extra_directory(), sha1)
+        task = tasks.copy_file.delay(_file, path_to)
+        return new_job('new file', description, project.user_id, 
+                       project.id, constants.JOB_IMAGE, task.task_id, sha1=sha1, session=session)
 
 
 
 def retrieve_sequence(_private_params=None):
+    '''
+    Retrieve the sequence from the plugin 'process' method.
+    '''
     if _private_params is not None:
         project = _private_params['project']
         return project.sequence
 
 
 def retrieve_project(_private_params=None):
+    '''
+    Retrieve the project from the plugin 'process' method.
+    '''
     if _private_params is not None:
         return _private_params['project']
 
 
 def retrieve_track(_private_params=None, track_id=None):
+    '''
+    Retrieve the track from the plugin 'process' method.
+    '''
     if _private_params is not None:
         project = _private_params['project']
         for track in project.tracks:
             if track.id == int(track_id):
                 return track
 
-from tw import forms as twf
-from tw.forms import validators as twv
-from pygdv.widgets.plugins import validators as gdvv
 
 
-   
+
 
 
 

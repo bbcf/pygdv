@@ -9,7 +9,7 @@ data_dir = 'pygdv.public.data'
 json_dir = 'jbrowse'
 tracks_dir = 'tracks'
 plugin_dir = 'plugins'
-gfeatminer_dir = 'gfeatminer'
+extra_dir = 'extras'
 
 public_user_email = 'public@pygdv.ch'
 # STATUSES
@@ -31,8 +31,11 @@ def json_directory():
 def track_directory():
     return os.path.join(resource_filename(data_dir, tracks_dir))
 
-def gfeatminer_directory():
-    return os.path.join(resource_filename(data_dir, gfeatminer_dir))
+def extra_directory():
+    return os.path.join(resource_filename(data_dir, extra_dir))
+
+def extra_url():
+    return url('/data/extras')
 
 def gfeatminer_url():
     return url('/data/gfeatminer')
@@ -105,3 +108,8 @@ job_output_image = 'IMAGE'
 REQUEST_TYPE = 'REQUEST_CLASSIFIER'
 REQUEST_TYPE_COMMAND_LINE = 'command_line'
 REQUEST_TYPE_BROWSER = 'browser'
+
+
+
+JOB_IMAGE = 'job_image'
+JOB_TRACK = 'job_track'

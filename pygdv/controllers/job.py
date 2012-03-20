@@ -22,7 +22,7 @@ __all__ = ['JobController']
 
 
 
-class JobController(CrudRestController):
+class   JobController(CrudRestController):
     allow_only = has_any_permission(constants.perm_user, constants.perm_admin)
     model = Job
     table = job_table
@@ -41,24 +41,19 @@ class JobController(CrudRestController):
         return dict(page='jobs', model='job', form_title="new job", items=data, value=kw)
     
     
-    @expose('pygdv.templates.image')
+    @expose('pygdv.templates.job')
     def result(self, id):
         job = DBSession.query(Job).filter(Job.id == id).first()
         if job is not None:
             data = util.to_datagrid(job_grid, [job])
-        
-        path = path = os.path.join(constants.gfeatminer_directory(), str(job.id))
-        
-        filename = os.listdir(path)[0]
-        
-        final = os.path.join(constants.gfeatminer_url(),  str(job.id), filename)
-        
-        tmpl_context.src = url(final)
-
-        return dict(page='jobs', model='Job', info=data)
-        
-        
-        return str(id)
+            if job.output == constants.JOB_IMAGE :
+                print job.data
+                src = constants.extra_url() + '/' + str(job.data)
+                return dict(page='jobs', model='Job', src=url(src), info=data)
+            if job.output == constants.JOB_TRACK :
+                return dict(page='jobs', model='Job', src='', info=data)
+            
+        raise redirect(url('/jobs/get_all'))
     
     
     @expose()

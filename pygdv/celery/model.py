@@ -37,7 +37,7 @@ def init_plugins():
 
 # Import your model modules here.
 from pygdv.model.constants import *
-from pygdv.model.database import Project, Sequence
+from pygdv.model.database import Project, Sequence, Job
 from pygdv.model.auth import User
 
 

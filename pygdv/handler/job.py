@@ -1,23 +1,26 @@
-from pygdv.handler.track import create_track
-from pygdv.model
-
-def new_track():
-    '''
-    Create a new track.
-    '''
-    create_track(user_id, sequence, f, trackname, project, session, admin)
+from pygdv import model
 
 
 
-def new_job(name, description, user_id, project_id):
-    
-    job = Job()
+def new_job(name, description, user_id, project_id, output, task_id, sha1=None, session=None):
+    if session is None:
+        session = model.DBSession
+    job = model.Job()
     job.name = name
     job.description = description
     job.user_id = user_id
     job.project_id = project_id
-    
-    pass
+    job.output = output
+    job.task_id = task_id
+    if sha1:
+        job.data = sha1
+    session.add(job)
+    session.flush()
+    return job
+
+
+
+
 
 
 #def new_sel(user_id, project_id, job_description, job_name, task_id=None):

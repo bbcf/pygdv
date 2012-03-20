@@ -25,11 +25,12 @@ from pygdv.widgets import SortableColumn
 job_grid = twf.DataGrid(fields=[
     ('Name', 'name'),
     ('Description', 'description'),
-    ('Output', 'output'),
+    ('Output', 'output_display'),
     ('Status', 'status'),
     ('Action', lambda obj:genshi.Markup(
         '<a href="%s"> result </a> '
         % url('./result', params={'id' : obj.id})
+         + get_delete_link(obj.id, constants.full_rights)
         ))
 ])
 

@@ -380,7 +380,7 @@ class Track(DeclarativeBase):
             self.parameters.key = value
             self.parameters.label = value
         self._name = value
-        
+    
     @property
     def status(self):
         return self.input.status
@@ -515,7 +515,6 @@ class Job(DeclarativeBase):
     task = relationship('Task', uselist=False, primaryjoin='Job.task_id == Task.task_id', foreign_keys='Task.task_id')
 
     data = Column(Text())
-    
     output = Column(VARCHAR(255))
     
     def _get_date(self):
@@ -544,9 +543,12 @@ class Job(DeclarativeBase):
     def __repr__(self):
         return 'Job < id : %s, name %s, desc: %s, data : %s , task_id : %s, output : %s>' % (
                         self.id, self.name, self.description, self.data, self.task_id, self.output)
-        
+    @property
+    def output_display(self):
+        if self.output == constants.JOB_IMAGE : return 'Image'
+        if self.output == constants.JOB_TRACK : return 'Track'
+        return self.output
     
-
 class Location(DeclarativeBase):
     '''
     Represent the Location a Selection can have.
