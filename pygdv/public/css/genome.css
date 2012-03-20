@@ -131,10 +131,11 @@ div.sequence {
 
 /* Common */
 
-#tab_tracks div.tracklist-label, #tab_sels table.selection_subtable, #tab_ops td, #tab_navigation .nav_cell {
+#tab_tracks div.tracklist-label, #tab_sels table.selection_subtable, #tab_ops tr, #tab_navigation .nav_cell {
     font-family: sans-serif;
     z-index: 20;
     background-color: #CFCFCF;
+    border: 1px #2b434c solid;
     color: #2b434c;
     cursor: pointer;
     padding: 3px;
@@ -151,6 +152,7 @@ div.sequence {
     height: 100%;
     padding: 0px;
     border: none;
+    text-decoration: none;
 }
 .menu_entry{
     vertical-align:middle;
@@ -221,9 +223,6 @@ div.sequence {
 
 /* Operations */
 
-#tab_ops #dijit_PopupMenuItem_0_text{
-    margin-top: -2px;
-}
 
 
 .feature-label {

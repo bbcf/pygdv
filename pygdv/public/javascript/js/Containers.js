@@ -143,10 +143,10 @@ PrincipalContainer.prototype.navigationContainer = function(DomNode, DijitNode, 
         var item_label = dojo.create("td",{className:'gdv_menu_td'},item_label_tr);
         var item_img = dojo.create("td",{className:'gdv_menu_td'},item_img_tr);
         dojo.create("span", {innerHTML: link_name,
-                         className: 'gdv_menu_span',
+                         className: 'nav_span',
                       }, item_label);
         dojo.create('img', {src : window.picsPathRoot + "menu_" + link_end + ".png",
-                         className : 'gdv_menu_image',
+                         className : 'nav_image',
                       }, item_img);
     }
     DijitNode.addChild(nav_container);
