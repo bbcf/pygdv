@@ -17,11 +17,10 @@ function TrackSelection_get() {
 
 
 /**
- * Return a JSON og all selected tracks ordered :
+ * Return a JSON of all selected tracks ordered :
  * {1:{label:file},2:{label2:file2},....}
  */
-
-function trackSelection_getTracks(){
+function TrackSelection_getTracks(){
     // Get a list of all track labels
     labels = dojo.query(".track-label");
     // New list contains only labels with a true selected proprety

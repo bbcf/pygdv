@@ -172,15 +172,15 @@ div.sequence {
     color: #A9A9A9;
 }
 .gdv_menu_td{
-    vertical-align:middle;
-    text-align:center;
+    vertical-align: middle;
+    text-align: center;
 }
 
 
 /* Selections */
 
 #selections_table{
-    float:left;
+    float: left;
     width: 100%;
 }
 #selections_table table.selection_subtable {}
@@ -200,6 +200,18 @@ div.sequence {
 
 /* Tracks */
 
+#tracksSort{
+    margin-left: -4px;
+    margin-top: -4px;
+    width: 105%;
+}
+#tracksSort td{
+    width: 34%;
+    background-color: #CFCFCF;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+}
 #tracksAvail{ /*container of tracks*/
     width: 90%; height: 85%;
     margin:0; padding:0;

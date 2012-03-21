@@ -279,24 +279,65 @@ Browser.prototype.buildMenuItem = function(link_end, link_name){
 
 
 /**
- * Create the HTML panel that will contains
+ * Generic function to sort a list of the same objects by a given key
+ * @field: object key
+ * @reverse = true for high to low, false for low to high
+ * @primer: transformation to apply before comparison
+ * Example: X.sort(sort_by('price', true, parseInt));
+ */
+var sort_by = function(field, reverse, primer){
+   var key = function (x) {return primer ? primer(x[field]) : x[field]};
+   return function (a,b) {
+       var A = key(a), B = key(b);
+       if (isNaN(A) && isNaN(B)) A = A.toLowerCase(); B = B.toLowerCase();
+       return ((A < B) ? -1 :
+               (A > B) ? +1 : 0) * [-1,1][+!!reverse];
+   }
+}
+
+
+/**
+ * Create the HTML panel that will contain
  * all tracks not loaded and set up the
  * machinery to accept the DnD with dojo
  * N.B : the leftPanel is now on the
  * bottom with a div which can show or hide the panel
  */
 Browser.prototype.createTrackList = function(container,tab_tracks, params) {
+
+    ctx = this;
+
     // Buttons to sort tracks
-    var sort = dojo.create("table", { id: "tracksSort",
-                 style: {width:"100%"} },
-            tab_tracks);
+    var sort = dojo.create("table", {id: "tracksSort"}, tab_tracks);
     var sorttr = dojo.create("tr", null, sort);
     var sortByName = dojo.create("td", {innerHTML: "By name"}, sorttr);
-    var sortByDate = dojo.create("td", {innerHTML: "By type"}, sorttr);
+    var sortByType = dojo.create("td", {innerHTML: "By type"}, sorttr);
     var sortByDate = dojo.create("td", {innerHTML: "By date"}, sorttr);
-    //dojo.connect(sortByName, function(e){});
-    //dojo.connect(sortByType, function(e){});
-    //dojo.connect(sortByDate, function(e){});
+
+    // Get list of tracks
+    //tracks_info = dojo.cookie("GenomeBrowser-tracks");
+    //console.log(tracks_info);
+    labels = dojo.query(".tracklist-label");
+    console.log(labels);
+    nlabels = labels.length;
+    console.log(labels[0].innerHTML)
+    trackList = [];
+    for (var i=0; i<nlabels; i++){ trackList.push(labels[i].innerHTML); }
+
+    // Connect the buttons to sorting functions
+    dojo.connect(sortByName, 'click', function(e){
+        trackList.sort(sort_by('innerHTML', true, null));
+        trackList = ','.join(trackList);
+        console.log(trackList)
+        //dojo.cookie("GenomeBrowser-tracks", trackList);
+        //ctx.createTrackList(container,tab_tracks, params);
+    });
+    dojo.connect(sortByType, 'click', function(e){
+        //trackList.sort('type', true, null);
+    });
+    dojo.connect(sortByDate, 'click', function(e){ trackList.sort('date', true, parseDate);
+
+    });
 
     // Container of tracks
     var trackListDiv = dojo.create("div", {id: "tracksAvail",
