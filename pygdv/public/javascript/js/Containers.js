@@ -84,20 +84,6 @@ PrincipalContainer.prototype.setOnclickMenuElement = function(){
         dojo.connect(b, "click", function(e){
             ctx.menu_current_tab = this.firstElementChild.lastElementChild.innerHTML;
             if (dojo.cookie("menu_current_tab") == ctx.menu_current_tab){ // if active tab is clicked again
-            //// Trial to hide a tab if it is clicked twice, show again if clicked again
-            //    if (this.open == undefined){
-            //        this.tab.past_height = this.tab.offsetHeight+"px";
-            //        this.open = 1;
-            //    } else if (this.open == 1) { // if open, close it
-            //        this.tab.style.cssText = "display: none !important";
-            //        this.open = 0;
-            //    } else { // if already close or 'undefined', open it
-            //        ctx.principal_dijit.selectChild(this.tab.id)
-            //            //this.tab.style.display = "block";
-            //            //this.tab.style.height = this.tab.past_height;
-            //                //ctx.show_operations();
-            //        this.open = 1;
-            //    }
                 if (this.open == 1){
                     ctx.reset();
                     dojo.cookie("menu_current_tab", "Fake");

@@ -220,8 +220,8 @@ div.sequence {
     padding-bottom: 2px;
 }
 #tab_tracks div.tracklist-label{ /*miniblock representing the track*/
-    /*float: left;
-    clear: both;*/
+    float: left;
+    clear: both;
     background-color: #BDD7FF;
     line-height: 100%;
 }

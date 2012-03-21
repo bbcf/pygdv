@@ -98,7 +98,7 @@ var Browser = function(params) {
 
         var contentWidget = new dijit.layout.ContentPane({region: "top"}, topPane);
         var browserWidget = new dijit.layout.ContentPane({region: "center"}, viewElem);
-        var menuWidget = new dijit.layout.ContentPane({region: "left", splitter:true,
+        var menuWidget = new dijit.layout.ContentPane({region: "left", splitter:false,
                                                        style : {overflow:'hidden'}}, menuleft);
 
         //add a layout for the operation form

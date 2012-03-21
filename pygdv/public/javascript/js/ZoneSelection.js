@@ -164,10 +164,11 @@ ZoneSelection.prototype.update_on_server = function(){
 function Marquee(x1, x2, chr) {
     this.x1 = x1;      // Start in pixels
     this.x2 = x2;      // End in pixels
-    this.alpha = 0.15; // Transparancy
+    this.alpha = 0.15; // Transparency
     this.chr   = chr; // The chromosome
     this.start = null; // Start in basepairs
     this.end   = null; // End in basepairs
+    this.desc  = ''; // Description
 };
 
 /**
