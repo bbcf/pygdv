@@ -425,15 +425,15 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
     // Connect the buttons to sorting functions
     dojo.connect(sortByName_button, 'click', function(e){
         console.log("sortbyname");
-        var menu_tracks = get_menu_tracks();
-        menu_tracks.sort(sort_by('key', true, null));
-        params.trackData = menu_tracks; // ? dojo.cookie("Menu-tracks") // save the new order
-        // remove old tracks list
-        dojo.forEach(dojo.byId("tracksAvail").childNodes, function(cnode,i){
-            if (i!=0) dojo.destroy(cnode);
-        });
-        // insert reordered tracks list
-        brwsr.trackListWidget.insertNodes(false, menu_tracks);
+        //var menu_tracks = get_menu_tracks();
+        //menu_tracks.sort(sort_by('key', true, null));
+        //params.trackData = menu_tracks; // ? dojo.cookie("Menu-tracks") // save the new order
+        //// remove old tracks list
+        //dojo.forEach(dojo.byId("tracksAvail").childNodes, function(cnode,i){
+        //    if (i!=0) dojo.destroy(cnode);
+        //});
+        //// insert reordered tracks list
+        //brwsr.trackListWidget.insertNodes(false, menu_tracks);
     });
     dojo.connect(sortByType_button, 'click', function(e){
         console.log("sortbytype");
