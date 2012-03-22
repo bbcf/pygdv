@@ -37,12 +37,13 @@ PrincipalContainer.prototype.createContainer = function(browser, menuLeftContain
     // the principal container and the corresponding dijit container
     var principal = dojo.create('div', {id : 'principal_cont'}, menuLeftContainer);
     var principal_dijit = new dijit.layout.AccordionContainer({
-            style: "height: 100%; width: 100%;"
+        style: "height: 100%; width: 100%;",
+	
         },
         principal);
     this.principal = principal;
     this.principal_dijit = principal_dijit;
-
+    
     // init some parameters
     var menu_nav = ['Home', 'Tracks', 'Projects', 'Circles'];
     if (!_gdv_info.admin){
@@ -87,7 +88,7 @@ PrincipalContainer.prototype.setOnclickMenuElement = function(){
         but.tab = dojo.query(".dijitContentPane", but.parentNode)[0];
         but.open = 1;
         dojo.connect(but, "click", function(e){
-            ctx.menu_current_tab = this.firstElementChild.lastElementChild.innerHTML;
+	    ctx.menu_current_tab = this.firstElementChild.lastElementChild.innerHTML;
             if (dojo.cookie("menu_current_tab") == ctx.menu_current_tab){ // if active tab is clicked again
                 if (this.open == 1){
                     ctx.reset();
@@ -109,13 +110,13 @@ PrincipalContainer.prototype.setOnclickMenuElement = function(){
 * Switch to the last visited menu element
 */
 PrincipalContainer.prototype.switchMenuElement = function(){
-    console.log(this.menu_current_tab);
     switch (this.menu_current_tab){
-        case "Navigation": this.show_navigation(); break;
-        case "Selections": this.show_selections(); break;
-        case "Operations": this.show_operations(); break;
-        case "Tracks"    : this.show_tracks(); break;
-        case "Fake"      : this.reset(); break;
+    case "Navigation": this.show_navigation(); break;
+    case "Selections": this.show_selections(); break;
+    case "Operations": this.show_operations(); break;
+    case "Tracks"    : this.show_tracks(); break;
+    case "Fake"      : this.reset(); break;
+    case "Jobs"      : this.show_jobs(); break;
         default: console.log("ProgrammingError: cannot retrieve menu_current_tab from cookie.");
     }
 }
@@ -269,4 +270,14 @@ PrincipalContainer.prototype.jobContainer = function(DomNode, DijitNode){
     //init jobs
     var jobs = init_jobs;
     console.log(jobs);
+    var jobs_table = dojo.create("table", {id:"jobs_table"}, cont);
+    var jbl = jobs.length;
+     for(var i=0; i<jbl; i++){
+     	 var job = jobs[i];
+     	 var tr = dojo.create("tr", {}, jobs_table);
+	 var td = dojo.create("td", {innerHTML: job.name}, tr);
+	 var td = dojo.create("td", {innerHTML: job.desc}, tr);
+	 var td = dojo.create("td", {innerHTML: job.out}, tr);
+     }
+    //jobs_table.startup();
 };
