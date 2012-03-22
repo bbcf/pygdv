@@ -20,6 +20,9 @@ PrincipalContainer.prototype.show_navigation = function(){
 PrincipalContainer.prototype.show_operations = function(){
     this.principal_dijit.selectChild('tab_ops');
 };
+PrincipalContainer.prototype.show_jobs = function(){
+    this.principal_dijit.selectChild('tab_jobs');
+};
 PrincipalContainer.prototype.reset = function(){
     this.principal_dijit.selectChild('tab_fake');
 };
@@ -44,7 +47,8 @@ PrincipalContainer.prototype.createContainer = function(browser, menuLeftContain
     var menu_nav = ['Home', 'Tracks', 'Projects', 'Circles'];
     if (!_gdv_info.admin){
         init_operations = ['You must be logged in to use operations'];
-        if (_gdv_info.mode == 'download'){
+        jobs = ['You must be logged in to view jobs'];
+	if (_gdv_info.mode == 'download'){
             menu_nav = ['Home', 'Copy']
         } else {
             menu_nav = ['Home']
@@ -55,6 +59,7 @@ PrincipalContainer.prototype.createContainer = function(browser, menuLeftContain
     this.navigationContainer(principal, principal_dijit, menu_nav);
     this.trackContainer(browser);
     this.selectionContainer(principal, principal_dijit);
+    this.jobContainer(principal, principal_dijit);
     this.operationContainer(principal, principal_dijit, init_operations, viewContainer, formwidget, browserwidget);
     this.fakeContainer(principal, principal_dijit);
 
@@ -104,6 +109,7 @@ PrincipalContainer.prototype.setOnclickMenuElement = function(){
 * Switch to the last visited menu element
 */
 PrincipalContainer.prototype.switchMenuElement = function(){
+    console.log(this.menu_current_tab);
     switch (this.menu_current_tab){
         case "Navigation": this.show_navigation(); break;
         case "Selections": this.show_selections(); break;
@@ -242,4 +248,25 @@ PrincipalContainer.prototype.fakeContainer = function(DomNode, DijitNode){
     }, fake);
     DijitNode.addChild(fake_container);
     this.fake = fake_container;
-}
+};
+
+
+
+
+/**
+* Add the Jobs tab
+*/
+PrincipalContainer.prototype.jobContainer = function(DomNode, DijitNode){
+    var cont = dojo.create('div', {}, DomNode);
+
+    var job_container = new dijit.layout.ContentPane({
+        title: "Jobs",
+        id:'tab_jobs'
+    }, cont);
+    DijitNode.addChild(job_container);
+    this.jobs = job_container;
+    
+    //init jobs
+    var jobs = init_jobs;
+    console.log(jobs);
+};

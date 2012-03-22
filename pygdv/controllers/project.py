@@ -103,6 +103,7 @@ class ProjectController(CrudRestController):
     @expose()
     @validate(project_new_form, error_handler=new)
     def post(self, *args, **kw):
+        
         return self.create(*args, **kw)
 
     
@@ -367,16 +368,7 @@ class ProjectController(CrudRestController):
             control += 'b.navigateTo("%s");' % kw['loc']
         
         # get jobs
-        jobs = DBSession.query(Job).filter(and_(Job.project_id == project.id, not_(Job.output == constants.job_output_reload))).all()
-        
-        jobs_output = [{'job_id' : job.id, 
-                       'status' : job.status, 
-                       'job_name' : job.name,
-                       'job_description' : job.description,
-                       'output' : job.output, 
-                       'error' : job.traceback}
-                      for job in jobs
-                      ]
+        jobs = 'init_jobs = %s' % handler.job.jobs(project_id)
         
         # get operations 
         operations_path = 'init_operations = %s' % json.dumps(handler.plugin.get_operations_paths(), default=handler.plugin.encode_tree)
@@ -385,7 +377,6 @@ class ProjectController(CrudRestController):
                     nr_assembly_id=project.sequence_id, 
                     project_id=project.id,
                     is_admin=True,
-                    init_jobs=json.dumps(jobs_output),
                     ref_seqs = refSeqs,
                     track_info = trackInfo,
                     parameters = parameters,
@@ -393,6 +384,7 @@ class ProjectController(CrudRestController):
                     control = control,
                     selections = selections,
                     operations_path = operations_path,
+                    jobs = jobs,
                     page = 'view')
     
     @expose()

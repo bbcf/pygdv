@@ -102,8 +102,7 @@ full_rights = {right_read : True, right_download : True, right_upload : True}
 formats_export = ('tsv', 'sql', 'bed')
 
 
-job_output_reload = 'RELOAD'
-job_output_image = 'IMAGE'
+
 
 REQUEST_TYPE = 'REQUEST_CLASSIFIER'
 REQUEST_TYPE_COMMAND_LINE = 'command_line'
@@ -113,3 +112,8 @@ REQUEST_TYPE_BROWSER = 'browser'
 
 JOB_IMAGE = 'job_image'
 JOB_TRACK = 'job_track'
+
+job_output_reload = JOB_TRACK
+job_output_image = JOB_IMAGE
+
+

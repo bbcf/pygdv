@@ -106,28 +106,20 @@ class PublicController(BaseController):
         if 'loc' in kw:
             control += 'b.navigateTo("%s");' % kw['loc']
             
-        jobs = DBSession.query(Job).filter(and_(Job.project_id == project.id, not_(Job.output == constants.job_output_reload))).all()
+        jobs = 'init_jobs = %s' % handler.job.jobs(id)
         
-        jobs_output = [{'job_id' : job.id, 
-                       'status' : job.status, 
-                       'job_name' : job.name,
-                       'job_description' : job.description,
-                       'output' : job.output, 
-                       'error' : job.traceback}
-                      for job in jobs
-                      ]
         
         return dict(species_name=project.species.name, 
                     nr_assembly_id=project.sequence_id, 
                     project_id=project.id,
                     is_admin=False,
-                    init_jobs=json.dumps(jobs_output),
                     ref_seqs = refSeqs,
                     track_info = trackInfo,
                     parameters = parameters,
                     style_control = style_control,
                     control = control,
                     selections = selections,
+                    jobs = jobs,
                     page='view')
         
         

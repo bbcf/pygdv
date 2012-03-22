@@ -1,6 +1,7 @@
 from pygdv import model
-
-
+from pygdv.lib import constants
+from sqlalchemy.sql import and_, not_
+import json
 
 def new_job(name, description, user_id, project_id, output, task_id, sha1=None, session=None):
     if session is None:
@@ -20,8 +21,14 @@ def new_job(name, description, user_id, project_id, output, task_id, sha1=None, 
 
 
 
-
-
+def jobs(project_id):
+    jobs = model.DBSession.query(model.Job).filter(and_(model.Job.project_id == project_id, not_(model.Job.output == constants.job_output_reload))).all()
+    out = [{'id' : job.id,
+            'name' : job.name,
+            'desc' : job.description,
+            'out' : job.output} for job in jobs]
+    
+    return json.dumps(out)
 
 #def new_sel(user_id, project_id, job_description, job_name, task_id=None):
 #    job = Job()
