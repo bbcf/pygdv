@@ -22,8 +22,8 @@ manager = None
 def session_connection(*args, **kw):
     print 'init of sessions args : %s, kw : %s' %(args, kw)
     import pygdv.celery.model
-    
-    
+
+
 worker_init.connect(session_connection)
 
 
@@ -40,7 +40,7 @@ def plugin_process(plugin_id, _private_params, *args, **kw):
     if plug :
         _private_params = json.loads(_private_params)
         session = model.DBSession()
-        _private_params['session'] = session 
+        _private_params['session'] = session
         _private_params['project'] = session.query(model.Project).filter(model.Project.id == _private_params['project_id']).first()
         kw.update(_private_params)
         value = plug.plugin_object.process(*args, **kw)
@@ -92,8 +92,8 @@ def copy_file(file_path, path_to):
     finally:
         session.flush()
         session.close()
-    
-    
+
+
 
 #############################################################################################################
 #        FILE PROCESSING
@@ -110,7 +110,7 @@ def del_input(sha1, *args, **kw):
     path2 = os.path.join(json_directory(), sha1)
     try :
         os.remove(path1)
-    except OSError: 
+    except OSError:
         pass
     shutil.rmtree(path2, ignore_errors = True)
     return 1
@@ -131,7 +131,7 @@ def del_file_on_error(tasks, sha1, *args, **kw):
             path2 = os.path.join(json_directory(), sha1)
             try :
                 os.remove(path1)
-            except OSError: 
+            except OSError:
                 pass
             shutil.rmtree(path2, ignore_errors = True)
             raise theid
@@ -146,7 +146,7 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, _format, p
     with track.load(dst, 'sql', readonly=False) as t:
         t.datatype = datatype
         t.assembly = assembly_name
-    
+
     try:
         os.remove(os.path.abspath(path))
     except OSError :
@@ -172,21 +172,21 @@ def gfeatminer_request(user_id, project_id, req, job_description, job_name):
         print 'gMiner ended with %s ' % data
         for path in data:
             if os.path.splitext(path)[1] == '.sql':
-               
+
                 project = session.query(model.Project).filter(model.Project.id == project_id).first()
                 from pygdv.handler.track import create_track
-                task_id, track_id = create_track(user_id, project.sequence, f=path, trackname='%s %s' 
+                task_id, track_id = create_track(user_id, project.sequence, f=path, trackname='%s %s'
                                              % (job_name, job_description), project=project, session = session)
     except Exception as e:
         etype, value, tb = sys.exc_info()
         traceback.print_exception(etype, value, tb)
         session.rollback()
         raise e
-   
+
     finally:
         session.commit()
         session.close()
-       
+
 
 
 
@@ -201,20 +201,21 @@ def gfeatminer_request(user_id, project_id, req, job_description, job_name):
 
 @task()
 def process_track(user_id, **kw):
+    print 'process track %s' % user_id
     '''
     Entry point for uploading and processing tracks.
     '''
     session = model.DBSession()
     if not GenRep().is_up():
         if 'tmp_track_id' in kw:
-            
+
             tmp_track = session.query(TMPTrack).filter(TMPTrack.id == kw['tmp_track_id']).first()
             tmp_track.status="FAILURE"
             tmp_track.traceback = 'GenRep service is down. Please Try again later'
             session.commit()
             session.close()
             raise Exception('GenRep service is down. Please Try again later')
-        
+
     if not 'assembly' in kw and not 'project_id' in kw:
         raise Exception('Missing assembly parameters.')
     assembly_id = kw.get('assembly', None)
@@ -231,11 +232,11 @@ def process_track(user_id, **kw):
             raise e
     finally:
         session.close()
-        
-        
-    
-        
-    
+
+
+
+
+
     if files is None:
         if 'tmp_track_id' in kw:
             session = model.DBSession()
@@ -244,30 +245,30 @@ def process_track(user_id, **kw):
             tmp_track.traceback = 'Cannot download data.'
             session.commit()
         raise Exception('No files to upload')
-    
-    
+
+
     project = None
-    
+
     if 'tmp_track_id' in kw:
         tmp_track = session.query(TMPTrack).filter(TMPTrack.id == kw['tmp_track_id']).first()
         session.delete(tmp_track)
         session.flush()
     try :
         admin = False
-        
+
         if 'admin' in kw:
             admin = kw['admin']
-            
+
         if 'project_id' in kw:
             project = session.query(model.Project).filter(model.Project.id == kw['project_id']).first()
             if project is None:
                 raise Exception('Project with id %s not found.' % kw['project_id'])
             assembly_id = project.sequence_id
-    
+
         if not assembly_id:
             raise Exception('Missing assembly parameters.')
-        
-            
+
+
         for filename, f, extension in files:
             sequence = session.query(model.Sequence).filter(model.Sequence.id == assembly_id).first()
             if sequence is None:
@@ -278,22 +279,22 @@ def process_track(user_id, **kw):
             if 'trackname'in kw:
                 del kw['trackname']
             task_id, track_id = create_track(user_id, sequence, f=f.name, trackname=filename, project=project, session=session, **kw)
-            
+
             if task_id == constants.NOT_SUPPORTED_DATATYPE or task_id == constants.NOT_DETERMINED_DATATYPE:
                 raise Exception('format %s' % task_id)
-            
+
     except Exception as e:
         etype, value, tb = sys.exc_info()
         traceback.print_exception(etype, value, tb)
-        session.rollback()        
+        session.rollback()
         raise e
-    
+
     finally:
         session.commit()
         session.close()
-    
-    
-    
+
+
+
 @task()
 def process_sqlite_file(datatype, assembly_name, path, sha1, name, format):
     '''
@@ -362,7 +363,7 @@ def _signal_database(path, sha1, name):
         err = ', '.join(p.stderr)
         raise Exception(err)
     jsongen.jsonify_quantitative(sha1, output_dir, path)
-    
+
 def _features_database(path, sha1, name):
     '''
     Launch the process to produce a JSON output for a ``feature`` database.
@@ -384,4 +385,4 @@ def _relational_database(path, sha1, name):
 
 
 
- 
+

@@ -135,7 +135,9 @@ var Browser = function(params) {
                 brwsr.refSeq = brwsr.allRefs[refSeqs[i].name];
                 brwsr.chromList.selectedIndex = i;
             }
-         }
+        }
+        if (dojo.cookie(brwsr.container.id + "-tracks") == undefined)
+            { dojo.cookie(brwsr.container.id + "-tracks", null); }
 
         // Connect something
         dojo.connect(brwsr.chromList, "onchange", function(event) {
@@ -305,39 +307,14 @@ var sort_by = function(field, reverse, primer){
  */
 Browser.prototype.createTrackList = function(container,tab_tracks, params) {
 
-    ctx = this;
+    var brwsr = this;
 
     // Buttons to sort tracks
     var sort = dojo.create("table", {id: "tracksSort"}, tab_tracks);
     var sorttr = dojo.create("tr", null, sort);
-    var sortByName = dojo.create("td", {innerHTML: "By name"}, sorttr);
-    var sortByType = dojo.create("td", {innerHTML: "By type"}, sorttr);
-    var sortByDate = dojo.create("td", {innerHTML: "By date"}, sorttr);
-
-    // Get list of tracks
-    //tracks_info = dojo.cookie("GenomeBrowser-tracks");
-    //console.log(tracks_info);
-    labels = dojo.query(".tracklist-label");
-    console.log(labels);
-    nlabels = labels.length;
-    console.log(labels[0].innerHTML)
-    trackList = [];
-    for (var i=0; i<nlabels; i++){ trackList.push(labels[i].innerHTML); }
-
-    // Connect the buttons to sorting functions
-    dojo.connect(sortByName, 'click', function(e){
-        trackList.sort(sort_by('innerHTML', true, null));
-        trackList = ','.join(trackList);
-        console.log(trackList)
-        //dojo.cookie("GenomeBrowser-tracks", trackList);
-        //ctx.createTrackList(container,tab_tracks, params);
-    });
-    dojo.connect(sortByType, 'click', function(e){
-        //trackList.sort('type', true, null);
-    });
-    dojo.connect(sortByDate, 'click', function(e){ trackList.sort('date', true, parseDate);
-
-    });
+    var sortByName_button = dojo.create("td", {innerHTML: "By name"}, sorttr);
+    var sortByType_button = dojo.create("td", {innerHTML: "By type"}, sorttr);
+    var sortByDate_button = dojo.create("td", {innerHTML: "By date"}, sorttr);
 
     // Container of tracks
     var trackListDiv = dojo.create("div", {id: "tracksAvail",
@@ -347,13 +324,7 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
                 innerHTML: "Drag and Drop tracks to view/hide"},
                 trackListDiv);
 
-    // Copy self object
-    var brwsr = this;
-
-    // Callback function
-    var changeCallback = function() {brwsr.view.showVisibleBlocks(true);};
-
-    // Populates tracksAvail with divs
+    // When a *track* is dropped into tracksAvail, add one div to the list
     var trackListCreate = function(track, hint) {
         // The little block containing the track name
         var node = dojo.create("div",
@@ -375,18 +346,21 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
         return {node: node, data: track, type: ["track"]};
     };
 
-    // Undocumented
+    // Drag & drop object in tracksAvail, calling trackListCreate
     this.trackListWidget = new dojo.dnd.Source(trackListDiv,
                        {creator: trackListCreate,
                         accept: ["track"],
                         selfAccept:false,
                         withHandles: false});
 
-    // Undocumented
+    // Callback function
+    var changeCallback = function() {brwsr.view.showVisibleBlocks(true);};
+
+    // When a *track* is dropped into the main window, add it to the view
     var trackCreate = function(track, hint) {
-        if ("avatar" == hint) {
-            return trackListCreate(track, hint);
-        } else {
+        if ("avatar" == hint) { // if inactive
+            return trackListCreate(track, hint); // add a div in tracksAvail
+        } else { // if to be viewed, add it to the View
             var replaceData = {refseq: brwsr.refSeq.name};
             var url = track.url.replace(/\{([^}]+)\}/g, function(match, group) {return replaceData[group];});
             var klass = eval(track.type);
@@ -398,12 +372,12 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
                                          charWidth: brwsr.view.charWidth,
                                          seqHeight: brwsr.view.seqHeight
                                      });
-        var node = brwsr.view.addTrack(newTrack);
+            var node = brwsr.view.addTrack(newTrack);
         }
         return {node: node, data: track, type: ["track"]};
     };
 
-    // Drag and drop stuff
+    // Drag and drop object in the view, calling trackCreate
     this.viewDndWidget = new dojo.dnd.Source(this.view.zoomContainer,
                          {copyState:function(keyPressed,self){
                              // if(_tc.tab_form){
@@ -417,16 +391,60 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
         brwsr.onVisibleTracksChanged();
     });
 
-    // Undocumented
-    this.trackListWidget.insertNodes(false, params.trackData);
-    var oldTrackList = dojo.cookie(this.container.id + "-tracks");
-    if (params.tracks) {
-        this.showTracks(params.tracks);
-    } else if (oldTrackList) {
-        this.showTracks(oldTrackList);
-    } else if (params.defaultTracks) {
-        this.showTracks(params.defaultTracks);
+    // Add a block in #tracksAvail if a track is dragged from the browser
+    this.trackListWidget.insertNodes(false, params.trackData);     // populates tracksAvail with nodes
+
+    // Add tracks to the view
+    var oldTrackList = dojo.cookie(this.container.id + "-tracks"); // tracks already in the view
+    if (params.tracks) {                       // if tracks to be added to the view
+        this.showTracks(params.tracks);        //     show
+    } else if (oldTrackList) {                 // else read cookie
+        this.showTracks(oldTrackList);         //     refresh
+    } else if (params.defaultTracks) {         // if no cookie
+        this.showTracks(params.defaultTracks); //     load default
     }
+
+    // Get a list of all inactive tracks - not loaded in the view
+    var get_menu_tracks = function(){
+        var all_tracks = params.trackData; // Array
+        var ntracks = all_tracks.length;
+        var menu_tracks = [];
+        for (var i=0; i<ntracks; i++){
+            var track_i = all_tracks[i];
+            var oldTrackList = dojo.cookie(brwsr.container.id + "-tracks");
+            console.log(track_i.key)
+            console.log(oldTrackList.split(','))
+            if (!(track_i.key in oldTrackList.split(','))) { // if not viewed
+                menu_tracks.push(track_i);
+                console.log("added", track_i.key)
+            }
+        }
+        return menu_tracks;
+    }
+
+    // Connect the buttons to sorting functions
+    dojo.connect(sortByName_button, 'click', function(e){
+        console.log("sortbyname");
+        var menu_tracks = get_menu_tracks();
+        menu_tracks.sort(sort_by('key', true, null));
+        params.trackData = menu_tracks; // ? dojo.cookie("Menu-tracks") // save the new order
+        // remove old tracks list
+        dojo.forEach(dojo.byId("tracksAvail").childNodes, function(cnode,i){
+            if (i!=0) dojo.destroy(cnode);
+        });
+        // insert reordered tracks list
+        brwsr.trackListWidget.insertNodes(false, menu_tracks);
+    });
+    dojo.connect(sortByType_button, 'click', function(e){
+        console.log("sortbytype");
+        //menu_tracks.sort('type', true, null);
+    });
+    dojo.connect(sortByDate_button, 'click', function(e){
+        console.log("sortbydate");
+        //menu_tracks.sort('date', true, parseDate);
+    });
+
+
 };
 
 /**
@@ -437,7 +455,7 @@ Browser.prototype.onVisibleTracksChanged = function() {
     var trackLabels = dojo.map(this.view.tracks, function(track) {
         return track.name;
     });
-    var oldTrackList = dojo.cookie(this.container.id + "-tracks");
+    var oldTrackList = dojo.cookie(this.container.id + "-tracks").split(',');
     dojo.cookie(this.container.id + "-tracks", trackLabels.join(","), {expires:60});
     this.view.showVisibleBlocks();
 };
@@ -593,9 +611,9 @@ Browser.prototype.showTracks = function(trackNameList) {
     }
     var movedNode;
     for (var i = 0; i < removeFromList.length; i++) {
-    this.trackListWidget.delItem(removeFromList[i]);
-    movedNode = dojo.byId(removeFromList[i]);
-    if (movedNode) movedNode.parentNode.removeChild(movedNode);
+        this.trackListWidget.delItem(removeFromList[i]);
+        movedNode = dojo.byId(removeFromList[i]);
+        if (movedNode) movedNode.parentNode.removeChild(movedNode);
     }
     this.onVisibleTracksChanged();
 };

@@ -78,10 +78,10 @@ PrincipalContainer.prototype.setOnclickMenuElement = function(){
     var buttons = dojo.query(".dijitAccordionTitle", this.principal);
     var bl = buttons.length;
     for (var i=0; i<bl; i++) {
-        b = buttons[i];
-        b.tab = dojo.query(".dijitContentPane", b.parentNode)[0];
-        b.open = 1;
-        dojo.connect(b, "click", function(e){
+        var button = buttons[i];
+        button.tab = dojo.query(".dijitContentPane", button.parentNode)[0];
+        button.open = 1;
+        dojo.connect(button, "click", function(e){
             ctx.menu_current_tab = this.firstElementChild.lastElementChild.innerHTML;
             if (dojo.cookie("menu_current_tab") == ctx.menu_current_tab){ // if active tab is clicked again
                 if (this.open == 1){
@@ -124,6 +124,7 @@ PrincipalContainer.prototype.trackContainer = function(browser){
         title: "Tracks",
         id: 'tab_tracks'
     });
+    dojo.cookie("Menu-tracks");
     this.principal_dijit.addChild(track_container);
     browser.tab_tracks = track_container;
     this.tracks = track_container;

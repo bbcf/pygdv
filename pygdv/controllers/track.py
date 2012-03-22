@@ -28,41 +28,41 @@ class TrackController(CrudRestController):
     new_form = track_new_form
     edit_filler = track_edit_filler
 
-   
-   
 
 
-    
-    
+
+
+
+
     @with_trailing_slash
     @expose('pygdv.templates.list')
     @expose('json')
     #@paginate('items', items_per_page=10)
     def get_all(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        
+
         tracks = DBSession.query(TMPTrack).filter(TMPTrack.user_id == user.id).all()
         tracks.extend(user.tracks)
         data = [util.to_datagrid(track_grid, tracks, "Track Listing", len(tracks)>0)]
         return dict(page='tracks', model='track', form_title="new track", items=data, value=kw)
-    
-    
-    
+
+
+
     @require(not_anonymous())
     @expose('pygdv.templates.form')
     def new(self, *args, **kw):
         tmpl_context.widget = track_new_form
         return dict(page='tracks', value=kw, title='new Track')
-    
+
 
     @expose('json')
     def create(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
         util.file_upload_converter(kw)
         task = tasks.process_track.delay(user.id, **kw)
-        
-        return reply.normal(request, 'Task launched.', './', {'task_id' : task.task_id})  
-    
+
+        return reply.normal(request, 'Task launched.', './', {'task_id' : task.task_id})
+
     @expose('json')
     @validate(track_new_form, error_handler=new)
     def post(self, *args, **kw):
@@ -81,17 +81,17 @@ class TrackController(CrudRestController):
                 else :
                     flash("Bad file/url", 'error')
                     raise redirect('./')
-        
+
         tmp_track = TMPTrack()
         tmp_track.name = filename
         tmp_track.sequence_id = kw['assembly']
         tmp_track.user_id = user.id
         DBSession.add(tmp_track)
         DBSession.flush()
-        
+
         kw['tmp_track_id'] = tmp_track.id
-        return self.create(*args, **kw) 
-    
+        return self.create(*args, **kw)
+
 
     @expose('genshi:tgext.crud.templates.post_delete')
     def post_delete(self, *args, **kw):
@@ -108,33 +108,33 @@ class TrackController(CrudRestController):
         else :
             handler.track.delete(_id)
         raise redirect('./')
-    
-    
+
+
     @expose('tgext.crud.templates.edit')
     def edit(self, *args, **kw):
         track = DBSession.query(Track).filter(Track.id == args[0]).first()
         tmpl_context.color = track.parameters.color
         return CrudRestController.edit(self, *args, **kw)
-    
+
     @expose()
     @validate(track_edit_form, error_handler=edit)
     def put(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
         _id = args[0]
-        
+
         if not checker.can_edit_track(user, _id) and not checker.user_is_admin(user.id):
             flash("You haven't the right to edit any tracks which is not yours")
             raise redirect('../')
-        
+
         track = DBSession.query(Track).filter(Track.id == _id).first()
         track.name = kw['name']
         if 'color' in kw:
             track.parameters.color = kw['color']
         DBSession.flush()
         redirect('../')
-        
-        
-    
+
+
+
     @expose('pygdv.templates.track_export')
     def export(self, track_id, *args, **kw):
         user = handler.user.get_user_in_session(request)
@@ -142,38 +142,38 @@ class TrackController(CrudRestController):
             flash("You haven't the right to export any tracks which is not yours")
             raise redirect('../')
         track = DBSession.query(Track).filter(Track.id == track_id).first()
-        
+
         data = util.to_datagrid(track_grid, [track])
         tmpl_context.form = track_export
         return dict(page='tracks', model='Track', info=data, form_title='', value=kw)
-    
+
     @expose()
     def dump(self, *args, **kw):
         return "You will be able to export the desired track in the format wanted. It's not implemented yet."
-    
+
     @expose()
     def link(self, track_id, *args, **kw):
         user = handler.user.get_user_in_session(request)
         if not checker.user_own_track(user.id, track_id)  and not checker.user_is_admin(user.id):
             flash("You haven't the right to download any tracks which is not yours")
-        
+
         raise redirect('./')
         return 'not implemented'
-    
+
     @expose()
     def traceback(self, track_id, tmp):
         user = handler.user.get_user_in_session(request)
         if tmp in ['True']:
             return DBSession.query(TMPTrack).filter(TMPTrack.id == track_id).first().traceback
-        
-        
+
+
         elif not checker.user_own_track(user.id, track_id) and not checker.user_is_admin(user.id):
 
             flash("You haven't the right to look at any tracks which is not yours")
             raise redirect('./')
         track = DBSession.query(Track).filter(Track.id == track_id).first()
         return track.traceback
-    
+
     @expose()
     def copy(self, track_id):
         user = handler.user.get_user_in_session(request)
@@ -184,21 +184,21 @@ class TrackController(CrudRestController):
             return reply.error(request, 'No track with this id.', './', {})
         handler.track.copy_track(user.id, t)
         return reply.normal(request, 'Copy successfull', './', {})
-    
-    
-    
-    
+
+
+
+
     ##### for ADMINS #######
-    
-    
-    
-    
+
+
+
+
     @require(has_permission('admin', msg='Only for admins'))
     @expose('pygdv.templates.form')
     def default_tracks(self, **kw):
         tmpl_context.widget = default_track_form
         return dict(page='tracks', value=kw, title='new default track (visible on all projects with the same assembly)')
-    
+
     @expose()
     @require(has_permission('admin', msg='Only for admins'))
     @validate(default_track_form, error_handler=default_tracks)
@@ -206,10 +206,10 @@ class TrackController(CrudRestController):
         user = handler.user.get_user_in_session(request)
         kw['admin'] = True
         util.file_upload_converter(kw)
-        
+
         task_id = tasks.process_track.delay(user.id, **kw)
-        return reply.normal(request, 'Task launched.', '/home', {'task_id' : task_id})  
-    
+        return reply.normal(request, 'Task launched.', '/home', {'task_id' : task_id})
+
     @require(has_permission('admin', msg='Only for admins'))
     @expose('pygdv.templates.list')
     def admin(self, **kw):
@@ -218,9 +218,9 @@ class TrackController(CrudRestController):
         for sequence in sequences:
             tracks += sequence.default_tracks
         data = [util.to_datagrid(track_grid, tracks, "Track Listing", len(tracks)>0)]
-        
+
         return dict(page='tracks', model='track', form_title="admin tracks",items=data,value=kw)
-    
+
     @require(has_permission('admin', msg='Only for admins'))
     @expose('pygdv.templates.list')
     def all(self, *args, **kw):
@@ -230,4 +230,4 @@ class TrackController(CrudRestController):
             tracks = DBSession.query(Track).all()
         data = [util.to_datagrid(track_grid, tracks, "Track Listing", len(tracks)>0)]
         return dict(page='tracks', model='track', form_title="new track",items=data,value=kw)
-    
+
