@@ -129,5 +129,10 @@ class RootController(BaseController):
     def test_log(self):
         return 'logged'
     
+    @expose()
+    def simulategr(self, *args, **kw):
+        import time
+        time.sleep(10)
+        return ''
     
     

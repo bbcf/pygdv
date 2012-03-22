@@ -14,20 +14,23 @@ function GenRep() {
 * @returns the complete url
 */
 GenRep.prototype.get = function(fn, path, content) {
-    if (!fn) {fn = function(data) {console.log(data);};}
+    if (!fn) {fn = function(data) {console.error(data);};}
     var ctx = this;
+    
     dojo.io.script.get({
-                url: this.url + '/' + path,
-                jsonp: "callback",
-                content: content,
-                load: fn,
-                error: ctx.error
+        url: this.url + '/' + path,
+        jsonp: "callback",
+        content: content,
+        load: fn,
+        error: ctx.error,
+	timeout : 0
     });
     return this.url + '/' + path;
 };
 
 GenRep.prototype.error = function(data){
     console.error(data);
+    
 };
 
 
@@ -85,7 +88,7 @@ GenRep.prototype.current_chr_id = function(view, fn) {
 */
 GenRep.prototype.chr_name_to_id = function(fn, assembly_id, chr_name) {
     callback = dojo.hitch(this, function(data) {
-        var chrom = this.filter_chrs(data, chr_name);
+	var chrom = this.filter_chrs(data, chr_name);
         var id = this.get_chr_id(chrom);
         fn(id);
     });
@@ -130,7 +133,9 @@ GenRep.prototype.get_chr_id = function(chrom) {
 * @returns nothing
 */
 GenRep.prototype.bands = function(view, fn) {
-    callback = dojo.hitch(this, function(chr_id) {this.bands_by_chr(fn, chr_id);});
+    callback = dojo.hitch(this, function(chr_id) {
+	this.bands_by_chr(fn, chr_id);
+    });
     this.current_chr_id(view, callback);
 };
 

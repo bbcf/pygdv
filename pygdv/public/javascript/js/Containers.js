@@ -78,10 +78,10 @@ PrincipalContainer.prototype.setOnclickMenuElement = function(){
     var buttons = dojo.query(".dijitAccordionTitle", this.principal);
     var bl = buttons.length;
     for (var i=0; i<bl; i++) {
-        var button = buttons[i];
-        button.tab = dojo.query(".dijitContentPane", button.parentNode)[0];
-        button.open = 1;
-        dojo.connect(button, "click", function(e){
+        var but = buttons[i];
+        but.tab = dojo.query(".dijitContentPane", but.parentNode)[0];
+        but.open = 1;
+        dojo.connect(but, "click", function(e){
             ctx.menu_current_tab = this.firstElementChild.lastElementChild.innerHTML;
             if (dojo.cookie("menu_current_tab") == ctx.menu_current_tab){ // if active tab is clicked again
                 if (this.open == 1){
