@@ -14,7 +14,7 @@ from pygdv.lib import constants, reply
 from pygdv.celery import tasks
 import json
 from sqlalchemy import and_, not_
-from bbcflib.genrep import GenRep
+
 from pygdv import handler
 
 __all__ = ['LoginController']

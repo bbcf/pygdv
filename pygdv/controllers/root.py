@@ -124,8 +124,10 @@ class RootController(BaseController):
         return dict(result=res.get())
     
     
-    
-    
+    @require(has_permission('admin', msg='Only for admins'))
+    @expose('json')
+    def test_log(self):
+        return 'logged'
     
     
     

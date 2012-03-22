@@ -2,7 +2,6 @@
 """Error controller"""
 
 from tg import request, expose, require, flash
-from bbcflib.genrep import GenRep, Assembly
 from repoze.what.predicates import has_any_permission
 from pygdv.lib import constants, checker
 from pygdv import handler

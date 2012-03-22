@@ -21,7 +21,6 @@ import transaction
 from pygdv.lib import checker
 from pygdv.lib.jbrowse import util as jb
 from pygdv.lib import constants, reply
-from bbcflib.genrep import GenRep
 
 from sqlalchemy.sql import and_, or_, not_
 import re

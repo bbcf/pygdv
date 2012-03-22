@@ -6,9 +6,8 @@ __all__ = ['Globals']
 
 
 
-from bbcflib.genrep import GenRep
 from pygdv.lib import constants
-
+from bbcflib.genrep import GenRep
 # CIRCLE & RIGHTS configuration
 
 

@@ -12,7 +12,7 @@ import track, transaction
 from pygdv.celery import model
 from sqlalchemy.sql.expression import except_
 from pygdv.model.database import TMPTrack
-from bbcflib.genrep import GenRep
+from bbcflib import genrep_cache as genrep
 
 success = 1
 
@@ -206,15 +206,17 @@ def process_track(user_id, **kw):
     Entry point for uploading and processing tracks.
     '''
     session = model.DBSession()
-    if not GenRep().is_up():
-        if 'tmp_track_id' in kw:
 
-            tmp_track = session.query(TMPTrack).filter(TMPTrack.id == kw['tmp_track_id']).first()
-            tmp_track.status="FAILURE"
-            tmp_track.traceback = 'GenRep service is down. Please Try again later'
-            session.commit()
-            session.close()
-            raise Exception('GenRep service is down. Please Try again later')
+#    if not GenRep().is_up():
+#        if 'tmp_track_id' in kw:
+#            
+#            tmp_track = session.query(TMPTrack).filter(TMPTrack.id == kw['tmp_track_id']).first()
+#            tmp_track.status="FAILURE"
+#            tmp_track.traceback = 'GenRep service is down. Please Try again later'
+#            session.commit()
+#            session.close()
+#            raise Exception('GenRep service is down. Please Try again later')
+        
 
     if not 'assembly' in kw and not 'project_id' in kw:
         raise Exception('Missing assembly parameters.')
