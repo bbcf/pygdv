@@ -295,8 +295,8 @@ class ProjectController(CrudRestController):
     @expose('pygdv.templates.view')
     def view(self, project_id, *args, **kw):
         
-        if not GenRep().is_up():
-            raise redirect(url('/error', {'m': 'Genrep service is down. Please try again later.'}))
+#        if not GenRep().is_up():
+#            raise redirect(url('/error', {'m': 'Genrep service is down. Please try again later.'}))
         
         
         user = handler.user.get_user_in_session(request)

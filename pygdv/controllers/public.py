@@ -36,8 +36,8 @@ class PublicController(BaseController):
             raise redirect(url('/home'))
         mode = None
         
-        if not GenRep().is_up():
-            raise redirect(url('/error', {'m': 'Genrep service is down. Please try again later.'}))
+#        if not GenRep().is_up():
+#            raise redirect(url('/error', {'m': 'Genrep service is down. Please try again later.'}))
         
         
         if k == project.key : mode = 'read'
