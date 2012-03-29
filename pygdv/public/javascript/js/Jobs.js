@@ -1,3 +1,5 @@
+var JOB_LOADING_TIME = 10
+
 function JobPane(){};
 
 
@@ -24,6 +26,7 @@ JobPane.prototype.init_panel = function(DomNode, DijitNode){
 	var tr = dojo.create("tr", {}, m);
 	var td = dojo.create("td", {className: 'pane_unit', innerHTML: job.name, title: job.desc}, tr);
 	var td = dojo.create("td", {className: 'pane_unit'}, tr);
+	var td = dojo.create("td", {className: 'pane_unit', innerHTML : job.id, style : {display : 'hidden'}}, tr);
 	td.appendChild(ctx.job_output(job));
     }
 };
@@ -39,4 +42,26 @@ JobPane.prototype.job_output = function(job){
     case 'job_pendintg': return dojo.create('div', {innerHTML : 'Running', className : 'loading_gif'});
     default: return dojo.create('a', {target : '_blank', href : 'javascript:location.reload(true);'});
     }
+};
+
+/**
+* Fetch the jobs from the server and add the missing ones.
+*/
+JobPane.prototype.get_jobs = function(callback){
+    var pdata="project_id=" + _gdv_info.project_id;
+    var xhrArgs = {
+	url : _GDV_JOB_URL + '/get_jobs',
+	postData : pdata,
+	handleAs : 'json',
+	load : function(data){
+	    callback(data);
+	},
+	error : function(data){
+	    console.error(data);
+	},
+    };
+};
+
+function op_form_submitted(){
+    console.log("perhaps a new job");
 };

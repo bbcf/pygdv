@@ -42,6 +42,7 @@ dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
         this.isTyping = false;
         this.post_it(this.field);
     },
+    
     post_it : function(field){
 	var ctx = this;
         var pData="project_id=" + _gdv_info.project_id + "&term=" + field;

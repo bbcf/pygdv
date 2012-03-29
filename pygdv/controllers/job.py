@@ -71,8 +71,13 @@ class JobController(CrudRestController):
         handler.job.delete(_id)
         raise redirect('./')
     
-    
-    
+    @expose('json')
+    def get_jobs(self, project_id, *args, **ke):
+        user = handler.user.get_user_in_session(request)
+        if not checker.check_permission_project(user.id, project_id, constants.right_read_id):
+            return {'error' : "You haven't the right to read this project"}
+        jobs = DBSession.query(Job).filter(and_(Job.user_id == user.id, Job.project_id == project_id, not_(Job.output == constants.job_output_reload))).all()
+        return {'jobs' : jobs}
     
     @expose()
     def traceback(self, id):

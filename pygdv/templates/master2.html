@@ -13,12 +13,12 @@
     <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
     <title py:replace="''">Your title goes here</title>
     <meta py:replace="select('*')"/>
-    
+    <script type="text/javascript" src="${tg.url('/javascript/jslib/dojo/dojo.js')}"></script>
     <script type="text/javascript" src="${tg.url('/javascript/jslib/DataTables-1.8.2/media/js/jquery.js')}"></script>
     <script type="text/javascript" src="${tg.url('/javascript/jslib/DataTables-1.8.2/media/js/jquery.dataTables.js')}"></script>
 
     <script type="text/javascript" src="${tg.url('/javascript/js/DataTables.js')}"></script>
-
+    
     
    <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/style.css')}" />
    <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/admin.css')}" />
@@ -31,5 +31,14 @@
     </py:with>
     <div py:replace="select('*|text()')"/>
   </div>
+
+
+  <script>
+    var input = dojo.query("input[type=submit]")[0]
+    dojo.connect(input, 'onclick', function(e){
+    parent.op_form_submitted();
+    });
+  </script>
+
 </body>
 </html>
