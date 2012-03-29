@@ -1,7 +1,7 @@
 from pygdv import model
 from pygdv.lib import constants
 from sqlalchemy.sql import and_, not_
-import json, datetime
+import json, datetime, shutil, os
 
 
 def new_tmp_job(name, user_id, project_id, session=None):
@@ -62,6 +62,17 @@ def jobs(project_id):
             'out' : job.output} for job in jobs]
     
     return json.dumps(out)
+
+def delete(job_id):
+    job = model.DBSession.query(model.Job).filter(model.Job.id == job_id).first()
+    if job is not None:
+        path = os.path.join(constants.extra_directory(), job.data)
+        try :
+            os.remove(path)
+        except OSError:
+            pass
+        model.DBSession.delete(job)
+        model.DBSession.flush()
 
 #def new_sel(user_id, project_id, job_description, job_name, task_id=None):
 #    job = Job()

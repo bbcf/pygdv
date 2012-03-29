@@ -1,4 +1,4 @@
-from pygdv.model import DBSession, Project, User, Track, Circle, Right, Group
+from pygdv.model import DBSession, Project, User, Track, Circle, Right, Group, Job
 from pygdv.lib import constants
 from sqlalchemy.sql import and_, or_
 
@@ -62,5 +62,8 @@ def can_download_track(user_id, track_id):
         return t != None
     return True
     
-
-
+def can_edit_job(user_id, job_id):
+    if not user_is_admin(user_id):
+        j = DBSession.query(Job).filter(and_(Job.id == job_id, Job.user_id == user_id)).first()
+        return j != None
+    return True

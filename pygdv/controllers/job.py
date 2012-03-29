@@ -12,7 +12,7 @@ from tg import app_globals as gl
 import tg, os
 from repoze.what.predicates import has_any_permission
 from pygdv import handler
-from pygdv.lib import util, constants
+from pygdv.lib import util, constants, checker
 from pygdv.widgets.job import job_grid
 from pygdv.widgets.job import job_edit_filler, job_edit_form, job_grid, job_new_form, job_table, job_table_filler
 from tg.decorators import paginate, with_trailing_slash,without_trailing_slash
@@ -47,13 +47,25 @@ class JobController(CrudRestController):
         if job is not None:
             data = util.to_datagrid(job_grid, [job])
             if job.output == constants.JOB_IMAGE :
-                print job.data
                 src = constants.extra_url() + '/' + str(job.data)
                 return dict(page='jobs', model='Job', src=url(src), info=data)
             if job.output == constants.JOB_TRACK :
                 return dict(page='jobs', model='Job', src='', info=data)
             
         raise redirect(url('/jobs/get_all'))
+    
+    
+    @expose('genshi:tgext.crud.templates.post_delete')
+    def post_delete(self, *args, **kw):
+        user = handler.user.get_user_in_session(request)
+        _id = args[0]
+        if not checker.can_edit_job(user.id, _id):
+            flash("You haven't the right to edit a job which is not yours")
+            raise redirect('../')
+        handler.job.delete(_id)
+        raise redirect('./')
+    
+    
     
     
     @expose()
