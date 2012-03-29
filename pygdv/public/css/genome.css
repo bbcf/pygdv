@@ -1037,3 +1037,8 @@ table tr td.pane_unit{
     padding:1px;
     
 }
+div.loading_gif{
+    background: url("../images/ajax-loader.gif") no-repeat;
+    width : 100%;
+}
+

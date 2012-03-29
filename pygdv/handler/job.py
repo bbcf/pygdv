@@ -14,7 +14,7 @@ def new_tmp_job(name, user_id, project_id, session=None):
     job.description = 'Launched the : ' + str(dt)
     job.user_id = user_id
     job.project_id = project_id
-    job.output = ''
+    job.output = constants.JOB_PENDING
     job.task_id = ''
     session.add(job)
     session.flush()

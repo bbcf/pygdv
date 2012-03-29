@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <xi:include href="master.html" />
+  <xi:include href="definitions.html"/>
+
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
+  <title py:replace="page"></title>
+</head>
+<style>
+#menu_items {
+  padding:0px 12px 0px 2px;
+  list-style-type:None
+}
+</style>
+
+<body class="tundra">
+  <h1>Hidden queries for users</h1>
+  <ul>
+    <li><a href="${tg.url('tracks/all')}">All tracks</a>.</li>
+    <li><a href="${tg.url('tracks/all?user_id=1')}">Track from an user</a>.</li>
+    <li><a href="${tg.url('projects/admin')}">All projects</a>.</li>
+  </ul>
+
+  <h1> Others admin sections</h1>
+  <ul>
+    <li py:for="item in admin_items">
+
+      <a href="${tg.url(item)}s">${item}</a>
+    </li>
+  </ul>
+
+
+</body>
+</html>
