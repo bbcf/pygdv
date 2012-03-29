@@ -40,6 +40,12 @@ class JobController(CrudRestController):
         data = [util.to_datagrid(job_grid, jobs, "Job Listing", len(jobs)>0)]
         return dict(page='jobs', model='job', form_title="new job", items=data, value=kw)
     
+    @without_trailing_slash
+    @expose()
+    def new(self, *args, **kw):
+        return "You can launch jobs from project view"
+    
+    
     
     @expose('pygdv.templates.job')
     def result(self, id):

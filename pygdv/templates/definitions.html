@@ -13,7 +13,7 @@
       <li><a href="${tg.url('/jobs')}" class="${('', 'active')[defined('page') and page=='jobs']}">Jobs</a></li>           
       <li><a href="${tg.url('/help')}" class="${('', 'active')[defined('page') and page=='help']}">Help</a></li>           
       <span py:if="tg.auth_stack_enabled" py:strip="True">
-	<li py:if="request.identity" id="login" class="loginlogout"><a href="${tg.url('/users')}">Admin</a></li>
+	<li py:if="request.identity" id="login" class="loginlogout ${('', 'active')[defined('page') and page=='admin']}"><a href="${tg.url('/admin')}">Admin</a></li>
 	<li py:if="not request.identity" id="login" class="loginlogout"><a href="${tg.url('/login')}">Login</a></li>
 	<li py:if="request.identity" id="login" class="loginlogout"><a href="${tg.url('/login/out')}">Logout</a></li>
 	
