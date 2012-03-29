@@ -26,7 +26,7 @@ job_grid = twf.DataGrid(fields=[
     ('Name', 'name'),
     ('Description', 'description'),
     ('Output', 'output_display'),
-    ('Status', 'status'),
+    ('Status', lambda obj: get_job_status(obj)),
     ('Action', lambda obj:genshi.Markup(
         '<a href="%s"> result </a> '
         % url('./result', params={'id' : obj.id})
@@ -34,6 +34,21 @@ job_grid = twf.DataGrid(fields=[
         ))
 ])
 
+def get_job_status(job=None):
+    '''
+    Get a output for the status of a task : a link to the traceback if the status is ``FAILURE``,
+    else the string representing the status.
+    @param track : the track to get the status from
+    '''
+    obj = job
+    if obj.status != constants.ERROR: return obj.status
+    return genshi.Markup('<a href="%s">%s</a>' % (url('./traceback', params={'id':obj.id}),
+                                                  constants.ERROR
+                                                  ))
+    
+    
+    
+    
 # TABLE
 class JobTable(TableBase):
     __model__ = Job

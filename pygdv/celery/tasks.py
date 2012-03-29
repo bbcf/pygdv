@@ -36,17 +36,27 @@ import subprocess
 @task()
 def plugin_process(plugin_id, _private_params, *args, **kw):
     from pygdv.handler.plugin import get_plugin_byId
+    from pygdv.handler.job import new_tmp_job
     plug = get_plugin_byId(plugin_id, model.Manager)
     if plug :
         _private_params = json.loads(_private_params)
         session = model.DBSession()
         _private_params['session'] = session
-        _private_params['project'] = session.query(model.Project).filter(model.Project.id == _private_params['project_id']).first()
+        project = session.query(model.Project).filter(model.Project.id == _private_params['project_id']).first()
+        _private_params['project'] = project
+        job = new_tmp_job(plug.plugin_object.title(), project.user_id, project.id, session=session)
+        _private_params['job'] = job
         kw.update(_private_params)
-        value = plug.plugin_object.process(*args, **kw)
-        session.commit()
-        session.close()
-        return value
+        try :
+            value = plug.plugin_object.process(*args, **kw)
+            return value
+        except Exception as e:
+            job.data = str(e)
+            job.output = constants.JOB_FAILURE
+        finally :
+            session.commit()
+            session.close()
+       
     return 0
 
 

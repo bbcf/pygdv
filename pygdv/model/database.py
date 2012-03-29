@@ -527,7 +527,10 @@ class Job(DeclarativeBase):
     
     @property
     def traceback(self):
-        if self.task is None: return ''
+        if self.task is None: 
+            if self.data is not None:
+                return self.data
+            return ''
         return self.task.traceback
     
     @property
@@ -537,6 +540,8 @@ class Job(DeclarativeBase):
     @property
     def status(self):
         if self.task is None:
+            if self.data is not None:
+                return constants.ERROR
             return 'PENDING'
         return self.task.status
     

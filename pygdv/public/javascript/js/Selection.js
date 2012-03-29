@@ -35,7 +35,7 @@ SelectionPane.prototype.draw = function(store, selections){
         var del = dojo.create("td", {class:"delete"}, postr);
         var desctr = dojo.create("tr", null, selection_subtable);
         var desc = dojo.create("td", {class:"description", colspan:2}, desctr);
-        dojo.create("div", {innerHTML:"&nbsp", class:"delete_img_field"}, del);
+        dojo.create("div", {innerHTML:"", class:"delete_img_field"}, del);
         dojo.create("div", {innerHTML:"Enter description", class:"description_field",
                            style: {color: "grey"}}, desc);
 

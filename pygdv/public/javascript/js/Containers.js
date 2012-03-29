@@ -270,14 +270,30 @@ PrincipalContainer.prototype.jobContainer = function(DomNode, DijitNode){
     //init jobs
     var jobs = init_jobs;
     console.log(jobs);
-    var jobs_table = dojo.create("table", {id:"jobs_table"}, cont);
+    var jobs_table = dojo.create("table", {id:"jobs_table", className: 'pane_table',}, cont);
     var jbl = jobs.length;
-     for(var i=0; i<jbl; i++){
-     	 var job = jobs[i];
-     	 var tr = dojo.create("tr", {}, jobs_table);
-	 var td = dojo.create("td", {innerHTML: job.name}, tr);
-	 var td = dojo.create("td", {innerHTML: job.desc}, tr);
-	 var td = dojo.create("td", {innerHTML: job.out}, tr);
+    var ctx = this;
+    for(var i=0; i<jbl; i++){
+     	var job = jobs[i];
+	var tr = dojo.create("tr", {}, jobs_table);
+	var m = dojo.create("table", {className: 'pane_element'}, tr);
+     	var tr = dojo.create("tr", {}, m);
+	var td = dojo.create("td", {className: 'pane_unit', innerHTML: job.name, title: job.desc}, tr);
+	var td = dojo.create("td", {className: 'pane_unit'}, tr);
+	td.appendChild(ctx.job_output(job));
      }
     //jobs_table.startup();
+};
+
+/**
+* Return the right display for the job output
+*/
+PrincipalContainer.prototype.job_output = function(job){
+    var job_output = job.out;
+
+    switch(job_output){
+    case 'job_image': return dojo.create('a', {target:'_blank', href: _GDV_JOB_URL + '/result?id=' + job.id, innerHTML:'view output'});
+    case 'job_failure': return dojo.create('a', {target:'_blank', href: _GDV_JOB_URL + '/traceback?id=' + job.id, innerHTML:'failure'});
+    default: return dojo.create('a', {target:'_blank', href: 'javascript:location.reload(true);'});
+    }
 };

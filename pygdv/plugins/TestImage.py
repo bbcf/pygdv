@@ -37,4 +37,4 @@ class TestImagePlugin(IPlugin, OperationPlugin):
                     }
         result = gMiner.run(**d)
         for f in result:
-            new_file(kw, f, self.description())
+            new_file(kw, f, self.title(), self.description())

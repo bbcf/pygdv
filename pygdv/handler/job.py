@@ -1,7 +1,40 @@
 from pygdv import model
 from pygdv.lib import constants
 from sqlalchemy.sql import and_, not_
-import json
+import json, datetime
+
+
+def new_tmp_job(name, user_id, project_id, session=None):
+    dt = datetime.datetime.now().strftime(constants.date_format)
+    if session is None:
+        session = model.DBSession
+        
+    job = model.Job()
+    job.name = name
+    job.description = 'Launched the : ' + str(dt)
+    job.user_id = user_id
+    job.project_id = project_id
+    job.output = ''
+    job.task_id = ''
+    session.add(job)
+    session.flush()
+    return job
+
+def update_job(job, name, description, user_id, project_id, output, task_id, sha1=None, session=None):
+    if session is None:
+        session = model.DBSession
+    job.name = name
+    job.description = description
+    job.user_id = user_id
+    job.project_id = project_id
+    job.output = output
+    job.task_id = task_id
+    if sha1:
+        job.data = sha1
+    session.add(job)
+    session.flush()
+    return job
+    
 
 def new_job(name, description, user_id, project_id, output, task_id, sha1=None, session=None):
     if session is None:

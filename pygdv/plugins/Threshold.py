@@ -20,6 +20,9 @@ class TestPlugin(IPlugin, OperationPlugin):
     def output(self):
         return form.ThresholdForm
     
+    def description(self):
+        return 'Apply a threshold on the track selected'
+    
     def process(self, **kw):
         threshold = int(kw.get('thr', 0))
         my_track = retrieve_track(kw, kw.get('track'))
@@ -31,7 +34,7 @@ class TestPlugin(IPlugin, OperationPlugin):
         
         
         # create a new track on GDV
-        new_track(kw, _file=path, trackname='test plugin')
+        new_track(kw, path, self.title(), self.description())
         return 0
 
 

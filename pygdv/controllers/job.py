@@ -22,7 +22,7 @@ __all__ = ['JobController']
 
 
 
-class   JobController(CrudRestController):
+class JobController(CrudRestController):
     allow_only = has_any_permission(constants.perm_user, constants.perm_admin)
     model = Job
     table = job_table

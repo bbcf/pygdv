@@ -7,22 +7,23 @@ root_key = 'Operations'
 
 
 
-def new_track(_private_params=None, _file=None, trackname=None, **kw):
+def new_track(_private_params, _file, name, description, **kw):
     '''
     Create a new track in GDV.
     param _file : the track path
     param trackname : the name of the track
     '''
     from pygdv.handler.track import create_track
-    from pygdv.handler.job import new_job
+    from pygdv.handler.job import update_job
     if _private_params is not None:
         session = _private_params['session']
         project = _private_params['project']
+        job = _private_params['job']
         task_id, track = create_track(_private_params['user_id'],project.sequence, 
-                                      f=_file, trackname=trackname, project=project, session=session)
-        return new_job('new track', kw.get('description'), project.user_id, project.id, constants.JOB_TRACK, task_id, session=session)
+                                      f=_file, trackname=name, project=project, session=session)
+        return update_job(job, name, description, project.user_id, project.id, constants.JOB_TRACK, task_id, session=session)
         
-def new_file(_private_params, _file, description, **kw):
+def new_file(_private_params, _file, name, description, **kw):
     '''
     Create a new file in GDV.
     param _file : the file path
@@ -33,10 +34,12 @@ def new_file(_private_params, _file, description, **kw):
     if _private_params is not None:
         project = _private_params['project']
         session = _private_params['session']
+        job = _private_params['job']
         sha1 = util.get_file_sha1(_file)
         path_to = os.path.join(constants.extra_directory(), sha1)
         task = tasks.copy_file.delay(_file, path_to)
-        return new_job('new file', description, project.user_id, 
+        
+        return update_job(job, name, description, project.user_id, 
                        project.id, constants.JOB_IMAGE, task.task_id, sha1=sha1, session=session)
 
 

@@ -112,6 +112,7 @@ REQUEST_TYPE_BROWSER = 'browser'
 
 JOB_IMAGE = 'job_image'
 JOB_TRACK = 'job_track'
+JOB_FAILURE = 'job_failure'
 
 job_output_reload = JOB_TRACK
 job_output_image = JOB_IMAGE

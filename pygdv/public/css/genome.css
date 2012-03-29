@@ -1016,3 +1016,24 @@ div.trackmover {
     cursor : pointer;
     z-index : 300;
 }
+
+
+
+table .pane_element{
+    width:100%;
+    letter-spacing:0;
+    font-size:small;
+    line-height:80%;
+    background-color: #CFCFCF;
+    border: 1px #2b434c solid;
+    color: #2b434c;
+    padding:1px;
+}
+table.pane_table{
+    
+}
+
+table tr td.pane_unit{
+    padding:1px;
+    
+}
