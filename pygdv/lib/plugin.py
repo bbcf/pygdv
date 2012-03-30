@@ -29,7 +29,7 @@ def new_file(_private_params, _file, name, description, **kw):
     param _file : the file path
     param name : the file name
     '''
-    from pygdv.handler.job import new_job
+    from pygdv.handler.job import update_job
     from pygdv.celery import tasks
     if _private_params is not None:
         project = _private_params['project']

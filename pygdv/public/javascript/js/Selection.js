@@ -28,15 +28,15 @@ SelectionPane.prototype.draw = function(store, selections){
     for (var i=0; i<locs_len; i++){
         var loc = selections[i];
         var selection_tr = dojo.create("tr", null, selections_table);
-        var selection_subtable = dojo.create("table", {class:"selection_subtable"}, selection_tr);
+        var selection_subtable = dojo.create("table", {className:"selection_subtable"}, selection_tr);
 
         var postr = dojo.create("tr", null, selection_subtable);
-        var pos = dojo.create("td", {class:"position", innerHTML: loc.chr+":"+loc.start+"-"+loc.end }, postr);
-        var del = dojo.create("td", {class:"delete"}, postr);
+        var pos = dojo.create("td", {className:"position", innerHTML: loc.chr+":"+loc.start+"-"+loc.end }, postr);
+        var del = dojo.create("td", {className:"delete"}, postr);
         var desctr = dojo.create("tr", null, selection_subtable);
-        var desc = dojo.create("td", {class:"description", colspan:2}, desctr);
-        dojo.create("div", {innerHTML:"", class:"delete_img_field"}, del);
-        dojo.create("div", {innerHTML:"Enter description", class:"description_field",
+        var desc = dojo.create("td", {className:"description", colspan:2}, desctr);
+        dojo.create("div", {innerHTML:"", className:"delete_img_field"}, del);
+        dojo.create("div", {innerHTML:"Enter description", className:"description_field",
                            style: {color: "grey"}}, desc);
 
         this.connect_location(pos, loc);
@@ -79,7 +79,7 @@ SelectionPane.prototype.connect_description = function(description, location){
                 var key=ee.keyCode || ee.which;
                 if (key==13 || key==undefined){
                     location.desc = input.value;
-                    dojo.create("td", {innerHTML: location.desc, class:"description_field"}, input, "replace");
+                    dojo.create("td", {innerHTML: location.desc, className:"description_field"}, input, "replace");
                     ctx.connect_description(description, location);
                     ctx.handler.update_on_server();
                     dojo.stopEvent(ee);
@@ -96,7 +96,9 @@ SelectionPane.prototype.connect_description = function(description, location){
 SelectionPane.prototype.connect_delete = function(domNode, location, handler){
     var ctx = this;
     dojo.connect(domNode, "click", function(e){
-        handler.delete(location);
+        if (confirm('Are you sure ?')){
+	    handler.delete(location);
+	}
         dojo.stopEvent(e);
     });
 

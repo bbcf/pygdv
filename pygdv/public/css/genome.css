@@ -187,12 +187,12 @@ div.sequence {
 #selections_table td.position {}
 #selections_table td.description {}
 #selections_table td.delete {}
-#selections_table td.delete div.delete_img_field {
+td.delete div.delete_img_field {
     position: relative;
     height: 17px; width: 17px;
     background: url("../images/delete.png") no-repeat;
 }
-#selections_table td.delete .delete_img_field:hover {
+td.delete .delete_img_field:hover {
     height: 15px; width: 15px;
     top: -1px; left: -1px;
     border: 1px solid black;
@@ -1038,7 +1038,13 @@ table tr td.pane_unit{
     
 }
 div.loading_gif{
-    background: url("../images/ajax-loader.gif") no-repeat;
+    background: url("../img/ajax-loader.gif") no-repeat;
     width : 100%;
+}
+
+div.tiny_loading_gif{
+    background : url("../img/ajax-loader-tiny.gif") no-repeat;
+    width : 17px;
+    height : 17px;
 }
 

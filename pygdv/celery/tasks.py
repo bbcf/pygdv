@@ -44,16 +44,20 @@ def plugin_process(plugin_id, _private_params, *args, **kw):
         _private_params['session'] = session
         project = session.query(model.Project).filter(model.Project.id == _private_params['project_id']).first()
         _private_params['project'] = project
-        job = new_tmp_job(plug.plugin_object.title(), project.user_id, project.id, session=session)
-        _private_params['job'] = job
+#        job = new_tmp_job(plug.plugin_object.title(), project.user_id, project.id, session=session)
+#        _private_params['job'] = job
         kw.update(_private_params)
         try :
             value = plug.plugin_object.process(*args, **kw)
             return value
         except Exception as e:
+            print 'ERRROR'
+            job = kw['job']
             job.data = str(e)
             job.output = constants.JOB_FAILURE
+            session.add(job)
         finally :
+            print 'SESSION END'
             session.commit()
             session.close()
        

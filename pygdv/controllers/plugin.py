@@ -7,6 +7,7 @@ from repoze.what.predicates import has_any_permission
 from pylons import tmpl_context
 from formencode import Invalid
 from pygdv import handler
+from pygdv.model import DBSession, Project
 from pygdv.celery import tasks
 import json
 
@@ -67,7 +68,13 @@ class PluginController(BaseController):
             raise redirect(url('./get_form', kw))
         
         kw['plugin_id'] = private_params.get('form_id')
+        
+        project = DBSession.query(Project).filter(Project.id == private_params['project_id']).first()
+        job = handler.job.new_tmp_job(plug.plugin_object.title(), project.user_id, project.id)
+        kw['job'] = job
+        
         tasks.plugin_process.delay(**kw)
+        
         flash('Job launched')
         
         kw['form_id']=private_params.get('form_id')

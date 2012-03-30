@@ -58,18 +58,18 @@ def jobs(project_id):
     jobs = model.DBSession.query(model.Job).filter(and_(model.Job.project_id == project_id, not_(model.Job.output == constants.job_output_reload))).all()
     out = [{'id' : job.id,
             'name' : job.name,
-            'desc' : job.description,
-            'out' : job.output} for job in jobs]
+            'description' : job.description,
+            'output' : job.output} for job in jobs]
     
-    return json.dumps(out)
+    return json.dumps({'jobs' : out})
 
 def delete(job_id):
     job = model.DBSession.query(model.Job).filter(model.Job.id == job_id).first()
     if job is not None:
-        path = os.path.join(constants.extra_directory(), job.data)
         try :
+            path = os.path.join(constants.extra_directory(), job.data)
             os.remove(path)
-        except OSError:
+        except (OSError, AttributeError):
             pass
         model.DBSession.delete(job)
         model.DBSession.flush()
