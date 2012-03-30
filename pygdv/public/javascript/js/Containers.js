@@ -45,7 +45,7 @@ PrincipalContainer.prototype.createContainer = function(browser, menuLeftContain
     this.principal_dijit = principal_dijit;
     
     // init some parameters
-    var menu_nav = ['Home', 'Tracks', 'Projects', 'Circles'];
+    var menu_nav = ['Home', 'Tracks', 'Projects', 'Circles', 'Jobs'];
     if (!_gdv_info.admin){
         init_operations = ['You must be logged in to use operations'];
         jobs = ['You must be logged in to view jobs'];

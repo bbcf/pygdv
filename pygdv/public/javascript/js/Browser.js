@@ -330,8 +330,8 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
         var node = dojo.create("table",
                 { id: dojo.dnd.getUniqueId(),
                   className: ".pane_table"} );
-	console.log(track);
-        var node_inner = dojo.create("table", {className : 'pane_element'}, node);
+	
+	var node_inner = dojo.create("table", {className : 'pane_element'}, node);
         var node_inner_tr = dojo.create("tr", {}, node_inner);
         var node_name = dojo.create("td", {className:"pane_unit", innerHTML : track.key}, node_inner_tr);
         //var node_type = dojo.create("td", {className:"pane_unit", innerHTML : track.type}, node_inner_tr);
