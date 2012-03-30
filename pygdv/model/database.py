@@ -403,6 +403,11 @@ class Track(DeclarativeBase):
     def tmp(self):
         return False
     
+    @property
+    def tiny_date(self):
+        return self._created.strftime(constants.tiny_date_format);
+    
+    
     created = synonym('_created', descriptor=property(_get_date, _set_date))
     last_access = synonym('_last_access', descriptor=property(_get_last_access, _set_last_access))
     name = synonym('_name', descriptor=property(_get_name, _set_name))
@@ -471,7 +476,7 @@ class TrackParameters(DeclarativeBase):
         Get the representation dict for jbrowse
         '''
         d = {'url' : self.url, 'label' : self.label, 'type' : self.type, 
-                'gdv_id' : self.id, 'key' : self.key}
+                'gdv_id' : self.id, 'key' : self.key, 'date' : self.track.tiny_date}
         if self.color:
             d['color'] = self.color
         return d

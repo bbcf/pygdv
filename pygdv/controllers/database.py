@@ -49,7 +49,7 @@ class DatabaseController(BaseController):
                 im_data += [row [0], round(row[1], 3)]
             
             #print 'for image %s : %s' %(im, im_data)
-            # if no result from previous query, put score from an image before
+            #if no result from previous query, put score from an image before
 #            if not r :
 #                cur.execute('select score from sc where number < ? order by number desc limit 1;', (im,))
 #                row = cur.fetchone()

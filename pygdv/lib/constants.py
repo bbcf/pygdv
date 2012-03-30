@@ -74,7 +74,7 @@ NOT_SUPPORTED_DATATYPE = 'format not supported'
 # DATA FORMAT
 date_format = "%d. %b %Y %Hh%M"
 
-
+tiny_date_format = "%d/%m/%y"
 
 
 

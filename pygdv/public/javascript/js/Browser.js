@@ -310,11 +310,11 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
     var brwsr = this;
 
     // Buttons to sort tracks
-    var sort = dojo.create("table", {id: "tracksSort"}, tab_tracks);
-    var sorttr = dojo.create("tr", null, sort);
-    var sortByName_button = dojo.create("td", {innerHTML: "By name"}, sorttr);
-    var sortByType_button = dojo.create("td", {innerHTML: "By type"}, sorttr);
-    var sortByDate_button = dojo.create("td", {innerHTML: "By date"}, sorttr);
+    // var sort = dojo.create("table", {id: "tracksSort"}, tab_tracks);
+    // var sorttr = dojo.create("tr", null, sort);
+    // var sortByName_button = dojo.create("td", {innerHTML: "By name"}, sorttr);
+    // var sortByType_button = dojo.create("td", {innerHTML: "By type"}, sorttr);
+    // var sortByDate_button = dojo.create("td", {innerHTML: "By date"}, sorttr);
 
     // Container of tracks
     var trackListDiv = dojo.create("div", {id: "tracksAvail",
@@ -327,15 +327,15 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
     // When a *track* is dropped into tracksAvail, add one div to the list
     var trackListCreate = function(track, hint) {
         // The little block containing the track name
-        var node = dojo.create("div",
+        var node = dojo.create("table",
                 { id: dojo.dnd.getUniqueId(),
-                  className: "tracklist-label",
-                  innerHTML: track.key } );
-        var node_inner = dojo.create("table",null,node);
-        var node_inner_tr = dojo.create("tr",null,node_inner);
-        var node_name = dojo.create("td",{className:"node_inner_td"},node_inner_tr);
-        var node_type = dojo.create("td",{className:"node_inner_td"},node_inner_tr);
-        var node_data = dojo.create("td",{className:"node_inner_td"},node_inner_tr);
+                  className: ".pane_table"} );
+	console.log(track);
+        var node_inner = dojo.create("table", {className : 'pane_element'}, node);
+        var node_inner_tr = dojo.create("tr", {}, node_inner);
+        var node_name = dojo.create("td", {className:"pane_unit", innerHTML : track.key}, node_inner_tr);
+        //var node_type = dojo.create("td", {className:"pane_unit", innerHTML : track.type}, node_inner_tr);
+        var node_data = dojo.create("td", {className:"pane_unit", innerHTML : track.date}, node_inner_tr);
         // In the list, wrap the list item in a container for
         // border drag-insertion-point monkeying
         if ("avatar" != hint) {
@@ -423,26 +423,26 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
     }
 
     // Connect the buttons to sorting functions
-    dojo.connect(sortByName_button, 'click', function(e){
-        console.log("sortbyname");
-        //var menu_tracks = get_menu_tracks();
-        //menu_tracks.sort(sort_by('key', true, null));
-        //params.trackData = menu_tracks; // ? dojo.cookie("Menu-tracks") // save the new order
-        //// remove old tracks list
-        //dojo.forEach(dojo.byId("tracksAvail").childNodes, function(cnode,i){
-        //    if (i!=0) dojo.destroy(cnode);
-        //});
-        //// insert reordered tracks list
-        //brwsr.trackListWidget.insertNodes(false, menu_tracks);
-    });
-    dojo.connect(sortByType_button, 'click', function(e){
-        console.log("sortbytype");
-        //menu_tracks.sort('type', true, null);
-    });
-    dojo.connect(sortByDate_button, 'click', function(e){
-        console.log("sortbydate");
-        //menu_tracks.sort('date', true, parseDate);
-    });
+    // dojo.connect(sortByName_button, 'click', function(e){
+    //     console.log("sortbyname");
+    //     //var menu_tracks = get_menu_tracks();
+    //     //menu_tracks.sort(sort_by('key', true, null));
+    //     //params.trackData = menu_tracks; // ? dojo.cookie("Menu-tracks") // save the new order
+    //     //// remove old tracks list
+    //     //dojo.forEach(dojo.byId("tracksAvail").childNodes, function(cnode,i){
+    //     //    if (i!=0) dojo.destroy(cnode);
+    //     //});
+    //     //// insert reordered tracks list
+    //     //brwsr.trackListWidget.insertNodes(false, menu_tracks);
+    // });
+    // dojo.connect(sortByType_button, 'click', function(e){
+    //     console.log("sortbytype");
+    //     //menu_tracks.sort('type', true, null);
+    // });
+    // dojo.connect(sortByDate_button, 'click', function(e){
+    //     console.log("sortbydate");
+    //     //menu_tracks.sort('date', true, parseDate);
+    // });
 
 
 };

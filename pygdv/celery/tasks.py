@@ -51,13 +51,11 @@ def plugin_process(plugin_id, _private_params, *args, **kw):
             value = plug.plugin_object.process(*args, **kw)
             return value
         except Exception as e:
-            print 'ERRROR'
             job = kw['job']
             job.data = str(e)
             job.output = constants.JOB_FAILURE
             session.add(job)
         finally :
-            print 'SESSION END'
             session.commit()
             session.close()
        
