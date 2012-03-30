@@ -64,46 +64,24 @@ function initGDV(browser, project_id, gdv_info, readonly){
     };
 
     dojo.addOnLoad(function(){
-    /* the menu on the left */
-    // try {
-    //     var bool =
-    //     _menub = new ch.epfl.bbcf.gdv.GDVMenuBar(
-    //     {'toolbar' : gminer, 'menu_navigation' : menu_nav , 'browser' : browser});
-    // } catch(err) {console.error(err);}
-
     /* the search field on top right */
-//    try {
-//        _gdv_pc.navigationContainer();
-//    } catch(err) {console.error(err);}
-
-    // /* the tab container on bottom */
-    // try {
-    //     _tc = new ch.epfl.bbcf.gdv.TabContainer({'browser':browser,'readonly':readonly});
-    // } catch(err) {console.error(err);}
-
-    /* a handler for the jobs */
-    // try {
-    //     _jh = new ch.epfl.bbcf.gdv.JobHandler({});
-    // } catch(err) {console.error(err);}
-
+	try {
+	    _gdvls = new ch.epfl.bbcf.gdv.Livesearch();
+	} catch(err) {console.error(err);}
+	
     _lp = new LinkPanel();
 
-    // if(!_menub) console.error('menu bar failed');
-    // if(!_gdvls) console.error('tab container failed');
-    // if(!_gdvls) console.error('search field initialization failed');
-    // if(!_jh) console.error('job handler failed');
-
-    /* hack for the copy menu */
-    if(!gdv_info.admin){
-        var copy_link = dojo.byId('menu_Copy');
-        var uri = document.URL;
-        var query = uri.substring(uri.indexOf('?') + 1, uri.length);
-        var queryO = dojo.queryToObject(query);
-        if ('k' in queryO){
-        copy_link.href= _GDV_URL + '/projects/copy?k=' + queryO['k'] + '&project_id=' + _gdv_info.project_id;
-        } else {console.fatal('you will not be able to copy the project')};
-    };
-
+        /* hack for the copy menu */
+	if(!gdv_info.admin){
+            var copy_link = dojo.byId('menu_Copy');
+            var uri = document.URL;
+            var query = uri.substring(uri.indexOf('?') + 1, uri.length);
+            var queryO = dojo.queryToObject(query);
+            if ('k' in queryO){
+		copy_link.href= _GDV_URL + '/projects/copy?k=' + queryO['k'] + '&project_id=' + _gdv_info.project_id;
+            } else {console.fatal('you will not be able to copy the project')};
+	};
+	
     });
 
 
