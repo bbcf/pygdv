@@ -21,10 +21,13 @@
 <body class="tundra">
   
   <div class="getting_started">
-    <h2><a name="Upload" href="#Upload">Upload file</a></h2>
+    
+
+
+    <a name="Upload" href="#Upload"></a>
+    <h2>Tracks</h2>
     <p>
-      We call genomic files <span class="imp"><a href="${tg.url('/tracks')}">Tracks</a></span>. 
-      To upload a new one, select <a href="${tg.url('/tracks')}">Tracks</a> tab and use the form to upload your data. You can enter URL or simply select it from your filesystem.
+      We call genomic files <span class="imp">Tracks</span>. So to vizualize any genomic data you have to  upload a new one. Select <a href="${tg.url('/tracks')}">Tracks</a> tab and use the form to upload your data. You can enter URL or simply select it from your filesystem.
     </p>
     <p>
       Don't forget to choose the right assembly for your file. See <a href="#Assembly"> how to add an assembly</a>
@@ -33,35 +36,42 @@
     
 
     
-  <h2><a name="Project" href="#Project">See the data uploaded</a></h2>
+
+
+    <a name="Project" href="#Project"></a>
+    <h2>Projects</h2>
   <p>
-    You will be able to see the track(s) you uploaded by making <span class="imp"><a href="${tg.url('/projects')}">Projects</a></span>.
-    Create one form the <a href="${tg.url('/projects')}">Projects</a> tab, and add the track(s) with the <a class="action edit_link"></a> button.
+    <span class="imp">Projects</span> are a group of <span class="imp">Tracks</span>. Create one with the <a href="${tg.url('/projects')}">Projects</a> tab, and <span class="imp">edit</span> with the 
+    <a class="action edit_link"></a> button. Then select the Tracks you want to see.
 </p>
 
+  
 
-<h2><a name="Share" href="#Share">Share data</a></h2>
+
+
+  <a name="Share" href="#Share"></a>
+    <h2>Circles</h2>
     <p>
-      You can share <span class="imp">projects</span> with the <a class="action share_link"></a> button.
+      Circles are a group of persons. You can create one with the <a href="${tg.url('/circles')}">Circles</a> tab.<br/><br/>
+      You can share <span class="imp">Projects</span> with the <a class="action share_link"></a> button.
       You have two possibilities :
       <ul>
-	<li>You have two <span class="imp">links</span> with <span class="imp">read</span> and <span class="imp">download</span> permissions that you can give to people that will be able to see the project and download data associated to the project respectivly (download permission includes read one). </li>
-	<li>You can share with just a group of persons. Select a <span class="imp">circle</span> and add it. You have one more permissions : <span class="imp">upload</span> that will give to this circle of person to upload data on the same project.</li>
+	<li>With the <span class="imp">read/download links</span> (Give that link to annybody and he will be able to <span class="imp">see/download</span> the project's data). </li>
+	<li>With a circle you created (You can tweak permissions)</li>
 	</ul>
     </p>
     
-
-<h2><a name="Circle" href="#Circle">Create a circle</a></h2>
-    <p>
-      Go on <span class="imp"><a href="${tg.url('/circles')}">Circles</a></span> tab, and select the person(s) you want to add in it.
-    </p>
-
-    <h2><a name="Assembly" href="#Assembly">Assemblies</a></h2>
+ 
+    <a name="Assembly" href="#Assembly"></a>
+    <h2>Assemblies</h2>
     <p>
       If the assembly you want to use is missing, use <a href="mailto:webmaster.bbcf@epfl.ch?subject=[GDV] Ask for a new assembly">contact</a>. Specify in the mail which assembly you want to have and it will be added. If the assembly is not very usual, contact us. It can be added very easily.
     </p>
+    
 
-<h2><a name="API" href="#API">Access with an API</a></h2>
+
+    <a name="API" href="#API"></a>
+    <h2>Access with an API</h2>
     <p>
       You can access GDV with a simple programming interface. Based on HTTP request, you can create projects, add tracks, and prepare view without the web interface. The simplest if the data you generate is at the end of an analysis pipeline. For more information on it you should read <a href="https://github.com/bbcf/bbcflib/blob/master/bbcflib/gdv.py">the python file</a> that resume the requests to send to GDV.
     </p>
