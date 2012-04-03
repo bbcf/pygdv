@@ -126,7 +126,7 @@ class LoginController(BaseController):
         identifier = authentication_plugins['ticket']
         cookiename = identifier.cookie_name
         response.delete_cookie(cookiename)
-        raise redirect(url())
+        raise redirect('/')
     
     
     def build_user(self,principal):

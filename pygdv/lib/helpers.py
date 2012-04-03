@@ -80,7 +80,7 @@ def get_export_link(obj_id, param='track_id', rights=None, tmp=False):
     if tmp:
         return '' 
     elif rights is not None:
-        return ''' <a class='action export_link' title="%s" href="%s"></a>''' % ('export', url('/tracks/export', params={param:obj_id}))
+        return ''' <a class='action export_link' title="%s" href="%s"></a>''' % ('export', url('/tracks/link', params={param:obj_id}))
     return ''
 
 def get_share_link(obj_id, param, rights = None):

@@ -6,7 +6,7 @@ from tgext.crud import CrudRestController
 
 from repoze.what.predicates import not_anonymous, has_any_permission, has_permission
 
-from tg import expose, flash, require, tmpl_context, validate, request
+from tg import expose, flash, require, tmpl_context, validate, request, response
 from tg.controllers import redirect
 from tg.decorators import with_trailing_slash
 
@@ -15,6 +15,7 @@ from pygdv.widgets.track import track_table, track_export, track_table_filler, t
 from pygdv import handler
 from pygdv.lib import util, constants, checker, reply
 from pygdv.celery import tasks
+from tg.controllers import CUSTOM_CONTENT_TYPE
 
 __all__ = ['TrackController']
 
@@ -151,15 +152,23 @@ class TrackController(CrudRestController):
 
     @expose()
     def dump(self, *args, **kw):
+        if not checker.can_download_track(user.id, track_id)  and not checker.user_is_admin(user.id):
+            flash("You haven't the right to export any tracks which is not yours")
+            raise redirect('../')
+
         return "You will be able to export the desired track in the format wanted. It's not implemented yet."
 
-    @expose()
+    @expose(content_type=CUSTOM_CONTENT_TYPE)
     def link(self, track_id, *args, **kw):
         user = handler.user.get_user_in_session(request)
         if not checker.user_own_track(user.id, track_id)  and not checker.user_is_admin(user.id):
             flash("You haven't the right to download any tracks which is not yours")
+        track = DBSession.query(Track).filter(Track.id == track_id).first()
+        response.content_type = 'application/x-sqlite3'
+        return open(track.path).read()
 
-        raise redirect('./')
+
+
         return 'not implemented'
 
     @expose()

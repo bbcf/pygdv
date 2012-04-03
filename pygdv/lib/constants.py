@@ -99,7 +99,7 @@ tmp_user_name = 'tmp_user'
 full_rights = {right_read : True, right_download : True, right_upload : True}
 
 
-formats_export = ('tsv', 'sql', 'bed')
+formats_export = ('sql')
 
 formats_supported = ('GFF', 'GTF', 'WIG', 'BED', 'BEDGRAPH')
 
