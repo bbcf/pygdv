@@ -49,14 +49,14 @@ class FormExpose(object):
 
 ################################################################################
 class FormButton(object):
-    '''
+    """
     A form button.
     A form button can be just an element that lead to other elements, or
     it can lead to the display of a form.
-    '''
+    """
 
     def __init__(self, name, do_form, childs, parameters=None):
-        '''
+        """
         @param name : the name to be displayed
         @type name : a string
         @param childs : the childs buttons or childs form elements
@@ -65,7 +65,7 @@ class FormButton(object):
         @type do_form : a boolean
         @param parameters : parameters needed by gFeatMiner to identify the request
         @type parameters : a dict
-        '''
+        """
         self.name = name
         self.do_form = do_form
         self.childs = childs
@@ -111,11 +111,11 @@ class FormButton(object):
 
 ################################################################################
 class FormElement(object):
-    '''
+    """
     A form element.
     It can represent a checkbox, textarea, etc ... on the web form.
     The different possible types are given by the tuple 'elements_types'
-    '''
+    """
 
     def __init__(self, name, type, id, radio_values=None, help_text=None):
         '''

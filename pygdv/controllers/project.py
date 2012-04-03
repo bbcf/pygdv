@@ -76,7 +76,8 @@ class ProjectController(CrudRestController):
         control = '''
        
         '''
-        return dict(page='projects', model='project',form_title="New project", user_projects=user_projects, shared_projects=shared_projects, control=control, value=kw)
+        t = handler.help.tooltip['project']
+        return dict(page='projects', model='project',form_title="New project", user_projects=user_projects, shared_projects=shared_projects, control=control, value=kw, tooltip=t)
     
 
 

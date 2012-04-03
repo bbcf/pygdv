@@ -42,9 +42,11 @@ class TrackController(CrudRestController):
         user = handler.user.get_user_in_session(request)
 
         tracks = DBSession.query(TMPTrack).filter(TMPTrack.user_id == user.id).all()
+
         tracks.extend(user.tracks)
         data = [util.to_datagrid(track_grid, tracks, "Track Listing", len(tracks)>0)]
-        return dict(page='tracks', model='track', form_title="new track", items=data, value=kw)
+        t = handler.help.tooltip['track']
+        return dict(page='tracks', model='track', form_title="new track", items=data, value=kw, tooltip=t)
 
 
 

@@ -40,7 +40,7 @@ class WorkerController(BaseController):
         with track.new(path, 'sql') as t:
             t.fields = simple_fields
             for chromosome in sels:
-                t.write(chromosome, ((marquee['start'], marquee['end'], 0, '', 0 , '') for marquee in sels[chromosome]));
+                t.write(chromosome, ((marquee['start'], marquee['end'], 0, '', 0 , '') for marquee in sels[chromosome]))
             t.datatype = constants.FEATURES
             t.assembly = project.sequence.name
             

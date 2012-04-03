@@ -50,7 +50,8 @@ class CircleController(CrudRestController):
         kw['page']='circle'
         user = handler.user.get_user_in_session(request)
         data = [util.to_datagrid(circle_grid, user.circles, "Circle Listing", len(user.tracks)>0)]
-        return dict(page='circles', model='circle', form_title="new circle",items=data,value=kw)
+        t = handler.help.tooltip['circle']
+        return dict(page='circles', model='circle', form_title="new circle",items=data,value=kw, tooltip=t)
 
     @expose('genshi:tgext.crud.templates.post_delete')
     def post_delete(self, *args, **kw):

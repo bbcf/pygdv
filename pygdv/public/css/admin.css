@@ -53,6 +53,8 @@ a.edit_link{
     cursor: pointer;
 }
 
+
+
 /* admin add/edit view */
 .crud_edit label, .crud_add label{
     font-size: 12px;
@@ -100,6 +102,11 @@ a.detail_link{
 }
 a.detail_link{
     background-image: url('../images/plus.png');
+}
+a.delete_link{
+    padding-left: 20px;
+    background-repeat: no-repeat;
+    background-image: url('../images/delete.png');
 }
 
 a.copy_link{
@@ -172,3 +179,31 @@ span.imp {
 /*     border: dashed 2px red; */
 
 /* } */
+
+.tooltip_gdv{
+    position:relative;
+    color: #FFFFFF;
+    
+}
+.tooltip_pane{
+    width: 200px;
+    position: absolute;
+    display:none;
+}
+div.tooltip_hider{
+    background: url('../images/info.png') no-repeat;
+    width: 16px;height: 16px;
+    padding: 5px;
+}
+
+.tooltip_title{
+    padding:0.1px;
+    text-align: center;
+    background: url('../images/sbgred.jpg') repeat;
+    
+}
+.tooltip_body{
+    padding: 10px;
+    text-align: left;
+    background: url('../images/sbggrey.png') repeat;
+}

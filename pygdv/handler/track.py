@@ -230,7 +230,7 @@ def move_database(datatype, assembly_name, path, sha1, name, tmp_file, _format):
     out_name = '%s.%s' % (sha1, 'sql')
     dst = os.path.join(track_directory(), out_name)
     shutil.move(path, dst)
-    t = tasks.process_sqlite_file.delay(datatype, assembly_name, dst, sha1, name, _format);
+    t = tasks.process_sqlite_file.delay(datatype, assembly_name, dst, sha1, name, _format)
     return t
 
 def convert_file(datatype, assembly_name, path, sha1, name, tmp_file, _format):

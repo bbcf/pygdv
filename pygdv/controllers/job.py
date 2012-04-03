@@ -38,7 +38,8 @@ class JobController(CrudRestController):
         user = handler.user.get_user_in_session(request)
         jobs = DBSession.query(Job).filter(and_(Job.user_id == user.id, not_(Job.output == constants.job_output_reload))).all()
         data = [util.to_datagrid(job_grid, jobs, "Job Listing", len(jobs)>0)]
-        return dict(page='jobs', model='job', form_title="new job", items=data, value=kw)
+        t = handler.help.tooltip['job']
+        return dict(page='jobs', model='job', form_title="new job", items=data, value=kw, tooltip=t)
     
     @without_trailing_slash
     @expose()

@@ -92,6 +92,7 @@ class Circle(DeclarativeBase):
     @property 
     def get_users(self):
         return ', '.join([user.name for user in self.users])
+
 class RightCircleAssociation(DeclarativeBase):
     __tablename__='RightCircleAssociation'
     

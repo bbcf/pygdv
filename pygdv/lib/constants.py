@@ -101,7 +101,7 @@ full_rights = {right_read : True, right_download : True, right_upload : True}
 
 formats_export = ('tsv', 'sql', 'bed')
 
-
+formats_supported = ('GFF', 'GTF', 'WIG', 'BED', 'BEDGRAPH')
 
 
 REQUEST_TYPE = 'REQUEST_CLASSIFIER'

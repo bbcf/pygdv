@@ -45,11 +45,12 @@
   <!-- A simple item grid -->
   <py:def function="item_list(items)">
       <div class="crud_table" style="height:50%; width:90%">
-        <div py:for="item in items">
+	
+	<div py:for="item in items">
 	<div py:choose="item.grid_display">
 	  
 	<span py:when="True">
-	  <h1><span py:replace="item.grid_title"/></h1>
+	  <h1><span py:replace="item.grid_title"/></h1> <span py:replace="tooltip"></span>
 	  <a href="../${tg.url(model)}s/new" class="add_link">New $model</a>
 	  <div py:content="item.grid(item.grid_data)"></div>
 	</span>
