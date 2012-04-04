@@ -1,5 +1,5 @@
 """Track Controller"""
-
+from __future__ import absolute_import
 
 from tgext.crud import CrudRestController
 
@@ -16,6 +16,7 @@ from pygdv import handler
 from pygdv.lib import util, constants, checker, reply
 from pygdv.celery import tasks
 from tg.controllers import CUSTOM_CONTENT_TYPE
+import tempfile, track
 
 __all__ = ['TrackController']
 
@@ -148,15 +149,27 @@ class TrackController(CrudRestController):
 
         data = util.to_datagrid(track_grid, [track])
         tmpl_context.form = track_export
+        kw['track_id']=track_id
         return dict(page='tracks', model='Track', info=data, form_title='', value=kw)
 
     @expose()
-    def dump(self, *args, **kw):
+    def dump(self, track_id, format, *args, **kw):
+        user = handler.user.get_user_in_session(request)
+        print args
+        print kw
         if not checker.can_download_track(user.id, track_id)  and not checker.user_is_admin(user.id):
             flash("You haven't the right to export any tracks which is not yours")
             raise redirect('../')
+        _track = DBSession.query(Track).filter(Track.id == track_id).first()
+        if format == 'sqlite':
+            response.content_type = 'application/x-sqlite3'
+            return open(_track.path).read()
+        else :
 
-        return "You will be able to export the desired track in the format wanted. It's not implemented yet."
+            tmp_file = tempfile.NamedTemporaryFile(delete=True)
+            tmp_file.close()
+            track.convert(_track.path, (tmp_file.name, format))
+            return open(tmp_file.name).read()
 
     @expose(content_type=CUSTOM_CONTENT_TYPE)
     def link(self, track_id, *args, **kw):
