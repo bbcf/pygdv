@@ -135,5 +135,8 @@ class RootController(BaseController):
         import time
         time.sleep(10)
         return ''
-    
-    
+
+    @expose()
+    def koopa(self, x):
+
+        return 'ok'

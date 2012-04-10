@@ -238,13 +238,13 @@ PrincipalContainer.prototype.operationContainer = function(DomNode, DijitNode, p
 
     
     // initialize the print button
-    var bilou = dojo.create('input', {type:'button', value:'print'},cont);
-    dojo.connect(bilou, 'click', function(e){
-	var trs = dojo.query('.track.dojoDndItem');
-	console.log(trs);
-	window.print();
-	dojo.stopEvent(e);
-    });
+    // var bilou = dojo.create('input', {type:'button', value:'print'},cont);
+    // dojo.connect(bilou, 'click', function(e){
+    // 	var trs = dojo.query('.track.dojoDndItem');
+    // 	console.log(trs);
+    // 	window.print();
+    // 	dojo.stopEvent(e);
+    // });
 
 };
 

@@ -2,7 +2,7 @@
       xmlns:xi="http://www.w3.org/2001/XInclude"
       py:strip="">
 <py:def function="header">
-  <div id="header">
+  <div id="${('sheader', 'header')[defined('page') and page=='index']}">
   	<h1>
   		GDV
 		<span class="subtitle">Genome Data Viewer</span>

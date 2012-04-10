@@ -24,6 +24,12 @@ a {
 	background: url('../images/bgred.jpg') top left;
 }
 
+#sheader {
+	height: 40px;
+	margin: 10px 10px 0 10px;
+	background: url('../images/sbgred.jpg') top left;
+}
+
 #header h1 {
 	padding: 0;
 	margin: 0;
@@ -41,6 +47,22 @@ a {
 	top: 70px;
 }
 
+#sheader h1 {
+	padding: 0;
+	margin: 0;
+	
+	padding-left: 180px;
+	color: #fff;
+	position: relative;
+	font-size: 36px;
+}
+
+#sheader h1 .subtitle {
+	font-size: 60%;
+	position: absolute;
+	left: 280px;
+	top: 10px;
+}
 ul#mainmenu {
 	margin: 0;
 	padding: 0 10px;
