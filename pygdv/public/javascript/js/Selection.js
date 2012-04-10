@@ -101,10 +101,10 @@ SelectionPane.prototype.connect_delete = function(domNode, location, handler){
     var ctx = this;
     dojo.connect(domNode, "click", function(e){
         if (confirm('Are you sure ?')){
-	    handler.delete(location);
-	}
+        handler.delete(location);
+    }
         dojo.stopEvent(e);
-    });
+});
 
 };
 

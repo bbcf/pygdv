@@ -26,7 +26,7 @@ function Minimap(gv) {
     this.gv = gv;
     // Define some constants
     this.padding = 4;
-    // Store the overview element
+    // Store the 'overview' div that contains the minimap.
     this.overview = dojo.byId("overview");
     this.height = this.overview.clientHeight - 2 * this.padding;
     // Make a raphael graphics object
