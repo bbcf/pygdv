@@ -36,7 +36,11 @@ SelectionPane.prototype.draw = function(store, selections){
         var desctr = dojo.create("tr", null, selection_subtable);
         var desc = dojo.create("td", {className:"description", colspan:2}, desctr);
         dojo.create("div", {innerHTML:"", className:"delete_img_field"}, del);
-        dojo.create("div", {innerHTML:"Enter description", className:"description_field",
+	var desc_str = "Enter description";
+	if (loc.desc){
+	    desc_str = loc.desc;
+	}
+        dojo.create("div", {innerHTML: desc_str, className:"description_field",
                            style: {color: "grey"}}, desc);
 
         this.connect_location(pos, loc);
@@ -76,8 +80,8 @@ SelectionPane.prototype.connect_description = function(description, location){
             input.select();
 
             updateDescription = function(ee){
-                var key=ee.keyCode || ee.which;
-                if (key==13 || key==undefined){
+                var key = ee.keyCode || ee.which;
+                if (key == 13 || key == undefined){
                     location.desc = input.value;
                     dojo.create("td", {innerHTML: location.desc, className:"description_field"}, input, "replace");
                     ctx.connect_description(description, location);

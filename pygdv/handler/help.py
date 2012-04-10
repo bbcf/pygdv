@@ -56,6 +56,13 @@ tooltip['project']=make_tooltip('Project', '''A project is a playlist of track :
 </ul>
 ''')
 
+tooltip['links']=make_tooltip('Links to your project', '''You can give these link to other people (right-click > copy link). They will be able to directly see the project by clicking this link.
+<ul>
+    <li>read : user can only visualize the project.</li>
+    <li>download : user can visualize and copy the project on it's own interface if he login.</li>
+</ul>
+''')
+
 tooltip['read']=make_tooltip('Read permission', '''A circle with this permission can only visualize the data on the project.''')
 
 tooltip['download']=make_tooltip('Download permission', '''A circle with this permission can download the data associated with the project.''')

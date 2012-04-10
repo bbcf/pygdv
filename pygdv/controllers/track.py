@@ -15,7 +15,6 @@ from pygdv.widgets.track import track_table, track_export, track_table_filler, t
 from pygdv import handler
 from pygdv.lib import util, constants, checker, reply
 from pygdv.celery import tasks
-from tg.controllers import CUSTOM_CONTENT_TYPE
 import tempfile, track
 
 __all__ = ['TrackController']
@@ -153,10 +152,8 @@ class TrackController(CrudRestController):
         return dict(page='tracks', model='Track', info=data, form_title='', value=kw)
 
     @expose()
-    def dump(self, track_id, format, *args, **kw):
+    def dump(self, track_id, format,  *args, **kw):
         user = handler.user.get_user_in_session(request)
-        print args
-        print kw
         if not checker.can_download_track(user.id, track_id)  and not checker.user_is_admin(user.id):
             flash("You haven't the right to export any tracks which is not yours")
             raise redirect('../')
@@ -165,13 +162,13 @@ class TrackController(CrudRestController):
             response.content_type = 'application/x-sqlite3'
             return open(_track.path).read()
         else :
-
             tmp_file = tempfile.NamedTemporaryFile(delete=True)
             tmp_file.close()
             track.convert(_track.path, (tmp_file.name, format))
+            response.content_type = 'text/plain'
             return open(tmp_file.name).read()
 
-    @expose(content_type=CUSTOM_CONTENT_TYPE)
+    @expose()
     def link(self, track_id, *args, **kw):
         user = handler.user.get_user_in_session(request)
         if not checker.user_own_track(user.id, track_id)  and not checker.user_is_admin(user.id):
@@ -181,8 +178,6 @@ class TrackController(CrudRestController):
         return open(track.path).read()
 
 
-
-        return 'not implemented'
 
     @expose()
     def traceback(self, track_id, tmp):

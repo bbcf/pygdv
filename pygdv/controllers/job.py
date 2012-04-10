@@ -55,7 +55,7 @@ class JobController(CrudRestController):
             data = util.to_datagrid(job_grid, [job])
             if job.output == constants.JOB_IMAGE :
                 src = constants.extra_url() + '/' + str(job.data)
-                return dict(page='jobs', model='Job', src=url(src), info=data)
+                return dict(page='jobs', model='Job', src=src, info=data)
             if job.output == constants.JOB_TRACK :
                 return dict(page='jobs', model='Job', src='', info=data)
             

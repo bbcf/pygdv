@@ -63,9 +63,8 @@ class SelectionController(object):
             DBSession.flush()
             locations_ids.append(obj.id)
         # remove not saved ones
-        loc_toremove = DBSession.query(Location).filter(not_(Location.id.in_(locations_ids))).all()
-        for l in loc_toremove:
-            print l
+        loc_to_remove = DBSession.query(Location).filter(not_(Location.id.in_(locations_ids))).all()
+        for l in loc_to_remove:
             DBSession.delete(l)
         DBSession.flush()
         return {'saved' : 'ok'}

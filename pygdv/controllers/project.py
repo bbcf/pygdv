@@ -215,8 +215,10 @@ class ProjectController(CrudRestController):
         down = url('/public/project', {'id' : project_id, 'k' : project.download_key})
        
         kw['project_id'] = project_id
+        t = handler.help.tooltip['links']
         return dict(page='projects', model='Project', info=data,
-                    circle_right_data=cr_data, form_title='Circles availables', value=kw, public=pub, download=down)
+                    circle_right_data=cr_data, form_title='Circles availables', value=kw, public=pub, download=down,
+                    tooltip_permissions=t)
 
 
     @expose()

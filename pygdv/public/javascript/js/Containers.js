@@ -235,6 +235,17 @@ PrincipalContainer.prototype.operationContainer = function(DomNode, DijitNode, p
     // initialize the iframe that will be showed
     // if an user click on an Operation button
     op.create_frame(viewContainer, fwdgt, bwdgt);
+
+    
+    // initialize the print button
+    var bilou = dojo.create('input', {type:'button', value:'print'},cont);
+    dojo.connect(bilou, 'click', function(e){
+	var trs = dojo.query('.track.dojoDndItem');
+	console.log(trs);
+	window.print();
+	dojo.stopEvent(e);
+    });
+
 };
 
 
