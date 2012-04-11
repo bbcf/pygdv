@@ -169,7 +169,7 @@ function Marquee(x1, x2, chr) {
     this.chr   = chr; // The chromosome
     this.start = null; // Start in basepairs
     this.end   = null; // End in basepairs
-    this.desc  = ''; // Description
+    this.desc  = "(no description)"; // Description
 };
 
 /**
@@ -311,13 +311,26 @@ MarqueeHandler.prototype.start = function(event) {
 MarqueeHandler.prototype.add_marquee = function(selection, leftbase, factor) {
     var start = selection['start'];
     var end = selection['end'];
+    var id = selection['id'];
+    var desc = selection['desc'];
     var x1 = (start - leftbase) * factor;
     var x2 = (end - leftbase ) * factor;
     var m = new Marquee(x1, x2, selection['chr']);
     m.start = start;
     m.end = end;
-    m.id = selection['id'];
-    m.desc = selection['desc'];
+    m.id = id;
+
+    console.log(selection)
+    console.log(selection['desc'])
+
+    console.log(m.desc)
+    console.log(m)
+
+    m.desc = desc;
+
+    console.log(m.desc)
+    console.log(m)
+
     this.mergeMarquee(m);
     this.marquees.push(m);
 };
