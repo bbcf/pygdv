@@ -42,12 +42,6 @@ function ZoneSelection(gv) {
             ctx.addStoredSelections(init_locations, gv, handler);
         });
     }
-
-    // //create an DOM node that will sore all selections
-    // var store = document.createElement("span");
-    // store.id="store_selections";
-    // store.style.display="none";
-    // dojo.body().appendChild(store);
 };
 
 /**
@@ -169,7 +163,7 @@ function Marquee(x1, x2, chr) {
     this.chr   = chr; // The chromosome
     this.start = null; // Start in basepairs
     this.end   = null; // End in basepairs
-    this.desc  = "(no description)"; // Description
+    this.desc  = "Enter description"; // Description
 };
 
 /**
@@ -315,24 +309,15 @@ MarqueeHandler.prototype.add_marquee = function(selection, leftbase, factor) {
     var desc = selection['desc'];
     var x1 = (start - leftbase) * factor;
     var x2 = (end - leftbase ) * factor;
-    var m = new Marquee(x1, x2, selection['chr']);
-    m.start = start;
-    m.end = end;
-    m.id = id;
+    var marquee = new Marquee(x1, x2, selection['chr']);
 
-    console.log(selection)
-    console.log(selection['desc'])
+    marquee.start = start;
+    marquee.end = end;
+    marquee.id = id;
+    if (desc){ marquee.desc = desc; }
 
-    console.log(m.desc)
-    console.log(m)
-
-    m.desc = desc;
-
-    console.log(m.desc)
-    console.log(m)
-
-    this.mergeMarquee(m);
-    this.marquees.push(m);
+    this.mergeMarquee(marquee);
+    this.marquees.push(marquee);
 };
 
 /**
@@ -345,10 +330,7 @@ MarqueeHandler.prototype.getMarquee = function(x0) {
     len = this.marquees.length
     for(var i=0; i<len; i++){
         m = this.marquees[i]
-        if (m.chr != this.gv.ref.name) {
-            continue;
-        }
-        // not the right chr
+        if (m.chr != this.gv.ref.name) { continue; } // not the right chr
         if ((m.x1 <= x0) && (x0 <= m.x2)) {        // the cursor is on a marquee
             m.alpha = 0.15;                        // change transparency
             if (x0-m.x1 > m.x2-x0) { m.x2 = x0; }    // closer to left edge
@@ -436,7 +418,7 @@ MarqueeHandler.prototype.mergeMarquee = function(current) {
         if (m.x1 < x1) {x1 = m.x1;}
         if (m.x2 > x2) {x2 = m.x2;}
     });
-    if(desc){current.desc = desc.join(' | ');}
+    if(desc.length != 0){current.desc = desc.join(' | ');}
     current.x1 = x1; current.x2 = x2
 };
 

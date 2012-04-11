@@ -14,15 +14,15 @@ __all__ = ['SelectionController']
 chunk = 20000
 
 class SelectionController(object):
-  
-  
+
+
     @expose()
     @require(has_any_permission(constants.perm_user, constants.perm_admin))
     def index(self):
         return ''
-        
-        
-        
+
+
+
     @expose()
     @require(has_any_permission(constants.perm_user, constants.perm_admin))
     def save(self, project_id, color, description, locations):
@@ -30,19 +30,19 @@ class SelectionController(object):
         if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
             flash('You must have %s permission to delete the project.' % constants.right_upload, 'error')
             return {'save' : 'failed'}
-            
+
         #print "save %s, color %s, desc %s loc %s" % (project_id, color, description, locations)
         ''' For the moment, there is only one selection per project'''
         sel = DBSession.query(Selection).filter(Selection.project_id == project_id).first()
         if sel is None:
             sel = Selection()
             sel.project_id = project_id
-            
+
         sel.description = description
         sel.color = color
         DBSession.add(sel)
         DBSession.flush()
-        
+
         locations_ids = []
         # add locations
         for loc in json.loads(locations):
@@ -50,14 +50,14 @@ class SelectionController(object):
             if loc.has_key('id'):
                 obj = DBSession.query(Location).join(Selection.locations).filter(
                         and_(Selection.id == sel.id, Location.id == loc.get('id'))).first()
-                
+
             if obj is None:
                 obj = Location()
-                
-            obj.chromosome = loc.get('chr') 
+
+            obj.chromosome = loc.get('chr')
             obj.start = loc.get('start')
             obj.end = loc.get('end')
-            obj.description = loc.get('desc', '') 
+            obj.description = loc.get('desc', 'No description')
             obj.selection = sel
             DBSession.add(obj)
             DBSession.flush()
@@ -68,9 +68,9 @@ class SelectionController(object):
             DBSession.delete(l)
         DBSession.flush()
         return {'saved' : 'ok'}
-    
-    
-    
+
+
+
     @expose()
     @require(has_any_permission(constants.perm_user, constants.perm_admin))
     def delete(self, project_id, selection_id):
@@ -85,6 +85,6 @@ class SelectionController(object):
         DBSession.delete(selection)
         DBSession.flush()
         return {'delete' : 'success'}
-    
+
 
 
