@@ -645,8 +645,10 @@ Browser.prototype.visibleTracks = function() {
  */
 Browser.prototype.onCoarseMove = function(startbp, endbp) {
     var length = this.view.ref.end - this.view.ref.start;
-    var trapLeft = Math.round((((startbp - this.view.ref.start) / length) * this.view.overviewBox.w) + this.view.overviewBox.l);
-    var trapRight = Math.round((((endbp - this.view.ref.start) / length) * this.view.overviewBox.w) + this.view.overviewBox.l);
+    var trapLeft = Math.round((((startbp - this.view.ref.start) / length) * this.view.overviewBox.w)
+                    + this.view.overviewBox.l);
+    var trapRight = Math.round((((endbp - this.view.ref.start) / length) * this.view.overviewBox.w)
+                    + this.view.overviewBox.l);
 
     // CSS positioning
     this.view.locationThumb.style.height = (this.view.overviewBox.h - 4) + "px";
@@ -728,24 +730,25 @@ Browser.prototype.createNavBox = function(params) {
     var overview = dojo.create("div", {
         className: "overview",
         id: "overview",
-        style: {cssText: "display: inline-block"},
+        style: {cssText: "display: inline-block",
+                margin:"4px"},
         }, navbox_middle);
-    var minimap = dojo.create("canvas", {
-        id: "minimap",
-        width: "100%", height: "18px",
-        }, overview);
     // If a track is dropped onto the minimap location, a new canvas is created.
-    var minitrackCreate = function(track, hint) {
-        dojo.destroy(dojo.byId("minimap"));
+    var minimapCreate = function(track, hint) {
+        var old_minimap = dojo.byId("minimap");
+        if (old_minimap) dojo.destroy(dojo.byId("minimap"));
         var minimap = dojo.create("canvas", {
             id:"minimap",
-            width:"100%", height:"18px",
+            width: "350px",
+            height: "18px",
             }, overview);
         return {node: minimap, data: track, type: ["track"]};
-    };
+        };
+    // Initialize
+    minimapCreate();
     // Activate drag & drop onto the minimap
     var minimapWidget = new dojo.dnd.Target(overview,
-        { creator: minitrackCreate,
+        { creator: minimapCreate,
           accept: ["track"],
           withHandles: false
         });

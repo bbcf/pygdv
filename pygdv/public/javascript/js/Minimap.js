@@ -26,11 +26,11 @@ function Minimap(view) {
     this.padding = 4;
     this.overview = dojo.byId("overview"); //container of the minimap
     this.height = this.overview.clientHeight - 2 * this.padding;
-    // Make a raphael graphics object
-    this.raph = Raphael("overview", "100%", "100%");
+        // Make a raphael graphics object
+        //this.raph = Raphael("overview", "100%", "100%");
     // Make a canvas graphics object
     this.canvas = dojo.byId("minimap");
-    console.log(this.raph, this.canvas)
+    console.log(this.overview, this.canvas)
     // Redraw when the window is resized
     dojo.connect(window, "onresize", this, function(e) {this.draw();});
 }
@@ -58,7 +58,7 @@ Minimap.prototype.update = function() {
 };
 
 /**
- * A dictionaty linking stain attribute
+ * A dictionary linking stain attribute
  * to RGB colors
  */
 Minimap.prototype.stains = {
@@ -71,25 +71,59 @@ Minimap.prototype.stains = {
 };
 
 /*
- * Draws the contour
+ * Draw the contour and filling
  */
 Minimap.prototype.drawContour = function() {
     var ctx = this.canvas.getContext('2d');
-    var h = 9; // this.heigth;
-    var l = this.width;
-    ctx.lineWidth = 5;
+    var h = this.canvas.height/2;
+    var L = this.canvas.width;
+    var lw = 0;
+    ctx.lineWidth = 1+lw;
     ctx.beginPath();
-    ctx.arc(h, h, h, 0.5*Math.PI,1.5*Math.PI);
-    ctx.lineTo(l-2*h, 0);
-    ctx.arc(h, h, h, 1.5*Math.PI,0.5*Math.PI);
-    ctx.lineTo(0, 2*h);
+    ctx.arc(h+1, h, h-lw-1, 0.5*Math.PI, 1.5*Math.PI);
+    ctx.lineTo(L-h-1, lw+1);
+    ctx.arc(L-h-1, h, h-lw-1, 1.5*Math.PI, 0.5*Math.PI);
+    ctx.lineTo(h+1, 2*h-lw-1);
     ctx.stroke();
+    ctx.fillStyle = "#aaaaaa";
+    ctx.fill();
 }
+
+Minimap.prototype.draw = function() {
+    this.drawContour();
+}
+
+
+/*
+ * Draws the minitrack inside of the minimap
+ */
+Minimap.prototype.drawMinitrack = function() {
+    // Verify that browser supports <canvas>
+    if (this.canvas.getContext){
+        var ctx = this.canvas.getContext('2d');
+        // Clear the canvas, resetting the transformation matrix
+        ctx.save(); ctx.setTransform(1,0,0,1,0,0);
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.restore();
+        // Update the element width
+        this.width = this.overview.clientWidth - 2;
+        // Draw the contour
+        // Draw the minitrack itself
+            //ctx.fillStyle = "red";
+            //ctx.fillRect(0,0,100,100);
+    // Dummy image if canvas is not supported
+    } else {
+        this.overview.style.backgroundImage  =
+            "url('" + window.picsPathRoot + "dummy_chromosome.png')";
+    }
+};
+
+
 
 /**
  * Draws the bands
  */
-Minimap.prototype.draw = function() {
+Minimap.prototype.drawMiniChromosome = function() {
     // Clear the canvas
     this.raph.clear();
     // Update the element width
@@ -124,26 +158,3 @@ Minimap.prototype.draw = function() {
     }
 };
 
-/*
- * Draws the minitrack inside of the minimap
- */
-Minimap.prototype.drawMinitrack = function() {
-    // Verify that browser supports <canvas>
-    if (this.canvas.getContext){
-        var ctx = this.canvas.getContext('2d');
-        // Clear the canvas, resetting the transformation matrix
-        ctx.save(); ctx.setTransform(1,0,0,1,0,0);
-        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        ctx.restore();
-        // Update the element width
-        this.width = this.overview.clientWidth - 2;
-        // Draw the contour
-        // Draw the minitrack itself
-            //ctx.fillStyle = "red";
-            //ctx.fillRect(0,0,100,100);
-    // Dummy image if canvas is not supported
-    } else {
-        this.overview.style.backgroundImage  =
-            "url('" + window.picsPathRoot + "dummy_chromosome.png')";
-    }
-};
