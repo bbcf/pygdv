@@ -778,19 +778,20 @@
 
  div#navbox_right {
      position: absolute;
-     right: 0em;
+     right: 0px;
      width: 186px;
      padding: 3px;
      height: 26px;
      text-align: right;
  }
 
- div#navbox_silder {
+ div#navbox_slider {
      position: absolute;
      right: 190px;
      width: 160px;
      top: 4px;
  }
+
 
  div#overview {
      width: 100%;

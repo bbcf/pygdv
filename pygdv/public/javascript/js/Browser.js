@@ -215,6 +215,14 @@ var Browser = function(params) {
         // Update the position of the zoom slider
         dijit.byId("zoom_slider")._setValueAttr(brwsr.view.curZoom);
 
+        // Default image in case minimap doesn't work
+        //dojo.byId("overview").style.backgroundImage  = "url('" + window.picsPathRoot + "dummy_chromosome.png')";
+
+        // Create a minimap object
+        var minimap = new Minimap(gv);
+        gv.minimap = minimap;
+        minimap.draw();
+
         // If someone calls methods on this browser object
         // before it's fully initialized, then we defer
         // those functions until now
@@ -683,19 +691,11 @@ Browser.prototype.createNavBox = function(params) {
     // Copy self object
     var brwsr = this;
 
-    // Three part navbox
-    var navbox = document.createElement("div");
-    navbox.id = "navbox";
-    navbox.style.cssText = "z-index: 10;";
-    var navbox_left   = document.createElement("div");
-    var navbox_middle = document.createElement("div");
-    var navbox_right  = document.createElement("div");
-    navbox_left.id = "navbox_left";
-    navbox_middle.id = "navbox_middle";
-    navbox_right.id = "navbox_right";
-    navbox.appendChild(navbox_left);
-    navbox.appendChild(navbox_middle);
-    navbox.appendChild(navbox_right);
+    var navbox = dojo.create("div", {id: "navbox", style: {cssText: "z-index:10;"} });
+    var navbox_left = dojo.create("div", {id: "navbox_left"}, navbox);
+    var navbox_middle = dojo.create("div", {id: "navbox_middle"}, navbox);
+    var navbox_right = dojo.create("div", {id: "navbox_right"}, navbox);
+    var navbox_slider = dojo.create("div", {id: "navbox_slider"}, navbox);
 
     // ------------Navbox left--------------
     // Select or move buttons
@@ -739,7 +739,6 @@ Browser.prototype.createNavBox = function(params) {
         if (old_minimap) dojo.destroy(dojo.byId("minimap"));
         var minimap = dojo.create("canvas", {
             id:"minimap",
-            width: "350px",
             height: "18px",
             }, overview);
         return {node: minimap, data: track, type: ["track"]};
@@ -755,9 +754,6 @@ Browser.prototype.createNavBox = function(params) {
 
     // ------------Navbox right--------------
     // Zoom slider
-    var navbox_silder  = document.createElement("div");
-    navbox_silder.id = "navbox_silder";
-    navbox.appendChild(navbox_silder);
     var zoomSlider = new dijit.form.HorizontalSlider({
            name: "zoom_slider",
            id: "zoom_slider",
@@ -770,8 +766,8 @@ Browser.prototype.createNavBox = function(params) {
            onChange: function(value) {brwsr.view.zoomTo(value);}
        },
        "zoom_slider");
-    navbox_silder.title = "Change the zoom level";
-    navbox_silder.appendChild(zoomSlider.domNode);
+    navbox_slider.title = "Change the zoom level";
+    navbox_slider.appendChild(zoomSlider.domNode);
     // Search button
     this.goButton = document.createElement("input");
     this.goButton.type = "image";

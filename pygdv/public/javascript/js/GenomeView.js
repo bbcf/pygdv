@@ -462,14 +462,6 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
     var genrep = new GenRep();
     view.genrep = genrep;
 
-    // Default image in case minimap doesn't work
-    //dojo.byId("overview").style.backgroundImage  = "url('" + window.picsPathRoot + "dummy_chromosome.png')";
-
-    // Create a minimap object
-    var minimap = new Minimap(view);
-    view.minimap = minimap;
-    minimap.update();
-
     // Undocumented
     GDV_POST_FETCHER.send();
 }
