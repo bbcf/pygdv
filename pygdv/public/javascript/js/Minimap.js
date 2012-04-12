@@ -21,16 +21,16 @@ Raphael.fn.roundedRectangle = function (x, y, w, h, r1, r2, r3, r4){
  * The master object of the minimap
  * A hook for this is found in Browser.js
  */
-function Minimap(gv) {
-    // Store the view
-    this.gv = gv;
-    // Define some constants
+function Minimap(view) {
+    this.gv = view;
     this.padding = 4;
-    // Store the 'overview' div that contains the minimap.
-    this.overview = dojo.byId("overview");
+    this.overview = dojo.byId("overview"); //container of the minimap
     this.height = this.overview.clientHeight - 2 * this.padding;
     // Make a raphael graphics object
     this.raph = Raphael("overview", "100%", "100%");
+    // Make a canvas graphics object
+    this.canvas = dojo.byId("minimap");
+    console.log(this.raph, this.canvas)
     // Redraw when the window is resized
     dojo.connect(window, "onresize", this, function(e) {this.draw();});
 }
@@ -70,6 +70,22 @@ Minimap.prototype.stains = {
     'acen':    "90-#111:30-#222"
 };
 
+/*
+ * Draws the contour
+ */
+Minimap.prototype.drawContour = function() {
+    var ctx = this.canvas.getContext('2d');
+    var h = 9; // this.heigth;
+    var l = this.width;
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.arc(h, h, h, 0.5*Math.PI,1.5*Math.PI);
+    ctx.lineTo(l-2*h, 0);
+    ctx.arc(h, h, h, 1.5*Math.PI,0.5*Math.PI);
+    ctx.lineTo(0, 2*h);
+    ctx.stroke();
+}
+
 /**
  * Draws the bands
  */
@@ -105,5 +121,29 @@ Minimap.prototype.draw = function() {
         // Fill the color depending on the stain variable
         r.attr({fill: this.stains[this.bands[i]['band']['stain']]});
         r.attr({'stroke-width': '0'});
+    }
+};
+
+/*
+ * Draws the minitrack inside of the minimap
+ */
+Minimap.prototype.drawMinitrack = function() {
+    // Verify that browser supports <canvas>
+    if (this.canvas.getContext){
+        var ctx = this.canvas.getContext('2d');
+        // Clear the canvas, resetting the transformation matrix
+        ctx.save(); ctx.setTransform(1,0,0,1,0,0);
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.restore();
+        // Update the element width
+        this.width = this.overview.clientWidth - 2;
+        // Draw the contour
+        // Draw the minitrack itself
+            //ctx.fillStyle = "red";
+            //ctx.fillRect(0,0,100,100);
+    // Dummy image if canvas is not supported
+    } else {
+        this.overview.style.backgroundImage  =
+            "url('" + window.picsPathRoot + "dummy_chromosome.png')";
     }
 };

@@ -275,7 +275,7 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
     this.eventCursorGrab      = function(e) {this.setCursorToGrab(e.target);}
     this.eventCursorGrabbing  = function(e) {this.setCursorToGrabbing(e.target);}
     this.eventCursorSelect    = function(e) {this.setCursorToSelect(e.target);}
-    
+
     this.setCursorToGrab(this.elem)
 
     // The locationThumb is the currently viewed zone indicator on the minimap
@@ -291,7 +291,7 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
     // If you click on the minimap somewhere outside of
     // the locationThumb, you want to move there.
     dojo.connect(this.overview, "onmousedown", this, function(e) {
-	this.centerAtBase(Math.round((e.layerX / this.overviewBox.w) * this.ref.end));
+        this.centerAtBase(Math.round((e.layerX / this.overviewBox.w) * this.ref.end));
     });
 
     // Copy the self object
@@ -327,7 +327,7 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
 
     // The function triggered when the user drags the view space
     view.dragMove = function(event) {
-	view.setPosition({
+    view.setPosition({
             x: view.winStartPos.x - (event.clientX - view.dragStartPos.x),
             y: view.winStartPos.y - (event.clientY - view.dragStartPos.y)
         });
@@ -337,9 +337,9 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
 
     // When the mouse button is clicked but not released
     view.mouseDown = function(event) {
-	if(event.target.className == "score_input"){
+        if(event.target.className == "score_input"){
             return false;
-	}
+        }
         if ("animation" in view) {
             if (view.animation instanceof Zoomer) {
                 dojo.stopEvent(event);
@@ -463,7 +463,7 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
     view.genrep = genrep;
 
     // Default image in case minimap doesn't work
-    dojo.byId("overview").style.backgroundImage  = "url('" + window.picsPathRoot + "dummy_chromosome.png')";
+    //dojo.byId("overview").style.backgroundImage  = "url('" + window.picsPathRoot + "dummy_chromosome.png')";
 
     // Create a minimap object
     var minimap = new Minimap(view);

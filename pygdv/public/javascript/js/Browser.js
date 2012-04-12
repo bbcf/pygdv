@@ -316,22 +316,22 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
     // var sortByType_button = dojo.create("td", {innerHTML: "By type"}, sorttr);
     // var sortByDate_button = dojo.create("td", {innerHTML: "By date"}, sorttr);
 
-    // Container of tracks
-    var trackListDiv = dojo.create("div", {id: "tracksAvail",
+    // Create the container of tracks in the left menu
+    var tracksAvail = dojo.create("div", {id: "tracksAvail",
                 className: "container handles"},
                 tab_tracks);
     dojo.create("div", {id:"tracksExplain",
                 innerHTML: "Drag and Drop tracks to view/hide"},
-                trackListDiv);
+                tracksAvail);
 
-    // When a *track* is dropped into tracksAvail, add one div to the list
+    // When a *track* is dropped into tracksAvail, add one node to the list.
+    // Dojo.dnd adds a simple div by default, here we personalize the node it creates.
     var trackListCreate = function(track, hint) {
         // The little block containing the track name
         var node = dojo.create("table",
                 { id: dojo.dnd.getUniqueId(),
                   className: ".pane_table"} );
-	
-	var node_inner = dojo.create("table", {className : 'pane_element'}, node);
+        var node_inner = dojo.create("table", {className : 'pane_element'}, node);
         var node_inner_tr = dojo.create("tr", {}, node_inner);
         var node_name = dojo.create("td", {className:"pane_unit", innerHTML : track.key}, node_inner_tr);
         //var node_type = dojo.create("td", {className:"pane_unit", innerHTML : track.type}, node_inner_tr);
@@ -346,8 +346,9 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
         return {node: node, data: track, type: ["track"]};
     };
 
-    // Drag & drop object in tracksAvail, calling trackListCreate
-    this.trackListWidget = new dojo.dnd.Source(trackListDiv,
+    // Make tracksAvail be a drag & drop object,
+    // calling trackListCreate for each new element.
+    this.trackListWidget = new dojo.dnd.Source(tracksAvail,
                        {creator: trackListCreate,
                         accept: ["track"],
                         selfAccept:false,
@@ -356,7 +357,7 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
     // Callback function
     var changeCallback = function() {brwsr.view.showVisibleBlocks(true);};
 
-    // When a *track* is dropped into the main window, add it to the view
+    // When a track is dropped into the main window, add it to the view
     var trackCreate = function(track, hint) {
         if ("avatar" == hint) { // if inactive
             return trackListCreate(track, hint); // add a div in tracksAvail
@@ -377,16 +378,19 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
         return {node: node, data: track, type: ["track"]};
     };
 
-    // Drag and drop object in the view, calling trackCreate
+    // Make this.view.zoomContainer be a drag & drop object,
+    // calling trackCreate for each new element.
     this.viewDndWidget = new dojo.dnd.Source(this.view.zoomContainer,
-                         {copyState:function(keyPressed,self){
-                             // if(_tc.tab_form){
-                 //      if(_tc.tab_form.selected){
-                             //         return true;
-                 //      }
-                             // }
-                             return false;
-                         },creator: trackCreate, accept: ["track"], withHandles: true});
+                         { copyState:function(keyPressed,self){
+                              // if(_tc.tab_form){ if(_tc.tab_form.selected){ return true; } }
+                              return false;
+                           },
+                           creator: trackCreate,
+                           accept: ["track"],
+                           withHandles: true
+                         });
+
+    // dojo.subscribe: "Register a function to a named topic" (??)
     dojo.subscribe("/dnd/drop", function(source,nodes,iscopy) {
         brwsr.onVisibleTracksChanged();
     });
@@ -422,7 +426,7 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
         return menu_tracks;
     }
 
-    // Connect the buttons to sorting functions
+    //// Connect the buttons to sorting functions
     // dojo.connect(sortByName_button, 'click', function(e){
     //     console.log("sortbyname");
     //     //var menu_tracks = get_menu_tracks();
@@ -720,14 +724,31 @@ Browser.prototype.createNavBox = function(params) {
     this.chromList.title = "Change chromosome";
     navbox_left.appendChild(this.chromList);
 
-    // ------------Navbox middle--------------
-    // Minimap
-    // (overview means chromosome minimap here)
-    var overview = document.createElement("div");
-    overview.className = "overview";
-    overview.style.cssText = "display: inline-block;";
-    overview.id = "overview";
-    navbox_middle.appendChild(overview);
+    // ------------Minimap - Navbox middle--------------
+    var overview = dojo.create("div", {
+        className: "overview",
+        id: "overview",
+        style: {cssText: "display: inline-block"},
+        }, navbox_middle);
+    var minimap = dojo.create("canvas", {
+        id: "minimap",
+        width: "100%", height: "18px",
+        }, overview);
+    // If a track is dropped onto the minimap location, a new canvas is created.
+    var minitrackCreate = function(track, hint) {
+        dojo.destroy(dojo.byId("minimap"));
+        var minimap = dojo.create("canvas", {
+            id:"minimap",
+            width:"100%", height:"18px",
+            }, overview);
+        return {node: minimap, data: track, type: ["track"]};
+    };
+    // Activate drag & drop onto the minimap
+    var minimapWidget = new dojo.dnd.Target(overview,
+        { creator: minitrackCreate,
+          accept: ["track"],
+          withHandles: false
+        });
 
     // ------------Navbox right--------------
     // Zoom slider
