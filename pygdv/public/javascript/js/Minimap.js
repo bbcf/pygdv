@@ -6,9 +6,8 @@
 function Minimap(view) {
     var minimap = this;
     this.gv = view;
-    this.padding = 4;
     this.overview = dojo.byId("overview"); //container of the minimap
-    this.height = this.overview.clientHeight - 2 * this.padding;
+    this.height = this.overview.clientHeight - 2 * 0;
     this.width = this.overview.clientWidth - 2;
 
     var canvas = dojo.byId("minimap");
@@ -63,7 +62,7 @@ Minimap.prototype.reset = function() {
 }
 
 /*
- * Draws the mini-track inside of the minimap
+ * Draw the mini-track inside of the minimap
  */
 Minimap.prototype.drawMinitrack = function() {
     var ctx = this.canvas.getContext('2d');
@@ -72,166 +71,77 @@ Minimap.prototype.drawMinitrack = function() {
 };
 
 /*
- * Draws the mini-chromosome inside of the minimap
+ * Draw the mini-chromosome (cytosomal bands) inside of the minimap
  */
 Minimap.prototype.drawMiniChromosome = function() {
     var ctx = this.canvas.getContext('2d');
     this.reset;
-
-    // Get the cytosomal bands
     this.chr_length = this.gv.ref['length']; // chromosome length
-    callback = dojo.hitch(this, function(bands) {
+    callback = dojo.hitch(this, function(bands) { // hitch makes it asynchronous
         this.bands = bands;
         this.count = this.bands.length;
         if(this.count === 0){
             console.info('GenRep is telling there is no bands on this chromosome.');
         };
+        for (var i=0; i<this.count; i++) {
+            // Compute drawing coordinates
+            var pos   = this.bands[i]['band']['position'];
+            var start = this.bands[i]['band']['start'] * (this.canvas.width / this.chr_length) + 1;
+            var end   = this.bands[i]['band']['end']   * (this.canvas.width / this.chr_length) + 1;
+            ctx.beginPath();
+            if (!pos) { // 'normal' band
+                ctx.rect(start, 1, end-start, this.canvas.height-2);
+                last = start;
+            } else if (pos == 'left')  { // first band
+                roundedRectangle(ctx, start+1, 1, end-start, this.canvas.height-2, [8,0,0,8]);
+            } else if (pos == 'right') { // last band
+                roundedRectangle(ctx, start, 1, end-start-1, this.canvas.height-2, [0,8,8,0]);
+                ctx.rect(last-1, 1, start-last+1, this.canvas.height-2);
+            }
+            // Fill the color depending on the stain variable
+            ctx.closePath();
+            ctx.lineWidth = 0;
+            ctx.fillStyle = this.stains[this.bands[i]['band']['stain']];
+            ctx.fill();
+        }
     });
     this.gv.genrep.bands(this.gv, callback);
-
-    // If there are no bands on the chromosome, stop
-    if (this.count === 0) return;
-    // Iterate over every band
-    for (var i=0; i<this.count; i++) {
-        // Compute drawing coordinates
-        var pos   = this.bands[i]['band']['position'];
-        var start = this.bands[i]['band']['start'] * (this.width / this.chr_length) + 1;
-        var end   = this.bands[i]['band']['end']   * (this.width / this.chr_length) + 1;
-        // Draw centromeres differently
-        if (!pos) {
-            ctx.rect(start, this.padding, end-start, this.height, 0);
-        }
-        else if (pos == 'left')  {
-            r = roundedRectangle(ctx, start, this.padding, end-start, this.height, 2, "#999", "white");
-            left = start;
-        }
-        else if (pos == 'right') {
-            r = roundedRectangle(ctx, start, this.padding, end-start, this.height, "#999", "white");
-            ctx.rect(left, this.padding, end-left, this.height, 9);
-        }
-        // Fill the color depending on the stain variable
-        ctx.lineWidth = 0;
-        ctx.fillStyle = this.stains[this.bands[i]['band']['stain']];
-        ctx.fill();
-    }
-}
+};
 
 /**
  * Draws a rounded rectangle using the current state of the canvas.
- * stroke & fill: (optional) strings, color of respectively stroke and fill
+ * stroke & fill: (optional) strings, color of respectively stroke and fill.
+ * *radius* can either be a number (same 4 corners) or a length-4 array
+ * (4 different corner radii): [bottom left, bottom right, top right, top left].
  */
-function roundedRectangle(ctx, x, y, width, height, radius, stroke, fill) {
-    ctx.beginPath();
-    ctx.moveTo(x + radius, y);
-    ctx.lineTo(x + width - radius, y);
-    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-    ctx.lineTo(x + width, y + height - radius);
-    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-    ctx.lineTo(x + radius, y + height);
-    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-    ctx.lineTo(x, y + radius);
-    ctx.quadraticCurveTo(x, y, x + radius, y);
-    ctx.closePath();
-    if (stroke) {
-        ctx.fillStyle = stroke;
-        ctx.stroke();
+function roundedRectangle(ctx, x, y, width, height, radius) {
+    if (isNaN(radius) && radius.length == 4) {
+        r1 = radius[0]; r2 = radius[1]; r3 = radius[2]; r4 = radius[3];
+    } else {
+        r1 = r2 = r3 = r4 = radius;
     }
-    if (fill) {
-        ctx.fillStyle = fill;
-        ctx.fill();
-    }
+    ctx.moveTo(x + r1, y);
+    ctx.lineTo(x + width - r2, y); // bottom line
+    ctx.arc(x + width - r2, y + r2, r2, 1.5*Math.PI, 0, true); // bottom right angle
+    ctx.lineTo(x + width, y + height - r3); // right line
+    ctx.arc(x + width - r3, y + height - r3, r3, 0, 0.5*Math.PI, true); // top right angle
+    ctx.lineTo(x + r4, y + height); // top line
+    ctx.arc(x + r4, y + height - r4, r4, 0.5*Math.PI, Math.PI, true); // top left angle
+    ctx.lineTo(x, y + r1); // left line
+    ctx.arc(x + r1, y + r1, r1, Math.PI, 1.5*Math.PI, true); // bottom left angle
 }
 
-
-
-
-
-
 /**
- * Called when the page is loaded
- * or the chromosome is changed.
- * The bands will be reloaded and redrawn
- */
-Minimap.prototype.update = function() {
-    // Get the chromsome total length
-    this.chr_length = this.gv.ref['length'];
-    // Get the cytosomal bands
-    callback = dojo.hitch(this, function(bands) {
-        this.bands = bands;
-        this.count = this.bands.length;
-        if(this.count === 0){
-            console.info('GenRep is telling there is no bands on this chromosome.');
-        };
-        dojo.byId('overview').style.backgroundImage = "";
-        this.draw();
-    });
-    var gv = this.gv;
-    gv.genrep.bands(gv, callback);
-};
-
-/**
- * A dictionary linking stain attribute
- * to RGB colors
+ * A dictionary linking stain attribute to RGB colors
  */
 Minimap.prototype.stains = {
-    'gneg':    "90-#ccc:30-#fff",
-    'gpos25':  "90-#999:30-#ccc",
-    'gpos50':  "90-#777:30-#999",
-    'gpos75':  "90-#555:30-#777",
-    'gpos100': "90-#222:30-#555",
-    'acen':    "90-#111:30-#222"
-};
-
-/**
- * Extension of the Rapheal library to
- * add custom rounded rectangles
- * roundedRectangle(x, y, width, height, upper_left_corner, upper_right_corner, lower_right_corner, lower_left_corner)
- * Credits: http://tinyurl.com/3jd6er9
- */
-Raphael.fn.roundedRectangle = function (x, y, w, h, r1, r2, r3, r4){
-  var array = [];
-  array = array.concat(["M",x,r1+y, "Q",x,y, x+r1,y]);
-  array = array.concat(["L",x+w-r2,y, "Q",x+w,y, x+w,y+r2]);
-  array = array.concat(["L",x+w,y+h-r3, "Q",x+w,y+h, x+w-r3,y+h]);
-  array = array.concat(["L",x+r4,y+h, "Q",x,y+h, x,y+h-r4, "Z"]);
-  return this.path(array);
-};
-
-/**
- * Draws the bands
- */
-Minimap.prototype.draw_old = function() {
-    // Clear the canvas
-    this.raph.clear();
-    // Update the element width
-    this.width = this.overview.clientWidth - 2;
-    // Check that we have bands
-    if (this.count === 0) {
-        r = this.raph.rect(2, this.padding, this.width - 2, this.height, 9);
-        r.attr({fill: '90-#999:30-#ccc'});
-        return;
-    }
-    // Iterate over every band
-    for (var i=0; i<this.count; i++) {
-        // Compute drawing coordinates
-        var pos   = this.bands[i]['band']['position'];
-        var start = this.bands[i]['band']['start'] * (this.width / this.chr_length) + 1;
-        var end   = this.bands[i]['band']['end']   * (this.width / this.chr_length) + 1;
-        // Draw centromeres differently
-        if (!pos) {
-            r = this.raph.rect(start, this.padding, end-start, this.height, 0);
-        }
-        else if (pos == 'left')  {
-            r = this.raph.roundedRectangle(start, this.padding, end-start, this.height, 9, 0, 0, 9);
-            left = start;
-        }
-        else if (pos == 'right') {
-            r = this.raph.roundedRectangle(start, this.padding, end-start, this.height, 0, 9, 9, 0);
-            this.raph.rect(left, this.padding, end-left, this.height, 9);
-        }
-        // Fill the color depending on the stain variable
-        r.attr({fill: this.stains[this.bands[i]['band']['stain']]});
-        r.attr({'stroke-width': '0'});
-    }
+    'gneg':    "#cccccc", //"90-#ccc:30-#fff",
+    'gpos25':  "#999999", //"90-#999:30-#ccc",
+    'gpos50':  "#777777", // "90-#777:30-#999",
+    'gpos75':  "#555555", // "90-#555:30-#777",
+    'gpos66':  "#444444",
+    'gpos33':  "#333333",
+    'gpos100': "#222222", // "90-#222:30-#555",
+    'acen':    "#111111" // "90-#111:30-#222"
 };
 

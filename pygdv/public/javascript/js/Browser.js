@@ -215,18 +215,16 @@ var Browser = function(params) {
         // Update the position of the zoom slider
         dijit.byId("zoom_slider")._setValueAttr(brwsr.view.curZoom);
 
-        // Default image in case minimap doesn't work
-        //dojo.byId("overview").style.backgroundImage  = "url('" + window.picsPathRoot + "dummy_chromosome.png')";
-
         // Create a minimap object
         var minimap = new Minimap(gv);
         gv.minimap = minimap;
         minimap.draw();
 
         // If someone calls methods on this browser object
-        // before it's fully initialized, then we defer
-        // those functions until now
-        for (var i = 0; i < brwsr.deferredFunctions.length; i++) {brwsr.deferredFunctions[i]();}
+        // before it's fully initialized, then we defer those functions until now
+        for (var i = 0; i < brwsr.deferredFunctions.length; i++) {
+            brwsr.deferredFunctions[i]();
+        }
         brwsr.deferredFunctions = [];
 
         // Initializes the GDV canvas
@@ -266,6 +264,8 @@ Browser.prototype.buildLeftMenu = function(container){
  */
 Browser.prototype.buildMenuItem = function(link_end, link_name){
     // Create a container and link
+    //var cont = dojo.create("div");
+    //var link = dojo.create("a", null, cont);
     var cont = document.createElement('div');
     var link = document.createElement('a');
     cont.appendChild(link);

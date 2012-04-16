@@ -591,7 +591,7 @@ GenomeView.prototype.setLocation = function(refseq, startbp, endbp) {
         this.setY(0);
         this.containerHeight = this.topSpace;
         // Update and redraw the chromosome minimap
-        this.minimap.update()
+        this.minimap.draw()
     }
     this.pxPerBp = Math.min(this.dim.width / (endbp - startbp), this.charWidth);
 
