@@ -180,7 +180,7 @@ var Browser = function(params) {
         // Connect Browser.js function and GenomeView.js function
         dojo.connect(gv, "onCoarseMove", brwsr, "onCoarseMove");
         // Set up the menu at the left
-        brwsr.buildLeftMenu(menuleft);
+        //brwsr.buildLeftMenu(menuleft);
 
         // Set up principal container
         _gdv_pc = new PrincipalContainer();
@@ -236,7 +236,7 @@ var Browser = function(params) {
  * Build the menu on the left
  * @param{container} - the HTML div containing the menu
  */
-Browser.prototype.buildLeftMenu = function(container){
+//Browser.prototype.buildLeftMenu = function(container){
 
     // /* Navigation menu */
     // var navig = document.createElement('div');
@@ -257,35 +257,29 @@ Browser.prototype.buildLeftMenu = function(container){
     //     container.appendChild(this.buildMenuItem('preferences','Preferences'));
     //     container.appendChild(this.buildMenuItem('help','Help'));
     // }
-};
+//};
 
 /**
  * Helper to build a menu item
  */
 Browser.prototype.buildMenuItem = function(link_end, link_name){
-    // Create a container and link
-    //var cont = dojo.create("div");
-    //var link = dojo.create("a", null, cont);
-    var cont = document.createElement('div');
-    var link = document.createElement('a');
-    cont.appendChild(link);
-    // Make an image
-    var img = document.createElement('img');
-    img.src = this.imageRoot + "menu_" + link_end + ".png";
-    img.className='gdv_menu_image';
-    link.appendChild(img);
-    // Create a span
-    var span = document.createElement('span');
-    span.innerHTML=link_name;
-    span.className='gdv_menu_item';
-    link.appendChild(span);
-    // Configure the link
-    link.href=_GDV_URL+'/'+link_end;
-    link.className='hl';
-    // Return the container
+    var cont = dojo.create("div");
+    var link = dojo.create("a", {
+        href: _GDV_URL+'/'+link_end,
+        className: 'hl',
+        }, cont);
+    // Picture of the menu element
+    var img = dojo.create("img", {
+        src: this.imageRoot + "menu_" + link_end + ".png",
+        className: 'gdv_menu_image',
+        }, link);
+    // Title of the menu element
+    var span = dojo.create("span", {
+        innerHTML: link_name,
+        className: 'gdv_menu_item',
+        }, link);
     return cont;
 };
-
 
 
 /**
@@ -325,12 +319,14 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
     // var sortByDate_button = dojo.create("td", {innerHTML: "By date"}, sorttr);
 
     // Create the container of tracks in the left menu
-    var tracksAvail = dojo.create("div", {id: "tracksAvail",
-                className: "container handles"},
-                tab_tracks);
-    dojo.create("div", {id:"tracksExplain",
-                innerHTML: "Drag and Drop tracks to view/hide"},
-                tracksAvail);
+    var tracksAvail = dojo.create("div", {
+                id: "tracksAvail",
+                className: "container handles"
+                }, tab_tracks);
+    dojo.create("div", {
+                id:"tracksExplain",
+                innerHTML: "Drag and Drop tracks to view/hide"
+                }, tracksAvail);
 
     // When a *track* is dropped into tracksAvail, add one node to the list.
     // Dojo.dnd adds a simple div by default, here we personalize the node it creates.
@@ -374,8 +370,7 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
             var url = track.url.replace(/\{([^}]+)\}/g, function(match, group) {return replaceData[group];});
             var klass = eval(track.type);
             var newTrack = new klass(track, url, brwsr.refSeq,
-                                     {
-                                         changeCallback: changeCallback,
+                                     {   changeCallback: changeCallback,
                                          trackPadding: brwsr.view.trackPadding,
                                          baseUrl: brwsr.dataRoot,
                                          charWidth: brwsr.view.charWidth,
@@ -434,7 +429,7 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
         return menu_tracks;
     }
 
-    //// Connect the buttons to sorting functions
+    //// Connect the buttons to sorting functions (TO BE FIXED)
     // dojo.connect(sortByName_button, 'click', function(e){
     //     console.log("sortbyname");
     //     //var menu_tracks = get_menu_tracks();
@@ -455,8 +450,6 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
     //     console.log("sortbydate");
     //     //menu_tracks.sort('date', true, parseDate);
     // });
-
-
 };
 
 /**
