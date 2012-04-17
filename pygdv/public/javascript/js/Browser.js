@@ -216,7 +216,7 @@ var Browser = function(params) {
         dijit.byId("zoom_slider")._setValueAttr(brwsr.view.curZoom);
 
         // Create a minimap object
-        var minimap = new Minimap(gv);
+        var minimap = new Minimap(brwsr,gv);
         gv.minimap = minimap;
         minimap.draw();
 
@@ -384,10 +384,11 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
     // Make this.view.zoomContainer be a drag & drop object,
     // calling trackCreate for each new element.
     this.viewDndWidget = new dojo.dnd.Source(this.view.zoomContainer,
-                         { copyState:function(keyPressed,self){
-                              // if(_tc.tab_form){ if(_tc.tab_form.selected){ return true; } }
-                              return false;
+                         { copyState: function(keyPressed,self){
+                                if (keyPressed) return true;
+                                else return false;
                            },
+                           //copyOnly: false,
                            creator: trackCreate,
                            accept: ["track"],
                            withHandles: true
@@ -419,11 +420,8 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
         for (var i=0; i<ntracks; i++){
             var track_i = all_tracks[i];
             var oldTrackList = dojo.cookie(brwsr.container.id + "-tracks");
-            console.log(track_i.key)
-            console.log(oldTrackList.split(','))
             if (!(track_i.key in oldTrackList.split(','))) { // if not viewed
                 menu_tracks.push(track_i);
-                console.log("added", track_i.key)
             }
         }
         return menu_tracks;
@@ -431,7 +429,6 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
 
     //// Connect the buttons to sorting functions (TO BE FIXED)
     // dojo.connect(sortByName_button, 'click', function(e){
-    //     console.log("sortbyname");
     //     //var menu_tracks = get_menu_tracks();
     //     //menu_tracks.sort(sort_by('key', true, null));
     //     //params.trackData = menu_tracks; // ? dojo.cookie("Menu-tracks") // save the new order
@@ -443,11 +440,9 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
     //     //brwsr.trackListWidget.insertNodes(false, menu_tracks);
     // });
     // dojo.connect(sortByType_button, 'click', function(e){
-    //     console.log("sortbytype");
     //     //menu_tracks.sort('type', true, null);
     // });
     // dojo.connect(sortByDate_button, 'click', function(e){
-    //     console.log("sortbydate");
     //     //menu_tracks.sort('date', true, parseDate);
     // });
 };
@@ -724,13 +719,14 @@ Browser.prototype.createNavBox = function(params) {
         className: "overview",
         id: "overview",
         style: {cssText: "display: inline-block",
-                margin:"3px"},
+                margin: "3px"},
         }, navbox_middle);
     dojo.create("canvas", {
         id:"minimap",
         height: "20px",
         }, overview);
-    // If a track is dropped onto the minimap location, a new canvas is created.
+    // If a track is dropped onto the minimap location, a
+    // new canvas is created and a mini-track is drawn.
     var minitrackCreate = function(track, hint) {
         var old_minimap = dojo.byId("minimap");
         if (old_minimap) dojo.destroy(old_minimap);
@@ -738,14 +734,15 @@ Browser.prototype.createNavBox = function(params) {
             id:"minimap",
             height: "20px",
             }, overview);
-        var minimap = new Minimap(gv);
-        gv.minimap = minimap;
-        minimap.drawMinitrack();
+        brwsr.view.minimap.canvas = minimap_canvas;
+        brwsr.view.minimap.drawMinitrack();
         return {node: minimap_canvas, data: track, type: ["minitrack"]};
         };
     // Activate drag & drop onto the minimap
-    var minimapWidget = new dojo.dnd.Target(overview,
+    this.minimapWidget = new dojo.dnd.Target(overview,
         { creator: minitrackCreate,
+          copyState: function(keyPressed,self){ return true; },
+          copyOnly: true,
           accept: ["track"],
           withHandles: false
         });

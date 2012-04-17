@@ -3,16 +3,30 @@
  * The master object of the minimap
  * A hook for this is found in Browser.js
  */
-function Minimap(view) {
+function Minimap(browser,view) {
     var minimap = this;
+    this.brwsr = browser;
     this.gv = view;
     this.overview = dojo.byId("overview"); //container of the minimap
     this.height = this.overview.clientHeight;
     this.width = this.overview.clientWidth - 2;
     this.canvas = dojo.byId("minimap");
-    console.log(this.overview, this.canvas)
     // Redraw when the window is resized
     dojo.connect(window, "onresize", this, function(e) {this.draw();});
+    dojo.connect(this.overview, "onmouseover", function(e) {
+        browser.minimapWidget.copyOnly = true;
+        //browser.minimapWidget.copyState = function(keyPressed,self){ return true; };
+        //console.log("true")
+    });
+    dojo.connect(this.overview, "onmouseout", function(e) {
+        browser.minimapWidget.copyOnly = false;
+        //browser.minimapWidget.copyState = function(keyPressed,self){ return false; };
+        //console.log("false")
+    });
+    dojo.connect(this.brwsr.minimapWidget, "onDrop", function(source, nodes, copy) {
+        //copy = true;
+        //console.log("e",source, nodes, copy, browser.minimapWidget.copyState, browser.minimapWidget.copyOnly)
+    });
 }
 
 /*
@@ -66,7 +80,7 @@ Minimap.prototype.reset = function() {
 Minimap.prototype.drawMinitrack = function() {
     var ctx = this.canvas.getContext('2d');
     this.reset();
-    alert("New minitrack")
+    console.log("New minitrack");
     drawContour(ctx, this.canvas.width, this.canvas.height);
 };
 
