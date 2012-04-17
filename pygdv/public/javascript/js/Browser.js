@@ -724,7 +724,7 @@ Browser.prototype.createNavBox = function(params) {
         className: "overview",
         id: "overview",
         style: {cssText: "display: inline-block",
-                margin:"4px"},
+                margin:"3px"},
         }, navbox_middle);
     // If a track is dropped onto the minimap location, a new canvas is created.
     var minimapCreate = function(track, hint) {
@@ -732,7 +732,7 @@ Browser.prototype.createNavBox = function(params) {
         if (old_minimap) dojo.destroy(dojo.byId("minimap"));
         var minimap = dojo.create("canvas", {
             id:"minimap",
-            height: "18px",
+            height: "20px",
             }, overview);
         return {node: minimap, data: track, type: ["track"]};
         };
