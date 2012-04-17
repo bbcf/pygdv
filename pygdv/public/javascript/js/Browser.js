@@ -726,21 +726,26 @@ Browser.prototype.createNavBox = function(params) {
         style: {cssText: "display: inline-block",
                 margin:"3px"},
         }, navbox_middle);
+    dojo.create("canvas", {
+        id:"minimap",
+        height: "20px",
+        }, overview);
     // If a track is dropped onto the minimap location, a new canvas is created.
-    var minimapCreate = function(track, hint) {
+    var minitrackCreate = function(track, hint) {
         var old_minimap = dojo.byId("minimap");
-        if (old_minimap) dojo.destroy(dojo.byId("minimap"));
-        var minimap = dojo.create("canvas", {
+        if (old_minimap) dojo.destroy(old_minimap);
+        var minimap_canvas = dojo.create("canvas", {
             id:"minimap",
             height: "20px",
             }, overview);
-        return {node: minimap, data: track, type: ["track"]};
+        var minimap = new Minimap(gv);
+        gv.minimap = minimap;
+        minimap.drawMinitrack();
+        return {node: minimap_canvas, data: track, type: ["minitrack"]};
         };
-    // Initialize
-    minimapCreate();
     // Activate drag & drop onto the minimap
     var minimapWidget = new dojo.dnd.Target(overview,
-        { creator: minimapCreate,
+        { creator: minitrackCreate,
           accept: ["track"],
           withHandles: false
         });

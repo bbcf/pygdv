@@ -13,12 +13,6 @@ function Minimap(view) {
     console.log(this.overview, this.canvas)
     // Redraw when the window is resized
     dojo.connect(window, "onresize", this, function(e) {this.draw();});
-    // Draw the mini-track when a track is dropped into the minimap
-    //dojo.connect(this.overview, "onDndDrop", function(source, nodes, copy, target) {
-    dojo.connect(this.overview, "onDrop", function(e) {
-        alert("Create minitrack");
-        this.drawMiniTrack();
-    });
 }
 
 /*
@@ -72,7 +66,7 @@ Minimap.prototype.reset = function() {
 Minimap.prototype.drawMinitrack = function() {
     var ctx = this.canvas.getContext('2d');
     this.reset();
-    console.log("New minitrack")
+    alert("New minitrack")
     drawContour(ctx, this.canvas.width, this.canvas.height);
 };
 
