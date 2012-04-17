@@ -16,3 +16,4 @@
 .project
 .pydevproject
 .settings/
+/celerybeat_ctl
