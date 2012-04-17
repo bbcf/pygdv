@@ -8,7 +8,6 @@ def selections(project_id):
         sel_obj = {'id' : sel.id, 'description' : sel.description, 'color' : sel.color}
         loc_list = []
         for loc in sel.locations:
-            print loc
             loc_list.append({'chr' : loc.chromosome,
                       'start' : loc.start,
                       'end' : loc.end,
