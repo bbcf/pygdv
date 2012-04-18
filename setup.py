@@ -41,7 +41,9 @@ install_requires=[
     "kombu-sqlalchemy",
     "yapsy",
     "psycopg2",
-
+    "tw.dojo",
+    "celery",
+    
     ]
 
 if sys.version_info[:2] == (2,4):
@@ -65,8 +67,12 @@ setup(
     test_suite='nose.collector',
     tests_require=testpkgs,
     package_data={'example': ['i18n/*/LC_MESSAGES/*.mo',
-                                 'templates/*/*',
-                                 'public/*/*']},
+                              'templates/*/*',
+                              'public/css/*',
+                              'public/images/*',
+                              'public/img/*',
+                              'public/javascript/js/*',
+                              ]},
     message_extractors={'example': [
             ('**.py', 'python', None),
             ('templates/**.html', 'genshi', None),
