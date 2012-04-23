@@ -1,0 +1,12 @@
+CELERY_IMPORTS = ('pygdv.celery.tasks',)
+
+## Result storage settings
+CELERY_RESULT_BACKEND = 'database'
+CELERY_RESULT_DBURI = 'postgresql://myuser:mypasswd@127.0.0.1/mydb'
+
+#CELERY_RESULT_ENGINE_OPTIONS = {'echo':True}
+
+## Broker settings
+BROKER_TRANSPORT = 'sqlakombu.transport.Transport'
+BROKER_HOST = 'postgresql://myuser:mypasswd@127.0.0.1/mydb'
+

@@ -1,5 +1,5 @@
 #!/bin/sh -e
-PYGDV_HOME=/home/yo/git/pygdv
+PYGDV_HOME=/my/project/dir
 PYGDV_CONFIG_FILE=development.ini
 
 case "$1" in

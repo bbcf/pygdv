@@ -156,14 +156,14 @@ ZoneSelection.prototype.update_on_server = function(){
  * @params {x1} the start of the selection in pixels
  * @params {x2} the end   of the selection in pixels
  */
-function Marquee(x1, x2, chr) {
+function Marquee(x1, x2, chr, desc) {
     this.x1 = x1;      // Start in pixels
     this.x2 = x2;      // End in pixels
     this.alpha = 0.15; // Transparency
     this.chr   = chr; // The chromosome
     this.start = null; // Start in basepairs
     this.end   = null; // End in basepairs
-    this.desc  = "Enter description"; // Description
+    this.desc  = desc; // Description
 };
 
 /**
@@ -309,15 +309,12 @@ MarqueeHandler.prototype.add_marquee = function(selection, leftbase, factor) {
     var desc = selection['desc'];
     var x1 = (start - leftbase) * factor;
     var x2 = (end - leftbase ) * factor;
-    var marquee = new Marquee(x1, x2, selection['chr']);
-
-    marquee.start = start;
-    marquee.end = end;
-    marquee.id = id;
-    if (desc){ marquee.desc = desc; }
-
-    this.mergeMarquee(marquee);
-    this.marquees.push(marquee);
+    var _m = new Marquee(x1, x2, selection['chr'], selection['desc']);
+    _m.start = start;
+    _m.end = end;
+    _m.id = selection['id'];
+    this.mergeMarquee(_m);
+    this.marquees.push(_m);
 };
 
 /**

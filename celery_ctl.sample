@@ -20,7 +20,7 @@
 
 #set -e
 
-PYGDV_HOME='/home/yo/git/pygdv'
+PYGDV_HOME='/my/project/dir'
 DEFAULT_PID_FILE=$PYGDV_HOME"/%n.pid"
 DEFAULT_LOG_FILE=$PYGDV_HOME"/%n.log"
 DEFAULT_LOG_LEVEL="INFO"
