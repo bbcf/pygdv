@@ -77,10 +77,38 @@ Minimap.prototype.reset = function() {
 /*
  * Draw the mini-track inside of the minimap
  */
-Minimap.prototype.drawMinitrack = function() {
+Minimap.prototype.drawMinitrack = function(track) {
+    var minimap = this;
     var ctx = this.canvas.getContext('2d');
     this.reset();
     console.log("New minitrack");
+
+    dojo.xhrPost({
+        url: _GDV_URL_DB + '/minimap',
+        postData: track.db,
+        load: function(data) {
+            draw_minitrack(data);
+        }
+    });
+
+    // Testing
+    var data = [1,1.4, 12,3.1, 24,5.6, 36,1.1, 45,7.8, 78,3,2]; //[pos,score,pos,score,...]
+    draw_minitrack(data);
+
+    var draw_minitrack = function(data){
+        var clen = data.length;
+        var barw = clen / 2*data.chr_length;
+        var barh = minimap.canvas.height;
+        for (var i=0; i<clen; i=i+2) {
+            var pos = data[i] * (minimap.canvas.width / minimap.chr_length) + 1;
+            var score = data[i+1];
+            ctx.beginPath();
+            ctx.rect(pos, 0, pos+barw, y+barh);
+            ctx.closePath();
+            ctx.fillStyle("black");
+            ctx.fill();
+        }
+    }
     drawContour(ctx, this.canvas.width, this.canvas.height);
 };
 

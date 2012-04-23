@@ -735,7 +735,7 @@ Browser.prototype.createNavBox = function(params) {
             height: "20px",
             }, overview);
         brwsr.view.minimap.canvas = minimap_canvas;
-        brwsr.view.minimap.drawMinitrack();
+        brwsr.view.minimap.drawMinitrack(track);
         return {node: minimap_canvas, data: track, type: ["minitrack"]};
         };
     // Activate drag & drop onto the minimap
@@ -744,7 +744,7 @@ Browser.prototype.createNavBox = function(params) {
           copyState: function(keyPressed,self){ return true; },
           copyOnly: true,
           accept: ["track"],
-          withHandles: false
+          withHandles: false,
         });
 
     // ------------Navbox right--------------
