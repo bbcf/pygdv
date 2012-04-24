@@ -78,37 +78,52 @@ Minimap.prototype.reset = function() {
  * Draw the mini-track inside of the minimap
  */
 Minimap.prototype.drawMinitrack = function(track) {
+    console.log("New minitrack");
+    console.log(track)
     var minimap = this;
     var ctx = this.canvas.getContext('2d');
     this.reset();
-    console.log("New minitrack");
 
+    track.md5 = track.url.split("/")[0];
+
+    /*
     dojo.xhrPost({
         url: _GDV_URL_DB + '/minimap',
-        postData: track.db,
+        postData: "type=" + track.type + "&db=" + track.md5 + "&zoom_value=" + 100,
         load: function(data) {
             draw_minitrack(data);
         }
     });
-
-    // Testing
-    var data = [1,1.4, 12,3.1, 24,5.6, 36,1.1, 45,7.8, 78,3,2]; //[pos,score,pos,score,...]
-    draw_minitrack(data);
+    */
 
     var draw_minitrack = function(data){
-        var clen = data.length;
-        var barw = clen / 2*data.chr_length;
-        var barh = minimap.canvas.height;
-        for (var i=0; i<clen; i=i+2) {
-            var pos = data[i] * (minimap.canvas.width / minimap.chr_length) + 1;
-            var score = data[i+1];
+        var len = data.length;
+        var cw = minimap.canvas.width;
+        var ch = minimap.canvas.height;
+        var barw = 2*cw / len;
+        positions = []; scores = []; scores2 = [];
+        for (var i=0; i<len; i=i+2) {
+            positions.push(data[i]);
+            scores.push(data[i+1]);
+            scores2.push(data[i+1]);
+        }
+        var max_score = scores2.sort().reverse()[0];
+        var pos = 0;
+        for (var i=0; i<len/2; i++) {
+            var barh = 0.9 * scores[i] * (ch / max_score);
             ctx.beginPath();
-            ctx.rect(pos, 0, pos+barw, y+barh);
+            ctx.rect(pos, ch-barh+1, barw, barh-2);
             ctx.closePath();
-            ctx.fillStyle("black");
+            ctx.fillStyle = "black";
             ctx.fill();
+            pos = pos+barw;
         }
     }
+    // Testing
+    var data = [1,1.4, 12,3.1, 24,5.6, 36,1.1, 45,7.8, 78,3.2, 112,11.3]; //[pos,score,pos,score,...]
+    draw_minitrack(data);
+
+    clearCorners(ctx, 0, 0, this.canvas.width, this.canvas.height, this.canvas.height/2+1);
     drawContour(ctx, this.canvas.width, this.canvas.height);
 };
 
