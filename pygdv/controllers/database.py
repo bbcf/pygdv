@@ -98,4 +98,25 @@ class DatabaseController(BaseController):
                 result[chr].append([k, v[0], v[1]])
         
         return result
-    
+
+    @expose('json')
+    def minimap(self, chr_zoom, db, type):
+        if type.lower() == 'imagetrack':
+            conn = sqlite3.connect(os.path.join(constants.json_directory(), db, chr_zoom))
+            im_data = []
+            cur = conn.cursor()
+            try :
+                cur.execute('select pos, score from sc order by im, pos asc;')
+            except OperationalError as e:
+                return '{}'
+            for row in cur :
+                im_data += [row [0], round(row[1], 3)]
+            cur.close()
+            conn.close()
+            return {'data' : im_data}
+
+        elif type.lower() == 'featuretrack':
+            return {'data' : [0, 1, 100, 10, 150, 0, 200, 10, 700, 5, 1100, 0, 3600, 2.4, 5700, 6.6, 9300, 17.3, 10500, 20, 15000, 0]}
+
+        else :
+            return {}
