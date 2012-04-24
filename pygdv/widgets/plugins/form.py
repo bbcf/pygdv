@@ -29,9 +29,6 @@ class ThresholdForm(twf.TableForm):
               
               twf.TextField(label_text='Threshold', id='thr',              # a simple input field (with a simple validator)
                             help_text = 'Input the trhreshold here', validator=twv.NotEmpty()),
-              
-              
-              
               ]
 
 class ImageForm(twf.TableForm):

@@ -5,8 +5,6 @@ root_key = 'Operations'
 
 
 
-
-
 def new_track(_private_params, _file, name, description, **kw):
     '''
     Create a new track in GDV.
