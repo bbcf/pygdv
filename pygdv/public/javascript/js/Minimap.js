@@ -81,50 +81,52 @@ Minimap.prototype.drawMinitrack = function(track) {
     console.log("New minitrack");
     console.log(track)
     var minimap = this;
+    var ch = minimap.canvas.height;
+    var cw = minimap.canvas.width;
     var ctx = this.canvas.getContext('2d');
     this.reset();
 
+    // put this somewhere else
+    this.chr_length = this.gv.ref['length']; // chromosome length
     track.md5 = track.url.split("/")[0];
 
-    /*
     dojo.xhrPost({
         url: _GDV_URL_DB + '/minimap',
-        postData: "type=" + track.type + "&db=" + track.md5 + "&zoom_value=" + 100,
-        load: function(data) {
-            draw_minitrack(data);
+        postData: "type=" + track.type + "&db=" + track.md5 + "&chr_zoom=" + 100,
+        load: function(x) {
+            x = JSON.parse(x);
+            draw_minitrack(x.data);
         }
     });
-    */
-
     var draw_minitrack = function(data){
         var len = data.length;
-        var cw = minimap.canvas.width;
         var ch = minimap.canvas.height;
-        var barw = 2*cw / len;
+        var cw = minimap.canvas.width;
         positions = []; scores = []; scores2 = [];
         for (var i=0; i<len; i=i+2) {
             positions.push(data[i]);
             scores.push(data[i+1]);
             scores2.push(data[i+1]);
         }
-        var max_score = scores2.sort().reverse()[0];
-        var pos = 0;
+        var max_score = scores2.sort(function(a,b){return b-a})[0];
+        var height_ratio = ch / max_score;
+        var width_ratio = cw / minimap.chr_length;
         for (var i=0; i<len/2; i++) {
-            var barh = 0.9 * scores[i] * (ch / max_score);
-            ctx.beginPath();
-            ctx.rect(pos, ch-barh+1, barw, barh-2);
-            ctx.closePath();
-            ctx.fillStyle = "black";
-            ctx.fill();
-            pos = pos+barw;
+            var start = positions[i] * width_ratio;
+            var end   = positions[i+1] * width_ratio;
+            if (!end) end = cw; // last piece
+            if (scores[i] != 0) {
+                var barh = 0.9 * scores[i] * height_ratio;
+                ctx.beginPath();
+                ctx.rect(start, ch-barh+1, end-start, barh-2);
+                ctx.closePath();
+                ctx.fillStyle = "black";
+                ctx.fill();
+            }
         }
+        clearCorners(ctx, 0, 0, cw, ch, ch/2+1);
+        drawContour(ctx, cw, ch);
     }
-    // Testing
-    var data = [1,1.4, 12,3.1, 24,5.6, 36,1.1, 45,7.8, 78,3.2, 112,11.3]; //[pos,score,pos,score,...]
-    draw_minitrack(data);
-
-    clearCorners(ctx, 0, 0, this.canvas.width, this.canvas.height, this.canvas.height/2+1);
-    drawContour(ctx, this.canvas.width, this.canvas.height);
 };
 
 /*
@@ -134,6 +136,9 @@ Minimap.prototype.drawMiniChromosome = function() {
     var ctx = this.canvas.getContext('2d');
     this.reset;
     this.chr_length = this.gv.ref['length']; // chromosome length
+    var ch = this.canvas.height;
+    var cw = this.canvas.width;
+    var width_ratio = cw / this.chr_length;
     callback = dojo.hitch(this, function(bands) { // hitch makes it asynchronous
         this.bands = bands;
         this.count = this.bands.length;
@@ -141,8 +146,8 @@ Minimap.prototype.drawMiniChromosome = function() {
         for (var i=0; i<this.count; i++) {
             // Compute drawing coordinates
             var pos   = this.bands[i]['band']['position'];
-            var start = this.bands[i]['band']['start'] * (this.canvas.width / this.chr_length) + 1;
-            var end   = this.bands[i]['band']['end']   * (this.canvas.width / this.chr_length) + 1;
+            var start = this.bands[i]['band']['start'] * width_ratio + 1;
+            var end   = this.bands[i]['band']['end']   * width_ratio + 1;
             var stain = this.stains[this.bands[i]['band']['stain']];
             var gradient = ctx.createLinearGradient(0,0,0,this.canvas.height);
             gradient.addColorStop(0.7,stain[0]);
@@ -151,7 +156,7 @@ Minimap.prototype.drawMiniChromosome = function() {
             ctx.rect(start, 1, end-start, this.canvas.height-2);
             ctx.closePath();
             ctx.lineWidth = 0;
-            ctx.fillStyle = gradient; //stain[1];
+            ctx.fillStyle = gradient;
             ctx.fill();
         }
         clearCorners(ctx, 0, 0, this.canvas.width, this.canvas.height, this.canvas.height/2+1);
@@ -161,7 +166,7 @@ Minimap.prototype.drawMiniChromosome = function() {
 };
 
 /*
- * After drawing the mini chromosome, round the corners at extremities.
+ * After drawing the minimap, round the corners at extremities.
  */
 function clearCorners(ctx, x, y, width, height, r) {
     var clearCorner = function(ctx, x, y, r) {

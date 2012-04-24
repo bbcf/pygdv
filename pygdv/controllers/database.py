@@ -11,13 +11,13 @@ from sqlite3 import OperationalError
 import track
 
 class DatabaseController(BaseController):
-    
 
-    
+
+
     @expose('json')
     def scores(self,  sha1, chr_zoom, imgs, **kw):
         '''
-        Get the compurted scores for the database specified, on the chromosome, zoom 
+        Get the compurted scores for the database specified, on the chromosome, zoom
         and for the images specified. It works with the ``signal`` database.
         @param sha1 : the sha1 of the database
         @param chr : the chromosome
@@ -25,29 +25,29 @@ class DatabaseController(BaseController):
         @param imgs : the list of images needed
         @return a json : {name : {image_nb : {image_data}}. With image_data = [pos, score, pos, score, ...]
         '''
-        
-        
+
+
         name = '%s/%s' % (sha1, chr_zoom)
-        
+
         conn = sqlite3.connect(os.path.join(constants.json_directory(), sha1, chr_zoom))
 
         data = {}
         db_data = {}
-        
+
         for im in imgs.split(',') :
-                
+
             im_data = []
             cur = conn.cursor()
             try :
                 cur.execute('select pos, score from sc where number = ? order by pos asc;', (im,))
             except OperationalError as e:
                 return '{}'
-            
+
             r = False
-            for row in cur : 
+            for row in cur :
                 r = True
                 im_data += [row [0], round(row[1], 3)]
-            
+
             #print 'for image %s : %s' %(im, im_data)
             #if no result from previous query, put score from an image before
 #            if not r :
@@ -55,14 +55,14 @@ class DatabaseController(BaseController):
 #                row = cur.fetchone()
 #                if row:
 #                    im_data += [0, row[0]]
-                
+
             db_data[im] = im_data
             cur.close()
         conn.close()
         data[name]=db_data
         return data
-            
-            
+
+
     @expose('json')
     def search(self, project_id, term, *args, **kw):
         project = DBSession.query(Project).filter(Project.id == project_id).first()
@@ -79,24 +79,24 @@ class DatabaseController(BaseController):
                     chr, name, start, stop = row
                     if chr not in chrs:
                         chrs[chr] = {}
-                        
+
                     names = chrs[chr]
                     if name in names:
                         old = names[name]
                         start = min(old[0], start)
                         stop = max(old[1], stop)
-                    names[name] = [start, stop] 
+                    names[name] = [start, stop]
             except Exception as e:
-                return {} 
-                
-        
+                return {}
+
+
         #result[chr].append([name, start, stop])
         result = {}
         for chr, names in chrs.iteritems() :
             result[chr] = []
             for k, v in names.iteritems():
                 result[chr].append([k, v[0], v[1]])
-        
+
         return result
 
     @expose('json')
@@ -116,7 +116,7 @@ class DatabaseController(BaseController):
             return {'data' : im_data}
 
         elif type.lower() == 'featuretrack':
-            return {'data' : [0, 1, 100, 10, 150, 0, 200, 10, 700, 5, 1100, 0, 3600, 2.4, 5700, 6.6, 9300, 17.3, 10500, 20, 15000, 0]}
+            return {'data' : [0, 1, 1000000, 10, 1500000, 0, 2000000, 10, 7000000, 5, 11000000, 0, 36000000, 2.4, 57000000, 6.6, 93000000, 17.3, 105000000, 20, 120000000, 12, 160000000, 0]}
 
         else :
             return {}
