@@ -799,13 +799,12 @@ GenomeView.prototype.sizeInit = function() {
     this.overviewBox = dojo.marginBox(this.overview);
 
     // Scale values, in pixels per bp, for all zoom levels
-    this.zoomLevels = [1/500000, 1/200000, 1/100000, 1/50000, 1/20000, 1/10000, 1/5000, 1/2000, 1/1000, 1/500, 1/200, 1/100, 1/50, 1/20, 1/10, 1/5, 1/2, 1, 2, 5, this.charWidth];
+    this.zoomLevels = [1/500000, 1/200000, 1/100000, 1/50000, 1/20000, 1/10000, 1/5000, 1/2000, 1/1000,
+                       1/500, 1/200, 1/100, 1/50, 1/20, 1/10, 1/5, 1/2, 1, 2, 5, this.charWidth];
 
     // Make sure we don't zoom out too far
-    while (((this.ref.end - this.ref.start) * this.zoomLevels[0])
-           < this.dim.width) {
+    while (((this.ref.end - this.ref.start) * this.zoomLevels[0]) < this.dim.width)
         this.zoomLevels.shift();
-    }
     this.zoomLevels.unshift(this.dim.width / (this.ref.end - this.ref.start));
 
     // Width, in pixels, of stripes at min zoom (so the view covers
@@ -1156,8 +1155,8 @@ GenomeView.prototype.showVisibleBlocks = function(updateHeight, pos, startX, end
     var containerStart = Math.round(this.pxToBp(this.offset));
     var containerEnd = Math.round(this.pxToBp(this.offset + (this.stripeCount * this.stripeWidth)));
     this.trackIterate(function(track, view) {
-                          track.showRange(leftVisible, rightVisible, startBase, bpPerBlock, view.pxPerBp, containerStart, containerEnd);
-                      });
+            track.showRange(leftVisible, rightVisible, startBase, bpPerBlock, view.pxPerBp, containerStart, containerEnd);
+        });
     GDV_POST_FETCHER.send();
     // A move event is ending
     // Update the zone selection

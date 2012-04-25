@@ -82,15 +82,14 @@ GDVPostBuffer.prototype.post = function(database){
     dojo.forEach(imgs,function(item,i,arr){
         var nb = item.nb;
         if(!(_imgs.join().indexOf(nb)>-1)){
-        _imgs.push(nb);
-        if(!(post_buffer.getScore(database,nb))){
-            pData += item.nb + ",";
-        } else {
-            //var imd = new ImageDrawer();
-            item.draw();
-            //imd.drawScores(item, this.getScore(database, item), item.color);
-        }
-
+            _imgs.push(nb);
+            if(!(post_buffer.getScore(database,nb))){
+                pData += item.nb + ",";
+            } else {
+                //var imd = new ImageDrawer();
+                item.draw();
+                //imd.drawScores(item, this.getScore(database, item), item.color);
+            }
         }
         });
     if(pData.length>pDataL){

@@ -229,6 +229,43 @@ var Browser = function(params) {
 
         // Initializes the GDV canvas
         initCanvas();
+
+        // Menu appearing on right-click on a track element, either in the view or in the tracks list.
+        dojo.ready(function() {
+            // determine which nodes are right-clickable (tracks)
+            var track_nodes = dojo.query(".pane_table", "tracksAvail");
+            var track_nodes_ids = [];
+            var len_track_nodes = track_nodes.length;
+            for (var i=0; i<len_track_nodes; i++) {
+                var node_i = track_nodes[i];
+                track_nodes_ids.push(node_i.id);
+            }
+            // create the menu
+            var trackDropMenu = new dijit.Menu({
+                targetNodeIds: track_nodes_ids,
+                selector: "pane_element",
+            });
+            // determine which dom element was clicked (fuck dijit)
+            var target = null;
+            dojo.connect(trackDropMenu, "_openMyself", function(e){
+                    if (e.target.className == "pane_unit")
+                        target = e.target.parentNode.parentNode;
+                    else if (e.target.className == "pane_element")
+                        target = e.target.parentNode;
+                    else if (e.target.className == "pane_table")
+                        target = e.target;
+                })
+            // add items to the menu and connect
+            trackDropMenu.addChild(new dijit.MenuItem({
+                label: "View in minimap",
+                onClick: function(e){
+                    var track_name = dojo.query(".pane_unit",target)[0].innerHTML;
+                    console.log("track",track);
+                    //gv.minimap.drawMinitrack(track)
+                }
+            }));
+        });
+
     });
 };
 
@@ -334,7 +371,7 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
         // The little block containing the track name
         var node = dojo.create("table",
                 { id: dojo.dnd.getUniqueId(),
-                  className: ".pane_table"} );
+                  className: "pane_table"} );
         var node_inner = dojo.create("table", {className : 'pane_element'}, node);
         var node_inner_tr = dojo.create("tr", {}, node_inner);
         var node_name = dojo.create("td", {className:"pane_unit", innerHTML : track.key}, node_inner_tr);
@@ -413,14 +450,14 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
     }
 
     // Get a list of all inactive tracks - not loaded in the view
-    var get_menu_tracks = function(){
+    this.get_menu_tracks = function(){
         var all_tracks = params.trackData; // Array
         var ntracks = all_tracks.length;
+        var viewed_trackLabels = dojo.cookie(brwsr.container.id + "-tracks");
         var menu_tracks = [];
         for (var i=0; i<ntracks; i++){
             var track_i = all_tracks[i];
-            var oldTrackList = dojo.cookie(brwsr.container.id + "-tracks");
-            if (!(track_i.key in oldTrackList.split(','))) { // if not viewed
+            if (viewed_trackLabels.split(',').indexOf(track_i.key) < 0 && track_i.key != "DNA") { // if not viewed
                 menu_tracks.push(track_i);
             }
         }
@@ -448,15 +485,25 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
 };
 
 /**
- * Undocumented
+ * If a track is moved from the list to the view or conversely,
+ * updates the related cookies and (? visibleBlocks).
  */
 Browser.prototype.onVisibleTracksChanged = function() {
     this.view.updateTrackList();
+    // Write viewed tracks in cookie "GenomeBrowser-tracks"
     var trackLabels = dojo.map(this.view.tracks, function(track) {
         return track.name;
     });
-    var oldTrackList = dojo.cookie(this.container.id + "-tracks").split(',');
     dojo.cookie(this.container.id + "-tracks", trackLabels.join(","), {expires:60});
+    // Write not viewed tracks in cookie "GenomeBrowser-menu_tracks"
+    // (Take all but those in cookie "GenomeBrowser-tracks")
+    menu_tracks = this.get_menu_tracks();
+    var menu_trackLabels = [];
+    for (var i=0; i<menu_tracks.length; i++) {
+        menu_trackLabels.push(menu_tracks[i].label);
+    }
+    dojo.cookie(this.container.id + "-menu_tracks", menu_trackLabels.join(","), {expires:60});
+    //
     this.view.showVisibleBlocks();
 };
 
@@ -474,7 +521,6 @@ Browser.prototype.addTracks = function(trackList, replace) {
         );
         return;
     }
-
     this.tracks.concat(trackList);
     if (show || (show === undefined)) {
         this.showTracks(dojo.map(trackList,
@@ -820,6 +866,7 @@ Browser.prototype.createNavBox = function(params) {
     // Return a div object
     return navbox;
 };
+
 
 /**********************************************************************
 Copyright (c) 2007-2011 The Evolutionary Software Foundation
