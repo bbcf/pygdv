@@ -792,9 +792,11 @@
      top: 4px;
  }
 
-
  div#overview {
      width: 100%;
+     display: inline-block;
+     vertical-align: middle;
+     margin: 0px 4px;
      border-style: none;
      background-repeat: no-repeat;
      background-size: 100% 21px;
@@ -803,6 +805,16 @@
      -webkit-background-size: 100% 21px;
      -khtml-background-size: 100% 21px;
      background-position: center;
+ }
+
+ canvas#minimap{
+     margin-top: 3px;
+ }
+
+ div#navbox_middle img {
+     display: inline-block;
+     vertical-align: middle;
+     cursor: pointer;
  }
 
  input#enableSel {

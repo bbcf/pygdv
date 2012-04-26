@@ -698,17 +698,32 @@ Browser.prototype.createNavBox = function(params) {
     this.chromList.title = "Change chromosome";
     navbox_left.appendChild(this.chromList);
 
-    // ------------Minimap - Navbox middle--------------
+    // ------------Navbox middle--------------
+    // Minimap
+    var leftArrow = dojo.create("img", {
+        id: "minimap_arrow_left",
+        src: "../../images/minimap_arrow_left.png"
+        }, navbox_middle);
     var overview = dojo.create("div", {
         className: "overview",
         id: "overview",
-        style: {cssText: "display: inline-block",
-                margin: "3px"},
+        }, navbox_middle);
+    var rightArrow = dojo.create("img", {
+        id: "minimap_arrow_right",
+        src: "../../images/minimap_arrow_right.png"
         }, navbox_middle);
     dojo.create("canvas", {
         id:"minimap",
         height: "20px",
         }, overview);
+    // Connect left & right arrows to a shift of the view
+    dojo.connect(leftArrow, "click", function(e){
+        brwsr.view.shiftView('backward');
+    })
+    dojo.connect(rightArrow, "click", function(e){
+        brwsr.view.shiftView('forward');
+    })
+
     // If a track is dropped onto the minimap location, a
     // new canvas is created and a mini-track is drawn.
     var minitrackCreate = function(track, hint) {

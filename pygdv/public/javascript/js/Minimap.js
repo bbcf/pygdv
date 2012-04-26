@@ -54,6 +54,8 @@ function drawContour(ctx, width, height){
  * Clear the canvas and redraw contour and background filling
  */
 Minimap.prototype.reset = function() {
+    //leave space for arrows left & right
+    this.overview.style.width = (this.overview.parentNode.clientWidth - 24) + "px";
     this.canvas.width = this.overview.clientWidth - 2;
     var ctx = this.canvas.getContext('2d');
     // Clear

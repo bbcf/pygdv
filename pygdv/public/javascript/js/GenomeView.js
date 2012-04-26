@@ -645,7 +645,8 @@ GenomeView.prototype.instantZoomUpdate = function() {
 };
 
 /**
- * Undocumented
+ * Moves the view to the specified position *base*,
+ * instantly if *instantly* is true, with fluent animation otherwise.
  */
 GenomeView.prototype.centerAtBase = function(base, instantly) {
     base = Math.min(Math.max(base, this.ref.start), this.ref.end);
@@ -668,7 +669,7 @@ GenomeView.prototype.centerAtBase = function(base, instantly) {
                 // We're moving somewhere nearby, so move smoothly
                 if (this.animation) this.animation.stop();
                 var distance = (center - base) * this.pxPerBp;
-            this.trimVertical();
+                this.trimVertical();
                 // Slide for an amount of time that's a function of the
                 // distance being traveled plus an arbitrary extra 200
                 // milliseconds so that short slides aren't too fast
@@ -710,15 +711,36 @@ GenomeView.prototype.showCoarse = function() {
 GenomeView.prototype.onCoarseMove = function() {};
 
 /**
- * Undocumented
+ * Returns the current base pair the view is centered at
  */
-GenomeView.prototype.thumbMoved = function(mover) {
+GenomeView.prototype.getCurrentPosition = function() {
     var pxLeft = parseInt(this.locationThumb.style.left);
     var pxWidth = parseInt(this.locationThumb.style.width);
     var pxCenter = pxLeft + (pxWidth / 2);
-    this.centerAtBase(((pxCenter / this.overviewBox.w) * (this.ref.end - this.ref.start)) + this.ref.start);
+    return {'pxCenter':pxCenter, 'pxWidth':pxWidth};
+}
+
+/**
+ * Move to the position the user dragged the red thing to.
+ */
+GenomeView.prototype.thumbMoved = function() {
+    var pxCenter = this.getCurrentPosition().pxCenter;
+    var ratio = (this.ref.end - this.ref.start) / this.overviewBox.w;
+    this.centerAtBase((pxCenter * ratio) + this.ref.start);
     this.setCursorToGrab(this.locationThumb)
 };
+
+/**
+ * Move view one screen to the left or to the right (with arrows).
+ */
+GenomeView.prototype.shiftView = function(direction){
+    var pxCenter = this.getCurrentPosition().pxCenter;
+    var pxWidth = this.getCurrentPosition().pxWidth;
+    var ratio = (this.ref.end - this.ref.start) / this.overviewBox.w;
+    if (direction == 'forward') { pxWidth = -pxWidth; }
+    console.log(pxWidth)
+    this.centerAtBase(((pxCenter - pxWidth) * ratio) + this.ref.start);
+}
 
 /**
  * Undocumented
@@ -776,14 +798,14 @@ GenomeView.prototype.showDone = function() {
 };
 
 /**
- * Undocumented
+ * Translates a *pixels* value into base pairs
  */
 GenomeView.prototype.pxToBp = function(pixels) {
     return pixels / this.pxPerBp;
 };
 
 /**
- * Undocumented
+ * Translates a base pairs value *bp* into pixels
  */
 GenomeView.prototype.bpToPx = function(bp) {
     return bp * this.pxPerBp;
@@ -1014,19 +1036,19 @@ GenomeView.prototype.zoomSteps = function(e, zoomLoc, steps) {
                                      fixedBp - ((zoomLoc * this.dim.width) / this.pxPerBp),
                                      fixedBp + (((1 - zoomLoc) * this.dim.width) / this.pxPerBp));
 
-    // Copy self object
-    var self = this;
+    // Copy view object
+    var view = this;
 
     // The base pair coordinates for futher use
-    self.leftBaseBeforeZoom  = (this.x + this.offset) / this.zoomLevels[this.oldZoom]
-    self.leftBaseAfterZoom   = fixedBp - ((zoomLoc * this.dim.width) / this.pxPerBp)
-    self.rightBaseBeforeZoom = (this.x + this.offset + this.dim.width) / this.zoomLevels[this.oldZoom]
-    self.rightBaseAfterZoom  = fixedBp + (((1 - zoomLoc) * this.dim.width) / this.pxPerBp)
+    view.leftBaseBeforeZoom  = (this.x + this.offset) / this.zoomLevels[this.oldZoom]
+    view.leftBaseAfterZoom   = fixedBp - ((zoomLoc * this.dim.width) / this.pxPerBp)
+    view.rightBaseBeforeZoom = (this.x + this.offset + this.dim.width) / this.zoomLevels[this.oldZoom]
+    view.rightBaseAfterZoom  = fixedBp + (((1 - zoomLoc) * this.dim.width) / this.pxPerBp)
 
     // Zooms take an arbitrary 700 milliseconds, which feels about right
     // to me, although if the zooms were smoother they could probably
     // get faster without becoming off-putting. -MS
-    new Zoomer(scale, this, function() {self.zoomUpdate(zoomLoc, fixedBp);}, 700, zoomLoc);
+    new Zoomer(scale, this, function() {view.zoomUpdate(zoomLoc, fixedBp);}, 700, zoomLoc);
 }
 
 /**
