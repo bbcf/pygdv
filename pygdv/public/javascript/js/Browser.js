@@ -230,44 +230,6 @@ var Browser = function(params) {
         // Initializes the GDV canvas
         initCanvas();
 
-        /*
-        dojo.ready(function() {
-            // returns an array of node ids that are right-clickable to open the menu (tracks)
-            // - add track ids from view
-            trackNodeIds = [];
-            for (var i=0; i<trackInfo.length; i++) {
-                var trackId = "track_" + trackInfo[i].label;
-                if (dojo.byId(trackId))
-                    { trackNodeIds.push("track_" + trackInfo[i].label); }
-            }
-            // create the menu
-            brwsr.rclickMenu = new dijit.Menu({
-                targetNodeIds: trackNodeIds,
-            });
-            console.log(rclickMenu.targetNodeIds)
-
-            // determine which dom element was clicked (fuck dijit)
-            var target = null;
-            dojo.connect(rclickMenu, "_openMyself", function(e){
-                    var name = e.target.className.split(" ");
-                    if (name.indexOf("block") >= 0) // view, image
-                        { target = e.target.parentNode; }
-                    else if (name.indexOf("track-label") >= 0) // view, label
-                        { target = e.target.parentNode; }
-                    console.log("target:", target);
-                })
-            // add items to the menu and connect
-            brwsr.rclickMenu.addChild(new dijit.MenuItem({
-                label: "View in minimap",
-                onClick: function(e){
-                    var track_name = dojo.query(".pane_unit",target)[0].innerHTML;
-                    console.log("track",track_name);
-                    //gv.minimap.drawMinitrack(track)
-                }
-            }));
-        });
-        */
-
     });
 };
 
