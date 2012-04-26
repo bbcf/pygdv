@@ -230,92 +230,45 @@ var Browser = function(params) {
         // Initializes the GDV canvas
         initCanvas();
 
-        // Menu appearing on right-click on a track element, either in the view or in the tracks list.
+        /*
         dojo.ready(function() {
-            // determine which nodes are right-clickable (tracks)
-            var track_nodes = dojo.query(".pane_table", "tracksAvail");
-            var track_nodes_ids = [];
-            var len_track_nodes = track_nodes.length;
-            for (var i=0; i<len_track_nodes; i++) {
-                var node_i = track_nodes[i];
-                track_nodes_ids.push(node_i.id);
+            // returns an array of node ids that are right-clickable to open the menu (tracks)
+            // - add track ids from view
+            trackNodeIds = [];
+            for (var i=0; i<trackInfo.length; i++) {
+                var trackId = "track_" + trackInfo[i].label;
+                if (dojo.byId(trackId))
+                    { trackNodeIds.push("track_" + trackInfo[i].label); }
             }
             // create the menu
-            var trackDropMenu = new dijit.Menu({
-                targetNodeIds: track_nodes_ids,
-                selector: "pane_element",
+            brwsr.rclickMenu = new dijit.Menu({
+                targetNodeIds: trackNodeIds,
             });
+            console.log(rclickMenu.targetNodeIds)
+
             // determine which dom element was clicked (fuck dijit)
             var target = null;
-            dojo.connect(trackDropMenu, "_openMyself", function(e){
-                    if (e.target.className == "pane_unit")
-                        target = e.target.parentNode.parentNode;
-                    else if (e.target.className == "pane_element")
-                        target = e.target.parentNode;
-                    else if (e.target.className == "pane_table")
-                        target = e.target;
+            dojo.connect(rclickMenu, "_openMyself", function(e){
+                    var name = e.target.className.split(" ");
+                    if (name.indexOf("block") >= 0) // view, image
+                        { target = e.target.parentNode; }
+                    else if (name.indexOf("track-label") >= 0) // view, label
+                        { target = e.target.parentNode; }
+                    console.log("target:", target);
                 })
             // add items to the menu and connect
-            trackDropMenu.addChild(new dijit.MenuItem({
+            brwsr.rclickMenu.addChild(new dijit.MenuItem({
                 label: "View in minimap",
                 onClick: function(e){
                     var track_name = dojo.query(".pane_unit",target)[0].innerHTML;
-                    console.log("track",track);
+                    console.log("track",track_name);
                     //gv.minimap.drawMinitrack(track)
                 }
             }));
         });
+        */
 
     });
-};
-
-/**
- * Build the menu on the left
- * @param{container} - the HTML div containing the menu
- */
-//Browser.prototype.buildLeftMenu = function(container){
-
-    // /* Navigation menu */
-    // var navig = document.createElement('div');
-    // navig.innerHTML='Navigation';
-    // navig.className='menu_entry';
-    // container.appendChild(navig);
-
-    // /* Admin var */
-    // var admin = dojo.byId('is_admin');
-
-    // /* Links */
-    //     if(admin.innerHTML=='false'){
-    //     container.appendChild(this.buildMenuItem('login','Copy in profile'));
-    // } else {
-    //     container.appendChild(this.buildMenuItem('home','Home'));
-    //     container.appendChild(this.buildMenuItem('admin','Admin'));
-    //     container.appendChild(this.buildMenuItem('projects','Projects'));
-    //     container.appendChild(this.buildMenuItem('preferences','Preferences'));
-    //     container.appendChild(this.buildMenuItem('help','Help'));
-    // }
-//};
-
-/**
- * Helper to build a menu item
- */
-Browser.prototype.buildMenuItem = function(link_end, link_name){
-    var cont = dojo.create("div");
-    var link = dojo.create("a", {
-        href: _GDV_URL+'/'+link_end,
-        className: 'hl',
-        }, cont);
-    // Picture of the menu element
-    var img = dojo.create("img", {
-        src: this.imageRoot + "menu_" + link_end + ".png",
-        className: 'gdv_menu_image',
-        }, link);
-    // Title of the menu element
-    var span = dojo.create("span", {
-        innerHTML: link_name,
-        className: 'gdv_menu_item',
-        }, link);
-    return cont;
 };
 
 
@@ -380,7 +333,7 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
         // In the list, wrap the list item in a container for
         // border drag-insertion-point monkeying
         if ("avatar" != hint) {
-            var container = dojo.create("div", {className: "tracklist-container"});
+            var container = dojo.create("div", {className: "tracklist-container rightclick"});
             container.appendChild(node);
             node = container;
         }
@@ -489,6 +442,7 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
  * updates the related cookies and (? visibleBlocks).
  */
 Browser.prototype.onVisibleTracksChanged = function() {
+    brwsr = this;
     this.view.updateTrackList();
     // Write viewed tracks in cookie "GenomeBrowser-tracks"
     var trackLabels = dojo.map(this.view.tracks, function(track) {
@@ -496,14 +450,48 @@ Browser.prototype.onVisibleTracksChanged = function() {
     });
     dojo.cookie(this.container.id + "-tracks", trackLabels.join(","), {expires:60});
     // Write not viewed tracks in cookie "GenomeBrowser-menu_tracks"
-    // (Take all but those in cookie "GenomeBrowser-tracks")
     menu_tracks = this.get_menu_tracks();
     var menu_trackLabels = [];
     for (var i=0; i<menu_tracks.length; i++) {
         menu_trackLabels.push(menu_tracks[i].label);
     }
     dojo.cookie(this.container.id + "-menu_tracks", menu_trackLabels.join(","), {expires:60});
-    //
+
+    // Menu appearing on right-click on a track element of the view.
+    if (this.rClickMenu) { dojo.destroy(this.rClickMenu); }
+    var trackIds = [];
+    for (var i=0; i<trackLabels.length; i++)
+        { trackIds.push("track_"+trackLabels[i]); }
+    var rClickMenu = new dijit.Menu({
+        targetNodeIds: trackIds,
+    });
+    this.rClickMenu = rClickMenu;
+    // Connect new viewed tracks with the menu on right click
+    rClickMenu.targetNodeIds = trackIds;
+    console.log(this.rClickMenu)
+    dojo.connect(rClickMenu, "_openMyself", function(e){
+            var name = e.target.className.split(" ");
+            if (name.indexOf("block") >= 0) // view, image
+                { target = e.target.parentNode; }
+            else if (name.indexOf("track-label") >= 0) // view, label
+                { target = e.target.parentNode; }
+            console.log("target:", target);
+        })
+    // add items to the menu and connect
+    rClickMenu.addChild(new dijit.MenuItem({
+        label: "View in minimap",
+        onClick: function(e){
+            var ntracks = trackInfo.length;
+            for (var i=0; i<ntracks; i++) {
+                if (target.id.split("track_")[1] == trackInfo[i].label)
+                    { track = trackInfo[i]; }
+            }
+            console.log(track)
+            gv.minimap.drawMinitrack(track)
+        }
+    }));
+
+    // ?
     this.view.showVisibleBlocks();
 };
 
