@@ -430,14 +430,12 @@ Browser.prototype.onVisibleTracksChanged = function() {
     this.rClickMenu = rClickMenu;
     // Connect new viewed tracks with the menu on right click
     rClickMenu.targetNodeIds = trackIds;
-    console.log(this.rClickMenu)
     dojo.connect(rClickMenu, "_openMyself", function(e){
             var name = e.target.className.split(" ");
             if (name.indexOf("block") >= 0) // view, image
                 { target = e.target.parentNode; }
             else if (name.indexOf("track-label") >= 0) // view, label
                 { target = e.target.parentNode; }
-            console.log("target:", target);
         })
     // add items to the menu and connect
     rClickMenu.addChild(new dijit.MenuItem({
@@ -448,7 +446,6 @@ Browser.prototype.onVisibleTracksChanged = function() {
                 if (target.id.split("track_")[1] == trackInfo[i].label)
                     { track = trackInfo[i]; }
             }
-            console.log(track)
             gv.minimap.drawMinitrack(track)
         }
     }));
