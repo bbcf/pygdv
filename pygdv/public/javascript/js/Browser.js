@@ -83,12 +83,6 @@ var Browser = function(params) {
         menuleft.id ='gdv_menu';
         brwsr.container.appendChild(menuleft);
 
-        // container at bottom
-        // var bottomPane = document.createElement('div');
-        // bottomPane.id='bottomPane';
-        // bottomPane.className='bottomPane';
-        // brwsr.container.appendChild(bottomPane);
-
         // Set up page layout
         var containerWidget = new dijit.layout.BorderContainer({
             //liveSplitters: false,
@@ -179,8 +173,6 @@ var Browser = function(params) {
 
         // Connect Browser.js function and GenomeView.js function
         dojo.connect(gv, "onCoarseMove", brwsr, "onCoarseMove");
-        // Set up the menu at the left
-        //brwsr.buildLeftMenu(menuleft);
 
         // Set up principal container
         _gdv_pc = new PrincipalContainer();
@@ -335,12 +327,11 @@ Browser.prototype.createTrackList = function(container,tab_tracks, params) {
 
     // Make this.view.zoomContainer be a drag & drop object,
     // calling trackCreate for each new element.
+    this.view.zoomContainer.dnd_copy = false;
     this.viewDndWidget = new dojo.dnd.Source(this.view.zoomContainer,
                          { copyState: function(keyPressed,self){
-                                if (keyPressed) return true;
-                                else return false;
+                                return brwsr.view.zoomContainer.dnd_copy;
                            },
-                           //copyOnly: false,
                            creator: trackCreate,
                            accept: ["track"],
                            withHandles: true
@@ -432,9 +423,9 @@ Browser.prototype.onVisibleTracksChanged = function() {
     rClickMenu.targetNodeIds = trackIds;
     dojo.connect(rClickMenu, "_openMyself", function(e){
             var name = e.target.className.split(" ");
-            if (name.indexOf("block") >= 0) // view, image
+            if (name.indexOf("block") >= 0)
                 { target = e.target.parentNode; }
-            else if (name.indexOf("track-label") >= 0) // view, label
+            else if (name.indexOf("track-label") >= 0)
                 { target = e.target.parentNode; }
         })
     // add items to the menu and connect

@@ -14,18 +14,10 @@ function Minimap(browser,view) {
     // Redraw when the window is resized
     dojo.connect(window, "onresize", this, function(e) {this.draw();});
     dojo.connect(this.overview, "onmouseover", function(e) {
-        browser.minimapWidget.copyOnly = true;
-        //browser.minimapWidget.copyState = function(keyPressed,self){ return true; };
-        //console.log("true")
+        browser.view.zoomContainer.dnd_copy = true;
     });
     dojo.connect(this.overview, "onmouseout", function(e) {
-        browser.minimapWidget.copyOnly = false;
-        //browser.minimapWidget.copyState = function(keyPressed,self){ return false; };
-        //console.log("false")
-    });
-    dojo.connect(this.brwsr.minimapWidget, "onDrop", function(source, nodes, copy) {
-        //copy = true;
-        //console.log("e",source, nodes, copy, browser.minimapWidget.copyState, browser.minimapWidget.copyOnly)
+        browser.view.zoomContainer.dnd_copy = false;
     });
 }
 
