@@ -706,7 +706,7 @@ GenomeView.prototype.showCoarse = function() {
 };
 
 /**
- * Undocumented
+ * Already exists. Should be moved here from Browser.js
  */
 GenomeView.prototype.onCoarseMove = function() {};
 
@@ -737,8 +737,7 @@ GenomeView.prototype.shiftView = function(direction){
     var pxCenter = this.getCurrentPosition().pxCenter;
     var pxWidth = this.getCurrentPosition().pxWidth;
     var ratio = (this.ref.end - this.ref.start) / this.overviewBox.w;
-    if (direction == 'forward') { pxWidth = -pxWidth; }
-    console.log(pxWidth)
+    if (direction == 'forward') { pxWidth = -pxWidth+1; }
     this.centerAtBase(((pxCenter - pxWidth) * ratio) + this.ref.start);
 }
 

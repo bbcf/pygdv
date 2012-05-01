@@ -72,7 +72,6 @@ Minimap.prototype.reset = function() {
  * Draw the mini-track inside of the minimap
  */
 Minimap.prototype.drawMinitrack = function(track) {
-    console.log("track_to_minitrack",track)
     var minimap = this;
     var ch = minimap.canvas.height;
     var cw = minimap.canvas.width;

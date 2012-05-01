@@ -723,6 +723,16 @@ Browser.prototype.createNavBox = function(params) {
     dojo.connect(rightArrow, "click", function(e){
         brwsr.view.shiftView('forward');
     })
+    dojo.connect(document, "keydown", function(e){
+        var key = e.keyCode || e.which;
+        if (key==37 || key==undefined){
+            brwsr.view.shiftView('backward');
+        }
+        if (key==39 || key==undefined){
+            brwsr.view.shiftView('forward');
+        }
+        dojo.stopEvent(e);
+    })
 
     // If a track is dropped onto the minimap location, a
     // new canvas is created and a mini-track is drawn.
