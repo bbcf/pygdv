@@ -723,7 +723,9 @@ Browser.prototype.createNavBox = function(params) {
     dojo.connect(rightArrow, "click", function(e){
         brwsr.view.shiftView('forward');
     })
+    // Connect left & right arrow keys to a shift of the view
     dojo.connect(document, "keydown", function(e){
+        dojo.byId("overview").focus();
         var key = e.keyCode || e.which;
         if (key==37 || key==undefined){
             brwsr.view.shiftView('backward');
@@ -767,7 +769,12 @@ Browser.prototype.createNavBox = function(params) {
            discreteValues: 20,
            intermediateChanges: false,
            style: "width: 178px;",
-           onChange: function(value) {brwsr.view.zoomTo(value);}
+           onChange: function(value) {
+               brwsr.view.zoomTo(value);
+               // lose focus to deactivate arrow keys that interfere with our custom events
+               var handle = dojo.query(".dijitSliderImageHandle", "zoom_slider")[0];
+               handle.blur();
+           }
        },
        "zoom_slider");
     navbox_slider.title = "Change the zoom level";
@@ -792,7 +799,7 @@ Browser.prototype.createNavBox = function(params) {
     this.locationBox.id="location";
     this.locationBox.style.cssText = "width: 130px; vertical-align: top;";
     dojo.connect(this.locationBox, "keydown", function(event) {
-    if (event.keyCode == dojo.keys.ENTER) {
+        if (event.keyCode == dojo.keys.ENTER) {
             brwsr.navigateTo(brwsr.locationBox.value);
             brwsr.goButton.disabled = true;
             dojo.stopEvent(event);

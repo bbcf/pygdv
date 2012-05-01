@@ -735,9 +735,9 @@ GenomeView.prototype.thumbMoved = function() {
  */
 GenomeView.prototype.shiftView = function(direction){
     var pxCenter = this.getCurrentPosition().pxCenter;
-    var pxWidth = this.getCurrentPosition().pxWidth;
+    var pxWidth = this.getCurrentPosition().pxWidth-1; // -1 to ensure slow animation
     var ratio = (this.ref.end - this.ref.start) / this.overviewBox.w;
-    if (direction == 'forward') { pxWidth = -pxWidth+1; }
+    if (direction == 'forward') { pxWidth = -pxWidth; }
     this.centerAtBase(((pxCenter - pxWidth) * ratio) + this.ref.start);
 }
 
