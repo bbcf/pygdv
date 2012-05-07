@@ -19,9 +19,7 @@
 .settings/
 /celerybeat_ctl
 dev.ini
-*.jpg
 *.html
-*.png
 /build
 *.egg
 *.db
