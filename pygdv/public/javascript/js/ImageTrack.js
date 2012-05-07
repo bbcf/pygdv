@@ -46,6 +46,8 @@ ImageTrack.prototype.setViewInfo = function(heightUpdate, numBlocks,
 ImageTrack.prototype.getZoom = function(scale) {
     //console.log(scale);
     var result = this.zoomCache[scale];
+    //console.log("result");
+    //console.log(result);
     if (result) return result;
 
     result = this.zoomLevels[0];

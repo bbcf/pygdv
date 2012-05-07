@@ -51,6 +51,7 @@ class Globals(object):
         
         
 def init_plugins():
+    print ' --- initializing plugins ---'
     from yapsy.PluginManager import PluginManager
     manager = PluginManager()
     manager.setPluginPlaces([constants.plugin_directory()])
@@ -64,10 +65,9 @@ def init_plugins():
         
 def test_plugin(plugin):
     plug = plugin.plugin_object
+    plug.description()
     plug.title()
     plug.path()
     plug.output()
     
     
-    
-        

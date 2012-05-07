@@ -43,7 +43,7 @@ def get_unique_tmp_directory():
     except OSError, e:
         if e.errno == errno.EEXIST:
                 return get_unique_tmp_directory()
-        else:#this error must be raised to tell that something wrong with mkdir
+        else: #this error must be raised to tell that something wrong with mkdir
             raise OSError
     return public_dirname
 

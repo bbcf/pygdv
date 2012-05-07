@@ -59,7 +59,7 @@ class LoginController(BaseController):
         # log or create him
         user = DBSession.query(User).filter(User.email == tmp_user.email).first()
         if user is None:
-            user_group = DBSession.query(Group).filter(Group.name == constants.group_users).first()
+            user_group = DBSession.query(Group).filter(Group.id == constants.group_users).first()
             user_group.users.append(tmp_user)
             DBSession.add(tmp_user)
             DBSession.flush()

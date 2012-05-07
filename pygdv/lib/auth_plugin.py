@@ -346,6 +346,7 @@ class CustomCommandLinePlugin(object):
             environ['auth'] = True
             return identity
         return None
+
     # IIdentifier
     def forget(self, environ, identity):
         '''

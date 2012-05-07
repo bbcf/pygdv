@@ -827,11 +827,12 @@ GenomeView.prototype.sizeInit = function() {
     while (((this.ref.end - this.ref.start) * this.zoomLevels[0]) < this.dim.width)
         this.zoomLevels.shift();
     this.zoomLevels.unshift(this.dim.width / (this.ref.end - this.ref.start));
-
+    
+    
     // Width, in pixels, of stripes at min zoom (so the view covers
     // the whole ref seq)
     this.minZoomStripe = this.regularStripe * (this.zoomLevels[0] / this.zoomLevels[1]);
-
+    
     // Undocumented
     this.curZoom = 0;
     while (this.pxPerBp > this.zoomLevels[this.curZoom])
