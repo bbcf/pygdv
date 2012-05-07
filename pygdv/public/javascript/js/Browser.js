@@ -733,7 +733,6 @@ Browser.prototype.createNavBox = function(params) {
         if (key==39 || key==undefined){
             brwsr.view.shiftView('forward');
         }
-        dojo.stopEvent(e);
     })
 
     // If a track is dropped onto the minimap location, a
