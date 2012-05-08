@@ -74,21 +74,31 @@ class TrackController(CrudRestController):
         except Exception as e:
             return reply.error(request, e, tg.url('./new'), {})
 
+
+        # get parameters
+        trackname = 'tes'
+        filename = 'blou'
+        extension = 'vgv'
+
+        
         # upload if it's from file_upload.
         if request.environ[constants.REQUEST_TYPE] == constants.REQUEST_TYPE_BROWSER :
             fu = kw.get('file_upload', None)
             if fu is not None:
                 kw['uploaded']=True
                 _f = util.download(file_upload=fu,
-                    filename=kw.get('filename', ''), extension=kw.get('extension', ''))
-                print _f
-                kw['file']=_f
+                    filename=filename, extension=extension))
+                print _f.name
+                kw['file']=_f.name
+
+
+
         # create a new track
-        _track = handler.track.new_track(user.id, admin=False, **kw)
+        _track = handler.track.new_track(user.id, trackname, admin=False, **kw)
 
         # launch task with the parameters
 
-        return reply.normal(request, 'Task launched.', './', {'task_id' : task.task_id})
+        return reply.normal(request, 'Task launched.', './', {})
 
     @expose('json')
     @validate(track_new_form, error_handler=new)

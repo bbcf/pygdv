@@ -85,7 +85,7 @@ def delete(track_id, session=None):
 
 
 
-def new_track(user_id, admin=False, **kw):
+def new_track(user_id, trackname, admin=False, **kw):
     """
     Create a new track and Input in the database.
     :param user_id : the user identifier. Will not be set if the track is admin.
