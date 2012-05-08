@@ -9,7 +9,7 @@ function Operations(){
 
 
 /**
-* OP PANE
+* OPERATION PANE
 * Add childrens to operation menu
 */
 Operations.prototype.menu_add_child = function(parent, node){
@@ -45,7 +45,7 @@ Operations.prototype.menu_add_child = function(parent, node){
 * Create the iframe of the serv (will contains the form)
 */
 Operations.prototype.create_frame = function(container, fwdgt, bwdgt){
-    this.ifr = dojo.io.iframe.create(this.ifr_id, '_gdv_info.operations.iframe_loaded()', _GDV_PLUG_URL + '/get_form');
+    this.ifr = dojo.io.iframe.create(this.ifr_id, '_gdv_info.operations.iframe_loaded()', _GDV_PLUG_URL + '/index');
     container.appendChild(this.ifr);
     this.container = container;
     this.fwdgt = fwdgt;
@@ -88,7 +88,7 @@ Operations.prototype.hide_form = function(){
 * Get the form from the server with the uid.
 */
 Operations.prototype.serv_get_form = function(form_id){
-    this.ifr.src = _GDV_PLUG_URL + '/get_form?form_id=' + form_id + '&project_id=' + _gdv_info.project_id;
+    this.ifr.src = _GDV_PLUG_URL + '?id=' + form_id + '&project_id=' + _gdv_info.project_id;
 };
 
 Operations.prototype.iframe_loaded = function(){

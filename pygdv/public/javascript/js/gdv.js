@@ -17,7 +17,7 @@ var _POST_URL_NAMES = _GDV_URL_DB + "/search";
 var _GDV_WORKER_URL = _GDV_URL + '/workers';
 var _GDV_JOB_URL = _GDV_URL + '/jobs';
 var _GDV_SEL_URL = _GDV_URL + '/selections';
-var _GDV_PLUG_URL = _GDV_URL + '/plugins';
+
 var _GDV_FORM_URL = _GDV_URL + '/forms';
 var _GDV_LINK_URL = _GDV_URL + '/reflect/links';
 
@@ -33,7 +33,7 @@ var _lp;//the link panel
 var _zs;//zone selection
 var _gdv_pc;//principal container
 var _gdv_info = {};
-
+var _GDV_PLUG_URL = '';
 /**
 * Initialization function for the browser
 * @param{browser} the reference of the browser
@@ -51,6 +51,7 @@ function initGDV(browser, project_id, gdv_info, readonly){
     _gdv_info = gdv_info;
     _gdv_info.project_id = project_id;
     _gdv_info.gb = browser;
+    _GDV_PLUG_URL = _gdv_info['plug_url'];
 
     /* if it's a public view, parameters must be instancied diferrently */
 

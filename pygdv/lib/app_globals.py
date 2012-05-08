@@ -46,28 +46,5 @@ class Globals(object):
         self.right_read = constants.right_read
         
         self.genrep = GenRep()
-        
-        self.plugin_manager = init_plugins()
-        
-        
-def init_plugins():
-    print ' --- initializing plugins ---'
-    from yapsy.PluginManager import PluginManager
-    manager = PluginManager()
-    manager.setPluginPlaces([constants.plugin_directory()])
-    manager.collectPlugins()
-    for plug in manager.getAllPlugins():
-        try :
-            test_plugin(plug)
-        except NotImplementedError as e:
-            print "[WARNING] plugin " + plug.name + " will not work"
-    return manager    
-        
-def test_plugin(plugin):
-    plug = plugin.plugin_object
-    plug.description()
-    plug.title()
-    plug.path()
-    plug.output()
-    
+
     

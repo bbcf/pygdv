@@ -14,6 +14,7 @@ from pygdv.lib import constants
 import track
 from celery.task import task, chord, subtask, TaskSet
 from pygdv.lib.constants import json_directory, track_directory
+from tg.controllers import url
 
 
 format_synonyms = {'db': 'sql',
@@ -243,3 +244,5 @@ def convert_file(datatype, assembly_name, path, sha1, name, tmp_file, _format):
     return t
 
 
+def link(track):
+    return url('tracks/link?track_id=%s' % track.id)

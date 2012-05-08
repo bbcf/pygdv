@@ -55,7 +55,7 @@ PrincipalContainer.prototype.createContainer = function(browser, menuLeftContain
             menu_nav = ['Home']
         }
     }
-
+    
     // create additionnal children containers
     this.navigationContainer(principal, principal_dijit, menu_nav);
     this.trackContainer(browser);
@@ -207,6 +207,7 @@ PrincipalContainer.prototype.selectionContainer = function(DomNode, DijitNode){
 * Add the Operations tab
 */
 PrincipalContainer.prototype.operationContainer = function(DomNode, DijitNode, paths, viewContainer, fwdgt, bwdgt){
+    
     var cont = dojo.create('div', {}, DomNode);
 
     var ops_container = new dijit.layout.ContentPane({

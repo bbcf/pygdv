@@ -16,7 +16,6 @@ import transaction
 import os
 from pygdv.lib import constants
 from datetime import datetime
-
 import uuid
 from sqlalchemy.engine.base import Transaction
 
@@ -423,8 +422,7 @@ class Track(DeclarativeBase):
     def path(self):
         return self.input.path
     
-    
-    
+
 class TMPTrack(DeclarativeBase):
     '''
     Represent a track on the view.

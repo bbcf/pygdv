@@ -15,7 +15,7 @@ from pygdv.widgets.project import project_table,  project_admin_grid, project_wi
 from pygdv.widgets.track import track_in_project_grid
 from pygdv.widgets import ModelWithRight
 from pygdv import handler
-from pygdv.lib import util
+from pygdv.lib import util, plugin
 import os, json
 import transaction
 from pygdv.lib import checker
@@ -362,6 +362,8 @@ class ProjectController(CrudRestController):
         if prefix : info['prefix'] = prefix
         info['sequence_id'] = project.sequence_id
         info['admin'] = True
+        info['plug_url'] = url('/plugins')
+
         info = json.dumps(info)
 
         control = 'b.showTracks();initGDV(b, %s, %s);' % (project.id, info)
@@ -373,9 +375,11 @@ class ProjectController(CrudRestController):
         # get jobs
         jobs = 'init_jobs = %s' % handler.job.jobs(project_id)
         
-        # get operations 
-        operations_path = 'init_operations = %s' % json.dumps(handler.plugin.get_operations_paths(), default=handler.plugin.encode_tree)
-        
+        # get operations
+        ops = plugin.util.get_plugin_path()
+        operations_path = 'init_operations = %s' % ops
+        plug_url = plugin.util.form_url
+
         return dict(species_name=project.species.name, 
                     nr_assembly_id=project.sequence_id, 
                     project_id=project.id,

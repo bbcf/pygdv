@@ -1,9 +1,0 @@
-[Core]
-Name = TestImagePlugin
-Module = TestImage
-
-[Documentation]
-Author = Jarosz Yohan
-Version = 0.1
-Website = http://github.com/yjarosz
-Description = Make an image from a track (base coverage)
