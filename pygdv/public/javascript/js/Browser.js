@@ -725,13 +725,15 @@ Browser.prototype.createNavBox = function(params) {
     })
     // Connect left & right arrow keys to a shift of the view
     dojo.connect(document, "keydown", function(e){
-        dojo.byId("overview").focus();
-        var key = e.keyCode || e.which;
-        if (key==37 || key==undefined){
-            brwsr.view.shiftView('backward');
-        }
-        if (key==39 || key==undefined){
-            brwsr.view.shiftView('forward');
+        if (document.activeElement.tagName != 'INPUT') { // hack? One can probably do better
+            dojo.byId("overview").focus();
+            var key = e.keyCode || e.which;
+            if ((key==37 || key==undefined)){
+                brwsr.view.shiftView('backward');
+            }
+            if (key==39 || key==undefined){
+                brwsr.view.shiftView('forward');
+            }
         }
     })
 
