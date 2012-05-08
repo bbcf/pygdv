@@ -169,35 +169,6 @@ def convert(path, dst, sha1, datatype, assembly_name, name, tmp_file, _format, p
 
 
 
-#### GFEATMINER ####
-import gMiner
-
-@task()
-def gfeatminer_request(user_id, project_id, req, job_description, job_name):
-    '''
-    Launch a gFeatMiner request.
-    '''
-    print 'gfeatminer request %s : ' % req
-    session = model.DBSession()
-    try :
-        data = gMiner.run(**req)
-        print 'gMiner ended with %s ' % data
-        for path in data:
-            if os.path.splitext(path)[1] == '.sql':
-
-                project = session.query(model.Project).filter(model.Project.id == project_id).first()
-                from pygdv.handler.track import create_track
-                task_id, track_id = create_track(user_id, project.sequence, f=path, trackname='%s %s'
-                                             % (job_name, job_description), project=project, session = session)
-    except Exception as e:
-        etype, value, tb = sys.exc_info()
-        traceback.print_exception(etype, value, tb)
-        session.rollback()
-        raise e
-
-    finally:
-        session.commit()
-        session.close()
 
 
 

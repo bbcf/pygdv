@@ -25,9 +25,18 @@ class PluginController(BaseController):
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         req = {}
         if fill.has_key(id):
-            gen_tracks = [[handler.track.link(track), track.name] for track in project.tracks]
+            gen_tracks = [[track.name, handler.track.plugin_link(track)] for track in project.tracks]
             for param in fill.get(id):
                 req[param]= json.dumps(gen_tracks)
         req['id'] = id
         f = urllib2.urlopen(url, urllib.urlencode(req))
         return f.read()
+
+
+
+    @expose()
+    def callback(self, *args, **kw):
+        print 'callback'
+        print args
+        print kw
+        return {}

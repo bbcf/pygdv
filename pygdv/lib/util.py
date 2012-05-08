@@ -55,7 +55,7 @@ def upload(file_upload=None, url=None, fsys=None, extension=None, **kw):
     Upload the file and make it temporary.
     @param file_upload : if the file is uploaded from a FileUpload HTML field.
     @param url : if the file is uploaded from an url
-    @param urls : a list of urls separated by whitespaces. 
+    @param urls : a list of urls separated by whitespaces.
     @param fsys : if the file is on the same file system, a filesystem path
     @param fsys_list :  a list of fsys separated by whitespaces.
     @param file_names : a list of file name, in the same order than the files uploaded.
@@ -179,5 +179,39 @@ def file_upload_converter(kw):
             new_fu['filename'] = file_upload.filename
             new_fu['value'] = file_upload.value
             kw['file_upload'] = new_fu
-            
-            
+
+
+
+
+
+block_sz = 8192
+def download(url=None, file_upload=None, filename='', extension=''):
+    """
+    Download the file to a temporary place
+    """
+    tmp_file = tempfile.NamedTemporaryFile(prefix=filename, suffix=extension, delete=False)
+
+    if file_upload is not None:
+        print file_upload
+        filename = file_upload.filename
+        file_value = file_upload.value
+        tmp_file.write(file_value)
+        tmp_file.close()
+        return tmp_file
+
+    elif url is not None:
+        u = urlparse.urlparse(url)
+        if not u.hostname:
+            raise HTTPError('%s is not a valid URL.' % url)
+        try:
+            u = urllib2.urlopen(url)
+            while True:
+                buffer = u.read(block_sz)
+                if not buffer: break
+                tmp_file.write(buffer)
+            tmp_file.close()
+            return tmp_file
+        except HTTPError as e:
+            print '%s : %s' % (_from, e)
+            raise e
+    raise Exception("Nothing to download")

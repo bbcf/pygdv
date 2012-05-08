@@ -5,7 +5,7 @@ from tgext.crud import CrudRestController
 
 
 from repoze.what.predicates import not_anonymous, has_any_permission, has_permission
-
+import tg
 from tg import expose, flash, require, tmpl_context, validate, request, response
 from tg.controllers import redirect
 from tg.decorators import with_trailing_slash
@@ -61,38 +61,66 @@ class TrackController(CrudRestController):
     @expose('json')
     def create(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        util.file_upload_converter(kw)
-        task = tasks.process_track.delay(user.id, **kw)
+        # change a parameter name
+        if kw.has_key('assembly'):
+            kw['sequence_id']=kw.get('assembly')
+            del kw['assembly']
+        # verify track parameters
+        try :
+            handler.track.pre_track_creation(url=kw.get('urls', None),
+                file_upload=kw.get('file_upload', None),
+                project_id=kw.get('project_id', None),
+                sequence_id=kw.get('sequence_id', None))
+        except Exception as e:
+            return reply.error(request, e, tg.url('./new'), {})
+
+        # upload if it's from file_upload.
+        if request.environ[constants.REQUEST_TYPE] == constants.REQUEST_TYPE_BROWSER :
+            fu = kw.get('file_upload', None)
+            if fu is not None:
+                kw['uploaded']=True
+                _f = util.download(file_upload=fu,
+                    filename=kw.get('filename', ''), extension=kw.get('extension', ''))
+                print _f
+                kw['file']=_f
+        # create a new track
+        _track = handler.track.new_track(user.id, admin=False, **kw)
+
+        # launch task with the parameters
 
         return reply.normal(request, 'Task launched.', './', {'task_id' : task.task_id})
 
     @expose('json')
     @validate(track_new_form, error_handler=new)
     def post(self, *args, **kw):
-        user = handler.user.get_user_in_session(request)
-        if 'file_upload' in kw and kw['file_upload'] is not None:
-            filename = kw ['file_upload'].filename
-        elif 'urls' in kw :
-            import urlparse
-            filename = kw['urls'].split('/')[-1]
-            u = urlparse.urlparse(kw['urls'])
-            if not u.hostname:
-                url = 'http://%s' % kw['urls']
-                u = urlparse.urlparse(url)
-                if u.hostname:
-                    kw['urls'] = url
-                else :
-                    flash("Bad file/url", 'error')
-                    raise redirect('./')
-
-        tmp_track = TMPTrack()
-        tmp_track.name = filename
-        tmp_track.sequence_id = kw['assembly']
-        tmp_track.user_id = user.id
-        DBSession.add(tmp_track)
-        DBSession.flush()
-
-        kw['tmp_track_id'] = tmp_track.id
+#        user = handler.user.get_user_in_session(request)
+#
+#
+#
+#
+#        if 'file_upload' in kw and kw['file_upload'] is not None:
+#            filename = kw ['file_upload'].filename
+#        elif 'urls' in kw :
+#            import urlparse
+#            filename = kw['urls'].split('/')[-1]
+#            u = urlparse.urlparse(kw['urls'])
+#            if not u.hostname:
+#                url = 'http://%s' % kw['urls']
+#                u = urlparse.urlparse(url)
+#                if u.hostname:
+#                    kw['urls'] = url
+#                else :
+#                    flash("Bad file/url", 'error')
+#                    raise redirect('./')
+#
+#        tmp_track = TMPTrack()
+#        tmp_track.name = filename
+#        tmp_track.sequence_id = kw['assembly']
+#        tmp_track.user_id = user.id
+#        DBSession.add(tmp_track)
+#        DBSession.flush()
+#
+#        kw['tmp_track_id'] = tmp_track.id
         return self.create(*args, **kw)
 
 

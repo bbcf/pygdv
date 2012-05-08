@@ -3,24 +3,53 @@ from __future__ import absolute_import
 Tracks handler.
 '''
 
-from pygdv.model import DBSession, Input, Track, TrackParameters, Task
-import os, shutil
+from pygdv.model import DBSession, Input, Track, TrackParameters, Task, Sequence, Project
+import os, shutil, tg
 from pygdv.model import constants
 from pygdv.lib import util
 from pygdv.celery import tasks
 from pygdv.lib.constants import track_directory
 from track.util import determine_format
 from pygdv.lib import constants
-import track
+import track, urlparse
 from celery.task import task, chord, subtask, TaskSet
 from pygdv.lib.constants import json_directory, track_directory
-from tg.controllers import url
 
 
 format_synonyms = {'db': 'sql',
                    'bw': 'bigwig',
                    'bwg': 'bigwig',
                    'wiggle_0': 'wig',}
+
+
+def pre_track_creation(url=None, file_upload=None, project_id=None, sequence_id=None):
+    """
+    Verify track parameters
+    """
+    if file_upload is None and url is None:
+        raise Exception("Missing file to upload.")
+
+    if url is not None:
+        u = urlparse.urlparse(url)
+        if not u.hostname:
+            url = 'http://%s' % kw['urls']
+            u = urlparse.urlparse(url)
+            if not u.hostname:
+                raise Exception("Malformed url parameter.")
+
+    if project_id is None and sequence_id is None:
+        raise Exception('Missing assembly parameter.')
+
+    if project_id is not None:
+        project = DBSession.query(Project).filter(Project.id == project_id).first()
+        if project is None:
+            raise Exception('Project with id %s not found.' % project_id)
+
+    if sequence_id is not None:
+        sequence = DBSession.query(Sequence).filter(Sequence.id == sequence_id).first()
+        if sequence is None:
+            raise Exception('Sequence not found on GDV. Ask an admin to upload it.')
+
 
 
 def copy_track(user_id, track):
@@ -53,6 +82,41 @@ def delete(track_id, session=None):
             session.delete(_input)
         session.delete(track)
         session.flush()
+
+
+
+def new_track(user_id, admin=False, **kw):
+    """
+    Create a new track and Input in the database.
+    :param user_id : the user identifier. Will not be set if the track is admin.
+    :param admin: True if the track created is 'admin' ~ will be viewed by all users
+    """
+    # get parameters
+    sequence_id = kw.get('sequence_id', None)
+    if sequence_id is None:
+        project_id = kw.get('project_id')
+        project = session.query(Project).filter(Project.id == project_id).first()
+        sequence_id = project.sequence_id
+
+    # create input
+    _input = Input()
+    DBSession.add(_input)
+    DBSession.flush()
+
+    # create track
+    _track = Track()
+    _track.name = trackname
+    _track.sequence_id = sequence_id
+    _track.input_id = _input.id
+    if not admin:
+        _track.user_id = user_id
+
+    DBSession.add(_track)
+    DBSession.flush()
+    return track
+
+
+
 
 def create_track(user_id, sequence, f=None, trackname=None, project=None, session=None, admin=False, **kw):
     if session is None:
@@ -121,7 +185,7 @@ def create_input(f, trackname, sequence_name, session, force=False, extension=No
     _input = session.query(Input).filter(Input.sha1 == sha1).first()
     if _input is not None and not force:
         try:
-            os.remove(os.path.abspath(f));
+            os.remove(os.path.abspath(f))
         except OSError:
             pass
         print "file already exist"
@@ -245,4 +309,8 @@ def convert_file(datatype, assembly_name, path, sha1, name, tmp_file, _format):
 
 
 def link(track):
-    return url('tracks/link?track_id=%s' % track.id)
+    return tg.config.get('main.proxy') + '/tracks/link?track_id=%s' % track.id
+
+
+def plugin_link(track):
+    return tg.config.get('main.proxy') + '/' + track.rel_path

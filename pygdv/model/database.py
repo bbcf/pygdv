@@ -279,11 +279,11 @@ class Input(DeclarativeBase):
     
     # columns
     id = Column(Integer, autoincrement=True, primary_key=True)
-    sha1 = Column(Unicode(255), unique=True, nullable=False)
+    sha1 = Column(Unicode(255), unique=True, nullable=True)
     _last_access = Column(DateTime, default=datetime.now, nullable=False)
     tracks = relationship('Track', backref='input',  cascade="all, delete, delete-orphan")
   
-    task_id = Column(VARCHAR(255), nullable=False)
+    task_id = Column(VARCHAR(255), nullable=True)
     task = relationship('Task', uselist=False, primaryjoin='Input.task_id == Task.task_id', foreign_keys='Task.task_id')
     #task_id = Column(Integer, ForeignKey('celery_taskmeta.task_id', ondelete="CASCADE"), nullable=False)
     #task = relationship('Task')
@@ -421,6 +421,10 @@ class Track(DeclarativeBase):
     @property
     def path(self):
         return self.input.path
+
+    @property
+    def rel_path(self):
+        return self.input.sha1 + '.sql'
     
 
 class TMPTrack(DeclarativeBase):
