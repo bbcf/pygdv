@@ -9,7 +9,7 @@ from celery.signals import worker_init
 from celery.task.http import HttpDispatchTask
 
 from pygdv.lib import constants, util
-import track, transaction, urlib, urllib2
+import track, transaction, urllib, urllib2
 from pygdv.celery import model
 from sqlalchemy.sql.expression import except_
 from pygdv.model.database import TMPTrack
@@ -23,7 +23,7 @@ manager = None
 
 
 @task()
-def track_input(kw):
+def track_input(**kw):
     """
     First Entry point for track processing : 
     1) the track is uploaded (if it's not already the case)
@@ -37,7 +37,10 @@ def track_input(kw):
     callback.delay(kw.get('callback_url') + '/after_sha1', {'fname' : _fname,
                                                 'sha1' : sha1,
                                                  'force' : kw.get('force', False),
-                                                  'kw' : **kw})
+                                                  'kw' : kw})
+
+
+
 @task()
 def track_process(kw):
     """
@@ -48,10 +51,11 @@ def track_process(kw):
          features track : with jbrowse internal library
      6) callback at any time if the process fail, or at the end with success 
      """
-    print 'second track process'
+    print 'second track process %s' % kw
 
 
-def upload(kw):
+
+def upload(**kw):
     """
     Upload the track.
     """

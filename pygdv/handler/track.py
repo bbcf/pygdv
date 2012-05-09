@@ -44,42 +44,41 @@ def pre_track_creation(url=None, file_upload=None, project_id=None, sequence_id=
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         if project is None:
             raise Exception('Project with id %s not found.' % project_id)
+    if sequence_id is None:
+        sequence_id = project.sequence_id
+    sequence = DBSession.query(Sequence).filter(Sequence.id == sequence_id).first()
+    if sequence is None:
+        raise Exception('Sequence not found on GDV. Ask an admin to upload it.')
 
-    if sequence_id is not None:
-        sequence = DBSession.query(Sequence).filter(Sequence.id == sequence_id).first()
-        if sequence is None:
-            raise Exception('Sequence not found on GDV. Ask an admin to upload it.')
-
-def fetch_track_parameters(url=None, file_upload=None, trackname=None, extension=None):
+def fetch_track_parameters(url=None, file_upload=None, trackname=None, extension=None, project_id=None, sequence_id=None):
     """
     Fetch track parameters from the request.
     Guess trackname and extension if they are not provided.
     """
     if trackname is None:
         if url is not None:
-            trackname = os.path.splitext(os.path.split(s)[1])[0]
+            trackname = os.path.splitext(os.path.split(url)[1])[0]
         elif file_upload is not None:
-            filename = os.path.splitext(file_upload['filename'])[0]
+            trackname = os.path.splitext(file_upload.filename)[0]
+
     if extension is None:
         if url is not None:
-            extension = os.path.splitext(os.path.split(s)[1])[1]
+            extension = os.path.splitext(os.path.split(url)[1])[1]
         elif file_upload is not None:
-            filename = os.path.splitext(file_upload['filename'])[1]
-    return trackname, extension
+            extension = os.path.splitext(file_upload.filename)[1]
 
-def new_track(user_id, trackname, admin=False, **kw):
+    if sequence_id is None:
+        project = DBSession.query(Project).filter(Project.id == project_id).first()
+        sequence_id = project.sequence_id
+
+    return trackname, extension, sequence_id
+
+def new_track(user_id, trackname, sequence_id, admin=False, **kw):
     """
     Create a new track and Input in the database.
     :param user_id : the user identifier. Will not be set if the track is admin.
     :param admin: True if the track created is 'admin' ~ will be viewed by all users
     """
-    # get parameters
-    sequence_id = kw.get('sequence_id', None)
-    if sequence_id is None:
-        project_id = kw.get('project_id')
-        project = session.query(Project).filter(Project.id == project_id).first()
-        sequence_id = project.sequence_id
-
     # create input
     _input = Input()
     DBSession.add(_input)
@@ -95,7 +94,7 @@ def new_track(user_id, trackname, admin=False, **kw):
 
     DBSession.add(_track)
     DBSession.flush()
-    return track
+    return _track
 
 
 def update(track=None, track_id=None, params=None):
@@ -105,6 +104,7 @@ def update(track=None, track_id=None, params=None):
     :param track_id : the track_id to fetch the track if it's not provided
     :param params : a dict to tell what to update
     """
+    print 'update track %s , %s , %s' % (track, track_id, params)
     if track is None:
         track = DBSession.query(Track).filter(Track.id == track_id).first()
     
@@ -141,14 +141,15 @@ def delete_input(sha1):
     in the "json directory"
     :param sha1 : the sha1 of the input
     '''
-    trackdir = os.path.join(track_directory(), sha1 + '.sql')
-    try :
-        os.remove(trackdir)
-    except OSError:
-        pass
+    if sha1 is not None:
+        trackdir = os.path.join(track_directory(), sha1 + '.sql')
+        try :
+            os.remove(trackdir)
+        except OSError:
+            pass
 
-    jsondir = os.path.join(json_directory(), sha1)
-    shutil.rmtree(path2, ignore_errors = True)
+        jsondir = os.path.join(json_directory(), sha1)
+        shutil.rmtree(jsondir, ignore_errors = True)
 
 
 
@@ -181,20 +182,17 @@ def copy_track(user_id, track):
     DBSession.flush()
     return to_copy
 
-def delete(track_id, session=None):
+def delete_track(track=None, track_id=None):
     '''
     Delete the track and the input associated if this is the only track with this input.
     '''
-    if session is None:
-        session = DBSession
-    track = session.query(Track).filter(Track.id == track_id).first()
-    if track is not None:
-        _input = track.input
-        if len(_input.tracks) == 1:
-            tasks.del_input(_input.sha1)
-            session.delete(_input)
-        session.delete(track)
-        session.flush()
+    if track is None:
+        track = DBSession.query(Track).filter(Track.id == track_id).first()
+    _input = track.input
+    if len(_input.tracks) == 1:
+        delete_input(_input.sha1)
+    DBSession.delete(track)
+    DBSession.flush()
 
 
 

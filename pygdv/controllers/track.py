@@ -42,9 +42,9 @@ class TrackController(CrudRestController):
     def get_all(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
 
-        tracks = DBSession.query(TMPTrack).filter(TMPTrack.user_id == user.id).all()
+        #tracks = DBSession.query(TMPTrack).filter(TMPTrack.user_id == user.id).all()
 
-        tracks.extend(user.tracks)
+        tracks = user.tracks
         data = [util.to_datagrid(track_grid, tracks, "Track Listing", len(tracks)>0)]
         t = handler.help.tooltip['track']
         return dict(page='tracks', model='track', form_title="new track", items=data, value=kw, tooltip=t)
@@ -76,10 +76,12 @@ class TrackController(CrudRestController):
 
 
         # get parameters
-        trackname, extension = handler.track.fetch_track_parameters(url=kw.get('urls', None),
+        trackname, extension, sequence_id = handler.track.fetch_track_parameters(url=kw.get('urls', None),
                 file_upload=kw.get('file_upload', None), 
                 trackname=kw.get('trackname', None), 
-                extension=kw.get('extension', None))
+                extension=kw.get('extension', None),
+                project_id=kw.get('project_id', None),
+                sequence_id=kw.get('sequence_id', None))
                 
         # upload the track it's from file_upload
         if request.environ[constants.REQUEST_TYPE] == constants.REQUEST_TYPE_BROWSER :
@@ -87,18 +89,20 @@ class TrackController(CrudRestController):
             if fu is not None:
                 kw['uploaded']=True
                 _f = util.download(file_upload=fu,
-                    filename=filename, extension=extension)
+                    filename=trackname, extension=extension)
                 kw['file']=_f.name
-
+                del kw['file_upload']
+                print _f.name
+        print kw
         # create a new track
-        _track = handler.track.new_track(user.id, trackname, admin=False, **kw)
+        _track = handler.track.new_track(user.id, trackname, sequence_id=sequence_id, admin=False, **kw)
         kw['track_id']=_track.id
         
         # launch task with the parameters
         async = tasks.track_input.delay(**kw)
         
         # update the track
-        handler.track.update(_track, {'task_id' : async.task_id})
+        handler.track.update(track=_track, params={'task_id' : async.task_id})
 
         return reply.normal(request, 'Processing launched.', './', {'task_id' : async.task_id,
                                                                     'track_id' : _track.id})
@@ -141,16 +145,15 @@ class TrackController(CrudRestController):
     def post_delete(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
         _id = args[0]
-        tmp = kw.get('tmp', 'False')
-        if tmp in ['True']:
-            tmp_track = DBSession.query(TMPTrack).filter(TMPTrack.id == _id).first()
-            DBSession.delete(tmp_track)
-            DBSession.flush()
-        elif not checker.can_edit_track(user, _id) and not checker.user_is_admin(user.id):
+#        tmp = kw.get('tmp', 'False')
+#        if tmp in ['True']:
+#            tmp_track = DBSession.query(TMPTrack).filter(TMPTrack.id == _id).first()
+#            DBSession.delete(tmp_track)
+#            DBSession.flush()
+        if not checker.can_edit_track(user, _id) and not checker.user_is_admin(user.id):
             flash("You haven't the right to edit any tracks which is not yours")
             raise redirect('../')
-        else :
-            handler.track.delete(_id)
+        handler.track.delete_track(track_id=_id)
         raise redirect('./')
 
 
@@ -311,18 +314,19 @@ class TrackController(CrudRestController):
                 handler.track.delete_input(_input.sha1)
                 DBSession.delete(_input)
                 DBSession.flush()
-            else :
-                print '[x] after sha1 [x] File %s already exist.' % sha1
-                do_process = False
-                handler.track.update(track_id=kw.get('track_id'), 
-                    params={'new_input_id' : _input.id})
+        else :
+            print '[x] after sha1 [x] File %s already exist.' % sha1
+            do_process = False
+            handler.track.update(track_id=kw.get('track_id'),
+                params={'new_input_id' : _input.id})
+
+
         if do_process :
             print '[x] after sha1 [x] Processing %s to %s' %s (fname, sha1)
             async = tasks.track_process(kw)
             
             handler.track.update(track_id=kw.get('track_id'),
                 params={'new_task_id' : async.task_id})
-            
         return {}
 
 
