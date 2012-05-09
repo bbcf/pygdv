@@ -24,7 +24,7 @@ format_synonyms = {'db': 'sql',
 
 def pre_track_creation(url=None, file_upload=None, project_id=None, sequence_id=None):
     """
-    Verify track parameters
+    Verify track parameters.
     """
     if file_upload is None and url is None:
         raise Exception("Missing file to upload.")
@@ -49,6 +49,119 @@ def pre_track_creation(url=None, file_upload=None, project_id=None, sequence_id=
         sequence = DBSession.query(Sequence).filter(Sequence.id == sequence_id).first()
         if sequence is None:
             raise Exception('Sequence not found on GDV. Ask an admin to upload it.')
+
+def fetch_track_parameters(url=None, file_upload=None, trackname=None, extension=None):
+    """
+    Fetch track parameters from the request.
+    Guess trackname and extension if they are not provided.
+    """
+    if trackname is None:
+        if url is not None:
+            trackname = os.path.splitext(os.path.split(s)[1])[0]
+        elif file_upload is not None:
+            filename = os.path.splitext(file_upload['filename'])[0]
+    if extension is None:
+        if url is not None:
+            extension = os.path.splitext(os.path.split(s)[1])[1]
+        elif file_upload is not None:
+            filename = os.path.splitext(file_upload['filename'])[1]
+    return trackname, extension
+
+def new_track(user_id, trackname, admin=False, **kw):
+    """
+    Create a new track and Input in the database.
+    :param user_id : the user identifier. Will not be set if the track is admin.
+    :param admin: True if the track created is 'admin' ~ will be viewed by all users
+    """
+    # get parameters
+    sequence_id = kw.get('sequence_id', None)
+    if sequence_id is None:
+        project_id = kw.get('project_id')
+        project = session.query(Project).filter(Project.id == project_id).first()
+        sequence_id = project.sequence_id
+
+    # create input
+    _input = Input()
+    DBSession.add(_input)
+    DBSession.flush()
+
+    # create track
+    _track = Track()
+    _track.name = trackname
+    _track.sequence_id = sequence_id
+    _track.input_id = _input.id
+    if not admin:
+        _track.user_id = user_id
+
+    DBSession.add(_track)
+    DBSession.flush()
+    return track
+
+
+def update(track=None, track_id=None, params=None):
+    """
+    Update the track in the database
+    :param track : the track
+    :param track_id : the track_id to fetch the track if it's not provided
+    :param params : a dict to tell what to update
+    """
+    if track is None:
+        track = DBSession.query(Track).filter(Track.id == track_id).first()
+    
+    # set the task related with the track
+    if params.has_key('task_id'):
+        track.input.task_id = params.get('task_id')
+        DBSession.add(track)
+        
+    # set the new task related with the track
+    # the old one is deleted
+    if params.has_key('new_task_id'):
+        old_task = track.input.task
+        track.input.task_id = params.get('new_task_id')
+        DBSession.delete(old_task)
+        DBSession.add(track)
+    
+    
+    # set the input to the track. The old input belonging to the track 
+    # is deleted
+    if params.has_key('new_input_id'):
+        old_input = track.input
+        track.input_id = kw.get('new_input_id')
+        DBSession.delete(old_input)
+        DBSession.add(track)
+
+
+    DBSession.flush()
+
+
+def delete_input(sha1):
+    '''
+    Delete the input with the sha1 specified.
+    Must delete in the "track directory" + '.sql' and
+    in the "json directory"
+    :param sha1 : the sha1 of the input
+    '''
+    trackdir = os.path.join(track_directory(), sha1 + '.sql')
+    try :
+        os.remove(trackdir)
+    except OSError:
+        pass
+
+    jsondir = os.path.join(json_directory(), sha1)
+    shutil.rmtree(path2, ignore_errors = True)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -85,35 +198,6 @@ def delete(track_id, session=None):
 
 
 
-def new_track(user_id, trackname, admin=False, **kw):
-    """
-    Create a new track and Input in the database.
-    :param user_id : the user identifier. Will not be set if the track is admin.
-    :param admin: True if the track created is 'admin' ~ will be viewed by all users
-    """
-    # get parameters
-    sequence_id = kw.get('sequence_id', None)
-    if sequence_id is None:
-        project_id = kw.get('project_id')
-        project = session.query(Project).filter(Project.id == project_id).first()
-        sequence_id = project.sequence_id
-
-    # create input
-    _input = Input()
-    DBSession.add(_input)
-    DBSession.flush()
-
-    # create track
-    _track = Track()
-    _track.name = trackname
-    _track.sequence_id = sequence_id
-    _track.input_id = _input.id
-    if not admin:
-        _track.user_id = user_id
-
-    DBSession.add(_track)
-    DBSession.flush()
-    return track
 
 
 

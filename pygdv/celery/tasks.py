@@ -6,9 +6,10 @@ from pygdv.lib.jbrowse import jsongen, scores
 from pygdv.lib.constants import json_directory, track_directory, extra_directory
 from celery.result import AsyncResult
 from celery.signals import worker_init
+from celery.task.http import HttpDispatchTask
 
 from pygdv.lib import constants, util
-import track, transaction
+import track, transaction, urlib, urllib2
 from pygdv.celery import model
 from sqlalchemy.sql.expression import except_
 from pygdv.model.database import TMPTrack
@@ -19,6 +20,66 @@ success = 1
 
 manager = None
 
+
+
+@task()
+def track_input(kw):
+    """
+    First Entry point for track processing : 
+    1) the track is uploaded (if it's not already the case)
+    2) the sha1 of the track is calculated.
+    3) callback at any time if the process fail, or at the end with success 
+    """
+
+
+    _fname = upload(**kw)
+    sha1 = util.get_file_sha1(_fname)
+    callback.delay(kw.get('callback_url') + '/after_sha1', {'fname' : _fname,
+                                                'sha1' : sha1,
+                                                 'force' : kw.get('force', False),
+                                                  'kw' : **kw})
+@task()
+def track_process(kw):
+    """
+    Second entry point for track processing :
+     4) the track is converted to sqlite format (if it's not already the case)
+     5) the sqlite track is computed with two differents process for 
+         signal track : with an external jar file (psd.jar)
+         features track : with jbrowse internal library
+     6) callback at any time if the process fail, or at the end with success 
+     """
+    print 'second track process'
+
+
+def upload(kw):
+    """
+    Upload the track.
+    """
+    # file already uploaded
+    if kw.get('uploaded', False):
+        return kw.get('file')
+    
+    _f = util.download(url=kw.get('urls', None), 
+                       file_upload=kw.get('file_upload', None),
+                       filename=kw.get('filename', ''),
+                       extension=kw.get('extension', ''))
+    return _f.name
+        
+
+
+@task()
+def callback(url, parameters):
+    print 'callback to %s with %s' % (url, parameters)
+    try :
+        req = urllib2.urlopen(url, urllib.urlencode(parameters))
+    except Exception as e:
+        print 'Callback exception %s' % e
+        callback.retry(exc=e)
+
+
+
+
+
 def session_connection(*args, **kw):
     print 'init of sessions args : %s, kw : %s' %(args, kw)
     import pygdv.celery.model
@@ -27,9 +88,22 @@ def session_connection(*args, **kw):
 worker_init.connect(session_connection)
 
 
-
-
 import subprocess
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
