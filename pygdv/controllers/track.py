@@ -87,7 +87,7 @@ class TrackController(CrudRestController):
             if fu is not None:
                 kw['uploaded']=True
                 _f = util.download(file_upload=fu,
-                                   filename=trackname, extension=extension))
+                    filename=filename, extension=extension)
                 kw['file']=_f.name
 
         # create a new track
