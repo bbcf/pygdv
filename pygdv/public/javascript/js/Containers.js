@@ -2,7 +2,7 @@
 * Create all containers in the browser view.
 */
 
-function PrincipalContainer(){};
+function PrincipalContainer(){}
 
 
 /**
@@ -61,7 +61,11 @@ PrincipalContainer.prototype.createContainer = function(browser, menuLeftContain
     this.trackContainer(browser);
     this.selectionContainer(principal, principal_dijit);
     this.jobContainer(principal, principal_dijit);
-    this.operationContainer(principal, principal_dijit, init_operations, viewContainer, formwidget, browserwidget);
+    if (init_operations == 'connect'){
+        console.error('cannot connect to plugin system');
+    } else {
+        this.operationContainer(principal, principal_dijit, init_operations, viewContainer, formwidget, browserwidget);
+    }
     this.fakeContainer(principal, principal_dijit);
 
     // Retrieve from a cookie the last element of menu selected

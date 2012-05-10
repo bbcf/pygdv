@@ -21,8 +21,12 @@ def bootstrap(command, conf, vars):
             # ADMIN GROUP
             admins = model.Group()
             admins.name = group_admins
-            #admins.users.append(admin)
             model.DBSession.add(admins)
+
+            # USER GROUP
+            users = model.Group()
+            users.name = group_users
+
         
             # ADMIN PERMISSION
             perm = model.Permission()
@@ -30,13 +34,7 @@ def bootstrap(command, conf, vars):
             perm.description = u'This permission give admin right to the bearer.'
             perm.groups.append(admins)
             model.DBSession.add(perm)
-            
-            transaction.commit()
-        #else :
-            # USER GROUP
-            users = model.Group()
-            users.name = group_users
-          
+
             # READ PERMISSION
             read = model.Permission()
             read.name = perm_user
@@ -65,8 +63,8 @@ def bootstrap(command, conf, vars):
             
             print 'adding a special user'
             u = model.User()
-            u.name = 'koopa'
-            u.firstname = 'troopa'
+            u.name = 'webmaster'
+            u.firstname = 'bbcf'
             u.email = public_user_email
     
             users.users.append(u)

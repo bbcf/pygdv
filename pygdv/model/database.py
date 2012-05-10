@@ -283,10 +283,9 @@ class Input(DeclarativeBase):
     _last_access = Column(DateTime, default=datetime.now, nullable=False)
     tracks = relationship('Track', backref='input',  cascade="all, delete, delete-orphan")
   
-    task_id = Column(VARCHAR(255), nullable=True)
-    task = relationship('Task', uselist=False, primaryjoin='Input.task_id == Task.task_id', foreign_keys='Task.task_id')
-    #task_id = Column(Integer, ForeignKey('celery_taskmeta.task_id', ondelete="CASCADE"), nullable=False)
-    #task = relationship('Task')
+    task_id = Column(Integer, ForeignKey('celery_taskmeta.task_id', ondelete="CASCADE"), nullable=False)
+    task = relationship('Task')
+
     datatype = Column(datatypes, nullable=False, default=constants.NOT_DETERMINED_DATATYPE)
     
     @property

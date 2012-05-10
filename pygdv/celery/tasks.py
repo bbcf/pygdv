@@ -22,8 +22,13 @@ manager = None
 
 
 
+
+
+
+
+
 @task()
-def track_input(**kw):
+def track_input(_uploaded, _file, _urls, _track_name, _extension, _callback_url, _force, _track_id, _user_mail, _user_key, _sequence_id):
     """
     First Entry point for track processing : 
     1) the track is uploaded (if it's not already the case)
@@ -31,18 +36,28 @@ def track_input(**kw):
     3) callback at any time if the process fail, or at the end with success 
     """
 
-
-    _fname = upload(**kw)
+    task_id = track_input.request.id
+    _fname = upload(_uploaded, _file, _urls, _track_name, _extension)
     sha1 = util.get_file_sha1(_fname)
-    callback.delay(kw.get('callback_url') + '/after_sha1', {'fname' : _fname,
-                                                'sha1' : sha1,
-                                                 'force' : kw.get('force', False),
-                                                  'kw' : kw})
+    result = callback(_callback_url + '/after_sha1', {'fname' : _fname,
+                                                 'sha1' : sha1,
+                                                 'force' : _force,
+                                                 'callback_url' : _callback_url,
+                                                 'track_id' : _track_id,
+                                                 'mail' : _user_mail,
+                                                 'key' : _user_key,
+                                                 'old_task_id' : task_id,
+                                                 'sequence_id' : _sequence_id,
+                                                 'extension' : _extension,
+                                                 'trackname' : _track_name
+                                                  })
+    if result.has_key('error'):
+        raise Exception(result.get('error'))
 
 
 
 @task()
-def track_process(kw):
+def track_process(_usermail, _userkey, old_task_id, fname, sha1, callback_url, track_id, sequence_name, extension, trackname, _callback_url):
     """
     Second entry point for track processing :
      4) the track is converted to sqlite format (if it's not already the case)
@@ -51,35 +66,83 @@ def track_process(kw):
          features track : with jbrowse internal library
      6) callback at any time if the process fail, or at the end with success 
      """
-    print 'second track process %s' % kw
+    from pygdv import handler
+
+    out_name = '%s.%s' % (sha1, 'sql')
+    dst = os.path.join(track_directory(), out_name)
+
+    datatype = constants.NOT_DETERMINED_DATATYPE
+
+    # move sqlite file
+    if handler.track.is_sqlite_file(fname):
+        with track.load(fname, 'sql', readonly=True) as t:
+            datatype = t.datatype
+        shutil.move(fname, dst)
+
+    # process text file
+    else :
+        try :
+            track.convert(extension and (fname, extension) or fname, dst)
+            datatype = handler.track.guess_datatype(extension)
+            with track.load(dst, 'sql', readonly=False) as t:
+                t.datatype = datatype
+                t.assembly = assembly_name
+            try:
+                os.remove(os.path.abspath(fname))
+            except OSError :
+                pass
+        except Exception as e:
+            callback(_callback_url + '/after_process', {'old_task_id' : old_task_id,
+                                                        'mail' : _usermail,
+                                                        'key' : _userkey,
+                                                        'track_id' : 'None'
+            })
+            raise e
+
+    # process sqlite file
+    if datatype == constants.NOT_DETERMINED_DATATYPE :
+        raise Exception("Extension %s is not supported." % extension)
+
+    try :
+        dispatch = _sqlite_dispatch.get(datatype)
+        dispatch(dst, sha1, trackname)
+    except Exception as e:
+        etype, value, tb = sys.exc_info()
+        traceback.print_exception(etype, value, tb)
+        os.remove(dst)
+        result = callback(_callback_url + '/after_process', {'old_task_id' : old_task_id,
+                                                             'mail' : _usermail,
+                                                             'key' : _userkey,
+                                                             'track_id' : 'None'
+        })
+        raise e
+
+    result = callback(_callback_url + '/after_process', {'old_task_id' : old_task_id,
+                                                         'mail' : _usermail,
+                                                         'key' : _userkey,
+                                                         'track_id' : track_id
+    })
 
 
-
-def upload(**kw):
+def upload(_uploaded, _file, _urls, _track_name, _extension):
     """
     Upload the track.
     """
     # file already uploaded
-    if kw.get('uploaded', False):
-        return kw.get('file')
+    if _uploaded:
+        return _file
     
-    _f = util.download(url=kw.get('urls', None), 
-                       file_upload=kw.get('file_upload', None),
-                       filename=kw.get('filename', ''),
-                       extension=kw.get('extension', ''))
+    _f = util.download(url=_urls,
+                       filename=_track_name,
+                       extension=_extension)
     return _f.name
         
 
 
-@task()
 def callback(url, parameters):
     print 'callback to %s with %s' % (url, parameters)
-    try :
-        req = urllib2.urlopen(url, urllib.urlencode(parameters))
-    except Exception as e:
-        print 'Callback exception %s' % e
-        callback.retry(exc=e)
-
+    req = urllib2.urlopen(url, urllib.urlencode(parameters))
+    return json.loads(req.read())
 
 
 
@@ -363,6 +426,7 @@ def process_sqlite_file(datatype, assembly_name, path, sha1, name, format):
     '''
     Entry point of the sqlite file.
     '''
+
     try :
         dispatch = _sqlite_dispatch.get(datatype)
         dispatch(path, sha1, name)

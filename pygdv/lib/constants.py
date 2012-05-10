@@ -1,6 +1,7 @@
 from pkg_resources import resource_filename
 import os
 from tg import url
+import tg
 
 mother_dir = 'pygdv'
 bin_dir = 'bin'
@@ -11,7 +12,7 @@ tracks_dir = 'tracks'
 plugin_dir = 'plugins'
 extra_dir = 'extras'
 
-public_user_email = 'public@pygdv.ch'
+public_user_email = 'webmaster.bbcf@epfl.ch'
 # STATUSES
 PENDING = 'PENDING'
 SUCCESS = 'SUCCESS'
@@ -50,6 +51,8 @@ def test_directory():
 def plugin_directory():
     return os.path.join(resource_filename(mother_dir, plugin_dir))
 
+def callback_track_url():
+    return tg.config.get('main.proxy') + url('/tracks')
 
 # URLS TO PUT IN JSON
 def data_root():

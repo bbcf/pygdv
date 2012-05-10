@@ -16,7 +16,7 @@ from pygdv.widgets.track import track_in_project_grid
 from pygdv.widgets import ModelWithRight
 from pygdv import handler
 from pygdv.lib import util, plugin
-import os, json
+import os, json, urllib2
 import transaction
 from pygdv.lib import checker
 from pygdv.lib.jbrowse import util as jb
@@ -376,9 +376,14 @@ class ProjectController(CrudRestController):
         jobs = 'init_jobs = %s' % handler.job.jobs(project_id)
         
         # get operations
-        ops = plugin.util.get_plugin_path()
-        operations_path = 'init_operations = %s' % ops
-        plug_url = plugin.util.form_url
+        try :
+            ops = plugin.util.get_plugin_path()
+            operations_path = 'init_operations = %s' % ops
+            plug_url = plugin.util.form_url
+        except urllib2.URLError as e:
+            ops = '[]'
+            operations_path = 'init_operations = "connect"'
+            plug_url = ''
 
         return dict(species_name=project.species.name, 
                     nr_assembly_id=project.sequence_id, 

@@ -5,12 +5,12 @@ from tgext.crud import CrudRestController
 
 
 from repoze.what.predicates import not_anonymous, has_any_permission, has_permission
-import tg
+import tg, sys, traceback
 from tg import expose, flash, require, tmpl_context, validate, request, response
 from tg.controllers import redirect
 from tg.decorators import with_trailing_slash
 
-from pygdv.model import DBSession, Track, Sequence, Input
+from pygdv.model import DBSession, Track, Sequence, Input, Task
 from pygdv.widgets.track import track_table, track_export, track_table_filler, track_new_form, track_edit_filler, track_edit_form, track_grid, default_track_form
 from pygdv import handler
 from pygdv.lib import util, constants, checker, reply
@@ -76,7 +76,7 @@ class TrackController(CrudRestController):
 
 
         # get parameters
-        trackname, extension, sequence_id = handler.track.fetch_track_parameters(url=kw.get('urls', None),
+        track_name, extension, sequence_id = handler.track.fetch_track_parameters(url=kw.get('urls', None),
                 file_upload=kw.get('file_upload', None), 
                 trackname=kw.get('trackname', None), 
                 extension=kw.get('extension', None),
@@ -89,17 +89,27 @@ class TrackController(CrudRestController):
             if fu is not None:
                 kw['uploaded']=True
                 _f = util.download(file_upload=fu,
-                    filename=trackname, extension=extension)
+                    filename=track_name, extension=extension)
                 kw['file']=_f.name
                 del kw['file_upload']
-                print _f.name
-        print kw
+
         # create a new track
-        _track = handler.track.new_track(user.id, trackname, sequence_id=sequence_id, admin=False, **kw)
-        kw['track_id']=_track.id
-        
+        _track = handler.track.new_track(user.id, track_name, sequence_id=sequence_id, admin=False)
+
+        # format parameters
+        _uploaded = kw.get('uploaded', False)
+        _file = kw.get('file', None)
+        _urls = kw.get('urls', None)
+        _track_name = track_name
+        _extension = extension
+        _callback_url = constants.callback_track_url()
+        _force = kw.get('force', False)
+        _track_id = _track.id
+        _user_key = user.key
+        _user_mail = user.email
+
         # launch task with the parameters
-        async = tasks.track_input.delay(**kw)
+        async = tasks.track_input.delay(_uploaded, _file, _urls, _track_name, _extension, _callback_url, _force, _track_id, _user_mail, _user_key, sequence_id)
         
         # update the track
         handler.track.update(track=_track, params={'task_id' : async.task_id})
@@ -299,34 +309,53 @@ class TrackController(CrudRestController):
 
 
 
-    @expose()
-    def after_sha1(self, fname, sha1, force, kw):
+    @expose('json')
+    def after_sha1(self, fname, sha1, force, callback_url, track_id, old_task_id, mail, key, sequence_id, extension, trackname):
         """
         Called after a sha1 where calculated on a file.
         If the sha1 already exist, only the databases operations are done.
         Else the input will go in the second part of the process.
         The input can be 'forced' to be recomputed
         """
-        print 'called method from controller with %s and %s' % (fname, sha1)
-        _input = DBSession.query(Input).filter(Input.sha1 == sha1).first()
-        do_process = True
-        if _input is not None and force :
-                handler.track.delete_input(_input.sha1)
-                DBSession.delete(_input)
-                DBSession.flush()
-        else :
-            print '[x] after sha1 [x] File %s already exist.' % sha1
-            do_process = False
-            handler.track.update(track_id=kw.get('track_id'),
-                params={'new_input_id' : _input.id})
+        try :
+            print 'called method from controller with %s and %s' % (fname, sha1)
+            _input = DBSession.query(Input).filter(Input.sha1 == sha1).first()
+            do_process = True
+            if _input is not None and force :
+                    handler.track.delete_input(_input.sha1)
+                    DBSession.delete(_input)
+                    DBSession.flush()
+            elif _input is not None:
+                print '[x] after sha1 [x] File %s already exist.' % sha1
+                do_process = False
+                handler.track.update(track_id=track_id,
+                    params={'new_input_id' : _input.id})
+
+            if do_process :
+
+                handler.track.update(track_id=track_id, params={'sha1' : sha1})
+                print '[x] after sha1 [x] Processing %s to %s' % (fname, sha1)
+                sequence = DBSession.query(Sequence).filter(Sequence.id == sequence_id).first()
+                async = tasks.track_process.delay(mail, key, old_task_id, fname, sha1, callback_url, track_id, sequence.name, extension, trackname, callback_url)
+
+                handler.track.update(track_id=track_id,
+                    params={'new_task_id' : async.task_id})
+            return {'success' : 'to second process'}
+        except Exception as e:
+            etype, value, tb = sys.exc_info()
+            traceback.print_exception(etype, value, tb)
 
 
-        if do_process :
-            print '[x] after sha1 [x] Processing %s to %s' %s (fname, sha1)
-            async = tasks.track_process(kw)
-            
-            handler.track.update(track_id=kw.get('track_id'),
-                params={'new_task_id' : async.task_id})
-        return {}
+            return {'error' : str(e)}
 
 
+    @expose('json')
+    def after_process(self, mail, key, old_task_id, track_id):
+        print '[x] after process [x]'
+        task = DBSession.query(Task).filter(Task.task_id == old_task_id).first()
+        if task is not None :
+            DBSession.delete(task)
+            DBSession.flush()
+        if not track_id == 'None':
+            handler.track.finalize_track_creation(track_id=track_id)
+        return {'success' : 'end'}

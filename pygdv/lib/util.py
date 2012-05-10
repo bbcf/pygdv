@@ -192,8 +192,7 @@ def download(url=None, file_upload=None, filename='', extension=''):
     tmp_file = tempfile.NamedTemporaryFile(prefix=filename, suffix=extension, delete=False)
 
     if file_upload is not None:
-        print file_upload
-        filename = file_upload.filename
+        #filename = file_upload.filename
         file_value = file_upload.value
         tmp_file.write(file_value)
         tmp_file.close()

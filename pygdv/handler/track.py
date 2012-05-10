@@ -15,11 +15,30 @@ import track, urlparse
 from celery.task import task, chord, subtask, TaskSet
 from pygdv.lib.constants import json_directory, track_directory
 
+_formats = {'bed' : constants.FEATURES,
+            'gff' : constants.RELATIONAL,
+            'gtf' : constants.RELATIONAL,
+            'bigwig' : constants.SIGNAL,
+            'bw' : constants.SIGNAL,
+            'wig' : constants.SIGNAL,
+            'wiggle' : constants.SIGNAL,
+            'bedgraph' : constants.SIGNAL
+}
 
-format_synonyms = {'db': 'sql',
-                   'bw': 'bigwig',
-                   'bwg': 'bigwig',
-                   'wiggle_0': 'wig',}
+def is_sqlite_file(_f):
+    """
+    Guess if the file is sqlite3 or not
+    """
+    with open(_f, 'r') as _file:
+        if _file.read(15) == 'SQLite format 3' : return True
+    return False
+
+def guess_datatype(extension):
+    ext = extension.lower()
+    if _formats.has_key(ext):
+        return _formats.get(ext)
+
+
 
 
 def pre_track_creation(url=None, file_upload=None, project_id=None, sequence_id=None):
@@ -73,7 +92,7 @@ def fetch_track_parameters(url=None, file_upload=None, trackname=None, extension
 
     return trackname, extension, sequence_id
 
-def new_track(user_id, trackname, sequence_id, admin=False, **kw):
+def new_track(user_id, track_name, sequence_id, admin=False):
     """
     Create a new track and Input in the database.
     :param user_id : the user identifier. Will not be set if the track is admin.
@@ -86,7 +105,7 @@ def new_track(user_id, trackname, sequence_id, admin=False, **kw):
 
     # create track
     _track = Track()
-    _track.name = trackname
+    _track.name = track_name
     _track.sequence_id = sequence_id
     _track.input_id = _input.id
     if not admin:
@@ -94,7 +113,18 @@ def new_track(user_id, trackname, sequence_id, admin=False, **kw):
 
     DBSession.add(_track)
     DBSession.flush()
+
     return _track
+
+def finalize_track_creation(_track=None, track_id=None):
+    if _track is None:
+        _track = DBSession.query(Track).filter(Track.id == track_id).first()
+    # track parameters
+    params = TrackParameters()
+    params.track = _track
+    params.build_parameters()
+    DBSession.add(params)
+    DBSession.add(_track)
 
 
 def update(track=None, track_id=None, params=None):
@@ -116,9 +146,8 @@ def update(track=None, track_id=None, params=None):
     # set the new task related with the track
     # the old one is deleted
     if params.has_key('new_task_id'):
-        old_task = track.input.task
+        old_task_id = track.input.task_id
         track.input.task_id = params.get('new_task_id')
-        DBSession.delete(old_task)
         DBSession.add(track)
     
     
@@ -130,8 +159,13 @@ def update(track=None, track_id=None, params=None):
         DBSession.delete(old_input)
         DBSession.add(track)
 
+    # set the sha1 for the track input
+    if params.has_key('sha1'):
+        track.input.sha1 = params.get('sha1')
+        DBSession.add(track)
 
     DBSession.flush()
+
 
 
 def delete_input(sha1):
@@ -348,14 +382,7 @@ _process_dispatch = {'sql' : lambda *args, **kw : move_database(*args, **kw),
                     'bedgraph' : lambda *args, **kw : convert_file(*args, **kw)}
 
 
-_formats = {'sql' : constants.NOT_DETERMINED_DATATYPE,
-                    'bed' : constants.FEATURES,
-                    'gff' : constants.RELATIONAL,
-                    'gtf' : constants.RELATIONAL,
-                    'bigWig' : constants.SIGNAL,
-                    'wig' : constants.SIGNAL,
-                    'bedgraph' : constants.SIGNAL
-                    }
+
 
 _datatypes = {      constants.FEATURES : constants.FEATURES,
                     'qualitative' : constants.FEATURES,
