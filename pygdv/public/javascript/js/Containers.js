@@ -38,24 +38,24 @@ PrincipalContainer.prototype.createContainer = function(browser, menuLeftContain
     var principal = dojo.create('div', {id : 'principal_cont'}, menuLeftContainer);
     var principal_dijit = new dijit.layout.AccordionContainer({
         style: "height: 100%; width: 100%;",
-	
+
         },
         principal);
     this.principal = principal;
     this.principal_dijit = principal_dijit;
-    
+
     // init some parameters
     var menu_nav = ['Home', 'Tracks', 'Projects', 'Circles', 'Jobs'];
     if (!_gdv_info.admin){
         init_operations = ['You must be logged in to use operations'];
         jobs = ['You must be logged in to view jobs'];
-	if (_gdv_info.mode == 'download'){
+    if (_gdv_info.mode == 'download'){
             menu_nav = ['Home', 'Copy']
         } else {
             menu_nav = ['Home']
         }
     }
-    
+
     // create additionnal children containers
     this.navigationContainer(principal, principal_dijit, menu_nav);
     this.trackContainer(browser);
@@ -92,8 +92,10 @@ PrincipalContainer.prototype.setOnclickMenuElement = function(){
         but.tab = dojo.query(".dijitContentPane", but.parentNode)[0];
         but.open = 1;
         dojo.connect(but, "click", function(e){
-	    ctx.menu_current_tab = this.firstElementChild.lastElementChild.innerHTML;
-            if (dojo.cookie("menu_current_tab") == ctx.menu_current_tab){ // if active tab is clicked again
+            document.activeElement.blur(); // else if interacts with keyb events
+            ctx.menu_current_tab = this.firstElementChild.lastElementChild.innerHTML;
+            // if active tab is clicked again, close it
+            if (dojo.cookie("menu_current_tab") == ctx.menu_current_tab){
                 if (this.open == 1){
                     ctx.reset();
                     dojo.cookie("menu_current_tab", "Fake");
@@ -101,7 +103,8 @@ PrincipalContainer.prototype.setOnclickMenuElement = function(){
                 } else {
                     this.open = 1;
                 }
-            } else { // if a different tab is clicked
+            // if a different tab is clicked, change for it
+            } else {
                 dojo.cookie("menu_current_tab", ctx.menu_current_tab);
                 this.open = 1;
             }
@@ -145,7 +148,6 @@ PrincipalContainer.prototype.trackContainer = function(browser){
 * Add the Navigation tab
 */
 PrincipalContainer.prototype.navigationContainer = function(DomNode, DijitNode, menu_nav){
-
     var cont = dojo.create('div', {}, DomNode);
     var nav_container = new dijit.layout.ContentPane({
         title: "Navigation",
@@ -211,7 +213,7 @@ PrincipalContainer.prototype.selectionContainer = function(DomNode, DijitNode){
 * Add the Operations tab
 */
 PrincipalContainer.prototype.operationContainer = function(DomNode, DijitNode, paths, viewContainer, fwdgt, bwdgt){
-    
+
     var cont = dojo.create('div', {}, DomNode);
 
     var ops_container = new dijit.layout.ContentPane({
@@ -241,14 +243,14 @@ PrincipalContainer.prototype.operationContainer = function(DomNode, DijitNode, p
     // if an user click on an Operation button
     op.create_frame(viewContainer, fwdgt, bwdgt);
 
-    
+
     // initialize the print button
     // var bilou = dojo.create('input', {type:'button', value:'print'},cont);
     // dojo.connect(bilou, 'click', function(e){
-    // 	var trs = dojo.query('.track.dojoDndItem');
-    // 	console.log(trs);
-    // 	window.print();
-    // 	dojo.stopEvent(e);
+    //     var trs = dojo.query('.track.dojoDndItem');
+    //     console.log(trs);
+    //     window.print();
+    //     dojo.stopEvent(e);
     // });
 
 };

@@ -711,7 +711,7 @@ GenomeView.prototype.showCoarse = function() {
 GenomeView.prototype.onCoarseMove = function() {};
 
 /**
- * Returns the current base pair the view is centered at
+ * Returns the current base pair the view is centered at (yet unused)
  */
 GenomeView.prototype.getCurrentPosition = function() {
     var pxLeft = parseInt(this.locationThumb.style.left);
@@ -729,17 +729,6 @@ GenomeView.prototype.thumbMoved = function() {
     this.centerAtBase((pxCenter * ratio) + this.ref.start);
     this.setCursorToGrab(this.locationThumb)
 };
-
-/**
- * Move view one screen to the left or to the right (with arrows).
- */
-GenomeView.prototype.shiftView = function(direction){
-    var pxCenter = this.getCurrentPosition().pxCenter;
-    var pxWidth = this.getCurrentPosition().pxWidth-1; // -1 to ensure slow animation
-    var ratio = (this.ref.end - this.ref.start) / this.overviewBox.w;
-    if (direction == 'forward') { pxWidth = -pxWidth; }
-    this.centerAtBase(((pxCenter - pxWidth) * ratio) + this.ref.start);
-}
 
 /**
  * Undocumented
@@ -827,12 +816,12 @@ GenomeView.prototype.sizeInit = function() {
     while (((this.ref.end - this.ref.start) * this.zoomLevels[0]) < this.dim.width)
         this.zoomLevels.shift();
     this.zoomLevels.unshift(this.dim.width / (this.ref.end - this.ref.start));
-    
-    
+
+
     // Width, in pixels, of stripes at min zoom (so the view covers
     // the whole ref seq)
     this.minZoomStripe = this.regularStripe * (this.zoomLevels[0] / this.zoomLevels[1]);
-    
+
     // Undocumented
     this.curZoom = 0;
     while (this.pxPerBp > this.zoomLevels[this.curZoom])

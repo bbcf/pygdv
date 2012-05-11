@@ -722,24 +722,21 @@ Browser.prototype.createNavBox = function(params) {
         }, overview);
     // Connect left & right arrows to a shift of the view
     dojo.connect(leftArrow, "click", function(e){
-        brwsr.view.shiftView('backward');
+        brwsr.view.slide(0.9);
     })
     dojo.connect(rightArrow, "click", function(e){
-        brwsr.view.shiftView('forward');
+        brwsr.view.slide(-0.9);
     })
     // Connect left & right arrow keys to a shift of the view
     dojo.connect(document, "keydown", function(e){
         if (document.activeElement.tagName != 'INPUT') { // hack? One can probably do better
-            dojo.byId("overview").focus();
             var key = e.keyCode || e.which;
             if ((key==37 || key==undefined)){
-                brwsr.view.shiftView('backward');
+                brwsr.view.slide(0.9);
             }
             else if (key==39 || key==undefined){
-                brwsr.view.shiftView('forward');
+                brwsr.view.slide(-0.9);
             }
-	    
-	    
         }
     })
 
