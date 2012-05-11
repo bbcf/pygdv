@@ -110,10 +110,15 @@ def _download_from_url(url, filename=None):
         tmp_file.close()
         return filename, tmp_file
     except HTTPError as e:
+        import sys, traceback
+        etype, value, tb = sys.exc_info()
+        traceback.print_exception(etype, value, tb)
         print '%s : %s' % (url, e)
         raise e
 
 
+def str2bool(str):
+    return str.lower() in ['true', 't', '1', 1, 'yes', 'y']
 
 def get_file_sha1(file_path):
     '''                                                                                                                                                                                                    
@@ -211,6 +216,6 @@ def download(url=None, file_upload=None, filename='', extension=''):
             tmp_file.close()
             return tmp_file
         except HTTPError as e:
-            print '%s : %s' % (_from, e)
+            print '%s : %s' % (url, e)
             raise e
     raise Exception("Nothing to download")

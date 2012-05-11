@@ -10,7 +10,7 @@ from tg.controllers import redirect
 from tg.decorators import paginate, with_trailing_slash, without_trailing_slash
 import tg
 
-from pygdv.model import DBSession, Project, User, RightCircleAssociation, Track, Job
+from pygdv.model import DBSession, Project, User, RightCircleAssociation, Track, Job, Sequence
 from pygdv.widgets.project import project_table,  project_admin_grid, project_with_right, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid,circles_available_form, tracks_available_form, project_sharing_grid, project_grid_sharing
 from pygdv.widgets.track import track_in_project_grid
 from pygdv.widgets import ModelWithRight
@@ -97,7 +97,11 @@ class ProjectController(CrudRestController):
         
         if not 'assembly' in kw:
             return reply.error(request, 'Missing project `assembly` identifier.', './', {})
-            
+
+        sequence = DBSession.query(Sequence).filter(Sequence.id == int(kw.get('assembly'))).first()
+        if sequence is None:
+            return reply.error(request, "Assembly doesn't exist in GDV.", './', {})
+
         project = handler.project.create(kw['name'], kw['assembly'], user.id)
         return reply.normal(request, 'Project successfully created.', './', {'project' : project})  
     

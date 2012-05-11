@@ -89,10 +89,10 @@ def fetch_track_parameters(url=None, file_upload=None, trackname=None, extension
     if sequence_id is None:
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         sequence_id = project.sequence_id
-
+        extension = extension.replace('.', '').lower()
     return trackname, extension, sequence_id
 
-def new_track(user_id, track_name, sequence_id, admin=False):
+def new_track(user_id, track_name, sequence_id, admin=False, project_id=None):
     """
     Create a new track and Input in the database.
     :param user_id : the user identifier. Will not be set if the track is admin.
@@ -110,6 +110,11 @@ def new_track(user_id, track_name, sequence_id, admin=False):
     _track.input_id = _input.id
     if not admin:
         _track.user_id = user_id
+
+    if project_id is not None:
+        project = DBSession.query(Project).filter(Project.id == project_id).first()
+        project.tracks.append(_track)
+        DBSession.add(project)
 
     DBSession.add(_track)
     DBSession.flush()
@@ -134,7 +139,6 @@ def update(track=None, track_id=None, params=None):
     :param track_id : the track_id to fetch the track if it's not provided
     :param params : a dict to tell what to update
     """
-    print 'update track %s , %s , %s' % (track, track_id, params)
     if track is None:
         track = DBSession.query(Track).filter(Track.id == track_id).first()
     
@@ -155,15 +159,19 @@ def update(track=None, track_id=None, params=None):
     # is deleted
     if params.has_key('new_input_id'):
         old_input = track.input
-        track.input_id = kw.get('new_input_id')
+        _input = DBSession.query(Input).filter(Input.id == int( params.get('new_input_id'))).first()
+        _input.tracks.append(track)
+        DBSession.add(_input)
         DBSession.delete(old_input)
-        DBSession.add(track)
 
     # set the sha1 for the track input
     if params.has_key('sha1'):
         track.input.sha1 = params.get('sha1')
         DBSession.add(track)
 
+    if params.has_key('datatype'):
+        track.input.datatype = params.get('datatype')
+        DBSession.add(track)
     DBSession.flush()
 
 
@@ -225,6 +233,7 @@ def delete_track(track=None, track_id=None):
     _input = track.input
     if len(_input.tracks) == 1:
         delete_input(_input.sha1)
+        DBSession.delete(_input)
     DBSession.delete(track)
     DBSession.flush()
 

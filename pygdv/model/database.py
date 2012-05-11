@@ -300,7 +300,7 @@ class Input(DeclarativeBase):
         return self.sha1
     
     def _get_last_access(self):
-        return self._last_access.strftime(constants.date_format);
+        return self._last_access.strftime(constants.date_format)
         
     def _set_last_access(self,date):
         self._last_access=date
@@ -360,13 +360,13 @@ class Track(DeclarativeBase):
         return self.name
     
     def _get_date(self):
-        return self._created.strftime(constants.date_format);
+        return self._created.strftime(constants.date_format)
         
     def _set_date(self,date):
         self._created=date
         
     def _get_last_access(self):
-        return self._last_access.strftime(constants.date_format);
+        return self._last_access.strftime(constants.date_format)
         
     def _set_last_access(self, date):
         self._last_access=date

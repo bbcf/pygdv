@@ -65,18 +65,21 @@ class TrackController(CrudRestController):
         if kw.has_key('assembly'):
             kw['sequence_id']=kw.get('assembly')
             del kw['assembly']
+        if kw.has_key('urls'):
+            kw['url']=kw.get('urls')
+            del kw['urls']
         # verify track parameters
         try :
-            handler.track.pre_track_creation(url=kw.get('urls', None),
+            handler.track.pre_track_creation(url=kw.get('url', None),
                 file_upload=kw.get('file_upload', None),
                 project_id=kw.get('project_id', None),
                 sequence_id=kw.get('sequence_id', None))
         except Exception as e:
-            return reply.error(request, e, tg.url('./new'), {})
+            return reply.error(request, str(e), tg.url('./new'), {})
 
 
         # get parameters
-        track_name, extension, sequence_id = handler.track.fetch_track_parameters(url=kw.get('urls', None),
+        track_name, extension, sequence_id = handler.track.fetch_track_parameters(url=kw.get('url', None),
                 file_upload=kw.get('file_upload', None), 
                 trackname=kw.get('trackname', None), 
                 extension=kw.get('extension', None),
@@ -94,12 +97,12 @@ class TrackController(CrudRestController):
                 del kw['file_upload']
 
         # create a new track
-        _track = handler.track.new_track(user.id, track_name, sequence_id=sequence_id, admin=False)
+        _track = handler.track.new_track(user.id, track_name, sequence_id=sequence_id, admin=False, project_id=kw.get('project_id', None))
 
         # format parameters
         _uploaded = kw.get('uploaded', False)
         _file = kw.get('file', None)
-        _urls = kw.get('urls', None)
+        _urls = kw.get('url', None)
         _track_name = track_name
         _extension = extension
         _callback_url = constants.callback_track_url()
@@ -318,23 +321,22 @@ class TrackController(CrudRestController):
         The input can be 'forced' to be recomputed
         """
         try :
-            print 'called method from controller with %s and %s' % (fname, sha1)
+            print '[x] after sha1 [x] %s and %s' % (fname, sha1)
             _input = DBSession.query(Input).filter(Input.sha1 == sha1).first()
             do_process = True
-            if _input is not None and force :
-                    handler.track.delete_input(_input.sha1)
-                    DBSession.delete(_input)
-                    DBSession.flush()
+            if util.str2bool(force) and _input is not None :
+                handler.track.delete_input(_input.sha1)
+                DBSession.delete(_input)
+                DBSession.flush()
             elif _input is not None:
-                print '[x] after sha1 [x] File %s already exist.' % sha1
                 do_process = False
                 handler.track.update(track_id=track_id,
                     params={'new_input_id' : _input.id})
+                handler.track.finalize_track_creation(track_id=track_id)
 
             if do_process :
 
                 handler.track.update(track_id=track_id, params={'sha1' : sha1})
-                print '[x] after sha1 [x] Processing %s to %s' % (fname, sha1)
                 sequence = DBSession.query(Sequence).filter(Sequence.id == sequence_id).first()
                 async = tasks.track_process.delay(mail, key, old_task_id, fname, sha1, callback_url, track_id, sequence.name, extension, trackname, callback_url)
 
@@ -350,12 +352,13 @@ class TrackController(CrudRestController):
 
 
     @expose('json')
-    def after_process(self, mail, key, old_task_id, track_id):
-        print '[x] after process [x]'
+    def after_process(self, mail, key, old_task_id, track_id, datatype):
+        print '[x] after process [x] %s' % track_id
         task = DBSession.query(Task).filter(Task.task_id == old_task_id).first()
         if task is not None :
             DBSession.delete(task)
             DBSession.flush()
         if not track_id == 'None':
+            handler.track.update(track_id=track_id, params={'datatype' : datatype})
             handler.track.finalize_track_creation(track_id=track_id)
         return {'success' : 'end'}

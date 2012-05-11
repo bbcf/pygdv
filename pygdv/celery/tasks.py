@@ -86,16 +86,19 @@ def track_process(_usermail, _userkey, old_task_id, fname, sha1, callback_url, t
             datatype = handler.track.guess_datatype(extension)
             with track.load(dst, 'sql', readonly=False) as t:
                 t.datatype = datatype
-                t.assembly = assembly_name
+                t.assembly = sequence_name
             try:
                 os.remove(os.path.abspath(fname))
             except OSError :
                 pass
         except Exception as e:
+            etype, value, tb = sys.exc_info()
+            traceback.print_exception(etype, value, tb)
             callback(_callback_url + '/after_process', {'old_task_id' : old_task_id,
                                                         'mail' : _usermail,
                                                         'key' : _userkey,
-                                                        'track_id' : 'None'
+                                                        'track_id' : 'None',
+                                                        'datatype' : datatype
             })
             raise e
 
@@ -113,14 +116,16 @@ def track_process(_usermail, _userkey, old_task_id, fname, sha1, callback_url, t
         result = callback(_callback_url + '/after_process', {'old_task_id' : old_task_id,
                                                              'mail' : _usermail,
                                                              'key' : _userkey,
-                                                             'track_id' : 'None'
+                                                             'track_id' : 'None',
+                                                             'datatype' : datatype
         })
         raise e
 
     result = callback(_callback_url + '/after_process', {'old_task_id' : old_task_id,
                                                          'mail' : _usermail,
                                                          'key' : _userkey,
-                                                         'track_id' : track_id
+                                                         'track_id' : track_id,
+                                                         'datatype' : datatype
     })
 
 
@@ -128,6 +133,7 @@ def upload(_uploaded, _file, _urls, _track_name, _extension):
     """
     Upload the track.
     """
+    print "upload %s, %s, %s, %s, %s" % (_uploaded, _file, _urls, _track_name, _extension)
     # file already uploaded
     if _uploaded:
         return _file
