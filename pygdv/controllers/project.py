@@ -384,7 +384,7 @@ class ProjectController(CrudRestController):
             ops = plugin.util.get_plugin_path()
             operations_path = 'init_operations = %s' % ops
             plug_url = plugin.util.form_url
-        except urllib2.URLError as e:
+        except Exception as e:
             ops = '[]'
             operations_path = 'init_operations = "connect"'
             plug_url = ''
