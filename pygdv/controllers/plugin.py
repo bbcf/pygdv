@@ -26,6 +26,7 @@ class PluginController(BaseController):
         req = {}
         if fill.has_key(id):
             gen_tracks = [[track.name, handler.track.plugin_link(track)] for track in project.tracks]
+
             for param in fill.get(id):
                 req[param]= json.dumps(gen_tracks)
         req['id'] = id

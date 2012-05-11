@@ -735,9 +735,11 @@ Browser.prototype.createNavBox = function(params) {
             if ((key==37 || key==undefined)){
                 brwsr.view.shiftView('backward');
             }
-            if (key==39 || key==undefined){
+            else if (key==39 || key==undefined){
                 brwsr.view.shiftView('forward');
             }
+	    
+	    
         }
     })
 

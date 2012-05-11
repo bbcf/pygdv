@@ -427,8 +427,8 @@ def convert_file(datatype, assembly_name, path, sha1, name, tmp_file, _format):
 
 
 def link(track):
-    return tg.config.get('main.proxy') + '/tracks/link?track_id=%s' % track.id
+    return tg.config.get('main.proxy') + tg.url('/tracks/link?track_id=%s' % track.id)
 
 
 def plugin_link(track):
-    return tg.config.get('main.proxy') + '/' + track.rel_path
+    return tg.config.get('main.proxy') + tg.url('/') + track.rel_path
