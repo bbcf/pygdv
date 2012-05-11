@@ -18,7 +18,7 @@ from tg.configuration import AppConfig
 import pygdv
 from pygdv import model
 from pygdv.lib import app_globals, helpers 
-
+import tg
 
 base_config = AppConfig()
 base_config.renderers = []
@@ -51,6 +51,8 @@ base_config.use_toscawidgets=True
 def on_startup():
     import datetime
     print ' --- starting application --- '+str(datetime.datetime.now())
+    if tg.config.get('plugin.service.url') is None:
+        print 'WARNING : YOU MUST SET THE "plugin.service.url" in your config file.'
 
 def on_shutdown():
     print '--- stopping application --- '
