@@ -94,11 +94,15 @@ var Browser = function(params) {
         var browserWidget = new dijit.layout.ContentPane({region: "center"}, viewElem);
         var menuWidget = new dijit.layout.ContentPane({region: "left", splitter:false,
                                                        style : {overflow:'hidden'}}, menuleft);
-
+        var formElem;
+        var formWidget;
         //add a layout for the operation form
-        var formElem = dojo.create('div', {id:'op_form'}, brwsr.container);
-        var formWidget = new dijit.layout.ContentPane({region: "right", splitter:false,
-                                                       style : {overflow:'hidden'}}, formElem);
+        if (!(init_operations == 'connect')){
+            formElem = dojo.create('div', {id:'op_form'}, brwsr.container);
+            formWidget = new dijit.layout.ContentPane({region: "right", splitter:false,
+                style : {overflow:'hidden'}}, formElem);
+        }
+
         //var bottomWidget = new dijit.layout.ContentPane({region: "bottom",splitter:true}, bottomPane);
 
         // This creates the permalink to the current chr and loc
