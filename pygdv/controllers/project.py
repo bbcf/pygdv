@@ -313,8 +313,8 @@ class ProjectController(CrudRestController):
 
         # get the project
         project = DBSession.query(Project).filter(Project.id == project_id).first()
-        tracks = project.tracks
-        
+        tracks = project.success_tracks
+
         seq = project.sequence
         default_tracks = seq.default_tracks
         all_tracks = tracks + default_tracks
@@ -385,6 +385,7 @@ class ProjectController(CrudRestController):
             operations_path = 'init_operations = %s' % ops
             plug_url = plugin.util.form_url
         except Exception as e:
+            print e
             ops = '[]'
             operations_path = 'init_operations = "connect"'
             plug_url = ''

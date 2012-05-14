@@ -222,5 +222,6 @@ def download(url=None, file_upload=None, fsys=None, filename='', extension=''):
     elif fsys is not None:
         tmp_file.close()
         shutil.copy(fsys, tmp_file.name)
+        return tmp_file
 
     raise Exception("Nothing to download")

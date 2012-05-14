@@ -68,3 +68,5 @@ tooltip['read']=make_tooltip('Read permission', '''A circle with this permission
 tooltip['download']=make_tooltip('Download permission', '''A circle with this permission can download the data associated with the project.''')
 
 tooltip['upload']=make_tooltip('Upload permission', '''A circle with this permission can upload data on the project.''')
+
+tooltip['task']=make_tooltip('Task', '''A task is a job launched on Celery.''')

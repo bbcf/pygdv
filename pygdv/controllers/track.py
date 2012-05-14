@@ -60,6 +60,13 @@ class TrackController(CrudRestController):
 
     @expose('json')
     def create(self, *args, **kw):
+        """
+        Entry point for creating track
+
+        """
+        print 'CREATE TRACK %s, %s' % (args, kw)
+
+
         user = handler.user.get_user_in_session(request)
         # change a parameter name
         if kw.has_key('assembly'):
@@ -106,6 +113,7 @@ class TrackController(CrudRestController):
         _uploaded = kw.get('uploaded', False)
         _file = kw.get('file', None)
         _urls = kw.get('url', None)
+        _fsys=kw.get('fsys', None)
         _track_name = track_name
         _extension = extension
         _callback_url = constants.callback_track_url()
@@ -115,7 +123,7 @@ class TrackController(CrudRestController):
         _user_mail = user.email
 
         # launch task with the parameters
-        async = tasks.track_input.delay(_uploaded, _file, _urls, _track_name, _extension, _callback_url, _force, _track_id, _user_mail, _user_key, sequence_id)
+        async = tasks.track_input.delay(_uploaded, _file, _urls, _fsys, _track_name, _extension, _callback_url, _force, _track_id, _user_mail, _user_key, sequence_id)
         
         # update the track
         handler.track.update(track=_track, params={'task_id' : async.task_id})

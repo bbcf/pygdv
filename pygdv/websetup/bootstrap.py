@@ -8,7 +8,7 @@ import transaction
 
 
 from pygdv.lib.constants import right_upload, right_download, right_read, group_admins, perm_admin, group_users, perm_user
-from pygdv.lib.constants import right_download_id, right_read_id, right_upload_id, public_user_email
+from pygdv.lib.constants import right_download_id, right_read_id, right_upload_id, public_user_email, group_users_id, group_admins_id
 
 def bootstrap(command, conf, vars):
     """Place any commands to setup turbotequila here.
@@ -21,12 +21,14 @@ def bootstrap(command, conf, vars):
             # ADMIN GROUP
             admins = model.Group()
             admins.name = group_admins
+            admins.id = group_admins_id
             model.DBSession.add(admins)
 
             # USER GROUP
             users = model.Group()
             users.name = group_users
-
+            users.id = group_users_id
+            model.DBSession.add(users)
         
             # ADMIN PERMISSION
             perm = model.Permission()

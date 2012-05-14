@@ -4,6 +4,25 @@ from sqlalchemy.sql import and_, not_
 import json, datetime, shutil, os
 
 
+def new_job(name, description, user_id, project_id, output, ext_task_id=None, task_id=None):
+    job = model.Job()
+    job.name = name
+    job.description = description
+    job.user_id = user_id
+    job.project_id = project_id
+    job.output = output
+    if ext_task_id is not None:
+        job.ext_task_id = ext_task_id
+    if task_id is not None:
+        job.task_id = task_id
+    model.DBSession.add(job)
+    model.DBSession.flush()
+    return job
+
+
+
+
+
 def new_tmp_job(name, user_id, project_id, session=None):
     dt = datetime.datetime.now().strftime(constants.date_format)
     if session is None:
@@ -36,21 +55,7 @@ def update_job(job, name, description, user_id, project_id, output, task_id, sha
     return job
     
 
-def new_job(name, description, user_id, project_id, output, task_id, sha1=None, session=None):
-    if session is None:
-        session = model.DBSession
-    job = model.Job()
-    job.name = name
-    job.description = description
-    job.user_id = user_id
-    job.project_id = project_id
-    job.output = output
-    job.task_id = task_id
-    if sha1:
-        job.data = sha1
-    session.add(job)
-    session.flush()
-    return job
+
 
 
 

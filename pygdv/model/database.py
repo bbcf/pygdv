@@ -187,8 +187,9 @@ class Project(DeclarativeBase):
             rights.append(cr.right)
             result[cr.circle]=rights
         return result
-    
-    
+    @property
+    def success_tracks(self):
+        return [t for t in self.tracks if t.status == constants.SUCCESS]
     @property 
     def get_tracks(self):
         return ', '.join([track.name for track in self.tracks])
@@ -283,10 +284,10 @@ class Input(DeclarativeBase):
     _last_access = Column(DateTime, default=datetime.now, nullable=False)
     tracks = relationship('Track', backref='input',  cascade="all, delete, delete-orphan")
   
-    task_id = Column(Integer, ForeignKey('celery_taskmeta.task_id', ondelete="CASCADE"), nullable=False)
-    task = relationship('Task')
+    task_id = Column(VARCHAR(255))
+    task = relationship('Task', uselist=False, primaryjoin='Input.task_id == Task.task_id', foreign_keys='Task.task_id')
 
-    datatype = Column(datatypes, nullable=False, default=constants.NOT_DETERMINED_DATATYPE)
+    datatype = Column(datatypes, nullable=True, default=constants.NOT_DETERMINED_DATATYPE)
     
     @property
     def path(self):
@@ -521,7 +522,11 @@ class Job(DeclarativeBase):
     task_id = Column(VARCHAR(255))
     task = relationship('Task', uselist=False, primaryjoin='Job.task_id == Task.task_id', foreign_keys='Task.task_id')
 
+    # external task_id from job launcher
+    ext_task_id = Column(VARCHAR(255), unique=True)
+    # the result of the job
     data = Column(Text())
+    # the job "type" : image, file, ...
     output = Column(VARCHAR(255))
     
     def _get_date(self):
@@ -534,24 +539,19 @@ class Job(DeclarativeBase):
     
     @property
     def traceback(self):
-        if self.task is None: 
-            if self.data is not None:
-                return self.data
-            return ''
-        return self.task.traceback
-    
+        if self.task is not None:
+            return self.task.traceback
+        return self.data
     @property
     def get_type(self):
         return self.parameters.type
     
     @property
     def status(self):
-        if self.task is None:
-            if self.data is not None:
-                return constants.ERROR
-            return 'PENDING'
-        return self.task.status
-    
+        if self.task is not None:
+            return self.task.status
+        return self.output
+
     def __repr__(self):
         return 'Job < id : %s, name %s, desc: %s, data : %s , task_id : %s, output : %s>' % (
                         self.id, self.name, self.description, self.data, self.task_id, self.output)

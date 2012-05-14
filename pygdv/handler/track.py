@@ -80,7 +80,7 @@ def fetch_track_parameters(url=None, file_upload=None, fsys=None, trackname=None
         elif file_upload is not None:
             trackname = os.path.splitext(file_upload.filename)[0]
         elif fsys is not None:
-            trackname = os.path.splitext(file_upload.filename)[0]
+            trackname = os.path.splitext(fsys)[0]
 
     if extension is None:
         if url is not None:
@@ -88,7 +88,7 @@ def fetch_track_parameters(url=None, file_upload=None, fsys=None, trackname=None
         elif file_upload is not None:
             extension = os.path.splitext(file_upload.filename)[1]
         elif fsys is not None:
-            extension = os.path.splitext(file_upload.filename)[1]
+            extension = os.path.splitext(fsys)[1]
 
     if sequence_id is None:
         project = DBSession.query(Project).filter(Project.id == project_id).first()

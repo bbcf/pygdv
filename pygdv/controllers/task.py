@@ -30,7 +30,8 @@ class TaskController(CrudRestController):
         user = handler.user.get_user_in_session(request)
         tasks = DBSession.query(Task).all()
         data = [util.to_datagrid(task_grid, tasks, "Task Listing", len(tasks)>0)]
-        return dict(page='tasks', model='task', form_title="new task",items=data,value=kw)
+        t = handler.help.tooltip['task']
+        return dict(page='tasks', model='task', form_title="new task", items=data, tooltip=t, value=kw)
     
     
     @expose()

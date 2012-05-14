@@ -90,9 +90,11 @@ right_download_id = 2
 right_read_id = 1
 
 group_admins = 'Admins'
+group_admins_id = 1
 perm_admin = 'admin'
 
 group_users = 'Users'
+group_users_id = 2
 perm_user = 'user'
 
 tmp_user_name = 'tmp_user'

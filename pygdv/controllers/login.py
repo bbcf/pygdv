@@ -59,7 +59,7 @@ class LoginController(BaseController):
         # log or create him
         user = DBSession.query(User).filter(User.email == tmp_user.email).first()
         if user is None:
-            user_group = DBSession.query(Group).filter(Group.id == constants.group_users).first()
+            user_group = DBSession.query(Group).filter(Group.id == constants.group_users_id).first()
             user_group.users.append(tmp_user)
             DBSession.add(tmp_user)
             DBSession.flush()
@@ -73,7 +73,7 @@ class LoginController(BaseController):
         elif user.name == constants.tmp_user_name:
             user.name = tmp_user.name
             user._set_date(datetime.datetime.now())
-            user_group = DBSession.query(Group).filter(Group.name == constants.group_users).first()
+            user_group = DBSession.query(Group).filter(Group.name == constants.group_users_id).first()
             user_group.users.append(tmp_user)
             flash( 'Your account has been created')
             DBSession.add(user)
@@ -87,7 +87,7 @@ class LoginController(BaseController):
         
         # look if an user is admin or not
         admins = tg.config.get('admin.mails')
-        group_admins = DBSession.query(Group).filter(Group.name == constants.group_admins).first()
+        group_admins = DBSession.query(Group).filter(Group.id == constants.group_admins_id).first()
         if user.email in admins:
             user not in group_admins.users and group_admins.users.append(user)
         else :
