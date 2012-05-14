@@ -41,11 +41,11 @@ def guess_datatype(extension):
 
 
 
-def pre_track_creation(url=None, file_upload=None, project_id=None, sequence_id=None):
+def pre_track_creation(url=None, file_upload=None, fsys=None, project_id=None, sequence_id=None):
     """
     Verify track parameters.
     """
-    if file_upload is None and url is None:
+    if file_upload is None and url is None and fsys is None:
         raise Exception("Missing file to upload.")
 
     if url is not None:
@@ -69,7 +69,7 @@ def pre_track_creation(url=None, file_upload=None, project_id=None, sequence_id=
     if sequence is None:
         raise Exception('Sequence not found on GDV. Ask an admin to upload it.')
 
-def fetch_track_parameters(url=None, file_upload=None, trackname=None, extension=None, project_id=None, sequence_id=None):
+def fetch_track_parameters(url=None, file_upload=None, fsys=None, trackname=None, extension=None, project_id=None, sequence_id=None):
     """
     Fetch track parameters from the request.
     Guess trackname and extension if they are not provided.
@@ -79,11 +79,15 @@ def fetch_track_parameters(url=None, file_upload=None, trackname=None, extension
             trackname = os.path.splitext(os.path.split(url)[1])[0]
         elif file_upload is not None:
             trackname = os.path.splitext(file_upload.filename)[0]
+        elif fsys is not None:
+            trackname = os.path.splitext(file_upload.filename)[0]
 
     if extension is None:
         if url is not None:
             extension = os.path.splitext(os.path.split(url)[1])[1]
         elif file_upload is not None:
+            extension = os.path.splitext(file_upload.filename)[1]
+        elif fsys is not None:
             extension = os.path.splitext(file_upload.filename)[1]
 
     if sequence_id is None:

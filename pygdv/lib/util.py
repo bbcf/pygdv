@@ -190,7 +190,7 @@ def file_upload_converter(kw):
 
 
 block_sz = 8192
-def download(url=None, file_upload=None, filename='', extension=''):
+def download(url=None, file_upload=None, fsys=None, filename='', extension=''):
     """
     Download the file to a temporary place
     """
@@ -218,4 +218,9 @@ def download(url=None, file_upload=None, filename='', extension=''):
         except HTTPError as e:
             print '%s : %s' % (url, e)
             raise e
+
+    elif fsys is not None:
+        tmp_file.close()
+        shutil.copy(fsys, tmp_file.name)
+
     raise Exception("Nothing to download")

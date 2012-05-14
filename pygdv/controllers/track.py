@@ -72,6 +72,7 @@ class TrackController(CrudRestController):
         try :
             handler.track.pre_track_creation(url=kw.get('url', None),
                 file_upload=kw.get('file_upload', None),
+                fsys=kw.get('fsys', None),
                 project_id=kw.get('project_id', None),
                 sequence_id=kw.get('sequence_id', None))
         except Exception as e:
@@ -79,12 +80,14 @@ class TrackController(CrudRestController):
 
 
         # get parameters
-        track_name, extension, sequence_id = handler.track.fetch_track_parameters(url=kw.get('url', None),
-                file_upload=kw.get('file_upload', None), 
-                trackname=kw.get('trackname', None), 
-                extension=kw.get('extension', None),
-                project_id=kw.get('project_id', None),
-                sequence_id=kw.get('sequence_id', None))
+        track_name, extension, sequence_id = handler.track.fetch_track_parameters(
+            url=kw.get('url', None),
+            file_upload=kw.get('file_upload', None),
+            fsys=kw.get('fsys', None),
+            trackname=kw.get('trackname', None),
+            extension=kw.get('extension', None),
+            project_id=kw.get('project_id', None),
+            sequence_id=kw.get('sequence_id', None))
                 
         # upload the track it's from file_upload
         if request.environ[constants.REQUEST_TYPE] == constants.REQUEST_TYPE_BROWSER :

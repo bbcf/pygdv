@@ -13,7 +13,7 @@ import json, urllib, urllib2
 
 
 fill = {'dd2f5c97a48ab83caa5618a3a8898c54205c91b5' : ['track_1', 'track_2']}
-
+result = {'dd2f5c97a48ab83caa5618a3a8898c54205c91b5' : True}
 
 
 class PluginController(BaseController):
