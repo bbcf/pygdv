@@ -36,7 +36,7 @@ class JobController(CrudRestController):
     @expose('pygdv.templates.list')
     def get_all(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        jobs = DBSession.query(Job).filter(and_(Job.user_id == user.id, not_(Job.output == constants.job_output_reload))).all()
+        jobs = DBSession.query(Job).filter(Job.user_id == user.id).all()
         data = [util.to_datagrid(job_grid, jobs, "Job Listing", len(jobs)>0)]
         t = handler.help.tooltip['job']
         return dict(page='jobs', model='job', form_title="new job", items=data, value=kw, tooltip=t)
@@ -57,8 +57,8 @@ class JobController(CrudRestController):
                 src = constants.extra_url() + '/' + str(job.data)
                 return dict(page='jobs', model='Job', src=src, info=data)
             if job.output == constants.JOB_TRACK :
-                return dict(page='jobs', model='Job', src='', info=data)
-            
+                raise redirect('/tracks/%s/edit' % job.data)
+
         raise redirect(url('/jobs/get_all'))
     
     

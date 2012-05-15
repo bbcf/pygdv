@@ -181,11 +181,15 @@ class TrackController(CrudRestController):
         raise redirect('./')
 
 
-    @expose('tgext.crud.templates.edit')
+    @expose('pygdv.templates.track_form')
     def edit(self, *args, **kw):
         track = DBSession.query(Track).filter(Track.id == args[0]).first()
+        tmpl_context.widget = track_edit_form
         tmpl_context.color = track.parameters.color
-        return CrudRestController.edit(self, *args, **kw)
+        kw['name']=track.name
+
+        return dict(title='Edit track', page='track', color=track.parameters.color, value=kw)
+        #CrudRestController.edit(self, *args, **kw)
 
     @expose()
     @validate(track_edit_form, error_handler=edit)
@@ -199,6 +203,7 @@ class TrackController(CrudRestController):
 
         track = DBSession.query(Track).filter(Track.id == _id).first()
         track.name = kw['name']
+        print kw
         if 'color' in kw:
             track.parameters.color = kw['color']
         DBSession.flush()

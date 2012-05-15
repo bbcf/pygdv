@@ -64,6 +64,7 @@ class PluginController(BaseController):
                     if index == 0 :
                         # update current job
                         job.task_id = res.get('task_id')
+                        job.data = res.get('track_id')
                         DBSession.add(job)
                     else :
                         # create new jobs

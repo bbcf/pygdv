@@ -36,8 +36,8 @@ def get_track_color():
 class TEditForm(EditableForm):
     __model__ = Track
     __limit_fields__ = ['name']
-    color = twf.InputField(id='color',label_text='Enter a color',
-                          help_text = 'You can put rgb(102,30,29), hex value or just "red".', default=get_track_color)
+    color = twf.HiddenField(id='color',label_text='Enter a color',
+                          default=get_track_color)
 
 # EDIT FILLER
 class TEditFiller(EditFormFiller):

@@ -10,6 +10,7 @@
 <head>
   <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
   <title py:replace="page"></title>
+  
 </head>
 <style>
 #menu_items {
@@ -17,9 +18,30 @@
   list-style-type:None
 }
 </style>
+<script type="text/javascript" src="${tg.url('/javascript/jslib/dojo/dojo.js')}"
+    data-dojo-config="parseOnLoad: true"></script>
 
+
+<link rel="stylesheet" type="text/css" href="${tg.url('/javascript/jslib/dojox/widget/ColorPicker/ColorPicker.css')}"/>
 <body class="tundra">
 <h1><div py:replace="title">Title</div></h1>
-<div py:replace="tmpl_context.form(child_args=dict(tracks=dict(options=genre_options)))">Input Form</div>
+<div py:replace="tmpl_context.widget(value=value)">Input Form</div>
+<div id="picker" dojoType="dojox.widget.ColorPicker"
+     value="${color}"
+     onChange="handler(arguments[0],'color')"
+/>
 </body>
+
+
+
+<script type="text/javascript">
+
+dojo.require("dojox.widget.ColorPicker");
+var handler = function(val, id){
+    dojo.byId(id).value = val;
+}; 
+
+</script>
+
+
 </html>
