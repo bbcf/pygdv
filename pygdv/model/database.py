@@ -192,7 +192,7 @@ class Project(DeclarativeBase):
         return [t for t in self.tracks if t.status == constants.SUCCESS]
     @property 
     def get_tracks(self):
-        return ', '.join([track.name for track in self.tracks])
+        return ', '.join([track.name for track in self.success_tracks])
     @property
     def circles(self):
         res = []
