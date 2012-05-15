@@ -40,41 +40,27 @@ class PluginController(BaseController):
 
 
     @expose()
-    def callback(self, mail, key, project_id, form_id, task_id, status, *args, **kw):
+    def callback(self, mail, key, project_id, fid, tid, st, tn, td, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        print 'callback'
-        print args
-        print kw
-        print status
-
-        if status == 'RUNNING':
+        if st == 'RUNNING':
             # a new request is launched
-            job = handler.job.new_job(name='NEW JOB', description='a new job', user_id=user.id, project_id=project_id, output='no output for the moment', ext_task_id=task_id)
-            print 'new job %s' % job
+            job = handler.job.new_job(name=tn, description=td, user_id=user.id, project_id=project_id, output='RUNNING', ext_task_id=tid)
             return {}
 
-        elif status == 'SUCCESS' :
+        elif st == 'SUCCESS' :
             # a request is finished
-            # TODO update job
             # create new track
-            if new_tracks.has_key(form_id):
-                """
-                {'status': u'SUCCESS',
-                'form_id': u'dd2f5c97a48ab83caa5618a3a8898c54205c91b5',
-                'task_id': u'7a9c406a-3e56-4728-8589-03d31aab37e5',
-                'result': u'files merged',
-                'key': u'b8a05c98-5082-4cf2-976e-59b916e9e62a',
-                'mail': u'yohan.jarosz@epfl.ch'}
-                """
-                result_output = os.path.join(constants.extra_directory(), task_id)
+            if new_tracks.has_key(fid):
+                result_output = os.path.join(constants.extra_directory(), tid)
                 result_files = os.listdir(result_output)
-                job = DBSession.query(Job).filter(Job.ext_task_id == task_id).first()
+                job = DBSession.query(Job).filter(Job.ext_task_id == tid).first()
                 job.output = constants.JOB_TRACK
                 index = 0
                 for f in result_files:
                     _f = os.path.join(result_output, f)
-                    print _f
+
                     res = gdv.single_track(mail=mail, key=key, serv_url=tg.config.get('main.proxy'), project_id=project_id, fsys=_f)
+
                     if index == 0 :
                         # update current job
                         job.task_id = res.get('task_id')
@@ -86,23 +72,27 @@ class PluginController(BaseController):
                             user_id=user.id,
                             project_id=project_id,
                             output=job.output,
-                            task_id=task_id)
+                            task_id=tid)
                         DBSession.add(new_job)
-                    print res
 
                 DBSession.flush()
 
                 return {}
+            # job finished
             else :
-                job = DBSession.query(Job).filter(Job.ext_task_id == task_id).first()
+                job = DBSession.query(Job).filter(Job.ext_task_id == tid).first()
                 job.output = constants.SUCCESS
+                # data will reference directoy where job outputs will be found
+                job.data = os.path.join(constants.extra_url(), tid)
                 DBSession.add(job)
                 DBSession.flush()
                 return {}
 
-        elif status == 'ERROR' :
-            job = DBSession.query(Job).filter(Job.ext_task_id == task_id).first()
+        elif st == 'ERROR' :
+
+            job = DBSession.query(Job).filter(Job.ext_task_id == tid).first()
             job.output = constants.ERROR
+            job.data = kw.get('error', 'an error occured')
             DBSession.add(job)
             DBSession.flush()
             return {}
