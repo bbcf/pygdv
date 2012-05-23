@@ -69,7 +69,7 @@ Note that you can change it to any other database system supported by SQLAlchemy
 
 So if you want to use another database like *postgresql* for instance, you also need to install the right python binding ::
 
-    (pygdv) $ easy_install pycopg2 
+    (pygdv) $ easy_install psycopg2 
 
 
 ******************
@@ -80,7 +80,7 @@ pyGDV Installation
 
     $ git clone git@github.com:bbcf/pygdv.git
 
-.. note :: If you do not have git installed, please do so (instruction `here <http://git-scm.com/book/en/Getting-Started-Installing-Git>_` or `here <http://lmgtfy.com/?q=installing+git+source+version+control>`_).
+.. note :: If you do not have git installed, please do so (instruction `here <http://git-scm.com/book/en/Getting-Started-Installing-Git>`_ or `here <http://lmgtfy.com/?q=installing+git+source+version+control>`_).
 
 
 2. Put you on the right environment ::
@@ -92,7 +92,7 @@ pyGDV Installation
     (pygdv) $ easy_install -i http://tg.gy/215 tg.devtools
     (pygdv) $ easy_install numpy
 
-.. note :: Theses steps are separated from the setup *normal* install to prevent version conflicts
+.. note :: Theses steps are separated from the *normal* installation steps to prevent version conflicts
 
 
 4. Install BBCF dependencies, *bbcflib* and *track*.
