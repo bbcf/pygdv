@@ -17,7 +17,7 @@ You can start pyGDV with ::
 
     (pygdv) $ paster serve --reload devlopement.ini
 
-or by using the daemon file provided
+or by using the daemon file provided ::
 
    (pygdv) $ webserverctl start
 

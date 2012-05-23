@@ -7,6 +7,17 @@
 *pyGDV*'s documentation
 =======================
 
+pyGDV is a genome browser.
+
+
+=======
+Modules
+=======
+
+ * webserver : Turbogears
+ * worker : Celery
+ * messenger : RabbitMQ
+ * job library : JobLauncher
 
 =================
 Table of contents
