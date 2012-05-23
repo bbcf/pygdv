@@ -203,9 +203,8 @@ class TrackController(CrudRestController):
 
         track = DBSession.query(Track).filter(Track.id == _id).first()
         track.name = kw['name']
-        print kw
         if 'color' in kw:
-            track.parameters.color = kw['color']
+            track.parameters.color = kw.get('color')
         DBSession.flush()
         redirect('../')
 
