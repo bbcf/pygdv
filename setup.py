@@ -16,6 +16,20 @@ except ImportError:
     use_setuptools()
     from setuptools import setup, find_packages
 
+
+from distutils.core import setup
+from distutils.command.install_data import install_data
+
+class post_install(install_data):
+    def run(self):
+        # Call parent 
+        install_data.run(self)
+        # Execute commands
+        print "Post script"
+
+
+
+
 testpkgs=['WebTest >= 1.2.3',
                'nose',
                'coverage',
@@ -39,8 +53,6 @@ install_requires=[
     "tw.forms",
     "tw.dynforms",
     "kombu-sqlalchemy",
-    "yapsy",
-    "psycopg2",
     "tw.dojo",
     "celery",
     
