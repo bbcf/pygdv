@@ -24,3 +24,5 @@ dev.ini
 *.egg
 *.db
 *.DS_Store
+/doc/build/
+/prod.ini
