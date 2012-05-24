@@ -35,8 +35,11 @@ def is_sqlite_file(_f):
 
 def guess_datatype(extension):
     ext = extension.lower()
+    # remove dot in the first position only
+    if ext.index('.') == 0: ext.replace('.','',1)
     if _formats.has_key(ext):
         return _formats.get(ext)
+    raise Exception('Cannot guess the datatype for extension "%s"' % ext)
 
 
 
