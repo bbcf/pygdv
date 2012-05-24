@@ -396,9 +396,10 @@ def jsonify_quantitative(sha1, output_root_directory, database_path):
         pass
     conn = sqlite3.connect(database_path)
     cursor = conn.cursor()
-    cursor.execute('select * from chrNames;')
+    cursor.execute('select name from chrNames;')
     for row in cursor:
         chr_name = row[0]
+        print chr_name
         out = os.path.join(output_path, chr_name)
         try :
             os.mkdir(out)

@@ -164,6 +164,9 @@ function Marquee(x1, x2, chr, desc) {
     this.start = null; // Start in basepairs
     this.end   = null; // End in basepairs
     this.desc  = desc; // Description
+    if (!desc){
+	this.desc = 'enter description';
+    }
 };
 
 /**

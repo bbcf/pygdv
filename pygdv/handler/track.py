@@ -34,12 +34,9 @@ def is_sqlite_file(_f):
     return False
 
 def guess_datatype(extension):
-    ext = extension.lower()
-    # remove dot in the first position only
-    if ext.index('.') == 0: ext.replace('.','',1)
-    if _formats.has_key(ext):
-        return _formats.get(ext)
-    raise Exception('Cannot guess the datatype for extension "%s"' % ext)
+    if _formats.has_key(extension):
+        return _formats.get(extension)
+    raise Exception('Cannot guess the datatype for extension "%s"' % extension)
 
 
 
@@ -92,6 +89,12 @@ def fetch_track_parameters(url=None, file_upload=None, fsys=None, trackname=None
             extension = os.path.splitext(file_upload.filename)[1]
         elif fsys is not None:
             extension = os.path.splitext(os.path.split(fsys)[1])[1]
+
+    extension = extension.lower()
+
+    # remove dot in the first position only
+    if extension.index('.') == 0:
+        extension = extension.replace('.','',1)
 
     if sequence_id is None:
         project = DBSession.query(Project).filter(Project.id == project_id).first()
@@ -148,11 +151,16 @@ def update(track=None, track_id=None, params=None):
     """
     if track is None:
         track = DBSession.query(Track).filter(Track.id == track_id).first()
-    
+
+
     # set the task related with the track
     if params.has_key('task_id'):
-        track.input.task_id = params.get('task_id')
-        DBSession.add(track)
+        input = track.input
+        if input is None:
+            input = DBSession.query(Input).filter(Input.id == track.id).first()
+
+        input.task_id = params.get('task_id')
+        DBSession.add(input)
         
     # set the new task related with the track
     # the old one is deleted
@@ -173,8 +181,11 @@ def update(track=None, track_id=None, params=None):
 
     # set the sha1 for the track input
     if params.has_key('sha1'):
-        track.input.sha1 = params.get('sha1')
-        DBSession.add(track)
+        input = track.input
+        if input is None:
+            input = DBSession.query(Input).filter(Input.id == track.id).first()
+        input.sha1 = params.get('sha1')
+        DBSession.add(input)
 
     if params.has_key('datatype'):
         track.input.datatype = params.get('datatype')
