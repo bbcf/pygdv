@@ -36,11 +36,11 @@ Add an user for pyGDV, give him a password ::
 
 Add a host ::
 
-    $ sudo rabbitmqclt add_vhost pygdvhost
+    $ sudo rabbitmqctl add_vhost pygdvhost
 
 and give the user the right permissions ::
 
-    $ sudo rabbitmqclt set_permissions -p pygdvhost pygdvuser ".*" ".*" ".*"
+    $ sudo rabbitmqctl set_permissions -p pygdvhost pygdvuser ".*" ".*" ".*"
 
 
 ********************************
