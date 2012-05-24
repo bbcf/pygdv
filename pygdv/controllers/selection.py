@@ -45,7 +45,6 @@ class SelectionController(object):
 
         locations_ids = []
         # add locations
-        print 'locations %s' % locations
         for loc in json.loads(locations):
             obj = None
             if loc.has_key('id'):
