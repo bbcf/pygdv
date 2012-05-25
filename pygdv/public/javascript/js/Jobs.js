@@ -27,14 +27,23 @@ JobPane.prototype.init_panel = function(DomNode, DijitNode){
 
 /**
 * Return the right display for the job output
-* And set the contect pane to "Running" state
+* And set the context pane to "Running" state
+* if some job are not finished
 */
 JobPane.prototype.job_output = function(job){
     var job_output = job.output;
     switch(job_output){
+	
     case 'job_image': return dojo.create('a', {target:'_blank', href: _GDV_JOB_URL + '/result?id=' + job.id, innerHTML:'view output'});
-    case 'job_failure': return dojo.create('a', {target:'_blank', href: _GDV_JOB_URL + '/traceback?id=' + job.id, innerHTML:'failure'});
+	
+    case 'job_failure': 
+    case 'FAILURE':
+return dojo.create('a', {target:'_blank', href: _GDV_JOB_URL + '/traceback?id=' + job.id, innerHTML:'failure'});
+    
+
     case 'job_track' : return dojo.create('a', {innerHTML : 'reload', href : 'javascript:location.reload(true);'});
+    
+
     default : 
 	var p = dojo.create('div', {className : 'tiny_loading_gif'}); 
 	this.running = true;
