@@ -1,7 +1,8 @@
 var JOB_LOADING_TIME = 5000
 
 function JobPane(){
-    this.prefix = 'gdvjobs_'
+    this.prefix = 'gdvjobs_';
+    this.showed = false;
 };
 
 
@@ -26,6 +27,7 @@ JobPane.prototype.init_panel = function(DomNode, DijitNode){
 
 /**
 * Return the right display for the job output
+* And set the contect pane to "Running" state
 */
 JobPane.prototype.job_output = function(job){
     var job_output = job.output;
@@ -93,6 +95,7 @@ JobPane.prototype.display_jobs = function(jobo, context){
 	ctx = context;
     }
     ctx.running = false;
+    
     var jobs = jobo['jobs'];
     var jbl = jobs.length;
     for(var i=0; i<jbl; i++){
@@ -104,22 +107,42 @@ JobPane.prototype.display_jobs = function(jobo, context){
 	} else {
 	    tr = dojo.create("tr", {id: ctx.prefix + job.id}, ctx.jobstable);
 	}
+	
 	var m = dojo.create("table", {className: 'pane_element'}, tr);
 	var tr = dojo.create("tr", {}, m);
 	var td = dojo.create("td", {className: 'pane_unit', innerHTML: job.name, title: job.description}, tr);
 	var td = dojo.create("td", {className: 'pane_unit'}, tr);
+	
+	
 	td.appendChild(ctx.job_output(job));
+	
 	var del = dojo.create("td", {className:"delete"}, tr);
 	dojo.create("div", {innerHTML:"", className:"delete_img_field"}, del);
 	ctx.connect_delete(del, job);
     }
-
-    if (ctx.running){
+    if (ctx.running && ctx.showed){
 	setTimeout(function(){
 	    var fn = ctx.display_jobs;
 		ctx.get_jobs(fn, ctx);
 	}, JOB_LOADING_TIME);
     }
+};
+
+/**
+* Activate or deactivate the routine to fetch jobs from server
+*/
+JobPane.prototype.routine = function(bool){
+    if(bool){
+	this.showed = true;
+	var ctx = this;
+	setTimeout(function(){
+            var fn = ctx.display_jobs;
+            ctx.get_jobs(fn, ctx);
+	}, JOB_LOADING_TIME);
+    } else {
+	this.showed = false;
+    }
+
 };
 
 /**

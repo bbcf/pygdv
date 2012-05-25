@@ -27,6 +27,19 @@ PrincipalContainer.prototype.reset = function(){
     this.principal_dijit.selectChild('tab_fake');
 };
 
+/**
+* Function called when a new tab is selected.
+* It is a hook to launch or stop event.
+* 
+* *** a 'Jobs.get_jobs()' launched when job pane is selected
+*     or stopped
+*/
+PrincipalContainer.prototype.tab_selected = function(tab_name){
+    switch (tab_name){
+    case "Jobs"      :  this.jobs.routine(true);break;
+    default: this.jobs.routine(false);
+    }
+};
 
 
 /**
@@ -107,6 +120,7 @@ PrincipalContainer.prototype.setOnclickMenuElement = function(){
             } else {
                 dojo.cookie("menu_current_tab", ctx.menu_current_tab);
                 this.open = 1;
+		ctx.tab_selected(ctx.menu_current_tab);
             }
             dojo.stopEvent(e);
         });
@@ -126,6 +140,7 @@ PrincipalContainer.prototype.switchMenuElement = function(){
     case "Jobs"      : this.show_jobs(); break;
         default: console.log("ProgrammingError: cannot retrieve menu_current_tab from cookie.");
     }
+    this.tab_selected(this.menu_current_tab);
 }
 
 
