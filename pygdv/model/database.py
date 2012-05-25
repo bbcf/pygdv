@@ -479,7 +479,7 @@ class TrackParameters(DeclarativeBase):
         Get the representation dict for jbrowse
         '''
         d = {'url' : self.url, 'label' : self.label, 'type' : self.type, 
-                'gdv_id' : self.id, 'key' : self.key, 'date' : self.track.tiny_date}
+                'gdv_id' : self.track_id, 'key' : self.key, 'date' : self.track.tiny_date}
         if self.color:
             d['color'] = self.color
         return d

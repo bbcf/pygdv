@@ -264,7 +264,7 @@ class ProjectController(CrudRestController):
     def test(self, n):
         user = handler.user.get_user_in_session(request)
         p = handler.project.get_projects_with_permission(user.id, n)
-        raise redirect('./');
+        raise redirect('./')
 
     @expose('pygdv.templates.add_track')
     def add_track(self, project_id, *args, **kw):

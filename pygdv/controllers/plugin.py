@@ -46,9 +46,11 @@ class PluginController(BaseController):
         if st == 'RUNNING':
             # a new request is launched
             job = handler.job.new_job(name=tn, description=td, user_id=user.id, project_id=project_id, output='RUNNING', ext_task_id=tid)
+
             return {}
 
         elif st == 'SUCCESS' :
+            print 'ok'
             # a request is finished
             # create new track
             if new_tracks.has_key(fid):
@@ -59,14 +61,14 @@ class PluginController(BaseController):
                 index = 0
                 for f in result_files:
                     _f = os.path.join(result_output, f)
-
-                    res = gdv.single_track(mail=mail, key=key, serv_url=tg.config.get('main.proxy'), project_id=project_id, fsys=_f)
+                    res = gdv.single_track(mail=mail, key=key, serv_url=tg.config.get('main.proxy')+ tg.url('/'), project_id=project_id, fsys=_f)
 
                     if index == 0 :
                         # update current job
                         job.task_id = res.get('task_id')
                         job.data = res.get('track_id')
                         DBSession.add(job)
+
                     else :
                         # create new jobs
                         new_job = handler.job.new_job(name=job.name + ' (2)',
@@ -78,7 +80,6 @@ class PluginController(BaseController):
                         DBSession.add(new_job)
 
                 DBSession.flush()
-
                 return {}
             # job finished
             else :

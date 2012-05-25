@@ -110,29 +110,48 @@ JobPane.prototype.display_jobs = function(jobo, context){
     for(var i=0; i<jbl; i++){
 	var job = jobs[i];
 	var tr = null;
-	if (dojo.byId(ctx.prefix + job.id)){
-	    tr = dojo.byId(ctx.prefix + job.id);
-	    dojo.empty(tr);
-	} else {
-	    tr = dojo.create("tr", {id: ctx.prefix + job.id}, ctx.jobstable);
+	var display_it = true;
+	// look if the job output a track that is
+	// already loaded on the page
+	
+	if(job.output == 'job_track'){
+	    var til = trackInfo.length;
+	    for(i=0;i<til;i++){
+		tr = trackInfo[i];
+		if(tr['gdv_id'] == job.data){
+		    display_it = false;
+		    break;
+		}
+	    }
 	}
+
+	// render the job
+	if (display_it){
 	
-	var m = dojo.create("table", {className: 'pane_element'}, tr);
-	var tr = dojo.create("tr", {}, m);
-	var td = dojo.create("td", {className: 'pane_unit', innerHTML: job.name, title: job.description}, tr);
-	var td = dojo.create("td", {className: 'pane_unit'}, tr);
-	
-	
-	td.appendChild(ctx.job_output(job));
-	
-	var del = dojo.create("td", {className:"delete"}, tr);
-	dojo.create("div", {innerHTML:"", className:"delete_img_field"}, del);
-	ctx.connect_delete(del, job);
+	    if (dojo.byId(ctx.prefix + job.id)){
+		tr = dojo.byId(ctx.prefix + job.id);
+		dojo.empty(tr);
+	    } else {
+		tr = dojo.create("tr", {id: ctx.prefix + job.id}, ctx.jobstable);
+	    }
+	    
+	    var m = dojo.create("table", {className: 'pane_element'}, tr);
+	    var tr = dojo.create("tr", {}, m);
+	    var td = dojo.create("td", {className: 'pane_unit', innerHTML: job.name, title: job.description}, tr);
+	    var td = dojo.create("td", {className: 'pane_unit'}, tr);
+	    
+	    
+	    td.appendChild(ctx.job_output(job));
+	    
+	    var del = dojo.create("td", {className:"delete"}, tr);
+	    dojo.create("div", {innerHTML:"", className:"delete_img_field"}, del);
+	    ctx.connect_delete(del, job);
+	}
     }
     if (ctx.running && ctx.showed){
 	setTimeout(function(){
 	    var fn = ctx.display_jobs;
-		ctx.get_jobs(fn, ctx);
+	    ctx.get_jobs(fn, ctx);
 	}, JOB_LOADING_TIME);
     }
 };
