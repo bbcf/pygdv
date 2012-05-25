@@ -1,0 +1,18 @@
+#!/bin/sh -e
+PYGDV_HOME=/my/project/dir
+PYGDV_CONFIG_FILE=development.ini
+
+case "$1" in
+  start)
+    paster serve --daemon --pid-file=$PYGDV_HOME/paster.pid --log-file=$PYGDV_HOME/paster.log $PYGDV_HOME/$PYGDV_CONFIG_FILE start
+    ;;
+  stop)
+    paster serve --daemon --pid-file=$PYGDV_HOME/paster.pid --log-file=$PYGDV_HOME/paster.log  $PYGDV_HOME/$PYGDV_CONFIG_FILE stop
+    ;;
+  restart)
+    paster serve  --daemon --pid-file=$PYGDV_HOME/paster.pid --log-file=$PYGDV_HOME/paster.log $PYGDV_HOME/$PYGDV_CONFIG_FILE restart
+    ;;
+  *)
+    echo $"Usage: $0 {start|stop|restart}"
+    exit 1
+esac
