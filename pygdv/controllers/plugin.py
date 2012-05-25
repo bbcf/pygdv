@@ -12,26 +12,24 @@ from pygdv import handler
 from pygdv.model import DBSession, Job
 from bbcflib import gdv
 
-fill_with_tracks = {'dd2f5c97a48ab83caa5618a3a8898c54205c91b5' : ['track_1', 'track_2']}
-new_tracks = {'dd2f5c97a48ab83caa5618a3a8898c54205c91b5' : True}
 
 
 class PluginController(BaseController):
     allow_only = has_any_permission(constants.perm_admin, constants.perm_user)
 
     @expose()
-    def index(self, id, project_id, *args, **kw):
+    def index(self, id, project_id, fl, *args, **kw):
         url = plugin.util.get_form_url()
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         req = {}
         # add private parameters
         user = handler.user.get_user_in_session(request)
         req['_up']= json.dumps({"key" : user.key, "mail" : user.email, "project_id" : project_id})
-
+        fl = json.loads(fl)
+        if len(fl) > 0 :
         # add tracks in the form
-        if fill_with_tracks.has_key(id):
             gen_tracks = [[track.name, handler.track.plugin_link(track)] for track in project.success_tracks]
-            for param in fill_with_tracks.get(id):
+            for param in fl:
                 req[param]= json.dumps(gen_tracks)
         req['id'] = id
         f = urllib2.urlopen(url, urllib.urlencode(req))

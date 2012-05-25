@@ -1,7 +1,7 @@
 *******************
 pyGDV Configuration
 *******************
-There is three different configurations files to edit. Yes it is a lot, but your running a webserver that will launch 
+There is three different configurations files to edit. Yes it is a lot, but your running a webserver that will launch
 some costly computationnal tasks ;)
 
 You need to carrefully read these files, but importants notes are gathered here : 
@@ -39,7 +39,6 @@ If you want to serve pyGDV behind a prefix, you can add at the end of the [app:m
 .. warning :: before adding these lines, you must *deploy the application*.
 
 .. tip :: You could rename this file as *production.ini*, it's a good practice to have diferents configuration files for different purposes.
-
 
 -------
 who.ini
