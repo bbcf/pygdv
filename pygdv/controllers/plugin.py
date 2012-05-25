@@ -41,6 +41,7 @@ class PluginController(BaseController):
 
     @expose()
     def callback(self, mail, key, project_id, fid, tid, st, tn, td, *args, **kw):
+        print 'got callback %s (%s)' % (tid, st)
         user = handler.user.get_user_in_session(request)
         if st == 'RUNNING':
             # a new request is launched

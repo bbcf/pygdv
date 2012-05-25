@@ -280,17 +280,18 @@ class CustomCookiePlugin(object):
         cookie = cookies.get(self.cookie_name)
     # request = Request(environ)
         if cookie is None or not cookie.value:
-            # redirect to login_form
-            res = Response()
-            res.status = 302
-            addon = None
-            if 'SCRIPT_NAME' in environ:
-                addon = environ['SCRIPT_NAME']
-            if addon is not None:
-                res.location = addon + '/login_needed'
-            else :
-                res.location = 'login_needed'
-            return res
+            pass
+        # redirect to login_form
+        res = Response()
+        res.status = 302
+        addon = None
+        if 'SCRIPT_NAME' in environ:
+            addon = environ['SCRIPT_NAME']
+        if addon is not None:
+            res.location = addon + '/login_needed'
+        else :
+            res.location = 'login_needed'
+        return res
             
 
 
