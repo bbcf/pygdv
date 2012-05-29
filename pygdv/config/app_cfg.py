@@ -54,6 +54,9 @@ def on_startup():
     if tg.config.get('plugin.service.url') is None:
         print 'WARNING : YOU MUST SET THE "plugin.service.url" in your config file.'
 
+    if tg.config.get('plugin.shared.key') is None:
+        print 'WARNING : YOU MUST SET THE "plugin.shared.key" in your config file.'
+
 def on_shutdown():
     print '--- stopping application --- '
 base_config.call_on_startup = [on_startup]

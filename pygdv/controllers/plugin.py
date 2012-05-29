@@ -20,11 +20,13 @@ class PluginController(BaseController):
     @expose()
     def index(self, id, project_id, fl, *args, **kw):
         url = plugin.util.get_form_url()
+        key = plugin.util.get_shared_key()
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         req = {}
         # add private parameters
         user = handler.user.get_user_in_session(request)
-        req['_up']= json.dumps({"key" : user.key, "mail" : user.email, "project_id" : project_id})
+        req['_up'] = json.dumps({"key" : user.key, "mail" : user.email, "project_id" : project_id})
+        req['key'] = key
         fl = json.loads(fl)
         if len(fl) > 0 :
         # add tracks in the form
