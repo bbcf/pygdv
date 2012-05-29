@@ -50,34 +50,38 @@ class PluginController(BaseController):
             return {}
 
         elif st == 'SUCCESS' :
-            print 'ok'
             # a request is finished
-            # create new track
-            if new_tracks.has_key(fid):
+            # look if there is file output
+            if kw.has_key('fo'):
+                fos = json.loads(kw.get('fo'))
+
+
+
                 result_output = os.path.join(constants.extra_directory(), tid)
                 result_files = os.listdir(result_output)
                 job = DBSession.query(Job).filter(Job.ext_task_id == tid).first()
                 job.output = constants.JOB_TRACK
                 index = 0
-                for f in result_files:
-                    _f = os.path.join(result_output, f)
-                    res = gdv.single_track(mail=mail, key=key, serv_url=tg.config.get('main.proxy')+ tg.url('/'), project_id=project_id, fsys=_f)
+                for f in fos:
+                    if f[1] == 'track':
+                        _f = os.path.join(result_output, f[0])
+                        res = gdv.single_track(mail=mail, key=key, serv_url=tg.config.get('main.proxy')+ tg.url('/'), project_id=project_id, fsys=_f, delfile=True)
 
-                    if index == 0 :
-                        # update current job
-                        job.task_id = res.get('task_id')
-                        job.data = res.get('track_id')
-                        DBSession.add(job)
+                        if index == 0 :
+                            # update current job
+                            job.task_id = res.get('task_id')
+                            job.data = res.get('track_id')
+                            DBSession.add(job)
 
-                    else :
-                        # create new jobs
-                        new_job = handler.job.new_job(name=job.name + ' (2)',
-                            description=job.description + ' (2)',
-                            user_id=user.id,
-                            project_id=project_id,
-                            output=job.output,
-                            task_id=tid)
-                        DBSession.add(new_job)
+                        else :
+                            # create new jobs
+                            new_job = handler.job.new_job(name=job.name + ' (2)',
+                                description=job.description + ' (2)',
+                                user_id=user.id,
+                                project_id=project_id,
+                                output=job.output,
+                                task_id=tid)
+                            DBSession.add(new_job)
 
                 DBSession.flush()
                 return {}

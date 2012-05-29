@@ -25,7 +25,7 @@ manager = None
 
 
 @task()
-def track_input(_uploaded, _file, _urls, _fsys, _track_name, _extension, _callback_url, _force, _track_id, _user_mail, _user_key, _sequence_id):
+def track_input(_uploaded, _file, _urls, _fsys, _track_name, _extension, _callback_url, _force, _track_id, _user_mail, _user_key, _sequence_id, delfile):
     """
     First Entry point for track processing : 
     1) the track is uploaded (if it's not already the case)
@@ -34,7 +34,7 @@ def track_input(_uploaded, _file, _urls, _fsys, _track_name, _extension, _callba
     """
 
     task_id = track_input.request.id
-    _fname = upload(_uploaded, _file, _urls, _fsys, _track_name, _extension)
+    _fname = upload(_uploaded, _file, _urls, _fsys, _track_name, _extension, delfile)
     sha1 = util.get_file_sha1(_fname)
     result = callback(_callback_url + '/after_sha1', {'fname' : _fname,
                                                  'sha1' : sha1,
@@ -126,7 +126,7 @@ def track_process(_usermail, _userkey, old_task_id, fname, sha1, callback_url, t
     })
 
 
-def upload(_uploaded, _file, _urls, _fsys, _track_name, _extension):
+def upload(_uploaded, _file, _urls, _fsys, _track_name, _extension, delfile):
     """
     Upload the track.
     """
@@ -139,6 +139,14 @@ def upload(_uploaded, _file, _urls, _fsys, _track_name, _extension):
                         fsys=_fsys,
                        filename=_track_name,
                        extension=_extension)
+
+    # remove original file
+    if _fsys is not None:
+        if delfile.lower() in ['1', 'true', 'yes']:
+            try:
+                os.remove(_fsys)
+            except OSError:
+                pass
     return _f.name
         
 

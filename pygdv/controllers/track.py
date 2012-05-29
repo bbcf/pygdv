@@ -118,12 +118,13 @@ class TrackController(CrudRestController):
         _extension = extension
         _callback_url = constants.callback_track_url()
         _force = kw.get('force', False)
+        _delfile = kw.get('delfile', False)
         _track_id = _track.id
         _user_key = user.key
         _user_mail = user.email
 
         # launch task with the parameters
-        async = tasks.track_input.delay(_uploaded, _file, _urls, _fsys, _track_name, _extension, _callback_url, _force, _track_id, _user_mail, _user_key, sequence_id)
+        async = tasks.track_input.delay(_uploaded, _file, _urls, _fsys, _track_name, _extension, _callback_url, _force, _track_id, _user_mail, _user_key, sequence_id, _delfile)
         
         # update the track
         handler.track.update(track=_track, params={'task_id' : async.task_id})
