@@ -31,8 +31,7 @@ JobPane.prototype.init_panel = function(DomNode, DijitNode){
 */
 JobPane.prototype.job_output = function(job){
     var job_output = job.output;
-    console.log(job_output);
-    
+        
     switch(job_output){
 	
     case 'job_image': return dojo.create('a', {target:'_blank', href: _GDV_JOB_URL + '/result?id=' + job.id, innerHTML:'view output'});
@@ -101,12 +100,9 @@ JobPane.prototype.deljob = function(job_id){
 * to call this function
 */
 JobPane.prototype.display_jobs = function(jobo){
-    console.log('display jobs');
-    console.log(jobo);
-    
+        
     this.running = false;
     var ctx = this;
-    console.log(ctx);
     var jobs = jobo['jobs'];
     var jbl = jobs.length;
     for(var i=0; i<jbl; i++){
@@ -118,8 +114,8 @@ JobPane.prototype.display_jobs = function(jobo){
 	
 	if(job.output == 'job_track'){
 	    var til = trackInfo.length;
-	    for(i=0;i<til;i++){
-		tr = trackInfo[i];
+	    for(var j=0;j<til;j++){
+		tr = trackInfo[j];
 		if(tr['gdv_id'] == job.data){
 		    display_it = false;
 		    break;

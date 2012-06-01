@@ -19,6 +19,8 @@ def track_info(tracks, assembly_id=None):
                   'label':'DNA',
                   'type':'SequenceTrack',
                   'key':'DNA'}]
+
+
     l += [track.parameters.jb_dict for track in tracks]
     return l
         

@@ -189,7 +189,7 @@ class Project(DeclarativeBase):
         return result
     @property
     def success_tracks(self):
-        return [t for t in self.tracks if t.status == constants.SUCCESS]
+        return [t for t in self.tracks if t.status == constants.SUCCESS and t.parameters is not None]
     @property 
     def get_tracks(self):
         return ', '.join([track.name for track in self.success_tracks])
@@ -343,7 +343,8 @@ class Track(DeclarativeBase):
     _last_access = Column(DateTime, default=datetime.now, nullable=False)
     
     input_id = Column(Integer, ForeignKey('Input.id', ondelete="CASCADE"), nullable=False)
-   
+
+
     user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=True)
     
     
