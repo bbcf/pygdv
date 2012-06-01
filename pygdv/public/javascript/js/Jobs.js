@@ -22,7 +22,6 @@ JobPane.prototype.init_panel = function(DomNode, DijitNode){
     var jobs_table = dojo.create("table", {id:"jobs_table", className: 'pane_table',}, cont);
     this.jobstable = jobs_table;
     this.display_jobs(jobs);
-    
 };
 
 /**
@@ -32,6 +31,8 @@ JobPane.prototype.init_panel = function(DomNode, DijitNode){
 */
 JobPane.prototype.job_output = function(job){
     var job_output = job.output;
+    console.log(job_output);
+    
     switch(job_output){
 	
     case 'job_image': return dojo.create('a', {target:'_blank', href: _GDV_JOB_URL + '/result?id=' + job.id, innerHTML:'view output'});
@@ -56,14 +57,15 @@ return dojo.create('a', {target:'_blank', href: _GDV_JOB_URL + '/traceback?id=' 
 /**
 * Fetch the jobs from the server and callback them.
 */
-JobPane.prototype.get_jobs = function(callback, context){
+JobPane.prototype.get_jobs = function(){
+    var ctx = this;
     var pdata="project_id=" + _gdv_info.project_id;
     var xhrArgs = {
 	url : _GDV_JOB_URL + '/get_jobs',
 	postData : pdata,
 	handleAs : 'json',
 	load : function(data){
-	    callback(data, context);
+	    ctx.display_jobs(data);
 	},
 	error : function(data){
 	    console.error(data);
@@ -98,13 +100,13 @@ JobPane.prototype.deljob = function(job_id){
 * Display jobs on the panel, can specify on which context 
 * to call this function
 */
-JobPane.prototype.display_jobs = function(jobo, context){
-    var ctx = this;
-    if(context){
-	ctx = context;
-    }
-    ctx.running = false;
+JobPane.prototype.display_jobs = function(jobo){
+    console.log('display jobs');
+    console.log(jobo);
     
+    this.running = false;
+    var ctx = this;
+    console.log(ctx);
     var jobs = jobo['jobs'];
     var jbl = jobs.length;
     for(var i=0; i<jbl; i++){
@@ -140,7 +142,7 @@ JobPane.prototype.display_jobs = function(jobo, context){
 	    var td = dojo.create("td", {className: 'pane_unit', innerHTML: job.name, title: job.description}, tr);
 	    var td = dojo.create("td", {className: 'pane_unit'}, tr);
 	    
-	    
+	    // display the job output and change running status
 	    td.appendChild(ctx.job_output(job));
 	    
 	    var del = dojo.create("td", {className:"delete"}, tr);
@@ -148,29 +150,25 @@ JobPane.prototype.display_jobs = function(jobo, context){
 	    ctx.connect_delete(del, job);
 	}
     }
+    
     if (ctx.running && ctx.showed){
-	setTimeout(function(){
-	    var fn = ctx.display_jobs;
-	    ctx.get_jobs(fn, ctx);
-	}, JOB_LOADING_TIME);
-    }
+     	setTimeout(function(){
+     	    ctx.get_jobs();
+     	}, JOB_LOADING_TIME);
+     }
 };
 
 /**
 * Activate or deactivate the routine to fetch jobs from server
 */
 JobPane.prototype.routine = function(bool){
+    console.log("routine");
     if(bool){
 	this.showed = true;
-	var ctx = this;
-	setTimeout(function(){
-            var fn = ctx.display_jobs;
-            ctx.get_jobs(fn, ctx);
-	}, JOB_LOADING_TIME);
+	this.get_jobs();
     } else {
 	this.showed = false;
     }
-
 };
 
 /**
@@ -187,11 +185,11 @@ JobPane.prototype.connect_delete = function(HTMLnode, job){
     
 };
 
-function op_form_submitted(){
-    setTimeout(function(){
-	var fn = _gdv_pc.jobs.display_jobs;
-	_gdv_pc.show_jobs();
-	_gdv_pc.jobs.get_jobs(fn, _gdv_pc.jobs);
-    }, 1250);
+// function op_form_submitted(){
+//     setTimeout(function(){
+// 	var fn = _gdv_pc.jobs.display_jobs;
+// 	_gdv_pc.show_jobs();
+// 	_gdv_pc.jobs.get_jobs(fn, _gdv_pc.jobs);
+//     }, 1250);
     
-};
+// };
