@@ -93,7 +93,7 @@ def fetch_track_parameters(url=None, file_upload=None, fsys=None, trackname=None
     extension = extension.lower()
 
     # remove dot in the first position only
-    if extension.index('.') == 0:
+    if extension.find('.') == 0:
         extension = extension.replace('.','',1)
 
     if sequence_id is None:
