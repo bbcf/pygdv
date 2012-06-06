@@ -318,6 +318,8 @@ class Input(DeclarativeBase):
     @property
     def status(self):
         if self.task is None:
+            if self.task_id is not None:
+                return 'SUCCESS'
             return 'PENDING'
         return self.task.status
     
