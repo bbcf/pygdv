@@ -1,7 +1,7 @@
 """Circle Controller"""
 from tgext.crud import CrudRestController
 from tgext.crud.decorators import registered_validate
-
+from repoze.what.predicates import has_permission
 from repoze.what.predicates import has_any_permission
 
 from tg import expose, flash, require, request, tmpl_context, validate
@@ -80,8 +80,14 @@ class CircleController(CrudRestController):
             raise redirect('/circles')
         handler.circle.edit(circle, kw['name'], kw['description'], user, kw['users'])
         raise redirect('/circles')
-    
-    
-    
+
+
+    @require(has_permission('admin', msg='Only for admins'))
+    @expose('pygdv.templates.list')
+    def admin(self):
+        c = DBSession.query(Circle).all()
+        dc = [util.to_datagrid(circle_grid, c, "All circles", len(c)>0)]
+        t = handler.help.tooltip['circle']
+        return dict(page='circles', model='circle', tooltip=t, items=dc, value={})
     
      
