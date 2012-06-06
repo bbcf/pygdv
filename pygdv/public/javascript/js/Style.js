@@ -9,7 +9,10 @@ jQuery.fn.dataTableExt.oSort['string-case-desc'] = function(x,y) {
 
 
 $(document).ready(function() {
-    
+    $('.grid tr').click( function() {
+        console.log('click');
+	$(this).toggleClass('row_selected');
+    } );
     $('.grid').dataTable( {
         "aaSorting": [ [0,'asc'], [1,'asc'] ],
 	"bStateSave" : true,

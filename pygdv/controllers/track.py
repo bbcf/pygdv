@@ -310,8 +310,8 @@ class TrackController(CrudRestController):
         for sequence in sequences:
             tracks += sequence.default_tracks
         data = [util.to_datagrid(track_grid, tracks, "Track Listing", len(tracks)>0)]
-
-        return dict(page='tracks', model='track', form_title="admin tracks",items=data,value=kw)
+        t = handler.help.tooltip['track']
+        return dict(page='tracks', model='track', tooltip=t, form_title="admin tracks",items=data,value=kw)
 
     @require(has_permission('admin', msg='Only for admins'))
     @expose('pygdv.templates.list')
@@ -320,8 +320,9 @@ class TrackController(CrudRestController):
             tracks = DBSession.query(Track).filter(Track.user_id == kw['user_id']).all()
         else :
             tracks = DBSession.query(Track).all()
+        t = handler.help.tooltip['track']
         data = [util.to_datagrid(track_grid, tracks, "Track Listing", len(tracks)>0)]
-        return dict(page='tracks', model='track', form_title="new track",items=data,value=kw)
+        return dict(page='tracks', model='track', tooltip=t, form_title="new track",items=data,value=kw)
 
 
 
