@@ -5,13 +5,13 @@
 
 <!-- Menu bar for GDV -->
   <py:def function="mainmenu">
-    <ul id="mainmenu">
-      <li class="first"><a href="${tg.url('/')}" class="${('', 'active')[defined('page') and page=='index']}">Home</a></li>
-      <li><a href="${tg.url('/tracks')}" class="${('', 'active')[defined('page') and page=='tracks']}">Tracks</a></li>
-      <li><a href="${tg.url('/projects')}" class="${('', 'active')[defined('page') and page=='projects']}">Projects</a></li>           
-      <li><a href="${tg.url('/circles')}" class="${('', 'active')[defined('page') and page=='circles']}">Circles</a></li>           
-      <li><a href="${tg.url('/jobs')}" class="${('', 'active')[defined('page') and page=='jobs']}">Jobs</a></li>           
-      <li><a href="${tg.url('/help')}" class="${('', 'active')[defined('page') and page=='help']}">Help</a></li>           
+    <ul id="navigation">
+      <li class="first"><a href="${tg.url('/')}" class="${('', 'active')[defined('page') and page=='index']} menu_home">Home</a></li>
+      <li><a href="${tg.url('/tracks')}" class="${('', 'active')[defined('page') and page=='tracks']} menu_tracks">Tracks</a></li>
+      <li><a href="${tg.url('/projects')}" class="${('', 'active')[defined('page') and page=='projects']} menu_projects">Projects</a></li>           
+      <li><a href="${tg.url('/circles')}" class="${('', 'active')[defined('page') and page=='circles']} menu_circles">Circles</a></li>           
+      <li><a href="${tg.url('/jobs')}" class="${('', 'active')[defined('page') and page=='jobs']} menu_jobs">Jobs</a></li>           
+      <li><a href="${tg.url('/help')}" class="${('', 'active')[defined('page') and page=='help']} menu_help">Help</a></li>           
       <span py:if="tg.auth_stack_enabled" py:strip="True">
 	<li py:if="request.identity" id="login" class="loginlogout ${('', 'active')[defined('page') and page=='admin']}"><a href="${tg.url('/admin')}">Admin</a></li>
 	<li py:if="not request.identity" id="login" class="loginlogout"><a href="${tg.url('/login')}">Login</a></li>
@@ -44,28 +44,30 @@
 
   <!-- A simple item grid -->
   <py:def function="item_list(items)">
-      <div class="crud_table" style="height:50%; width:90%">
-	
-	<div py:for="item in items">
+    
+    <div id="controls">
+      <div class="actions">
+	<a href="../${tg.url(model)}s/new" class="add_link">New $model</a>
+      </div>
+      <div class="actions"><span py:replace="tooltip"/></div>
+    </div>
+    
+    <div class="crud_table" style="height:50%; width:90%">
+      <div py:for="item in items">
 	<div py:choose="item.grid_display">
 	  
-	<span py:when="True">
-	  <h1><span py:replace="item.grid_title"/></h1> <span py:replace="tooltip"></span>
-	  <a href="../${tg.url(model)}s/new" class="add_link">New $model</a>
-	  <div py:content="item.grid(item.grid_data)"></div>
-	</span>
-	
-	<span py:when="False">
-	  <a href="../${tg.url(model)}s/new" class="add_link">New $model</a>
-	  <h1>No ${item.grid_title}</h1>
-	</span>
-	
+	  <span py:when="True">
+	    <div py:content="item.grid(item.grid_data)"></div>
+	  </span>
+	  <span py:when="False">
+	    <h1>No Data</h1>
+	  </span>
+	  
 	</div>
       </div>
     </div>
-        
   </py:def>
-
+  
 
 <py:def function="item_list_without_link(items)">
       <div class="crud_table" style="height:50%; width:90%">

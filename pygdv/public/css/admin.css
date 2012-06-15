@@ -1,220 +1,194 @@
-.admin_grid{
-    margin-top: 1em;
-    width: 400px;
-}
-.admin_grid img{
-    border: 0;
-    vertical-align: middle;
-}
-
-a.add_link, a.edit_link{
-    background-repeat: no-repeat;
-    padding-left: 20px;
-}
-a.add_link{
-    background-image: url('../images/add.png');
-}
-a.edit_link{
-    background-image: url('../images/pencil.png');
-}
-
-/* admin list view */
-.crud_table .grid {
-    border-collapse: collapse;
-    border: 1px solid #ccc;
-}
-.crud_table .grid .odd.row_selected{
-    background-color: #ddf;
-
-}
-.crud_table .grid .even.row_selected{
-    background-color: #ddf;
-
-}
-.crud_table .grid .odd {
-    background-color: #eee;
-
-}
-.row_selected {
-    background-color:red;
-}
-.crud_table .grid th{
-    background: url("../images/menubg.png") no-repeat scroll -20px top transparent;
-    color: #fff;
-    font-weight: normal;
-    text-transform: capitalize;
-}
-.crud_table .grid td a{
-    color: #286571;
-}
-.crud_table .grid td.col_0 div{
-    float: left;
-}
-.crud_table .grid td.col_0 .edit_link, .crud_table .grid td.col_0 .delete-button, .crud_table .grid .button-to .delete-button{
-    display:block;
-    height:17px;
-    width:20px;
-    padding:0;
-    text-indent:-400px;
-    background-repeat: no-repeat;
-}
-.crud_table .grid td.col_0 .delete-button, .crud_table .grid .button-to .delete-button{
-    font-size: inherit;
-    background-image: url('../images/delete.png');
-    cursor: pointer;
-}
-
-
-
-/* admin add/edit view */
-.crud_edit label, .crud_add label{
-    font-size: 12px;
-}
-.crud_edit input, .crud_add input,
-.crud_edit select, .crud_add select{
-    width: 15em;
-}
-
-.delete-button{
-    display:block;
-    height:17px;
-    width:20px;
-    padding:0;
-    text-indent:-400px;
-    background-repeat: no-repeat;
-}
-
-.delete-button{
-    font-size: inherit;
-    background-image: url('../images/delete.png');
-    cursor: pointer;
-}
-
-a.view_link{
-    background-repeat: no-repeat;
-    padding: 1px;    
-    padding-left: 20px;
-    
-}
-a.view_link{
-    background-image: url('../images/view.png');
-}
-a.share_link{
-    background-repeat: no-repeat;
-    padding-left: 20px;
-}
-a.share_link{
-    background-image: url('../images/share.png');
-}
-
-a.detail_link{
-    background-repeat: no-repeat;
-    padding-left: 20px;
-}
-a.detail_link{
-    background-image: url('../images/plus.png');
-}
-a.delete_link{
-    padding-left: 20px;
-    background-repeat: no-repeat;
-    background-image: url('../images/delete.png');
-}
-
-a.copy_link{
-    background-repeat: no-repeat;
-    padding-left: 20px;
-}
-a.copy_link{
-    background-image: url('../images/copy.png');
-}
-
-a.export_link{
-    background-repeat: no-repeat;
-    padding-left: 20px;
-}
-a.export_link{
-    background-image: url('../images/export.png');
-}
-
-
-
-
-
-
-
-table.grid {
-    border-collapse: collapse;
-    border: 1px solid #ccc;
-}
-table.grid .odd{
-    background-color: #eee;
-}
-
-table.grid th{
-    background: url("../images/menubg.png") no-repeat scroll -20px top transparent;
-    color: #fff;
-    font-weight: normal;
-    text-transform: capitalize;
-}
-table.grid td a{
-    color: #286571;
-}
-table.grid td.col_0 div{
-    float: left;
-}
-table.grid td.col_0 .edit_link, .crud_table .grid td.col_0 .delete-button, .crud_table .grid .button-to .delete-button{
-    display:block;
-    height:17px;
-    width:20px;
-    padding:0;
-    text-indent:-400px;
-    background-repeat: no-repeat;
-}
-table.grid td.col_0 .delete-button, .crud_table .grid .button-to .delete-button{
-    font-size: inherit;
-    background-image: url('../images/delete.png');
-    cursor: pointer;
-}
-
-div.actions {
-    margin:3px;
-}
-a.action {
-    margin:2px;
-}
-
-span.imp {
-    font-weight: bold;
-}
-/* tr.row_selected { */
-/*     border: dashed 2px red; */
-
+/* .admin_grid{ */
+/*     margin-top: 1em; */
+/*     width: 400px; */
+/* } */
+/* .admin_grid img{ */
+/*     border: 0; */
+/*     vertical-align: middle; */
 /* } */
 
-.tooltip_gdv{
-    position:relative;
-    color: #FFFFFF;
-    
-}
-.tooltip_pane{
-    width: 200px;
-    position: absolute;
-    display:none;
-}
-div.tooltip_hider{
-    background: url('../images/info.png') no-repeat;
-    width: 16px;height: 16px;
-    padding: 5px;
-}
+/* a.add_link, a.edit_link{ */
+/*     background-repeat: no-repeat; */
+/*     padding-left: 20px; */
+/* } */
+/* a.add_link{ */
+/*     background-image: url('../images/add.png'); */
+/* } */
+/* a.edit_link{ */
+/*     background-image: url('../images/pencil.png'); */
+/* } */
 
-.tooltip_title{
-    padding:0.1px;
-    text-align: center;
-    background: url('../images/sbgred.jpg') repeat;
+/* /\* admin list view *\/ */
+/* .crud_table .grid { */
+/*     border-collapse: collapse; */
+/*     border: 1px solid #ccc; */
+/* } */
+/* .crud_table .grid .odd.row_selected{ */
+/*     background-color: #ddf; */
+
+/* } */
+/* .crud_table .grid .even.row_selected{ */
+/*     background-color: #ddf; */
+
+/* } */
+/* .crud_table .grid .odd { */
+/*     background-color: #eee; */
+
+/* } */
+/* .row_selected { */
+/*     background-color:red; */
+/* } */
+/* .crud_table .grid th{ */
+/*     background: url("../images/menubg.png") no-repeat scroll -20px top transparent; */
+/*     color: #fff; */
+/*     font-weight: normal; */
+/*     text-transform: capitalize; */
+/* } */
+/* .crud_table .grid td a{ */
+/*     color: #286571; */
+/* } */
+/* .crud_table .grid td.col_0 div{ */
+/*     float: left; */
+/* } */
+/* .crud_table .grid td.col_0 .edit_link, .crud_table .grid td.col_0 .delete-button, .crud_table .grid .button-to .delete-button{ */
+/*     display:block; */
+/*     height:17px; */
+/*     width:20px; */
+/*     padding:0; */
+/*     text-indent:-400px; */
+/*
+  background-repeat: no-repeat; */
+/* } */
+/* .crud_table .grid td.col_0 .delete-button, .crud_table .grid .button-to .delete-button{ */
+/*     font-size: inherit; */
+/*     background-image: url('../images/delete.png'); */
+/*     cursor: pointer; */
+/* } */
+
+
+
+/* /\* admin add/edit view *\/ */
+/* .crud_edit label, .crud_add label{ */
+/*     font-size: 12px; */
+/* } */
+/* .crud_edit input, .crud_add input, */
+/* .crud_edit select, .crud_add select{ */
+/*     width: 15em; */
+/* } */
+
+/* .delete-button{ */
+/*     display:block; */
+/*     height:17px; */
+/*     width:20px; */
+/*     padding:0; */
+/*     text-indent:-400px; */
+/*     background-repeat: no-repeat; */
+/* } */
+
+/* .delete-button{ */
+/*     font-size: inherit; */
+/*     background-image: url('../images/delete.png'); */
+/*     cursor: pointer; */
+/* } */
+
+/* a.view_link{ */
+/*     background-repeat: no-repeat; */
+/*     padding: 1px;     */
+/*     padding-left: 20px; */
     
-}
-.tooltip_body{
-    padding: 10px;
-    text-align: left;
-    background: url('../images/sbggrey.png') repeat;
-}
+/* } */
+/* a.view_link{ */
+/*     background-image: url('../images/view.png'); */
+/* } */
+/* a.share_link{ */
+/*     background-repeat: no-repeat; */
+/*     padding-left: 20px; */
+/* } */
+/* a.share_link{ */
+/*     background-image: url('../images/share.png'); */
+/* } */
+
+/* a.detail_link{ */
+/*     background-repeat: no-repeat; */
+/*     padding-left: 20px; */
+/* } */
+/* a.detail_link{ */
+/*     background-image: url('../images/plus.png'); */
+/* } */
+/* a.delete_link{ */
+/*     padding-left: 20px; */
+/*     background-repeat: no-repeat; */
+/*     background-image: url('../images/delete.png'); */
+/* } */
+
+/* a.copy_link{ */
+/*     background-repeat: no-repeat; */
+/*     padding-left: 20px; */
+/* } */
+/* a.copy_link{ */
+/*     background-image: url('../images/copy.png'); */
+/* } */
+
+/* a.export_link{ */
+/*     background-repeat: no-repeat; */
+/*     padding-left: 20px; */
+/* } */
+/* a.export_link{ */
+/*     background-image: url('../images/export.png'); */
+/* } */
+
+
+
+
+
+
+
+/* table.grid { */
+/*     border-collapse: collapse; */
+/*     border: 1px solid #ccc; */
+/* } */
+/* table.grid .odd{ */
+/*     background-color: #eee; */
+/* } */
+
+/* table.grid th{ */
+/*     background: url("../images/menubg.png") no-repeat scroll -20px top transparent; */
+/*     color: #fff; */
+/*     font-weight: normal; */
+/*     text-transform: capitalize; */
+/* } */
+/* table.grid td a{ */
+/*     color: #286571; */
+/* } */
+/* table.grid td.col_0 div{ */
+/*     float: left; */
+/* } */
+/* table.grid td.col_0 .edit_link, .crud_table .grid td.col_0 .delete-button, .crud_table .grid .button-to .delete-button{ */
+/*     display:block; */
+/*     height:17px; */
+/*     width:20px; */
+/*     padding:0; */
+/*     text-indent:-400px; */
+/*     background-repeat: no-repeat; */
+/* } */
+/* table.grid td.col_0 .delete-button, .crud_table .grid .button-to .delete-button{ */
+/*     font-size: inherit; */
+/*     background-image: url('../images/delete.png'); */
+/*     cursor: pointer; */
+/* } */
+
+/* div.actions { */
+/*     margin:3px; */
+/* } */
+/* a.action { */
+/*     margin:2px; */
+/* } */
+
+/* span.imp { */
+/*     font-weight: bold; */
+/* } */
+/* /\* tr.row_selected { *\/ */
+/* /\*     border: dashed 2px red; *\/ */
+
+/* /\* } *\/ */
+

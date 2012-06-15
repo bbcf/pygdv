@@ -9,6 +9,7 @@ from tg import app_globals as gl
 from tg.controllers import redirect
 from tg.decorators import paginate, with_trailing_slash, without_trailing_slash
 import tg
+from pygdv.widgets import datagrid
 
 from pygdv.model import DBSession, Project, User, RightCircleAssociation, Track, Job, Sequence
 from pygdv.widgets.project import project_table,  project_admin_grid, project_with_right, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid,circles_available_form, tracks_available_form, project_sharing_grid, project_grid_sharing
@@ -52,32 +53,30 @@ class ProjectController(CrudRestController):
         
         
     @with_trailing_slash
-    @expose('pygdv.templates.project')
+    @expose('pygdv.templates.list')
     @expose('json')
     #@paginate('items', items_per_page=10)
     def get_all(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
         
         # user project
-        user_projects = [util.to_datagrid(project_grid, user.projects, "Project Listing", len(user.projects)>0)]
+        user_projects = [util.to_datagrid(datagrid.project_grid, user.projects, "Project Listing", len(user.projects)>0)]
         # shared projects
-        project_with_rights = handler.project.get_shared_projects(user)
-        
-        
-        
-        sp = []
-        for project, rights in project_with_rights.iteritems():
-            sp.append(ModelWithRight(project, {constants.right_read : constants.right_read in rights, 
-                                               constants.right_download : constants.right_download in rights,
-                                               constants.right_upload : constants.right_upload in rights}))
-        shared_projects = [util.to_datagrid(project_with_right, sp, "Shared projects", len(sp)>0)]
+#        project_with_rights = handler.project.get_shared_projects(user)
+#
+#        sp = []
+#        for project, rights in project_with_rights.iteritems():
+#            sp.append(ModelWithRight(project, {constants.right_read : constants.right_read in rights,
+#                                               constants.right_download : constants.right_download in rights,
+#                                               constants.right_upload : constants.right_upload in rights}))
+#        shared_projects = [util.to_datagrid(project_with_right, sp, "Shared projects", len(sp)>0)]
         #TODO check with permissions
         
         control = '''
        
         '''
         t = handler.help.tooltip['project']
-        return dict(page='projects', model='project',form_title="New project", user_projects=user_projects, shared_projects=shared_projects, control=control, value=kw, tooltip=t)
+        return dict(page='projects', model='project',form_title="New project", items=user_projects, value=kw, tooltip=t)
     
 
 

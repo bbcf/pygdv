@@ -12,6 +12,7 @@ from tg.decorators import with_trailing_slash
 
 from pygdv.model import DBSession, Track, Sequence, Input, Task
 from pygdv.widgets.track import track_table, track_export, track_table_filler, track_new_form, track_edit_filler, track_edit_form, track_grid, default_track_form
+from pygdv.widgets import datagrid
 from pygdv import handler
 from pygdv.lib import util, constants, checker, reply
 from pygdv.celery import tasks
@@ -45,7 +46,7 @@ class TrackController(CrudRestController):
         #tracks = DBSession.query(TMPTrack).filter(TMPTrack.user_id == user.id).all()
 
         tracks = user.tracks
-        data = [util.to_datagrid(track_grid, tracks, "Track Listing", len(tracks)>0)]
+        data = [util.to_datagrid(datagrid.track_grid, tracks, "Track Listing", len(tracks)>0)]
         t = handler.help.tooltip['track']
         return dict(page='tracks', model='track', form_title="new track", items=data, value=kw, tooltip=t)
 
