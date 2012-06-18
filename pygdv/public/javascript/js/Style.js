@@ -9,9 +9,6 @@ jQuery.fn.dataTableExt.oSort['string-case-desc'] = function(x,y) {
 
 
 $(document).ready(function() {
-    $('.grid tbody tr').click( function() {
-     	$(this).toggleClass('row_selected');
-    } );
     $('.grid tbody tr').hover( function() {
      	$(this).toggleClass('row_hover');
 	show_actions($(this));
@@ -19,7 +16,6 @@ $(document).ready(function() {
     $('.grid').dataTable( {
 	"bStateSave" : true,
 	"aaSorting": [ [0,'asc'], [1,'asc'] ],
-	
     });
     
 });
@@ -50,22 +46,31 @@ $(document).ready(function() {
     $(window).resize(function(){
 	good_content_size();
     });
-    
+    // set status class on tracks
+    $('.grid tbody tr').each(function(ind, dome){
+	var status = $(dome).find('.tr_status').html();
+	if (status){
+	    status = status.toLowerCase();
+	    $(dome).addClass('track_' + status);
+	}
+    });
 });
 
 function good_content_size(){
+    /** make the content of a good size */
     var new_width = $(window).width() - $('#navigation').width();
-    var max = Math.max(new_width, '800');
-    $('#content').width( max - 15 );
-    $('.crud_table').width('100%');
+    var max = Math.max(new_width, '800') - 15;
+    $('#content').width(max);
+    $('.grid').width(max);
+    $('#content').width(max);
 };
 
 function show_actions(node){
+    /** show the actions when user hover on content */
     var c = node.attr('class');
     if (c.indexOf('row_hover') > 0){
 	// create a span with actions htnl inside
 	var actions = node.find('.table_hidden').find('.tr_actions').first();
-	var d = actions.attr('display');
 	var s = $('<span class=tr_action_hover>').html(actions.html());
 	// position it
 	var l = node.find('td');
@@ -74,10 +79,10 @@ function show_actions(node){
 	var postop = l.eq(0).offset().top + 6;
 	s.css('top', postop + "px");
 	node.append(s);
-	
     } else {
 	node.find('.tr_action_hover').remove();
     }
-    
 };
+
+
 

@@ -11,6 +11,7 @@ from tg.decorators import paginate,with_trailing_slash, without_trailing_slash
 
 from pygdv.model import DBSession, Circle, Species, User
 from pygdv.widgets.circle import circle_table, circle_table_filler, circle_new_form, circle_edit_filler, circle_edit_form, circle_grid
+from pygdv.widgets import datagrid
 from pygdv import handler
 from pygdv.lib import util, checker, constants
 from sqlalchemy import and_
@@ -49,7 +50,7 @@ class CircleController(CrudRestController):
     def get_all(self, *args, **kw):
         kw['page']='circle'
         user = handler.user.get_user_in_session(request)
-        data = [util.to_datagrid(circle_grid, user.circles, "Circle Listing", len(user.tracks)>0)]
+        data = [util.to_datagrid(datagrid.circle_grid, user.circles, "Circle Listing", len(user.tracks)>0)]
         t = handler.help.tooltip['circle']
         return dict(page='circles', model='circle', form_title="new circle",items=data,value=kw, tooltip=t)
 

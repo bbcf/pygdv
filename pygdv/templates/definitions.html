@@ -56,12 +56,12 @@
       <div py:for="item in items">
 	<div py:choose="item.grid_display">
 	  
-	  <span py:when="True">
+	  <div py:when="True">
 	    <div py:content="item.grid(item.grid_data)"></div>
-	  </span>
-	  <span py:when="False">
+	  </div>
+	  <div py:when="False">
 	    <h1>No Data</h1>
-	  </span>
+	  </div>
 	  
 	</div>
       </div>

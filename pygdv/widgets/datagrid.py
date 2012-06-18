@@ -21,9 +21,9 @@ track_grid = twf.DataGrid(fields=[
     ('Created', 'created'),
     ('Assembly', 'sequence'),
     ('Type', 'vizu'),
-    ('Status', lambda obj: helpers.get_task_status(obj)),
     (hidden_info, lambda obj : hide_info({
         'tr_id' : obj.id,
+        'tr_status': obj.status,
         'tr_actions' :
         helpers.get_export_link(obj.id, rights = constants.full_rights, tmp=obj.tmp)
         + helpers.get_edit_link(obj.id, rights = constants.full_rights, link='./', tmp=obj.tmp)
@@ -46,3 +46,17 @@ project_grid = twf.DataGrid(fields = [
 
     }) ),
 ])
+
+
+circle_grid = twf.DataGrid(fields=[
+    ('Name', 'name'),
+    ('Description', 'description'),
+    ('Owner', 'creator'),
+    ('Members', 'get_users'),
+    (hidden_info,lambda obj : hide_info({
+        'tr_actions' :
+            helpers.get_delete_link(obj.id, rights = constants.full_rights)
+            + helpers.get_circles_edit_link(obj.id)
+        }))
+])
+

@@ -114,6 +114,7 @@ class ProjectController(CrudRestController):
 
     @expose('genshi:tgext.crud.templates.post_delete')
     def post_delete(self, *args, **kw):
+        print 'delete %s, %s' % (args, kw)
         user = handler.user.get_user_in_session(request)
         project_id = args[0]
         if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
