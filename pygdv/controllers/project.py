@@ -3,7 +3,7 @@ from tgext.crud import CrudRestController
 from tgext.crud.decorators import registered_validate
 
 from repoze.what.predicates import not_anonymous, has_any_permission, has_permission
-
+from pygdv.lib.base import BaseController
 from tg import expose, flash, require, error, request, tmpl_context, validate, url
 from tg import app_globals as gl
 from tg.controllers import redirect
@@ -18,25 +18,78 @@ from pygdv.widgets import ModelWithRight
 from pygdv import handler
 from pygdv.lib import util, plugin
 import os, json, urllib2
+from pygdv.widgets import form
 import transaction
 from pygdv.lib import checker
 from pygdv.lib.jbrowse import util as jb
 from pygdv.lib import constants, reply
-
+import tw2.core as twc
 from sqlalchemy.sql import and_, or_, not_
 import re
 
 __all__ = ['ProjectController']
 
 
-class ProjectController(CrudRestController):
+class ProjectController(BaseController):
     allow_only = has_any_permission(constants.perm_user, constants.perm_admin)
-    model = Project
-    table = project_table
-    table_filler = project_table_filler
-    edit_form = project_edit_form
-    new_form = project_new_form
-    edit_filler = project_edit_filler
+
+
+    @require(not_anonymous())
+    @expose('pygdv.templates.new')
+    def new(self, *args, **kw):
+        tmpl_context.widget = project_new_form
+        user = handler.user.get_user_in_session(request)
+        #tmpl_context.circles=user.circles
+        return dict(page='projects', value=kw, model='project')
+
+
+
+    @expose('pygdv.templates.project_edit')
+    def edit(self, *args, **kw):
+        user = handler.user.get_user_in_session(request)
+
+        if request.method == 'GET':
+            project_id = args[0]
+        else :
+            project_id = kw.get('pid')
+
+        if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
+            flash('You must have %s permission to view the project.' % constants.right_upload, 'error')
+            raise redirect('/projects')
+
+
+        widget = form.EditProject(action=url('/projects/edit/%s' % project_id)).req()
+        widget.value = {'pid' : project_id}
+        project = DBSession.query(Project).filter(Project.id == project_id).first()
+
+        tracks = DBSession.query(Track).join(User.tracks).filter(
+            and_(User.id == user.id, Track.sequence_id == project.sequence_id,
+                not_(Track.id.in_([t.id for t in project.tracks])))
+        ).all()
+
+
+        if request.method == 'GET':
+            widget.child.children[1].value = project.name
+            widget.child.children[2].options = [(t.id, t.name) for t in tracks] + [(t.id, t.name, {'selected' : True}) for t in project.tracks]
+            return dict(page='projects', widget=widget, model='project')
+
+        try:
+            widget.validate(kw)
+        except twc.ValidationError as e:
+            w = e.widget
+            w.child.children[1].value = project.name
+            w.child.children[2].options = [(t.id, t.name) for t in tracks] + [(t.id, t.name, {'selected' : True}) for t in project.tracks]
+            return dict(page='projects', widget=w, model='project')
+        print kw
+        handler.project.e(project_id=project_id, name=kw.get('name'), track_ids=kw.get('tracks', None))
+
+        raise redirect('/projects')
+
+
+
+
+
+
 
     
     @with_trailing_slash
@@ -56,7 +109,7 @@ class ProjectController(CrudRestController):
     @expose('pygdv.templates.list')
     @expose('json')
     #@paginate('items', items_per_page=10)
-    def get_all(self, *args, **kw):
+    def index(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
         
         # user project
@@ -80,14 +133,8 @@ class ProjectController(CrudRestController):
     
 
 
-    @require(not_anonymous())
-    @expose('pygdv.templates.form')
-    def new(self, *args, **kw):
-        tmpl_context.widget = project_new_form
-        user = handler.user.get_user_in_session(request)
-        #tmpl_context.circles=user.circles
-        return dict(page='projects', value=kw, title='New Project')
-    
+
+
     @expose('json')
     def create(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
@@ -146,27 +193,7 @@ class ProjectController(CrudRestController):
                     track_list=track_list)
 
 
-    @expose('pygdv.templates.form')
-    def edit(self, project_id, *args, **kw):
-        user = handler.user.get_user_in_session(request)
-        if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
-            flash('You must have %s permission to view the project.' % constants.right_upload, 'error')
-            raise redirect('/projects')
 
-        project = DBSession.query(Project).filter(Project.id == project_id).first()
-        tmpl_context.widget = project_edit_form
-        project_tracks = project.tracks
-        tmpl_context.selected_tracks =  project_tracks
-        tmpl_context.project = project
-        user_tracks = DBSession.query(Track).join(User.tracks).filter(
-                            and_(User.id == user.id, Track.sequence_id == project.sequence_id,
-                            not_(Track.id.in_([t.id for t in project_tracks])))
-                                 ).all()
-        
-        tmpl_context.tracks = user_tracks
-        
-        kw['_method']='PUT'
-        return dict(page='projects', value=kw, title='Edit Project')
 
     @expose()
     @validate(project_edit_form, error_handler=edit)
@@ -189,40 +216,48 @@ class ProjectController(CrudRestController):
 
 
     @expose('pygdv.templates.project_sharing')
-    def share(self, project_id, *args, **kw):
-        if project_id is None:
-            raise redirect('./')
+    def share(self, *args, **kw):
+
         user = handler.user.get_user_in_session(request)
-        if not checker.user_own_project(user.id, project_id):
-            flash('You cannot share a project which is not yours')
-            raise redirect('./')
 
-        # project info
+        if request.method == 'GET':
+            project_id = args[0]
+        else :
+            project_id = kw.get('pid')
+
+        if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
+            flash('You must have %s permission to view the project.' % constants.right_upload, 'error')
+            raise redirect('/projects')
+
         project = DBSession.query(Project).filter(Project.id == project_id).first()
-        data = util.to_datagrid(project_grid, [project])
+        widget = form.ShareProject(action=url('/projects/share/%s' % project_id))
 
-        # circles available
-        tmpl_context.widget = circles_available_form
-        tmpl_context.circles = user.circles
+        circles_already_shared = [p.circle for p in project.circles_rights]
+
+        widget.child.children[1].options = [(c.id, c.name) for c in user.circles if c not in [circles_already_shared]] + \
+                                           [(c.id, c.name, {'selected' : True}) for c in circles_already_shared]
 
         # circles with rights
-        cr_data = [util.to_datagrid(project_sharing_grid, project.circles_rights, "Sharing", len(project.circles_rights)>0)]
-        
+        cr_data = [util.to_datagrid(datagrid.project_sharing, project.circles_rights, "Sharing", len(project.circles_rights)>0)]
         # public url
         pub = url('/public/project', {'id' : project_id, 'k' : project.key})
        
         # download url
-        print project.download_key
         if project.download_key is None:
             project.download_key = project.setdefaultkey()
         
         down = url('/public/project', {'id' : project_id, 'k' : project.download_key})
-       
-        kw['project_id'] = project_id
+
+
+        widget.value = {'pid' : project_id}
+
         t = handler.help.tooltip['links']
-        return dict(page='projects', model='Project', info=data,
-                    circle_right_data=cr_data, form_title='Circles availables', value=kw, public=pub, download=down,
-                    tooltip_permissions=t)
+
+        if request.method == 'POST':
+            handler.project.e(project, circle_ids=kw.get('circles', None))
+
+        return dict(page='projects', model='project', public=pub, download=down, name=project.name,
+                    tooltip_permissions=t, widget=widget, items=cr_data)
 
 
     @expose()

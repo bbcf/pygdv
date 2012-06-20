@@ -97,7 +97,7 @@ group_users = 'Users'
 group_users_id = 2
 perm_user = 'user'
 
-tmp_user_name = 'tmp_user'
+tmp_user_name = 'user-not-registered'
 
 
 

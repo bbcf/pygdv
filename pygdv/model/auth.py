@@ -116,9 +116,6 @@ class User(DeclarativeBase):
             uid = str(uuid.uuid4())
         return uid
             
-            
-   
-   
     # columns
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Unicode(255), nullable=False)

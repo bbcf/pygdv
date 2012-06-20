@@ -53,10 +53,10 @@ class TrackController(CrudRestController):
 
 
     @require(not_anonymous())
-    @expose('pygdv.templates.form')
+    @expose('pygdv.templates.new')
     def new(self, *args, **kw):
         tmpl_context.widget = track_new_form
-        return dict(page='tracks', value=kw, title='new Track')
+        return dict(page='tracks', value=kw, model='track')
 
 
     @expose('json')
@@ -65,9 +65,6 @@ class TrackController(CrudRestController):
         Entry point for creating track
 
         """
-        print 'CREATE TRACK %s, %s' % (args, kw)
-
-
         user = handler.user.get_user_in_session(request)
         # change a parameter name
         if kw.has_key('assembly'):
@@ -190,7 +187,7 @@ class TrackController(CrudRestController):
         tmpl_context.color = track.parameters.color
         kw['name']=track.name
 
-        return dict(title='Edit track', page='track', color=track.parameters.color, value=kw)
+        return dict(title='Edit track', page='track', name=track.name, color=track.parameters.color, value=kw)
         #CrudRestController.edit(self, *args, **kw)
 
     @expose()

@@ -19,14 +19,28 @@
 </style>
 
 <body class="tundra">
+  
   <div id="controls">
     <div class="actions">
-      <div class="actions"><a href="../${tg.url(model)}s">back</a></div>
-      <div class="actions">New $model</div>
+      <a href="../${tg.url(model)}s/new">New $model</a>
     </div>
+    <div class="actions"><span py:replace="tooltip"/></div>
   </div>
-  <div class="new_form">
-    <div py:replace="tmpl_context.widget(value=value)">Input Form</div>
+  
+  <div class="crud_table" style="height:50%; width:90%">
+    <div py:choose="item.grid_display">
+      <div py:when="True">
+	<div py:content="item.grid(value=item.grid_data)"></div>
+      </div>
+      <div py:when="False">
+	<h1>No Data</h1>
+      </div>
+      
+    </div>
+    
   </div>
+
+
+
 </body>
 </html>

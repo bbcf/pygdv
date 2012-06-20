@@ -24,23 +24,29 @@
 
 <link rel="stylesheet" type="text/css" href="${tg.url('/javascript/jslib/dojox/widget/ColorPicker/ColorPicker.css')}"/>
 <body class="tundra">
-<h1><div py:replace="title">Title</div></h1>
-<div py:replace="tmpl_context.widget(value=value)">Input Form</div>
-<div id="picker" dojoType="dojox.widget.ColorPicker"
-     value="${color}"
-     onChange="handler(arguments[0],'color')"
-/>
+  <div id="controls">
+     <div class="actions">
+       ${name}
+     </div>
+  </div>
+  <div class="new_form">
+    <div py:replace="tmpl_context.widget(value=value)">Input Form</div>
+    <div id="picker" dojoType="dojox.widget.ColorPicker"
+	 value="${color}"
+	 onChange="handler(arguments[0],'color')"
+	 />
+  </div>
 </body>
 
 
 
 <script type="text/javascript">
-
-dojo.require("dojox.widget.ColorPicker");
-var handler = function(val, id){
-    dojo.byId(id).value = val;
-}; 
-
+  
+  dojo.require("dojox.widget.ColorPicker");
+  var handler = function(val, id){
+  dojo.byId(id).value = val;
+  }; 
+  
 </script>
 
 

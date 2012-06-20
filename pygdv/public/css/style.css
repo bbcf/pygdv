@@ -142,6 +142,12 @@ div#inner_content {
   top: 2.8em;
   width: 100%;
 }
+/* forms */
+div.new_form {
+    position: relative;
+    top: 2.8em;
+    width: 100%;
+}
 
 /* table */
 div.crud_table {
@@ -280,6 +286,10 @@ a.edit_link{
     background-repeat: no-repeat;
     background-image: url('../images/pencil.png');
 }
+a.add_link{
+    background-repeat: no-repeat;
+    background-image: url('../images/add.gif');
+}
 
 a.export_link{
     background-repeat: no-repeat;
@@ -288,12 +298,23 @@ a.export_link{
 
 /* tracks */
 
-.track_failure{
-    opacity:0.7;
-    filter:alpha(opacity=70);
-    color:red;
+.track-failure{
+    opacity:0.5;
+    filter:alpha(opacity=50);
+    background-color:red;
 }
 
+.circle_select, .track_select{
+height:18em;
+}
+
+/* circles */
+div.add_user_c{
+    background: none repeat scroll 0 0 #CCCCCC;
+    border-right: 1px solid #CCCCCC;
+    box-shadow: -3px 0 7px #000000;
+    z-index: 100;
+}
 
 /** FOOTER */
 
@@ -595,6 +616,7 @@ div.clearingdiv {
 clear:both;
 }
 
+
 /* /\* DATATABLES*\/ */
 
 /* .paging_two_button .ui-button { */
@@ -756,7 +778,10 @@ clear:both;
 
 /** ELEMENTS */
 
-
+.error{
+    color: red;
+    font-weight: bold;
+}
 /* tooltips */
 
 .tooltip_gdv{

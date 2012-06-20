@@ -72,6 +72,7 @@ class LoginController(BaseController):
             #transaction.commit()
         elif user.name == constants.tmp_user_name:
             user.name = tmp_user.name
+            user.firstname = tmp_user.firstname
             user._set_date(datetime.datetime.now())
             user_group = DBSession.query(Group).filter(Group.name == constants.group_users_id).first()
             user_group.users.append(tmp_user)
@@ -129,7 +130,7 @@ class LoginController(BaseController):
         raise redirect('/')
     
     
-    def build_user(self,principal):
+    def build_user(self, principal):
         '''
         Build an User from a principal hash from Tequila
         @param principal: the hash from Tequila

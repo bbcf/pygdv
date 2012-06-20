@@ -1,4 +1,4 @@
-from pygdv.model import DBSession, Circle, User
+from pygdv.model import DBSession, Circle, User, Group
 from sqlalchemy.sql import and_
 
 def create(name, description, creator, users=None):
@@ -25,7 +25,14 @@ def edit(c, name, description, creator, users=None):
     DBSession.add(c)
     DBSession.flush()
     
-      
+def add_user(circle=None, circle_id=None, user=None, user_id=None):
+    if user is None:
+        user = DBSession.query(User).filter(User.id == user_id).first()
+    if circle is None:
+        circle = DBSession.query(Circle).filter(Circle.id == circle_id).first()
+    circle.users.append(user)
+    DBSession.flush()
+
 def create_admin(name):
     '''
     Create a new admin circle.

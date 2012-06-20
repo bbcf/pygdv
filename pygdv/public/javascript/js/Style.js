@@ -51,9 +51,25 @@ $(document).ready(function() {
 	var status = $(dome).find('.tr_status').html();
 	if (status){
 	    status = status.toLowerCase();
-	    $(dome).addClass('track_' + status);
+	    if(status == 'failure'){
+		$(dome).removeClass();
+	    }
+	    $(dome).addClass('track-' + status);
 	}
     });
+    // set color on parameters
+    $('.grid tbody tr').each(function(ind, dome){
+	var color = $(dome).find('.tr_color').html();
+	if ((color) && !(color == 'None')){
+	    color = color.toLowerCase();
+	    $(dome).css('color', color);
+	} else {
+	    $(dome).css('color', 'blue');
+	}
+    });
+    // dynamic "add user" link
+    $('#add_user_c').click(function(){
+	$('.add_user_c').toggle('normal')});
 });
 
 function good_content_size(){

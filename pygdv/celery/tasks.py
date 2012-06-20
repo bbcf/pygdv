@@ -75,7 +75,8 @@ def track_process(_usermail, _userkey, old_task_id, fname, sha1, callback_url, t
         with track.load(fname, 'sql', readonly=True) as t:
             datatype = t.datatype
         shutil.move(fname, dst)
-
+        if datatype is None:
+            raise Exception("The datatype of your SQLite file is not defined : set it to 'signal' or 'features'.")
     # process text file
     else :
         try :

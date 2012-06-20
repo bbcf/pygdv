@@ -27,6 +27,13 @@ You can create a new one by clicking 'new circle' link. You can also tweak the p
 </ul>
 ''')
 
+tooltip['circledesc']=make_tooltip('Add user', '''Here you see the list of persons who are in ths circle.
+<ul>
+    <li><a class='action delete_link'></a>  remove the person from the circle.</li>
+    <li><a class='action add_link'></a>  add a person to this circle.</li>
+</ul>
+''')
+
 tooltip['job']=make_tooltip('Job', '''A Job is a result from a request you send from the view. To make a new one, go to Projects page and click on <a class='action view_link'></a>.
 <ul>
     <li><a class='action delete_link'></a>  delete the job.</li>

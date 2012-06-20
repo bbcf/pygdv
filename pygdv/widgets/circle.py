@@ -45,9 +45,6 @@ class CNewForm(twf.TableForm):
               twf.Spacer(),
               twf.TextArea(label_text='Description',id='description',
                             help_text = 'Give a Descrition', validator=NotEmpty),
-              twf.MultipleSelectField(id='users', label_text='Users : ',options=get_users,
-              help_text = 'Add users to the circle'),
-              twf.Spacer()
               ]
     
 # EDIT FILLER

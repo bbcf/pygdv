@@ -44,6 +44,8 @@ base_config.use_transaction_manager=True
 
 
 base_config.use_toscawidgets=True
+base_config.use_toscawidgets2=True
+
 
 
 

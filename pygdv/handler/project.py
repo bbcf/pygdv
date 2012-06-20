@@ -16,7 +16,45 @@ def create(name, sequence_id, user_id, tracks=None, isPublic=False, circles=None
     @param circles : a list of circles with 'read' permission
     '''
     return edit(Project(), name, user_id, sequence_id=sequence_id, tracks=tracks, isPublic=isPublic, circles=circles)
-    
+
+def e(project=None, project_id=None, name=None, track_ids=None, circle_ids=None):
+    if project is None:
+        project = DBSession.query(Project).filter(Project.id == project_id).first()
+
+    if name is not None :
+        project.name = name
+
+    if track_ids is not None:
+        project.tracks = []
+        if not isinstance(track_ids, list):
+            track_ids = [track_ids]
+        for tid in track_ids:
+            t = DBSession.query(Track).filter(Track.id == tid).first()
+            project.tracks.append(t)
+
+    if circle_ids is not None:
+        project._circles_rights = []
+        if not isinstance(circle_ids, list):
+            circle_ids = [circle_ids]
+            read_right = DBSession.query(Right).filter(Right.name == constants.right_read).first()
+            for cid in circle_ids : add_right(project=project, circle_id=cid, right=read_right)
+
+    DBSession.add(project)
+    DBSession.flush()
+    return project
+
+def add_right(project=None, project_id=None, circle=None, circle_id=None, right=None, right_id=None):
+    if project is None:
+        project = DBSession.query(Project).filter(Project.id == project_id).first()
+    if circle_id is None:
+        circle_id = circle.id
+    if right is None:
+        right = DBSession.query(Right).filter(Right.id == right_id).first()
+
+    cr_assoc = _get_circle_right_assoc(right, circle_id, project.id)
+    project._circle_right.append(cr_assoc)
+
+
 def edit(project, name, user_id, sequence_id=None, tracks=None, isPublic=False, circles=None):
     '''
     Like create but edit an existing project.
@@ -43,6 +81,10 @@ def edit(project, name, user_id, sequence_id=None, tracks=None, isPublic=False, 
     DBSession.add(project)
     DBSession.flush()
     return project
+
+
+
+
 
 def remove_sharing(project_id):
     project = DBSession.query(Project).filter(Project.id == project_id).first()

@@ -5,17 +5,21 @@
       xmlns:xi="http://www.w3.org/2001/XInclude">
 
   <xi:include href="master.html" />
-  <xi:include href="definitions.html"/>
 
 <head>
   <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
-  <title py:replace="page"></title>
-</head>
-
-<body class="tundra">
   
-${item_list(items)}
+</head>
+<body>
 
+  <div id="controls">
+    <div class="actions"><a href="../${tg.url(model)}s">back</a></div>
+    <div class="actions">New $model</div>
+  </div>
+  
+  <div class="new_form"> <div py:replace="widget.display()">New Form</div></div>
 
 </body>
 </html>
+
+

@@ -12,10 +12,16 @@
   <title py:replace="page"></title>
 </head>
 
-<body class="tundra">
+<body>
+  <div id="controls">
+    <div class="actions">
+      <div class="actions"><a href="/${tg.url(model)}s">back</a></div>
+      <div class="actions"> Edit project</div>
+    </div>
+  </div>
   
-${item_list(items)}
-
-
+  <div class="new_form">
+    <div py:replace="widget.display()">Input Form</div>
+  </div>
 </body>
 </html>

@@ -287,8 +287,7 @@ class AvailableTracksForm(twf.TableForm):
 def get_selected_tracks():
     return tmpl_context.selected_tracks
 def get_test():
-    return [( track.id, track.name) for track in tmpl_context.tracks] + [(track.id,track.name, {'selected' : True}) for track in tmpl_context.selected_tracks ]
-    return [(track.id, track.name) for track in tmpl_context.tracks] + [(track.id, track.name) for track in tmpl_context.selected_tracks ]
+        return [( track.id, track.name) for track in tmpl_context.tracks] + [(track.id, track.name, {'selected' : True}) for track in tmpl_context.selected_tracks ]
 
 class EditProjectForm2(DojoEditableForm):
     __model__ = Project

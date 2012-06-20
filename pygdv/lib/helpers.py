@@ -8,6 +8,29 @@ import genshi
 from tg import url
 from pygdv.lib import constants
 
+
+
+
+
+
+
+def get_circles_edit_link(obj_id):
+    return '''
+    <a class="action edit_link" title="%s" href="circles/edit/%s" style="text-decoration:none"></a>
+           ''' % ('edit', obj_id)
+
+
+def edit_link(id):
+    return '''<a class="action edit_link" title="edit" href="edit/%s" style="text-decoration:none"></a>''' % (id)
+
+
+def share_link(id):
+    '''
+    Return a HTML share link.
+    '''
+    return ''' <a class='action share_link' title="share" href="share/%s"></a>''' % id
+
+
 def get_delete_link(obj_id, rights = None):
     '''
     Get an HTML delete link for an object.
@@ -29,6 +52,11 @@ def get_delete_link(obj_id, rights = None):
         ''' % (obj_id, 'delete')
     return ''
 
+def get_delete_circle_description_link(user_id, circle_id):
+    return ''' <a class='action delete_link' title="%s" href="%s"></a>''' \
+    %('delete user from circle', url('/circles/delete_user', params={'id':circle_id, 'user_id' :user_id }))
+
+
 def get_track_delete_link(obj_id, tmp = False, rights = None):
     if rights is not None and constants.right_upload in rights :
         if rights[constants.right_upload]:
@@ -36,7 +64,7 @@ def get_track_delete_link(obj_id, tmp = False, rights = None):
     <form method="POST" action=%s class="button-to">
     <input name="_method" value="DELETE" type="hidden"/>
     <input name="tmp" value="%s" type="hidden"/>
-    <input class="action delete-button" title="%s" onclick="return confirm('Are you sure?');" 
+    <input class="action delete-button" title="%s" onclick="return confirm('Are you sure?');"
         value="" style="background-color: transparent; float:left;
         border:0; color: #286571; display: inline;"
     type="submit"/>
@@ -72,6 +100,9 @@ def get_copy_track_link(obj_id, rights=None):
         return ''' <a class='action copy_link' title="%s" href="%s"></a>''' % ('copy in your profile', url('/tracks/copy', params={'track_id':obj_id}))
     return ''
 
+def get_track_color(track):
+    if track.parameters is not None:
+        return track.parameters.color
 
 def get_export_link(obj_id, param='track_id', rights=None, tmp=False):
     '''
@@ -102,11 +133,6 @@ def get_edit_link(obj_id, rights = None, link='', tmp=False):
     <a class="action edit_link" title="%s" href="%s%s/edit" style="text-decoration:none"></a>
            ''' % ('edit', link, obj_id)
     return ''
-
-def get_circles_edit_link(obj_id):
-    return '''
-    <a class="action edit_link" title="%s" href="./%s/edit" style="text-decoration:none"></a>
-           ''' % ('edit', obj_id)
 
 
 
