@@ -70,7 +70,7 @@ class ProjectController(BaseController):
 
         if request.method == 'GET':
             widget.child.children[1].value = project.name
-            widget.child.children[2].options = [(t.id, t.name) for t in tracks] + [(t.id, t.name, {'selected' : True}) for t in project.tracks]
+            widget.child.children[2].options = [('','')] + [(t.id, t.name) for t in tracks] + [(t.id, t.name, {'selected' : True}) for t in project.tracks]
             return dict(page='projects', widget=widget, model='project')
 
         try:
@@ -80,8 +80,9 @@ class ProjectController(BaseController):
             w.child.children[1].value = project.name
             w.child.children[2].options = [(t.id, t.name) for t in tracks] + [(t.id, t.name, {'selected' : True}) for t in project.tracks]
             return dict(page='projects', widget=w, model='project')
-        print kw
-        handler.project.e(project_id=project_id, name=kw.get('name'), track_ids=kw.get('tracks', None))
+        track_ids = kw.get('tracks', [])
+        if not track_ids: track_ids = []
+        handler.project.e(project_id=project_id, name=kw.get('name'), track_ids=track_ids)
 
         raise redirect('/projects')
 
@@ -157,18 +158,19 @@ class ProjectController(BaseController):
         
         return self.create(*args, **kw)
 
-    
+
 
     @expose('genshi:tgext.crud.templates.post_delete')
     def post_delete(self, *args, **kw):
-        print 'delete %s, %s' % (args, kw)
         user = handler.user.get_user_in_session(request)
-        project_id = args[0]
-        if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
-            flash('You must have %s permission to delete the project.' % constants.right_upload, 'error')
-            raise redirect('./')
-        handler.project.remove_sharing(project_id)
-        return CrudRestController.post_delete(self, *args, **kw)
+        project_id = kw.get('id', None)
+        if project_id is not None:
+            if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
+                flash('You must have %s permission to delete the project.' % constants.right_upload, 'error')
+                raise redirect('./')
+        handler.project.delete(project_id=project_id)
+        raise redirect('./')
+
 
 
 
@@ -232,32 +234,34 @@ class ProjectController(BaseController):
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         widget = form.ShareProject(action=url('/projects/share/%s' % project_id))
 
-        circles_already_shared = [p.circle for p in project.circles_rights]
-
-        widget.child.children[1].options = [(c.id, c.name) for c in user.circles if c not in [circles_already_shared]] + \
-                                           [(c.id, c.name, {'selected' : True}) for c in circles_already_shared]
-
-        # circles with rights
-        cr_data = [util.to_datagrid(datagrid.project_sharing, project.circles_rights, "Sharing", len(project.circles_rights)>0)]
         # public url
         pub = url('/public/project', {'id' : project_id, 'k' : project.key})
        
         # download url
         if project.download_key is None:
             project.download_key = project.setdefaultkey()
-        
         down = url('/public/project', {'id' : project_id, 'k' : project.download_key})
 
 
         widget.value = {'pid' : project_id}
 
-        t = handler.help.tooltip['links']
+        tl = handler.help.tooltip['links']
+        tp = handler.help.tooltip['permissions']
+
 
         if request.method == 'POST':
-            handler.project.e(project, circle_ids=kw.get('circles', None))
+            circle_ids = kw.get('circles', [])
+            if not circle_ids: circle_ids = []
+            handler.project.e(project=project, circle_ids=circle_ids)
+
+
+        cr_data = [util.to_datagrid(datagrid.project_sharing, project.circles_rights, "Sharing", len(project.circles_rights)>0)]
+
+        widget.child.children[1].options =  [('','')] + [(c.id, c.name) for c in user.circles if c not in project.shared_circles] +\
+                                            [(c.id, c.name, {'selected' : True}) for c in project.shared_circles]
 
         return dict(page='projects', model='project', public=pub, download=down, name=project.name,
-                    tooltip_permissions=t, widget=widget, items=cr_data)
+                    tooltip_permissions=tp, tooltip_links=tl, widget=widget, items=cr_data)
 
 
     @expose()

@@ -167,16 +167,12 @@ class TrackController(CrudRestController):
     @expose('genshi:tgext.crud.templates.post_delete')
     def post_delete(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        _id = args[0]
-#        tmp = kw.get('tmp', 'False')
-#        if tmp in ['True']:
-#            tmp_track = DBSession.query(TMPTrack).filter(TMPTrack.id == _id).first()
-#            DBSession.delete(tmp_track)
-#            DBSession.flush()
-        if not checker.can_edit_track(user, _id) and not checker.user_is_admin(user.id):
-            flash("You haven't the right to edit any tracks which is not yours")
-            raise redirect('../')
-        handler.track.delete_track(track_id=_id)
+        track_id = kw.get('id', None)
+        if track_id is not None:
+            if not checker.can_edit_track(user, track_id) and not checker.user_is_admin(user.id):
+                flash("You haven't the right to edit any tracks which is not yours")
+                raise redirect('../')
+            handler.track.delete_track(track_id=track_id)
         raise redirect('./')
 
 

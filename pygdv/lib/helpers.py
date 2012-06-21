@@ -31,6 +31,17 @@ def share_link(id):
     return ''' <a class='action share_link' title="share" href="share/%s"></a>''' % id
 
 
+def delete_link(id, action='post_delete'):
+    return '''
+ <form method="POST" action=%s class="button-to">
+       <input class="action delete-button" title="delete" onclick="return confirm('Are you sure?');"
+        value="" style="background-color: transparent; float:left;
+        border:0; color: #286571; display: inline;"type="submit"/>
+    <input type="hidden" name='id' value="%s"/>
+</form>
+        ''' % (action, id)
+
+
 def get_delete_link(obj_id, rights = None):
     '''
     Get an HTML delete link for an object.

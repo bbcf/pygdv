@@ -10,12 +10,14 @@ jQuery.fn.dataTableExt.oSort['string-case-desc'] = function(x,y) {
 
 $(document).ready(function() {
     $('.grid tbody tr').hover( function() {
-     	$(this).toggleClass('row_hover');
-	show_actions($(this));
+     	$(this).find('.hidden_info').find('.tr_actions').toggleClass('table_hidden');
+	//toggleClass('row_hover');
+	//show_actions($(this));
     });
     $('.grid').dataTable( {
 	"bStateSave" : true,
 	"aaSorting": [ [0,'asc'], [1,'asc'] ],
+	"bPaginate" : false,
     });
     
 });
@@ -78,7 +80,11 @@ function good_content_size(){
     var max = Math.max(new_width, '800') - 15;
     $('#content').width(max);
     $('.grid').width(max);
-    $('#content').width(max);
+    /* calculate sizes for table columns */
+    var ths = $('.grid').find('th');
+    var nb = ths.length;
+    var  w = max / nb - 5;
+    $(ths).width(w);
 };
 
 function show_actions(node){

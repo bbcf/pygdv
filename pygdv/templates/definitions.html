@@ -49,10 +49,10 @@
       <div class="actions">
 	<a href="../${tg.url(model)}s/new" class="add_link">New $model</a>
       </div>
-      <div class="actions"><span py:replace="tooltip"/></div>
+      <div class="ttactions"><span py:replace="tooltip"/></div>
     </div>
     
-    <div class="crud_table" style="height:50%; width:90%">
+    <div class="crud_table">
       <div py:for="item in items">
 	<div py:choose="item.grid_display">
 	  
@@ -77,10 +77,10 @@
 	<a id="add_user_c" href="#">Add user</a>
 	<div class="add_user_c"><span py:replace="widget.display()">Add User Form</span></div>
       </div>
-      <div class="actions"><span py:replace="tooltip"/></div>
+      <div class="ttactions"><span py:replace="tooltip"/></div>
     </div>
     
-    <div class="crud_table" style="height:50%; width:90%">
+    <div class="crud_table">
       <div py:for="item in items">
 	<div py:choose="item.grid_display">
 	  
@@ -148,10 +148,10 @@
       <div class="actions">
 	<a href="../${tg.url(model)}s/new">New $model</a>
       </div>
-      <div class="actions"><span py:replace="tooltip"/></div>
+      <div class="ttactions"><span py:replace="tooltip"/></div>
     </div>
     
-    <div class="crud_table" style="height:50%; width:90%">
+    <div class="crud_table">
       <div py:for="item in items">
 	<div py:choose="item.grid_display">
 	  
@@ -173,10 +173,10 @@
       <div class="actions">
 	<a href="../${tg.url(model)}s/new" class="add_link">New $model</a>
       </div>
-      <div class="actions"><span py:replace="tooltip"/></div>
+      <div class="ttactions"><span py:replace="tooltip"/></div>
     </div>
     
-    <div class="crud_table" style="height:50%; width:90%">
+    <div class="crud_table">
       <div py:choose="item.grid_display">
 	  
 	<div py:when="True">
@@ -202,11 +202,11 @@
        <a id="add_user_c" href="#">Add user</a>
        <div class="add_user_c" style="${('display:none', '')[defined('error')]}"><span py:replace="widget.display()">Add User Form</span></div>
      </div>
-     <div class="actions"><span py:replace="tooltip"/></div>
+     <div class="ttactions"><span py:replace="tooltip"/></div>
    
    </div>
     
-   <div class="crud_table" style="height:50%; width:90%">
+   <div class="crud_table">
      <div py:for="item in items">
        <div py:choose="item.grid_display">
 	 
@@ -224,7 +224,7 @@
  
 
 <py:def function="item_list_without_link(items)">
-      <div class="crud_table" style="height:50%; width:90%">
+      <div class="crud_table">
         <div py:for="item in items">
 	<div py:choose="item.grid_display">
 	  
@@ -249,7 +249,7 @@
 </html>
 
 <py:def function="item_list_without_link(items)">
-      <div class="crud_table" style="height:50%; width:90%">
+      <div class="crud_table">
         <div py:for="item in items">
 	<div py:choose="item.grid_display">
 	  

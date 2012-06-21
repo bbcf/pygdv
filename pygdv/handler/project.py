@@ -33,12 +33,24 @@ def e(project=None, project_id=None, name=None, track_ids=None, circle_ids=None)
             project.tracks.append(t)
 
     if circle_ids is not None:
-        project._circles_rights = []
         if not isinstance(circle_ids, list):
             circle_ids = [circle_ids]
-            read_right = DBSession.query(Right).filter(Right.name == constants.right_read).first()
-            for cid in circle_ids : add_right(project=project, circle_id=cid, right=read_right)
-
+        circle_ids = [int(i) for i in circle_ids]
+        to_del = []
+        for shared in project._circle_right:
+            if shared.circle.id not in circle_ids : 
+                to_del.append(shared)
+        for d in to_del :
+            DBSession.delete(d)
+            project._circle_right.remove(d)
+        DBSession.flush()
+        
+        shared_ids = [c.id for c in project.shared_circles] 
+        read_right = DBSession.query(Right).filter(Right.name == constants.right_read).first()
+        for new_id in circle_ids:
+            if new_id not in shared_ids :
+                add_right(project=project, circle_id=new_id, right=read_right)
+        DBSession.flush()
     DBSession.add(project)
     DBSession.flush()
     return project
@@ -54,6 +66,14 @@ def add_right(project=None, project_id=None, circle=None, circle_id=None, right=
     cr_assoc = _get_circle_right_assoc(right, circle_id, project.id)
     project._circle_right.append(cr_assoc)
 
+
+
+def delete(project=None, project_id=None):
+    if project is None:
+        project = DBSession.query(Project).filter(Project.id == project_id).first()
+    remove_sharing(project=project)
+    DBSession.delete(project)
+    DBSession.flush()
 
 def edit(project, name, user_id, sequence_id=None, tracks=None, isPublic=False, circles=None):
     '''
@@ -86,14 +106,12 @@ def edit(project, name, user_id, sequence_id=None, tracks=None, isPublic=False, 
 
 
 
-def remove_sharing(project_id):
-    project = DBSession.query(Project).filter(Project.id == project_id).first()
-    rc_assocs = DBSession.query(RightCircleAssociation).filter(
-                        RightCircleAssociation.project_id == project_id).all()
-    for rc in rc_assocs:
-        project._circle_right.remove(rc)
+def remove_sharing(project=None, project_id=None):
+    if project is None:
+        project = DBSession.query(Project).filter(Project.id == project_id).first()
+    for rc in project._circle_right:
         DBSession.delete(rc)
-        DBSession.flush()
+    DBSession.flush()
 
 def change_rights(project_id, circle_id, rights=None):
     '''

@@ -14,36 +14,31 @@
 <body>
   
   <div id="controls">
-    <div class="actions">
-      <div class="actions"><a href="/${tg.url(model)}s">back</a></div>
-      <div class="actions"> Share project ${name}</div>
-      <div class="actions"><div py:replace="tooltip_permissions">Title</div></div>
-      <div class="actions"><a href='$public'>public link</a></div>
-      <div class="actions"><a href='$download'>import link</a></div>
-      <div class="actions"></div>
-    </div>
+    <div class="actions"><a href="../../${tg.url(model)}s">back</a></div>
+    <div class="actions"> Share project ${name}</div>
+    <div class="ttactions"><div py:replace="tooltip_links">Title</div></div>
+    <div class="actions"><a href='$public'>public link</a></div>
+    <div class="actions"><a href='$download'>import link</a></div>
+    <div class="ttactions"><div py:replace="tooltip_permissions">Title</div></div>
   </div>
   
-  <div class="new_form">
-    
-    <div py:replace="widget.display()">Share Form</div>
-    
-    <div class="crud_table" style="height:50%; width:90%">
-      <div py:for="item in items">
-	<div py:choose="item.grid_display">
-	  <span py:when="True">
-	    <h1><span py:replace="item.grid_title"/></h1>
-	    <div py:content="item.grid(item.grid_data)"></div>
-	  </span>
-	  
-	  <span py:when="False">
-	  </span>
-	  
-	</div>
+  <div class="circle_form">
+    <div py:replace="widget.display()">Share Form</div>  
+  </div>
+
+  <div class="share_table crud_table" >
+    <div py:for="item in items">
+      <div py:choose="item.grid_display">
+	<span py:when="True">
+	  <div py:content="item.grid(item.grid_data)"></div>
+	</span>
+	
+	<span py:when="False">
+	</span>
+	
       </div>
     </div>
   </div>
-    
   
 </body>
 </html>

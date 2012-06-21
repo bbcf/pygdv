@@ -24,10 +24,10 @@
     <div class="actions">
       <a href="${tg.url(model)}s/new">New $model</a>
     </div>
-    <div class="actions"><span py:replace="tooltip"/></div>
+    <div class="ttactions"><span py:replace="tooltip"/></div>
   </div>
   
-  <div class="crud_table" style="height:50%; width:90%">
+  <div class="crud_table">
     <div py:choose="item.grid_display">
       <div py:when="True">
 	<div py:content="item.grid(value=item.grid_data)"></div>

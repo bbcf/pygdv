@@ -44,3 +44,4 @@ class EditProject(twf.TableForm):
 class ShareProject(twf.TableForm):
     pid = twf.HiddenField()
     circles = twf.MultipleSelectField(label='Circles : ', css_class='circle_select')
+    submit = twf.SubmitButton(id="submit", value="Share")

@@ -3,56 +3,57 @@ import tw.forms as twf
 import genshi
 
 
-hidden_info = genshi.Markup("<span class='table_hidden'>hidden_info</span>")
+hidden_info = genshi.Markup("<div class='table_hidden'>hidden_info</div>")
 
 
 def hide_info(dict):
     span=''
     for k, v in dict.iteritems():
-        span +="<span class=%s>%s</span>" % (k, v)
+        span +="<div class='table_hidden %s'>%s</div>" % (k, v)
 
-    return genshi.Markup("<span class='table_hidden'>%s</span>" % span)
+    return genshi.Markup("<div class='hidden_info'>%s</div>" % span)
 
 
 
 
 track_grid = twf.DataGrid(fields=[
     ('Name', 'name'),
-    ('Created', 'created'),
-    ('Assembly', 'sequence'),
-    ('Type', 'vizu'),
     (hidden_info, lambda obj : hide_info({
-        'tr_id' : obj.id,
-        'tr_status': obj.status,
-        'tr_color' : helpers.get_track_color(obj),
-        'tr_actions' :
-        helpers.get_export_link(obj.id, rights = constants.full_rights, tmp=obj.tmp)
-        + helpers.get_edit_link(obj.id, rights = constants.full_rights, link='./', tmp=obj.tmp)
-        + helpers.get_track_delete_link(obj.id, obj.tmp, rights = constants.full_rights)
-    }))
-])
+                    'tr_id' : obj.id,
+                    'tr_status': obj.status,
+                    'tr_color' : helpers.get_track_color(obj),
+                    'tr_actions' :
+                        helpers.get_export_link(obj.id, rights = constants.full_rights, tmp=obj.tmp)
+                    + helpers.get_edit_link(obj.id, rights = constants.full_rights, link='./', tmp=obj.tmp)
+                    + helpers.delete_link(obj.id)
+                    })),
+     ('Created', 'created'),
+     ('Assembly', 'sequence'),
+     ('Type', 'vizu'),
+     
+    ])
 
 project_grid = twf.DataGrid(fields = [
-    ('Name', 'name'),
-    ('Created', 'created'),
-    ('Assembly', 'assembly'),
-    (hidden_info,lambda obj : hide_info({
-        'tr_actions' :
+        ('Name', 'name'),
+        (hidden_info,lambda obj : hide_info({
+                    'tr_actions' :
         helpers.get_view_link(obj.id, 'project_id', constants.full_rights)
-        + helpers.share_link(obj.id)
-        #+ helpers.get_copy_project_link(obj.id, constants.full_rights)
-        + helpers.edit_link(obj.id)
-        + helpers.get_delete_link(obj.id, constants.full_rights)
-        #+ helpers.get_detail_link(obj.id, 'project_id', constants.full_rights)
-
-    }) ),
-])
+                    + helpers.share_link(obj.id)
+                    #+ helpers.get_copy_project_link(obj.id, constants.full_rights)
+                    + helpers.edit_link(obj.id)
+        + helpers.delete_link(obj.id)
+                    #+ helpers.get_detail_link(obj.id, 'project_id', constants.full_rights)
+                    
+                    })),
+        ('Created', 'created'),
+        ('Assembly', 'assembly'),
+        ])
 
 project_sharing = twf.DataGrid(fields=[
-    ('Circle', 'circle.display'),
-    ('Rights', lambda obj:genshi.Markup(
-        get_project_right_sharing_form(obj)))
-])
+        ('Circle', 'circle.display'),
+        ('Rights', lambda obj:genshi.Markup(
+                get_project_right_sharing_form(obj)))
+        ])
 
 
 def get_right_checkbok(obj, right_name):
@@ -110,23 +111,24 @@ def get_project_right_sharing_form(circle_right):
 
 circle_grid = twf.DataGrid(fields=[
     ('Name', 'name'),
-    ('Description', 'description'),
-    ('Owner', 'creator'),
-    ('Members', 'get_users'),
     (hidden_info,lambda obj : hide_info({
         'tr_actions' :
             helpers.get_delete_link(obj.id, rights = constants.full_rights)
             + helpers.get_circles_edit_link(obj.id)
-        }))
+        })),
+    ('Description', 'description'),
+    ('Members', 'get_users'),
+    
 ])
 
 circle_description_grid = twf.DataGrid(fields=[
     ('Name', 'name'),
-    ('Firstname', 'firstname'),
-    ('Email', 'email'),
     (hidden_info,lambda obj : hide_info({
         'tr_actions' :
             helpers.get_delete_circle_description_link(obj.id, obj.cid)
-    }))
+    })),
+    ('Firstname', 'firstname'),
+    ('Email', 'email'),
+    
 ])
 

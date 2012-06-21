@@ -102,6 +102,7 @@ li > a.menu_circles{
     float:left;
     margin: 1em 0em 1em 12em;
     width:100%;
+    padding-bottom: 9em;
 }
 
 /* controls*/
@@ -125,6 +126,17 @@ div.actions {
   height: 2em;
   padding: 0.5em;
   margin-left: 1em;
+  max-width: 25em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+div.ttactions {
+  float: left;
+  height: 2em;
+  padding: 0.5em;
+  margin-left: 1em;
+  max-width: 25em;
 }
 
 
@@ -149,11 +161,37 @@ div.new_form {
     width: 100%;
 }
 
+div.circle_form{
+    position: relative;
+    padding-right: 7em;
+    top: 2.8em;
+    
+}
+
 /* table */
 div.crud_table {
     position: relative;
     top: 2.8em;
-    width: 100%;
+}
+table.grid{
+    table-layout: fixed;
+
+}
+table.grid td {
+    text-overflow:ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align:right;
+}
+table.grid th {
+    text-align:right;
+}
+
+table.grid td:first-child, table.grid th:first-child{
+    text-align:left;
+}
+table.grid th>:first-child {
+    text-align:left;
 }
 div.crud_table tr{
     cursor: pointer;
@@ -233,14 +271,8 @@ div.paginate_enabled_next{
 
 
 /* actions */
-span.table_hidden{
+div.table_hidden{
     display:none;
-}
-
-span.tr_action_hover{
-    display:inline;
-    position:fixed;
-    width:20em;
 }
 
 a.action{
@@ -248,6 +280,9 @@ a.action{
     height:16px;
     float:left;
     padding-left:1.5em;
+}
+.action_hover{
+    display:block;
 }
 a.view_link{
     background-repeat: no-repeat;
@@ -306,6 +341,7 @@ a.export_link{
 
 .circle_select, .track_select{
 height:18em;
+max-width:20em;
 }
 
 /* circles */

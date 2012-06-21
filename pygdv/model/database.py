@@ -144,7 +144,7 @@ class Project(DeclarativeBase):
  
     tracks = relationship('Track', secondary=project_track_table, backref='projects')
     
-    _circle_right = relationship('RightCircleAssociation', backref='project')
+    _circle_right = relationship('RightCircleAssociation', backref='project', cascade="all, delete, delete-orphan")
     
     jobs = relationship('Job', backref='project')
     
@@ -199,6 +199,10 @@ class Project(DeclarativeBase):
         for cr in self._circle_right:
             res.append(cr.circle)
         return res
+    @property
+    def shared_circles(self):
+        return [c.circle for c in self._circle_right]
+
     @property
     def get_circle_with_right_display(self):
         '''
