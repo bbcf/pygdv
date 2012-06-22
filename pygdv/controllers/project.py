@@ -82,6 +82,9 @@ class ProjectController(BaseController):
             return dict(page='projects', widget=w, model='project')
         track_ids = kw.get('tracks', [])
         if not track_ids: track_ids = []
+        if not isinstance(track_ids, list):
+            track_ids = [track_ids]
+        if len(track_ids) > 0 and '' in track_ids: track_ids.remove('')
         handler.project.e(project_id=project_id, name=kw.get('name'), track_ids=track_ids)
 
         raise redirect('/projects')
@@ -219,7 +222,6 @@ class ProjectController(BaseController):
 
     @expose('pygdv.templates.project_sharing')
     def share(self, *args, **kw):
-
         user = handler.user.get_user_in_session(request)
 
         if request.method == 'GET':
@@ -250,9 +252,22 @@ class ProjectController(BaseController):
 
 
         if request.method == 'POST':
-            circle_ids = kw.get('circles', [])
-            if not circle_ids: circle_ids = []
-            handler.project.e(project=project, circle_ids=circle_ids)
+            if kw.has_key('rights'):
+                rights_checkboxes = kw.get('rights_checkboxes', None)
+                if rights_checkboxes is not None:
+                    if not isinstance(rights_checkboxes,list):
+                        rights_checkboxes = [rights_checkboxes]
+                    handler.project.change_rights(kw.get('pid'), kw.get('cid'), rights=rights_checkboxes)
+                else : handler.project.change_rights(kw.get('pid'), kw.get('cid'))
+
+
+            else :
+                circle_ids = kw.get('circles', [])
+                if not circle_ids: circle_ids = []
+                if not isinstance(circle_ids, list):
+                    circle_ids = [circle_ids]
+                if len(circle_ids) > 0 and '' in circle_ids: circle_ids.remove('')
+                handler.project.e(project=project, circle_ids=circle_ids)
 
 
         cr_data = [util.to_datagrid(datagrid.project_sharing, project.circles_rights, "Sharing", len(project.circles_rights)>0)]

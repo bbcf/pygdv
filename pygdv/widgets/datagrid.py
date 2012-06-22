@@ -1,6 +1,7 @@
 from pygdv.lib import constants, helpers
 import tw.forms as twf
 import genshi
+from tg import url
 
 
 hidden_info = genshi.Markup("<div class='table_hidden'>hidden_info</div>")
@@ -76,9 +77,10 @@ def get_right_checkbok(obj, right_name):
 def get_project_right_sharing_form(circle_right):
     options = ['Read', 'Download', 'Upload']
     str = '''
-    <form class="required rightsharingform" method="post" action="post_share">
-    <div><input type="hidden" value="%s" name='circle_id' class="hiddenfield"></div>
-    <div><input type="hidden" value="%s" name='project_id' class="hiddenfield"></div>
+    <form class="required rightsharingform" method="post" action="%s">
+    <div><input type="hidden" value="%s" name='cid' class="hiddenfield"></div>
+    <div><input type="hidden" value="true" name='rights' class="hiddenfield"></div>
+    <div><input type="hidden" value="%s" name='pid' class="hiddenfield"></div>
     <table cellspacing="0" cellpadding="2" border="0">
         <tbody>
             <tr title="" id="rights_checkboxes.container">
@@ -86,7 +88,7 @@ def get_project_right_sharing_form(circle_right):
                     <table class="checkboxtable" id="rights_checkboxes">
                         <tbody>
                             <tr>
-                                ''' % (circle_right.circle.id, circle_right.project_id)
+                                ''' % (url('/projects/share/%s' % circle_right.project_id), circle_right.circle.id, circle_right.project_id)
     for opt in options:
         str+='<td>'+get_right_checkbok(circle_right, opt)+'</td>'
 

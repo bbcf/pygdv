@@ -26,8 +26,6 @@ def e(project=None, project_id=None, name=None, track_ids=None, circle_ids=None)
 
     if track_ids is not None:
         project.tracks = []
-        if not isinstance(track_ids, list):
-            track_ids = [track_ids]
         for tid in track_ids:
             t = DBSession.query(Track).filter(Track.id == tid).first()
             project.tracks.append(t)
@@ -130,7 +128,6 @@ def change_rights(project_id, circle_id, rights=None):
             project._circle_right.remove(rc)
             DBSession.delete(rc)
             DBSession.flush()
-   
     if rights is not None:
         _add_read_right(project, circle_id)
         for right_name in rights:
@@ -138,7 +135,7 @@ def change_rights(project_id, circle_id, rights=None):
                 right = DBSession.query(Right).filter(Right.name == right_name).first()
                 cr_assoc = _get_circle_right_assoc(right, circle_id, project_id)
                 project._circle_right.append(cr_assoc)
-                
+
     DBSession.add(project)
     DBSession.flush()
     

@@ -201,8 +201,14 @@ class Project(DeclarativeBase):
         return res
     @property
     def shared_circles(self):
-        return [c.circle for c in self._circle_right]
-
+        ids = []
+        cs = []
+        for cr in self._circle_right:
+            c = cr.circle
+            if c.id not in ids:
+                ids.append(c.id)
+                cs.append(c)
+        return cs
     @property
     def get_circle_with_right_display(self):
         '''
