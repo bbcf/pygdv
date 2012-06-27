@@ -280,8 +280,8 @@ class ProjectController(BaseController):
         widget.child.children[1].options =  [('','')] + [(c.id, c.name) for c in user.circles if c not in project.shared_circles] +\
                                             [(c.id, c.name, {'selected' : True}) for c in project.shared_circles]
 
-        return dict(page='projects', model='project', public=pub, download=down, name=project.name,
-                    tooltip_permissions=tp, tooltip_links=tl, widget=widget, items=cr_data)
+        return dict(page='projects', public=pub, download=down, name=project.name,
+                    tooltip_permissions=tp, tooltip_links=tl, widget=widget, items=cr_data, project_id=project_id)
 
 
     def post_share(self, project_id, circle_id, *args, **kw):

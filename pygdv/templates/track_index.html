@@ -26,10 +26,18 @@
 
     <ul id="left_stack" class="ui-layout-west"> 
 	<py:for each="dic in project_list">
-	  <py:choose test="dic[0]">
-	    <py:when test="None"><li class="all"><a href="${tg.url('/tracks')}">${dic[1]}</a></li></py:when>
-	    <py:otherwise><li class="${('', 'selected')[defined('project_id') and project_id == dic[0]]}"><a href="${tg.url('/tracks')}?pid=${dic[0]}">${dic[1]}</a></li></py:otherwise>
-	  </py:choose>
+	  <!-- <py:choose test="dic[0]"> -->
+	  <!--   <py:when test="None"><li class="all"><a href="${tg.url('/tracks')}">${dic[1]}</a></li></py:when> -->
+	  <!--   <py:otherwise><li class="${('', 'selected')[defined('project_id') and project_id == dic[0]]}"><a href="${tg.url('/tracks')}?pid=${dic[0]}">${dic[1]}</a></li></py:otherwise> -->
+	  <!-- </py:choose> -->
+	  <div py:choose="">
+	    <span py:when="dic[0] == None"><li class="all"><a href="${tg.url('/tracks')}">${dic[1]}</a></li></span>
+	    <span py:when="dic[0] == int(project_id) and len(dic) == 3"><li class="selected"><a href="${tg.url('/tracks')}?pid=${dic[0]}">${dic[1]} ${dic[2]}</a></li></span>
+	    <span py:when="dic[0] == int(project_id)"><li class="selected"><a href="${tg.url('/tracks')}?pid=${dic[0]}">${dic[1]}</a></li></span>
+	    <span py:when="len(dic) == 3"><li class="shared"><a href="${tg.url('/tracks')}?pid=${dic[0]}">${dic[1]} ${dic[2]}</a></li></span>
+	    <span py:otherwise=""><li><a href="${tg.url('/tracks')}?pid=${dic[0]}">${dic[1]}</a></li></span>
+	    
+	  </div>
 	</py:for>
 	
       </ul>

@@ -415,6 +415,11 @@ ul#left_stack li.selected {
     color: white;
 }
 
+ul#left_stack li.shared {
+    background-color: #4087d9;
+    color: white;
+}
+
 ul#left_stack li a {
 	color:black;
 	height: 31px;

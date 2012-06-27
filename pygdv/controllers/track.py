@@ -59,6 +59,11 @@ class TrackController(BaseController):
         project_list.insert(0, (None, 'All tracks'))
 
 
+        shared_with_rights = handler.project.get_shared_projects(user)
+        sorted_projects = sorted(shared_with_rights.iteritems(), key=lambda k : k[0].name)
+        for shared, rights in sorted_projects:
+            project_list.append((shared.id, shared.name, ''.join([r[0] for r in rights])))
+
         return dict(page='tracks', model='track', form_title="new track", track_list=track_list,
             project_list=project_list, value=kw, tooltip=t, project_id=kw.get('pid', None))
 
@@ -67,8 +72,6 @@ class TrackController(BaseController):
     @require(not_anonymous())
     @expose('pygdv.templates.track_new')
     def new(self, *args, **kw):
-        print 'NEW %s, %s' % (args, kw)
-        print tmpl_context.form_errors
 
         if kw.has_key('pid'):
             project_id = kw.get('pid')
@@ -209,6 +212,7 @@ class TrackController(BaseController):
         widget = form.EditTrack(action='/tracks/edit/%s' % track_id).req()
 
         track = DBSession.query(Track).filter(Track.id == track_id).first()
+
         d = {}
         d['name'] = track.name
         d['color'] = track.parameters.color
