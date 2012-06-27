@@ -32,8 +32,13 @@
 	  <!-- </py:choose> -->
 	  <div py:choose="">
 	    <span py:when="dic[0] == None"><li class="all"><a href="${tg.url('/tracks')}">${dic[1]}</a></li></span>
+	    
+	    <span py:when="project_id == None and len(dic) == 3"><li class="shared"><a href="${tg.url('/tracks')}">${dic[1]} ${dic[2]}</a></li></span>
+	    <span py:when="project_id == None"><li><a href="${tg.url('/tracks')}?pid=${dic[0]}">${dic[1]}</a></li></span>
+	    
 	    <span py:when="dic[0] == int(project_id) and len(dic) == 3"><li class="selected"><a href="${tg.url('/tracks')}?pid=${dic[0]}">${dic[1]} ${dic[2]}</a></li></span>
 	    <span py:when="dic[0] == int(project_id)"><li class="selected"><a href="${tg.url('/tracks')}?pid=${dic[0]}">${dic[1]}</a></li></span>
+	    
 	    <span py:when="len(dic) == 3"><li class="shared"><a href="${tg.url('/tracks')}?pid=${dic[0]}">${dic[1]} ${dic[2]}</a></li></span>
 	    <span py:otherwise=""><li><a href="${tg.url('/tracks')}?pid=${dic[0]}">${dic[1]}</a></li></span>
 	    
