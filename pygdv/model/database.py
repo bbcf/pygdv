@@ -155,7 +155,7 @@ class Project(DeclarativeBase):
     download_key = Column(Unicode(255), unique=True, default=setdefaultkey, nullable=False)
     
     def _get_date(self):
-        return self._created.strftime(constants.date_format);
+        return self._created.strftime(constants.date_format)
         
     def _set_date(self,date):
         self._created=date
@@ -219,7 +219,7 @@ class Project(DeclarativeBase):
         result = []
         for circle, rights in crs.items():
             result.append('%s (%s)\n' %(circle.name, ', '.join([right.name for right in rights])))
-        return result
+        return ', '.join(result)
     
     @property
     def circles_rights(self):

@@ -34,8 +34,7 @@ class ProjectController(BaseController):
     allow_only = has_any_permission(constants.perm_user, constants.perm_admin)
 
 
-    @require(not_anonymous())
-    @expose('pygdv.templates.new')
+    @expose('pygdv.templates.project_new')
     def new(self, *args, **kw):
         tmpl_context.widget = project_new_form
         user = handler.user.get_user_in_session(request)
@@ -43,7 +42,7 @@ class ProjectController(BaseController):
         return dict(page='projects', value=kw, model='project')
 
 
-
+    @with_trailing_slash
     @expose('pygdv.templates.project_edit')
     def edit(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
@@ -71,7 +70,7 @@ class ProjectController(BaseController):
         if request.method == 'GET':
             widget.child.children[1].value = project.name
             widget.child.children[2].options = [('','')] + [(t.id, t.name) for t in tracks] + [(t.id, t.name, {'selected' : True}) for t in project.tracks]
-            return dict(page='projects', widget=widget, model='project')
+            return dict(page='projects', widget=widget, project_id=project_id)
 
         try:
             widget.validate(kw)
@@ -79,7 +78,7 @@ class ProjectController(BaseController):
             w = e.widget
             w.child.children[1].value = project.name
             w.child.children[2].options = [(t.id, t.name) for t in tracks] + [(t.id, t.name, {'selected' : True}) for t in project.tracks]
-            return dict(page='projects', widget=w, model='project')
+            return dict(page='projects', widget=w, project_id=project_id)
         track_ids = kw.get('tracks', [])
         if not track_ids: track_ids = []
         if not isinstance(track_ids, list):
@@ -87,7 +86,7 @@ class ProjectController(BaseController):
         if len(track_ids) > 0 and '' in track_ids: track_ids.remove('')
         handler.project.e(project_id=project_id, name=kw.get('name'), track_ids=track_ids)
 
-        raise redirect('/projects')
+        raise redirect('/tracks', {'pid' : project_id})
 
 
 
@@ -109,9 +108,6 @@ class ProjectController(BaseController):
             return reply.normal(request, 'You can upload track on this project', './', {'project' : project})
         
         
-    @with_trailing_slash
-    @expose('pygdv.templates.list')
-    @expose('json')
     #@paginate('items', items_per_page=10)
     def index(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
@@ -153,20 +149,32 @@ class ProjectController(BaseController):
             return reply.error(request, "Assembly doesn't exist in GDV.", './', {})
 
         project = handler.project.create(kw['name'], kw['assembly'], user.id)
-        return reply.normal(request, 'Project successfully created.', './', {'project' : project})  
+        return reply.normal(request, 'Project successfully created.', '/tracks', {'project' : project})  
     
     @expose()
     @validate(project_new_form, error_handler=new)
     def post(self, *args, **kw):
-        
         return self.create(*args, **kw)
 
 
+    @expose()
+    def delete(self, *args, **kw):
+        user = handler.user.get_user_in_session(request)
+        if len(args) > 0:
+            project_id = args[0]
+            if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
+                flash('You must have %s permission to delete the project.' % constants.right_upload, 'error')
+                raise redirect('./')
 
-    @expose('genshi:tgext.crud.templates.post_delete')
+        handler.project.delete(project_id=project_id)
+        raise redirect('/tracks')
+
+
     def post_delete(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
+
         project_id = kw.get('id', None)
+
         if project_id is not None:
             if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
                 flash('You must have %s permission to delete the project.' % constants.right_upload, 'error')
@@ -177,7 +185,6 @@ class ProjectController(BaseController):
 
 
 
-    @expose('pygdv.templates.project_detail')
     def detail(self, project_id):
         if project_id is None:
             raise redirect('./')
@@ -200,8 +207,6 @@ class ProjectController(BaseController):
 
 
 
-    @expose()
-    @validate(project_edit_form, error_handler=edit)
     def put(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
         project_id = args[0]
@@ -279,7 +284,6 @@ class ProjectController(BaseController):
                     tooltip_permissions=tp, tooltip_links=tl, widget=widget, items=cr_data)
 
 
-    @expose()
     def post_share(self, project_id, circle_id, *args, **kw):
         user = handler.user.get_user_in_session(request)
         if not checker.user_own_project(user.id, project_id):
@@ -300,7 +304,6 @@ class ProjectController(BaseController):
             handler.project.change_rights(project_id, circle_id)
         raise redirect(url('/projects/share', {'project_id':project_id}))
 
-    @expose()
     def post_share_add(self,project_id, *args, **kw):
         user = handler.user.get_user_in_session(request)
         if not checker.user_own_project(user.id, project_id):
@@ -314,13 +317,11 @@ class ProjectController(BaseController):
                 handler.project.add_read_right(project, kw['circles'])
         raise redirect(url('/projects/share', {'project_id':project_id}))
 
-    @expose()
     def test(self, n):
         user = handler.user.get_user_in_session(request)
         p = handler.project.get_projects_with_permission(user.id, n)
         raise redirect('./')
 
-    @expose('pygdv.templates.add_track')
     def add_track(self, project_id, *args, **kw):
         # project info
         project = DBSession.query(Project).filter(Project.id == project_id).first()
@@ -335,7 +336,6 @@ class ProjectController(BaseController):
         return dict(page='projects', model='Project', info=data, form_title='Add track(s)',
                     value=kw)
 
-    @expose()
     def add(self, project_id, tracks, **kw):
         user = handler.user.get_user_in_session(request)
         if not checker.user_own_project(user.id, project_id):
@@ -458,7 +458,6 @@ class ProjectController(BaseController):
                     jobs = jobs,
                     page = 'view')
     
-    @expose()
     def copy(self, project_id, **kw):
         user = handler.user.get_user_in_session(request)
         if 'k' in kw:

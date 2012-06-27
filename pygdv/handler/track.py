@@ -450,3 +450,15 @@ def link(track):
 
 def plugin_link(track):
     return tg.config.get('main.proxy') + tg.url('/') + track.rel_path
+
+
+def edit(track=None, track_id=None, name=None, color=None):
+    if track is None:
+        track = DBSession.query(Track).filter(Track.id == track_id).first()
+    if name is not None:
+        track.name = name
+    if color is not None:
+        track.parameters.color = color
+    DBSession.add(track)
+    DBSession.flush()
+

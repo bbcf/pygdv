@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <xi:include href="master.html" />
+  
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
+  <title py:replace="page"></title>
+  </head>
+  
+  <body>
+    
+    
+    <div class="ui-layout-center crud_table">
+           ${flash()}
+      <div class="info" style="${('display:none', '')[defined('project_name') and project_name != None]}">
+	
+	<p>
+	  You will add a track to your repository and also add it to the project <em>$project_name</em><br/> 
+	  Your track will be added with the assembly <em>$ass_name</em><br/>
+	  If you want to upload the track on a different assembly, please go <a id="add_track_c" href="${tg.url('/tracks/new')}">here</a>.
+	</p>
+      </div>
+ 
+      <div class="new_form">
+	<div py:replace="tmpl_context.widget(value=value)">New track formForm</div>
+      </div>
+    </div>
+    
+    
+
+      <div id="south" class="ui-layout-south">
+	${footer()}
+      </div>
+      
+
+
+    <div id="north" class="ui-layout-north">
+      ${header()}
+      ${mainmenu()}
+      <div id="controls">
+	<div class="actions"><a href="../${tg.url(model)}s">back</a></div>
+	<div class="actions">New $model</div>
+      </div>
+    </div>
+    
+    
+
+  </body>
+</html>

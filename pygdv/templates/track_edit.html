@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <xi:include href="master.html" />
+  <xi:include href="definitions.html"/>
+
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
+  <title py:replace="page"></title>
+  
+</head>
+
+<script type="text/javascript" src="${tg.url('/javascript/jslib/dojo/dojo.js')}"
+    data-dojo-config="parseOnLoad: true"></script>
+
+
+<link rel="stylesheet" type="text/css" href="${tg.url('/javascript/jslib/dojox/widget/ColorPicker/ColorPicker.css')}"/>
+<body>
+  
+  <div class="ui-layout-center">
+    ${flash()}
+    <div py:replace="widget.display()">Input Form</div>
+    <div id="picker" dojoType="dojox.widget.ColorPicker"
+	 value="${color}"
+	 onChange="handler(arguments[0],'color')"
+	 />
+  </div>
+
+
+  
+
+  
+  <div id="south" class="ui-layout-south">
+    ${footer()}
+  </div>
+	
+  
+
+
+  <div id="north" class="ui-layout-north">
+    ${header()}
+    ${mainmenu()}
+    <div id="controls">
+      <div class="actions"><a href="${tg.url('/tracks')}">back</a></div>
+    </div>
+      
+    
+    
+    
+  </div>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+
+
+
+<script type="text/javascript">
+  
+  dojo.require("dojox.widget.ColorPicker");
+  var handler = function(val, id){
+  dojo.byId(id).value = val;
+  }; 
+  
+</script>
+
+
+</html>

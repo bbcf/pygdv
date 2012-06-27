@@ -8,13 +8,49 @@ jQuery.fn.dataTableExt.oSort['string-case-desc'] = function(x,y) {
 };Window
 
 
+
+
+
+/**
+LAYOUT
+*/
+
 $(document).ready(function() {
-    $('.grid tbody tr').hover( function() {
+    
+    $('body').layout({
+	north__size:120,
+	west__size: 180,
+	spacing_open : 0 ,
+	south__size: 35,
+	
+    });
+});
+
+
+$(document).ready(function() {
+    $('.crud_table .grid tbody tr').hover( function() {
      	$(this).find('.hidden_info').find('.tr_actions').toggleClass('table_hidden');
 	//toggleClass('row_hover');
 	//show_actions($(this));
     });
-    $('.grid').dataTable( {
+
+    // $('.grid tbody tr').click( function() {
+    // 	$('.grid tbody tr').find('.hidden_info').find('.tr_info').hide();
+    // 	// $(this).find('.hidden_info').find('.tr_info').toggle('normal');
+    // 	var info = $(this).find('.hidden_info').find('.tr_info');
+    // 	if($(info).children().length > 0){
+    // 	    var posnode = $(this).offset().left;
+    // 	    var w = $(document).width() - posnode;
+    // 	    var min = Math.min('500', w);
+    // 	    $(info).css('width', min + "px");
+    // 	    $(info).toggle('fast');
+	    
+    // 	}
+
+    
+ 
+
+    $('.crud_table .grid').dataTable( {
 	"bStateSave" : true,
 	"aaSorting": [ [0,'asc'], [1,'asc'] ],
 	"bPaginate" : false,
@@ -44,9 +80,9 @@ $(document).ready(function() {
     $('#footer').first().append($('.dataTables_paginate'));
     $('#footer').first().append($('.dataTables_length'));
     // resize the content (+ on resize)
-    good_content_size();
+    //good_content_size();
     $(window).resize(function(){
-	good_content_size();
+	//good_content_size();
     });
     // set status class on tracks
     $('.grid tbody tr').each(function(ind, dome){
@@ -69,17 +105,21 @@ $(document).ready(function() {
 	    $(dome).css('color', 'blue');
 	}
     });
-    // dynamic "add user" link
+    // dynamic forms
     $('#add_user_c').click(function(){
 	$('.add_user_c').toggle('normal')});
+    $('#add_circle_c').click(function(){
+	$('.add_circle_c').toggle('normal')});
+    $('#add_track_c').click(function(){
+	$('.add_track_c').toggle('normal')});
 });
 
-function good_content_size(){
+function good_content_size(left){
     /** make the content of a good size */
-    var new_width = $(window).width() - $('#navigation').width();
-    var max = Math.max(new_width, '800') - 15;
+    var new_width = $(window).width() - $('#left_stack').width();
+    var max = Math.max(new_width, '800') ;
     $('#content').width(max);
-    $('.grid').width(max);
+
     /* calculate sizes for table columns */
     var ths = $('.grid').find('th');
     var nb = ths.length;

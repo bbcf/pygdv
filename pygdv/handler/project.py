@@ -128,6 +128,7 @@ def change_rights(project_id, circle_id, rights=None):
             project._circle_right.remove(rc)
             DBSession.delete(rc)
             DBSession.flush()
+
     if rights is not None:
         _add_read_right(project, circle_id)
         for right_name in rights:

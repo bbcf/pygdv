@@ -13,28 +13,44 @@
 </head>
 
 <body>
+
+
   
-  <div id="controls">
-    <div class="actions">
-      <a href="${tg.url(model)}s/new">New $model</a>
-    </div>
-    <div class="ttactions"><span py:replace="tooltip"/></div>
-  </div>
   
-  <div class="crud_table">
-    <div py:choose="item.grid_display">
-      <div py:when="True">
-	<div py:content="item.grid(value=item.grid_data)"></div>
-      </div>
-      <div py:when="False">
-	<h1>No Data</h1>
-      </div>
       
+  
+    
+    
+    
+    <div class="ui-layout-center crud_table">
+      ${flash()}
+      <div py:choose="item.grid_display">
+	<div py:when="True">
+	  <div py:content="item.grid(value=item.grid_data)"></div>
+	</div>
+	<div py:when="False">
+	  <h1>No Data</h1>
+	  
+    </div></div></div>
+    
+    <div id="south" class="ui-layout-south">
+      ${footer()}
     </div>
     
-  </div>
-
-
-
+    
+    
+    <div id="north" class="ui-layout-north">
+      ${header()}
+      ${mainmenu()}
+      <div id="controls" class="ui-layout-north">
+	<div class="actions">
+	  <a id="add_circle_c" href="#">Add circle</a>
+	  <div class="add_circle_c" style="${('display:none', '')[defined('ac_error')]}">
+	    <span py:replace="widget.display()">Add circle Form</span></div>
+	</div>
+	<div class="ttactions"><span py:replace="tooltip"/></div>
+      </div>
+    </div>
+    
 </body>
 </html>

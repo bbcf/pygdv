@@ -26,7 +26,6 @@ __all__ = ['CircleController']
 class CircleController(BaseController):
     allow_only = has_any_permission(constants.perm_admin, constants.perm_user)
 
-    @expose('pygdv.templates.new_v2')
     def new(self, *args, **kw):
         widget = form.NewCircle(action=url('/circles/new')).req()
         if request.method == 'GET':
@@ -46,7 +45,22 @@ class CircleController(BaseController):
         user = handler.user.get_user_in_session(request)
         data = util.to_datagrid(datagrid.circle_grid, user.circles, grid_display=len(user.circles)>0)
         t = handler.help.tooltip['circle']
-        return dict(page='circles', model='circle', item=data, value=kw, tooltip=t)
+
+        widget = form.NewCircle(action=url('/circles/index')).req()
+        if request.method == 'GET':
+            return dict(page='circles', item=data, tooltip=t, widget=widget)
+        else :
+            try:
+                widget.validate(kw)
+            except twc.ValidationError as e:
+                return dict(page='circles',  item=data, tooltip=t, widget=e.widget, ac_error=True)
+
+
+        user = handler.user.get_user_in_session(request)
+        handler.circle.create(kw['name'], kw['description'], user)
+
+
+        return dict(page='circles', model='circle', item=data, widget=widget, tooltip=t)
 
 
 
@@ -54,7 +68,6 @@ class CircleController(BaseController):
 
 
 
-    @expose('genshi:tgext.crud.templates.post_delete')
     def post_delete(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
         circle_id = args[0]
@@ -76,7 +89,7 @@ class CircleController(BaseController):
         raise redirect('/circles/edit/%s' % id)
 
 
-    @expose('pygdv.templates.circle_description')
+    @expose('pygdv.templates.circle_edit')
     def edit(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
 
@@ -100,7 +113,7 @@ class CircleController(BaseController):
                     u.__dict__['cid'] = circle_id
                     wrappers = [u for u in circle.users if u.id != user.id]
                     data = [util.to_datagrid(datagrid.circle_description_grid, wrappers, grid_display=len(wrappers)>0)]
-                return dict(page='circles', name=circle.name, widget=e.widget, items=data, value=kw, tooltip=t, error=True)
+                return dict(page='circles', name=circle.name, widget=e.widget, items=data, value=kw, tooltip=t, au_error=True)
 
             to_add = DBSession.query(User).filter(User.email == mail).first()
             if to_add is None:

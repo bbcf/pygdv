@@ -2,6 +2,7 @@
 
 from tgext.crud import CrudRestController
 from pygdv.lib import tequila, constants
+from pygdv.lib.base import BaseController
 from tg import expose, url, flash, request, response, tmpl_context
 from tg.controllers import redirect
 from pygdv.model import User, Group, DBSession, Job
@@ -17,28 +18,30 @@ from pygdv.widgets.job import job_grid
 from pygdv.widgets.job import job_edit_filler, job_edit_form, job_grid, job_new_form, job_table, job_table_filler
 from tg.decorators import paginate, with_trailing_slash,without_trailing_slash
 from sqlalchemy.sql import and_, or_, not_
+from pygdv.widgets import datagrid
 
 __all__ = ['JobController']
 
 
 
-class JobController(CrudRestController):
+class JobController(BaseController):
     allow_only = has_any_permission(constants.perm_user, constants.perm_admin)
-    model = Job
-    table = job_table
-    table_filler = job_table_filler
-    edit_form = job_edit_form
-    new_form = job_new_form
-    edit_filler = job_edit_filler
-    
-    
+
     @with_trailing_slash
     @expose('pygdv.templates.list')
-    def get_all(self, *args, **kw):
+    def index(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
+        if request.method == 'POST':
+            jid = kw.get('id', None)
+            if jid is not None and checker.can_edit_job(user.id, jid):
+                handler.job.delete(jid)
+            else:
+                flash('not authorized')
+
         jobs = DBSession.query(Job).filter(Job.user_id == user.id).all()
-        data = [util.to_datagrid(job_grid, jobs, "Job Listing", len(jobs)>0)]
+        data = [util.to_datagrid(datagrid.job_grid, jobs, "Job Listing", len(jobs)>0)]
         t = handler.help.tooltip['job']
+
         return dict(page='jobs', model='job', form_title="new job", items=data, value=kw, tooltip=t)
     
     @without_trailing_slash

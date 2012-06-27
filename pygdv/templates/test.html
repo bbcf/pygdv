@@ -11,19 +11,11 @@
   <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
   <title py:replace="page"></title>
 </head>
-<style>
-#menu_items {
-  padding:0px 12px 0px 2px;
-  list-style-type:None
-}
-</style>
-
-<body class="tundra">
-  
-<div py:replace="test"/>
-
-
+<body>
+  <div id="controls">
+  </div>
+  <div class="new_form">
+    <div py:replace="widget.display()">Input Form</div>
+  </div>
 </body>
 </html>
-
-

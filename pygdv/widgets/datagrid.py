@@ -15,7 +15,16 @@ def hide_info(dict):
     return genshi.Markup("<div class='hidden_info'>%s</div>" % span)
 
 
-
+job_grid = twf.DataGrid(fields=[
+    ('Name', 'name'),
+    ('Description', 'description'),
+    ('Output', 'output_display'),
+    (hidden_info, lambda obj : hide_info({
+        'tr_status': obj.status,
+        'tr_actions' : helpers.delete_link(obj.id, action='.'),
+        'tr_info' : obj.traceback
+    }))
+])
 
 track_grid = twf.DataGrid(fields=[
     ('Name', 'name'),
@@ -24,14 +33,16 @@ track_grid = twf.DataGrid(fields=[
                     'tr_status': obj.status,
                     'tr_color' : helpers.get_track_color(obj),
                     'tr_actions' :
-                        helpers.get_export_link(obj.id, rights = constants.full_rights, tmp=obj.tmp)
-                    + helpers.get_edit_link(obj.id, rights = constants.full_rights, link='./', tmp=obj.tmp)
-                    + helpers.delete_link(obj.id)
+                        helpers.export_link(obj.id)
+                    + helpers.edit_link(obj.id, url('/tracks')),
                     })),
      ('Created', 'created'),
      ('Assembly', 'sequence'),
      ('Type', 'vizu'),
-     
+    (hidden_info, lambda obj : hide_info({
+        'tr_actions' :
+        helpers.delete_link(obj.id)
+    })),
     ])
 
 project_grid = twf.DataGrid(fields = [
@@ -41,14 +52,21 @@ project_grid = twf.DataGrid(fields = [
         helpers.get_view_link(obj.id, 'project_id', constants.full_rights)
                     + helpers.share_link(obj.id)
                     #+ helpers.get_copy_project_link(obj.id, constants.full_rights)
-                    + helpers.edit_link(obj.id)
-        + helpers.delete_link(obj.id)
+                    + helpers.edit_link(obj.id, url('/projects')),
                     #+ helpers.get_detail_link(obj.id, 'project_id', constants.full_rights)
-                    
                     })),
         ('Created', 'created'),
         ('Assembly', 'assembly'),
+        ('Track', 'get_tracks'),
+        (hidden_info,lambda obj : hide_info({
+        'tr_actions' :  helpers.delete_link(obj.id),
+        }))
         ])
+
+
+project_list= twf.DataGrid(fields = [
+        ('Projects', lambda obj: genshi.Markup(helpers.project_link(obj.name, obj.id))),
+])
 
 project_sharing = twf.DataGrid(fields=[
         ('Circle', 'circle.display'),
@@ -116,7 +134,7 @@ circle_grid = twf.DataGrid(fields=[
     (hidden_info,lambda obj : hide_info({
         'tr_actions' :
             helpers.get_delete_link(obj.id, rights = constants.full_rights)
-            + helpers.get_circles_edit_link(obj.id)
+            + helpers.edit_link(obj.id, url('/circles'))
         })),
     ('Description', 'description'),
     ('Members', 'get_users'),

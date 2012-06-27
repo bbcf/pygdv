@@ -17,7 +17,6 @@ from pygdv.lib.helpers import get_delete_link, get_detail_link, get_edit_link, g
 from pygdv import handler
 from tg import app_globals as gl
 from pygdv.lib import constants
-from pygdv.widgets import SortableColumn
 
 
 

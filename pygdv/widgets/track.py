@@ -12,7 +12,7 @@ from tg import url, tmpl_context
 from pygdv.model import DBSession, Track, Species, Sequence
 from pygdv.lib.helpers import get_delete_link, get_edit_link, get_task_status, get_export_link, get_copy_track_link, get_track_delete_link
 from pygdv.lib import constants
-
+import formencode
 
 # TABLE
 class TTable(TableBase):
@@ -37,6 +37,7 @@ class TEditForm(EditableForm):
     __model__ = Track
     __limit_fields__ = ['name']
     __omit_fields__ = ['id']
+    action = '/tracks'
     color = twf.HiddenField(id='color',label_text='Color :',
                           default=get_track_color)
 
@@ -132,6 +133,21 @@ help_text = 'Choose the assembly.'),
         d['assembly']=get_assemblies(species)
         return d
 
+class UploadForm2(twf.TableForm):
+
+    submit_text = 'Upload a file'
+    hover_help = True
+    show_errors = True
+    fields = [
+              
+    twf.FileField(label_text='Select a file in your computer ',id='file_upload',
+    help_text = 'Browse the file to upload in your computer. It will be converted to a Track.'),
+    twf.TextArea(id='urls',label_text='Or enter url to access your file.',
+                          help_text = 'Just paste an URL here.'),
+       twf.HiddenField(id='project_id'),
+  twf.Spacer(),
+              ]
+
 
 class UploadAdminFrom(twf.TableForm):
 
@@ -179,11 +195,22 @@ class TrackExport(twf.TableForm):
                                   help_text='select the output format', 
                                   options=constants.formats_export)
               ]
-    
+
+
+
+
+
 track_export = TrackExport()
 track_table = TTable(DBSession)
 track_table_filler = TTableFiller(DBSession)
 track_new_form = UploadFrom('upload_form',action='post')
+track_new_form2 = UploadForm2('upload_form',action='post2')
 default_track_form = UploadAdminFrom()
 track_edit_form = TEditForm(DBSession)
 track_edit_filler = TEditFiller(DBSession)
+
+
+
+class OneMissingSchema(formencode.schema.Schema):
+    allow_extra_fields=True
+    chained_validator=[formencode.validators.RequireIfMissing('urls', missing='file_upload')]

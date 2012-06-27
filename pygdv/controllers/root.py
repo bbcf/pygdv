@@ -68,10 +68,10 @@ class RootController(BaseController):
     sequences = SequenceController(DBSession, menu_items=models)
     tasks = TaskController(DBSession, menu_items=models)
     inputs = InputController(DBSession, menu_items=models)
-    tracks = TrackController(DBSession)
+    tracks = TrackController()
     projects = ProjectController()
     circles = CircleController()
-    jobs = JobController(DBSession)
+    jobs = JobController()
     public = PublicController()
     admin = AdminController()
     #workers = WorkerController()
@@ -118,20 +118,11 @@ class RootController(BaseController):
 #        """This method showcases how you can use the same controller for a data page and a display page"""
 #        return dict(page='data',params=kw)
     
-    @expose('json')
-    def test(self, x):
-        from pygdv.celery import tasks
-        res = tasks.test.delay((x))
-        return dict(result=res.get())
+    @expose('pygdv.templates.test')
+    def test(self, **kw):
+        print 'test %s' % kw
+        from tg import url
+        from pygdv.widgets import form
+        w = form.TestForm(action=url('./test'))
+        return dict(page='root', widget=w)
     
-    
-    @require(has_permission('admin', msg='Only for admins'))
-    @expose('json')
-    def test_log(self):
-        return 'logged'
-    
-    @expose()
-    def simulategr(self, *args, **kw):
-        import time
-        time.sleep(10)
-        return ''

@@ -1,66 +1,97 @@
 """Track Controller"""
 from __future__ import absolute_import
 
+from pygdv.lib.base import BaseController
 from tgext.crud import CrudRestController
 
 
 from repoze.what.predicates import not_anonymous, has_any_permission, has_permission
 import tg, sys, traceback
-from tg import expose, flash, require, tmpl_context, validate, request, response
+from tg import expose, flash, require, tmpl_context, validate, request, response, url
 from tg.controllers import redirect
 from tg.decorators import with_trailing_slash
 
-from pygdv.model import DBSession, Track, Sequence, Input, Task
-from pygdv.widgets.track import track_table, track_export, track_table_filler, track_new_form, track_edit_filler, track_edit_form, track_grid, default_track_form
-from pygdv.widgets import datagrid
+from pygdv.model import DBSession, Track, Sequence, Input, Task, Project, Species
+from pygdv.widgets.track import track_table, track_export, track_table_filler, track_new_form, track_new_form2, OneMissingSchema, track_edit_form, track_grid, default_track_form
+from pygdv.widgets import datagrid, form
 from pygdv import handler
 from pygdv.lib import util, constants, checker, reply
 from pygdv.celery import tasks
 import tempfile, track
-
+import tw2.core as twc
 __all__ = ['TrackController']
 
 
-class TrackController(CrudRestController):
+
+
+
+
+class TrackController(BaseController):
     allow_only = has_any_permission(constants.perm_user, constants.perm_admin)
-    model = Track
-    table = track_table
-    table_filler = track_table_filler
-    edit_form = track_edit_form
-    new_form = track_new_form
-    edit_filler = track_edit_filler
-
-
-
-
-
-
+    
+    
+    
 
     @with_trailing_slash
-    @expose('pygdv.templates.list')
+    @expose('pygdv.templates.track_index')
     @expose('json')
     #@paginate('items', items_per_page=10)
-    def get_all(self, *args, **kw):
+    def index(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
 
-        #tracks = DBSession.query(TMPTrack).filter(TMPTrack.user_id == user.id).all()
+        # view on a specific project
+        if kw.has_key('pid'):
+            project_id = kw.get('pid')
+            project = DBSession.query(Project).filter(Project.id == project_id).first()
+            if not checker.check_permission_project(user.id, project_id, constants.right_read):
+                flash('You must have %s permission to view the project.' % constants.right_read, 'error')
+                raise redirect('/tracks')
+            tracks = project.tracks
+        else :
+            tracks = user.tracks
 
-        tracks = user.tracks
-        data = [util.to_datagrid(datagrid.track_grid, tracks, "Track Listing", len(tracks)>0)]
+        # track list
+        track_list = [util.to_datagrid(datagrid.track_grid, tracks, "Track Listing", len(tracks)>0)]
         t = handler.help.tooltip['track']
-        return dict(page='tracks', model='track', form_title="new track", items=data, value=kw, tooltip=t)
+        
+        # project list
+        project_list = [(p.id, p.name,) for p in user.projects]
+        project_list.insert(0, (None, 'All tracks'))
+
+
+        return dict(page='tracks', model='track', form_title="new track", track_list=track_list,
+            project_list=project_list, value=kw, tooltip=t, project_id=kw.get('pid', None))
 
 
 
     @require(not_anonymous())
-    @expose('pygdv.templates.new')
+    @expose('pygdv.templates.track_new')
     def new(self, *args, **kw):
-        tmpl_context.widget = track_new_form
-        return dict(page='tracks', value=kw, model='track')
+        print 'NEW %s, %s' % (args, kw)
+        print tmpl_context.form_errors
 
+        if kw.has_key('pid'):
+            project_id = kw.get('pid')
+            project = DBSession.query(Project).filter(Project.id == project_id).first()
+            project_name = project.name
+            ass_name=project.sequence.name
+            tmpl_context.widget = track_new_form2
+            kw['project_id']=project_id
+            del kw['pid']
+        else:
+            project_name=None
+            ass_name=None
+            tmpl_context.widget = track_new_form
+        
+        return dict(page='tracks', value=kw, model='track', project_name=project_name, ass_name=ass_name)
 
     @expose('json')
     def create(self, *args, **kw):
+        print 'create %s, %s ' % (args, kw)
+        return {}
+
+    @expose('json')
+    def create2(self, *args, **kw):
         """
         Entry point for creating track
 
@@ -133,38 +164,29 @@ class TrackController(CrudRestController):
     @expose('json')
     @validate(track_new_form, error_handler=new)
     def post(self, *args, **kw):
-#        user = handler.user.get_user_in_session(request)
-#
-#
-#
-#
-#        if 'file_upload' in kw and kw['file_upload'] is not None:
-#            filename = kw ['file_upload'].filename
-#        elif 'urls' in kw :
-#            import urlparse
-#            filename = kw['urls'].split('/')[-1]
-#            u = urlparse.urlparse(kw['urls'])
-#            if not u.hostname:
-#                url = 'http://%s' % kw['urls']
-#                u = urlparse.urlparse(url)
-#                if u.hostname:
-#                    kw['urls'] = url
-#                else :
-#                    flash("Bad file/url", 'error')
-#                    raise redirect('./')
-#
-#        tmp_track = TMPTrack()
-#        tmp_track.name = filename
-#        tmp_track.sequence_id = kw['assembly']
-#        tmp_track.user_id = user.id
-#        DBSession.add(tmp_track)
-#        DBSession.flush()
-#
-#        kw['tmp_track_id'] = tmp_track.id
+        project_id = kw.get('project_id', None)
+        urls = kw.get('urls', None)
+        fu = kw.get('file_upload', None)
+        urls = urls and urls != '' or None
+        fu = fu and fu != '' or None
+        if fu is None and urls is None:
+            flash('Missing field', 'error')
+            raise redirect('/tracks/new')
+        return self.create(*args, **kw)
+    
+    @expose('json')
+    def post2(self, *args, **kw):
+        project_id = kw.get('project_id', None)
+        urls = kw.get('urls', None)
+        fu = kw.get('file_upload', None)
+        urls = urls and urls != '' or None
+        fu = fu and fu != '' or None
+        if fu is None and urls is None:
+            flash('Missing field', 'error')
+            raise redirect('/tracks/new', {'pid' : project_id})
         return self.create(*args, **kw)
 
-
-    @expose('genshi:tgext.crud.templates.post_delete')
+    #@expose('genshi:tgext.crud.templates.post_delete')
     def post_delete(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
         track_id = kw.get('id', None)
@@ -176,15 +198,32 @@ class TrackController(CrudRestController):
         raise redirect('./')
 
 
-    @expose('pygdv.templates.track_form')
-    def edit(self, *args, **kw):
-        track = DBSession.query(Track).filter(Track.id == args[0]).first()
-        tmpl_context.widget = track_edit_form
-        tmpl_context.color = track.parameters.color
-        kw['name']=track.name
+    @expose('pygdv.templates.track_edit')
+    def edit(self, track_id, **kw):
+        user = handler.user.get_user_in_session(request)
+        if track_id is not None:
+            if not checker.can_edit_track(user, track_id) and not checker.user_is_admin(user.id):
+                flash("You haven't the right to edit any tracks which is not yours")
+                raise redirect('/tracks')
 
-        return dict(title='Edit track', page='track', name=track.name, color=track.parameters.color, value=kw)
-        #CrudRestController.edit(self, *args, **kw)
+        widget = form.EditTrack(action='/tracks/edit/%s' % track_id).req()
+
+        track = DBSession.query(Track).filter(Track.id == track_id).first()
+        d = {}
+        d['name'] = track.name
+        d['color'] = track.parameters.color
+        d['track_id'] = track_id
+        widget.value = d
+        if request.method == 'GET':
+            return dict(title='Edit track', page='track', widget=widget, color=track.parameters.color )
+
+        if request.method == 'POST':
+            try:
+                widget.validate(kw)
+            except twc.ValidationError as e:
+                return dict(title='Edit track', page='track', widget=e.widget, color=track.parameters.color )
+        handler.track.edit(track=track, name=kw.get('name', None), color=kw.get('color', None))
+        raise redirect('/tracks')
 
     @expose()
     @validate(track_edit_form, error_handler=edit)

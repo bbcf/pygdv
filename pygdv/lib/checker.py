@@ -16,8 +16,9 @@ def user_own_project(user_id, project_id):
     Look if the user own the project 
     '''
     project = DBSession.query(Project).filter(Project.id == project_id).first()
-    return project.user_id == user_id
-
+    if project is not None:
+        return project.user_id == user_id
+    return False
 
 def user_own_track(user_id, track_id):
     '''
@@ -45,6 +46,9 @@ def user_is_admin(user_id):
     return user in admin_group.users
 
 def check_permission_project(user_id, project_id, right_id):
+    project = DBSession.query(Project).filter(Project.id == project_id).first()
+    if project is None:
+        return False
     if not user_own_project(user_id, project_id) and not user_is_admin(user_id):
         p = DBSession.query(Project).join(
                                 Project._circle_right).join(Right).join(User.circles).filter(

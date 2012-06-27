@@ -13,15 +13,42 @@
 </head>
 
 <body>
-  <div id="controls">
-    <div class="actions">
-      <div class="actions"><a href="/${tg.url(model)}s">back</a></div>
-      <div class="actions"> Edit project</div>
+
+
+  <div class="ui-layout-center crud_table">
+    ${flash()}
+    <div class="new_form">
+      <div py:replace="widget.display()">Input Form</div>
     </div>
   </div>
+
+
+
+
+
+
+
   
-  <div class="new_form">
-    <div py:replace="widget.display()">Input Form</div>
+  <div id="south" class="ui-layout-south">
+    ${footer()}
   </div>
+	
+  
+
+
+  <div id="north" class="ui-layout-north">
+    ${header()}
+    ${mainmenu()}
+    <div id="controls">
+      
+      <div class="actions"><a href="${tg.url('/tracks')}?pid=$project_id">back</a></div>
+
+
+    </div>
+  </div>
+ 
+
+
+
 </body>
 </html>

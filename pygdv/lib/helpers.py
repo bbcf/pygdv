@@ -20,8 +20,8 @@ def get_circles_edit_link(obj_id):
            ''' % ('edit', obj_id)
 
 
-def edit_link(id):
-    return '''<a class="action edit_link" title="edit" href="edit/%s" style="text-decoration:none"></a>''' % (id)
+def edit_link(id, model):
+    return '''<a class="action edit_link" title="edit" href="%s/edit/%s" style="text-decoration:none"></a>''' % (model, id)
 
 
 def share_link(id):
@@ -29,6 +29,11 @@ def share_link(id):
     Return a HTML share link.
     '''
     return ''' <a class='action share_link' title="share" href="share/%s"></a>''' % id
+
+def project_link(name, id=None):
+    if id is None:
+        return '''<a class="project_link" href="/tracks">%s</a> ''' % (name)
+    return '''<a class="project_link" href="/tracks?pid=%s">%s</a> ''' % (id, name)
 
 
 def delete_link(id, action='post_delete'):
@@ -41,6 +46,22 @@ def delete_link(id, action='post_delete'):
 </form>
         ''' % (action, id)
 
+def export_link(obj_id):
+    '''
+    Return a HTML export link.
+    '''
+    return ''' <a class='action export_link' title="export" href="tracks/link/%s"></a>''' % obj_id
+
+
+
+def tracks(obj):
+    if len(obj.tracks)>0:
+        return '<div class="htracks"><div class="httitle">Tracks</div>%s</div>' % obj.get_tracks
+    return ''
+def circles(obj):
+    if len(obj.shared_circles)>0:
+        return '<div class="hcircles"><div class="httitle">Circles</div>%s</div>' % obj.get_circle_with_right_display
+    return ''
 
 def get_delete_link(obj_id, rights = None):
     '''
@@ -120,7 +141,7 @@ def get_export_link(obj_id, param='track_id', rights=None, tmp=False):
     Return a HTML export link.
     '''
     if tmp:
-        return '' 
+        return ''
     elif rights is not None:
         return ''' <a class='action export_link' title="%s" href="%s"></a>''' % ('export', url('/tracks/link', params={param:obj_id}))
     return ''
