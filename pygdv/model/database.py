@@ -180,13 +180,12 @@ class Project(DeclarativeBase):
         '''
         result = {}
         for cr in self._circle_right:
-            if result.has_key(cr.circle) :
-                rights = result.get(cr.circle)
-            else :
-                rights = []
+            rights = result.get(cr.circle, [])
             rights.append(cr.right)
             result[cr.circle]=rights
+
         return result
+
     @property
     def success_tracks(self):
         return [t for t in self.tracks if t.status == constants.SUCCESS and t.parameters is not None]

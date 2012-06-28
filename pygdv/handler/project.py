@@ -1,7 +1,7 @@
 from pygdv.model import DBSession, Project, Track, Right, RightCircleAssociation, User, Circle
 from sqlalchemy.sql import and_, or_, not_
 from sqlalchemy.orm import aliased
-from pygdv.lib import constants
+from pygdv.lib import constants, checker
 from sqlalchemy.types import Boolean
 from pygdv.handler import track
 
@@ -212,7 +212,15 @@ def get_projects_with_permission(user_id, right_name):
                 and_(User.id == user_id, Right.id == right.id)
                      ).all()
     
-    
+def get_rights(project=None, project_id=None, user=None, user_id=None):
+    if project is None:
+        project = DBSession.query(Project).filter(Project.id == project_id).first()
+    if user is None:
+        user = DBSession.query(User).filter(User.id == user_id).first()
+
+    for circle, rights in project.circles_with_rights.iteritems():
+        if circle in user.circles:
+            return rights
 
 def get_shared_projects(user):
     '''

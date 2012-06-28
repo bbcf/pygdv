@@ -43,15 +43,28 @@ class TrackController(BaseController):
         if kw.has_key('pid'):
             project_id = kw.get('pid')
             project = DBSession.query(Project).filter(Project.id == project_id).first()
-            if not checker.check_permission_project(user.id, project_id, constants.right_read):
+            if not checker.check_permission(user=user, project=project, right_id=constants.right_read_id):
                 flash('You must have %s permission to view the project.' % constants.right_read, 'error')
                 raise redirect('/tracks')
             tracks = project.tracks
+            if checker.own(user=user, project=project):
+                kw['upload'] = True
+                grid = datagrid.track_grid
+            else :
+                rights = handler.project.get_rights(project=project, user=user)
+
+                if constants.right_upload_id in [r.id for r in rights]:
+                    kw['upload'] = True
+                grid = datagrid.track_grid_permissions(rights=rights)
+            track_list = [util.to_datagrid(grid, tracks, "Track Listing", len(tracks)>0)]
+
         else :
             tracks = user.tracks
+            track_list = [util.to_datagrid(datagrid.track_grid, tracks, "Track Listing", len(tracks)>0)]
+            kw['upload'] = True
 
         # track list
-        track_list = [util.to_datagrid(datagrid.track_grid, tracks, "Track Listing", len(tracks)>0)]
+
         t = handler.help.tooltip['track']
         
         # project list
@@ -64,8 +77,10 @@ class TrackController(BaseController):
         for shared, rights in sorted_projects:
             project_list.append((shared.id, shared.name, ''.join([r[0] for r in rights])))
 
+        print 'got upload ? %s' % kw.get('upload', None)
+        print 'got project_id ? %s' % kw.get('pid', None)
         return dict(page='tracks', model='track', form_title="new track", track_list=track_list,
-            project_list=project_list, value=kw, tooltip=t, project_id=kw.get('pid', None))
+            project_list=project_list, value=kw, tooltip=t, project_id=kw.get('pid', None), upload=kw.get('upload', None))
 
 
 
@@ -89,12 +104,12 @@ class TrackController(BaseController):
         return dict(page='tracks', value=kw, model='track', project_name=project_name, ass_name=ass_name)
 
     @expose('json')
-    def create(self, *args, **kw):
+    def create2(self, *args, **kw):
         print 'create %s, %s ' % (args, kw)
         return {}
 
     @expose('json')
-    def create2(self, *args, **kw):
+    def create(self, *args, **kw):
         """
         Entry point for creating track
 
@@ -170,9 +185,8 @@ class TrackController(BaseController):
         project_id = kw.get('project_id', None)
         urls = kw.get('urls', None)
         fu = kw.get('file_upload', None)
-        urls = urls and urls != '' or None
-        fu = fu and fu != '' or None
-        if fu is None and urls is None:
+
+        if (fu is None or fu == '') and (urls is None or urls == ''):
             flash('Missing field', 'error')
             raise redirect('/tracks/new')
         return self.create(*args, **kw)
@@ -182,9 +196,7 @@ class TrackController(BaseController):
         project_id = kw.get('project_id', None)
         urls = kw.get('urls', None)
         fu = kw.get('file_upload', None)
-        urls = urls and urls != '' or None
-        fu = fu and fu != '' or None
-        if fu is None and urls is None:
+        if not fu and not urls:
             flash('Missing field', 'error')
             raise redirect('/tracks/new', {'pid' : project_id})
         return self.create(*args, **kw)
@@ -195,7 +207,7 @@ class TrackController(BaseController):
         track_id = kw.get('id', None)
         if track_id is not None:
             if not checker.can_edit_track(user, track_id) and not checker.user_is_admin(user.id):
-                flash("You haven't the right to edit any tracks which is not yours")
+                flash("You haven't the right to edit any tracks which is not yours", 'error')
                 raise redirect('../')
             handler.track.delete_track(track_id=track_id)
         raise redirect('./')
@@ -205,8 +217,8 @@ class TrackController(BaseController):
     def edit(self, track_id, **kw):
         user = handler.user.get_user_in_session(request)
         if track_id is not None:
-            if not checker.can_edit_track(user, track_id) and not checker.user_is_admin(user.id):
-                flash("You haven't the right to edit any tracks which is not yours")
+            if not checker.can_edit_track(user, track_id) :
+                flash("You haven't the right to edit any tracks which is not yours", 'error')
                 raise redirect('/tracks')
 
         widget = form.EditTrack(action='/tracks/edit/%s' % track_id).req()

@@ -26,6 +26,62 @@ job_grid = twf.DataGrid(fields=[
     }))
 ])
 
+
+
+
+def track_grid_permissions(rights=None):
+    if rights is not None:
+        del_action = None
+        right_ids = [r.id for r in rights]
+        if constants.right_download_id in right_ids and constants.right_upload_id in right_ids:
+            actions = lambda obj : hide_info({
+                'tr_id' : obj.id,
+                'tr_status': obj.status,
+                'tr_color' : helpers.get_track_color(obj),
+                'tr_actions' :
+                    helpers.export_link(obj.id)
+                    + helpers.edit_link(obj.id, url('/tracks')),
+                })
+            del_action =  lambda obj : hide_info({
+                'tr_actions' :
+                    helpers.delete_link(obj.id)})
+
+        elif  constants.right_download_id in right_ids:
+            actions = lambda obj : hide_info({
+                'tr_id' : obj.id,
+                'tr_status': obj.status,
+                'tr_color' : helpers.get_track_color(obj),
+                'tr_actions' :
+                    helpers.export_link(obj.id)
+                })
+        elif constants.right_upload_id in right_ids:
+            actions = lambda obj : hide_info({
+                'tr_id' : obj.id,
+                'tr_status': obj.status,
+                'tr_color' : helpers.get_track_color(obj),
+                'tr_actions' :
+                    helpers.edit_link(obj.id, url('/tracks')),
+                })
+            del_action =  lambda obj : hide_info({
+                'tr_actions' :
+                    helpers.delete_link(obj.id)})
+        else :
+            actions = lambda obj : hide_info({
+                'tr_id' : obj.id,
+                'tr_status': obj.status,
+                'tr_color' : helpers.get_track_color(obj),
+                })
+
+        fields = [ ('Name', 'name'),
+        (hidden_info, actions),
+        ('Created', 'created'),
+        ('Assembly', 'sequence'),
+        ('Type', 'vizu'),
+        ]
+        if del_action is not None:
+            fields.append((hidden_info, del_action))
+    return twf.DataGrid(fields=fields)
+
 track_grid = twf.DataGrid(fields=[
     ('Name', 'name'),
     (hidden_info, lambda obj : hide_info({
@@ -44,6 +100,30 @@ track_grid = twf.DataGrid(fields=[
         helpers.delete_link(obj.id)
     })),
     ])
+
+track_read_grid = twf.DataGrid(fields=[
+    ('Name', 'name'),
+    (hidden_info, lambda obj : hide_info({
+        'tr_id' : obj.id,
+        'tr_status': obj.status,
+        'tr_color' : helpers.get_track_color(obj),
+        'tr_actions' :
+            helpers.export_link(obj.id)
+            + helpers.edit_link(obj.id, url('/tracks')),
+        })),
+    ('Created', 'created'),
+    ('Assembly', 'sequence'),
+    ('Type', 'vizu'),
+    (hidden_info, lambda obj : hide_info({
+        'tr_actions' :
+            helpers.delete_link(obj.id)
+    })),
+])
+
+
+
+
+
 
 project_grid = twf.DataGrid(fields = [
         ('Name', 'name'),

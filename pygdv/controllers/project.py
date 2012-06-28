@@ -52,9 +52,9 @@ class ProjectController(BaseController):
         else :
             project_id = kw.get('pid')
 
-        if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
-            flash('You must have %s permission to view the project.' % constants.right_upload, 'error')
-            raise redirect('/projects')
+        if not checker.check_permission(user=user, project_id=project_id, right_id=constants.right_upload_id):
+            flash('You must have %s permission to edit the project.' % constants.right_upload, 'error')
+            raise redirect('/tracks', {'pid' : project_id})
 
 
         widget = form.EditProject(action=url('/projects/edit/%s' % project_id)).req()
@@ -162,7 +162,7 @@ class ProjectController(BaseController):
         user = handler.user.get_user_in_session(request)
         if len(args) > 0:
             project_id = args[0]
-            if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
+            if not checker.check_permission(user=user, project_id=project_id, right_id=constants.right_upload_id):
                 flash('You must have %s permission to delete the project.' % constants.right_upload, 'error')
                 raise redirect('./')
 
@@ -234,9 +234,9 @@ class ProjectController(BaseController):
         else :
             project_id = kw.get('pid')
 
-        if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
-            flash('You must have %s permission to view the project.' % constants.right_upload, 'error')
-            raise redirect('/projects')
+        if not checker.check_permission(user=user, project_id=project_id, right_id=constants.right_upload_id):
+            flash('You must have %s permission to share the project', 'error') % constants.right_upload
+            raise redirect('/tracks', {'pid' : project_id})
 
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         widget = form.ShareProject(action=url('/projects/share/%s' % project_id))

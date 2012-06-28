@@ -6,10 +6,42 @@ from sqlalchemy.sql import and_, or_
 def can_edit_track(user, track_id):
     for track in user.tracks :
         if int(track_id) == track.id : return True
-    return user_is_admin(user.id)
+    if user_is_admin(user.id) : return True
+    track = DBSession.query(Track).filter(Track.id == track_id).first()
+    for project in track.projects:
+        if check_permission(project=project, user=user, right_id=constants.right_upload_id) : return True
+    return False
             
-            
-            
+def check_permission(project=None, project_id=None, user=None, user_id=None, right_id=None):
+    if project is None:
+        project = DBSession.query(Project).filter(Project.id == project_id).first()
+    if project is None: return False
+    if user is None:
+        user = DBSession.query(User).filter(User.id == user_id).first()
+
+    if own(user=user, project=project) : return True
+
+    for circle, rights in project.circles_with_rights.iteritems():
+        if right_id in [r.id for r in rights] and circle in user.circles: return True
+    return False
+
+def own(user=None, user_id=None, project=None, project_id=None):
+    if user_id is None:
+        user_id = user.id
+    if project is None:
+        project = DBSession.query(Project).filter(Project.id == project_id).first()
+    return project.user_id == user_id
+
+def is_admin(user=None, user_id=None):
+    if user is None:
+        user = DBSession.query(User).filter(User.id == user_id).first()
+    admin_group = DBSession.query(Group).filter(Group.name == constants.group_admins).first()
+    return user in admin_group.users
+
+
+
+
+
 
 def user_own_project(user_id, project_id):
     '''

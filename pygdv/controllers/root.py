@@ -126,3 +126,41 @@ class RootController(BaseController):
         w = form.TestForm(action=url('./test'))
         return dict(page='root', widget=w)
     
+
+    @expose('pygdv.templates.koopa')
+    def koopa(self, *args, **kw):
+
+        colModel = [
+                {'display' : 'ID', 'name' : 'id', 'width': 20, 'align' : 'center'},
+                {'display' : 'ID2', 'name' : 'blou', 'width': 20, 'align' : 'center'},
+        ]
+        _id = 'test'
+        from tg import url, tmpl_context
+        fetchURL = url('/troopa')
+        import tw.jquery as twjq
+        grid = twjq.FlexiGrid(id=_id, fetchURL=fetchURL, colModel=colModel, title='koopa',
+        useRp=True, rp=10, width=500, height=200)
+        data = [Koopa(i) for i in xrange(5)]
+        tmpl_context.grid = grid
+
+        return dict(page='koopa', data=data)
+
+    @expose('json')
+    def troopa(self, *args, **kw):
+        print 'called troopa %s'% kw
+        koopas = [Koopa(i) for i in xrange(5)]
+        data = [{'id' : koopa.blou, 'cell' : [koopa.blou, koopa.blou]} for koopa in koopas]
+        print data
+        return dict(rows=data, total=1)
+
+import json
+class JSONSerializable(object):
+    def __repr__(self):
+        return json.dumps(self.__dict__)
+
+class Koopa(object):
+    def __init__(self, _id):
+        self.blou = str(_id)
+
+    def __repr__(self):
+        return json.dumps(self.__dict__)
