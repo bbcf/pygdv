@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
 
-from tg import expose, flash, require, request
+from tg import expose, flash, require, request, url
 
 from pygdv.lib.base import BaseController
 from pygdv.model import DBSession, Project
@@ -83,9 +83,9 @@ class RootController(BaseController):
     
     @expose('pygdv.templates.index')
     def index(self,*args,**kw):
-        return dict(page='index')
+        raise redirect('/tracks')
     
-    @expose('pygdv.templates.index')
+    @expose('pygdv.templates.help')
     def login_needed(self):
         flash('You need to login', 'error')
         return dict(page='index')
@@ -129,34 +129,56 @@ class RootController(BaseController):
 
     @expose('pygdv.templates.koopa')
     def koopa(self, *args, **kw):
-
+        from tw.api import js_callback
         colModel = [
                 {'display' : 'ID', 'name' : 'id', 'width': 20, 'align' : 'center'},
                 {'display' : 'ID2', 'name' : 'blou', 'width': 20, 'align' : 'center'},
         ]
+        buttons = [{'name' : 'add', 'bclass' : 'add', 'onpress' : js_callback('add_record')},
+                {'name' : 'del', 'bclass' : 'delete', 'onpress' : js_callback('delete_record')}]
+
+
         _id = 'test'
         from tg import url, tmpl_context
         fetchURL = url('/troopa')
         import tw.jquery as twjq
-        grid = twjq.FlexiGrid(id=_id, fetchURL=fetchURL, colModel=colModel, title='koopa',
-        useRp=True, rp=10, width=500, height=200)
+        grid = twjq.FlexiGrid(id=_id, buttons=buttons, fetchURL=fetchURL, colModel=colModel, title='koopa',
+        useRp=True, rp=10, width=500, height=200, showTableToggleButton=True, usepager=True)
         data = [Koopa(i) for i in xrange(5)]
         tmpl_context.grid = grid
 
         return dict(page='koopa', data=data)
+
+    @expose('pygdv.templates.peach')
+    def peach(self, *args, **kw):
+        import tw2.jqplugins.jqgrid as jq
+        colNames = ['ID', 'SAME']
+        colModel = [{'name' : 'blou', 'width' : 50, 'align' : 'center'},
+        {'name' : 'blou'}]
+        from tg import url
+        opts = {'pager' : 'module-0-demo_pager', 'colNames' : colNames, 'colModel' : colModel, 'url' : url('/troopa')}
+        pager_opts = {'refresh' : True}
+        widget = jq.jqGridWidget(id='test', options=opts, pager_options=pager_opts).req()
+        return dict(widget=widget, page='peach')
+
+    @expose('json')
+    def bowser(self, *args, **kw):
+        print 'bowser %s, %s' % (args, kw)
+        return {}
 
     @expose('json')
     def troopa(self, *args, **kw):
         print 'called troopa %s'% kw
         koopas = [Koopa(i) for i in xrange(5)]
         data = [{'id' : koopa.blou, 'cell' : [koopa.blou, koopa.blou]} for koopa in koopas]
-        print data
-        return dict(rows=data, total=1)
 
-import json
-class JSONSerializable(object):
-    def __repr__(self):
-        return json.dumps(self.__dict__)
+        return dict(rows=data, total=5, counts=5)
+
+
+
+
+import tw2.jqplugins.jqgrid as jq
+
 
 class Koopa(object):
     def __init__(self, _id):

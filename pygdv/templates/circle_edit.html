@@ -17,6 +17,7 @@
 
     
     <div class="ui-layout-center crud_table">
+      ${flash()}
       <div py:for="item in items">
 	<div py:choose="item.grid_display">
 	  
@@ -31,13 +32,17 @@
       </div>
     </div>
 
-
+     <div id="south" class="ui-layout-south">
+    ${footer()}
+  </div>
+     
 
     <div id="north" class="ui-layout-north">
       ${header()}
       ${mainmenu()}
       <div id="controls" class="ui-layout-north">
 	<div class="actions"><a href="${tg.url('/circles')}">back</a></div>
+	<div class="actions">Editing circle</div>
 	<div class="actions">
 	  <a id="add_user_c" href="#">Add user</a>
 	  <div class="add_user_c" style="${('display:none', '')[defined('au_error')]}">

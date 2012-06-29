@@ -18,9 +18,14 @@ def make_tooltip(title, message):
 
 
 
+tooltip['main'] = make_tooltip('Main view', '''This is the main view where you find all files (called 'tracks') that you have uploaded.
+They are displayed on the center. On the right, this is a list of 'Projects'. It's a playlist that regroup some tracks that you can vizualise on
+ the genome browser. You can also share Projects among collaborators. Add a project by clicking 'New project link'.
+''')
+
 
 tooltip['circle'] = make_tooltip('Circle', '''A circle is a group of person you may want to collaborate with.
-You can create a new one by clicking 'new circle' link. You can also tweak the permissions to give to each circle.
+You can create a new one by clicking 'Add circle' link. You can also tweak the permissions to give to each circle.
 <ul>
     <li><a class='action delete_link'></a>  delete the circle.</li>
     <li><a class='action edit_link'></a>  edit the circle : change its name, its description, add/remove users.</li>

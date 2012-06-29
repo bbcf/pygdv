@@ -56,6 +56,7 @@ class TrackController(BaseController):
                 if constants.right_upload_id in [r.id for r in rights]:
                     kw['upload'] = True
                 grid = datagrid.track_grid_permissions(rights=rights)
+            kw['pn'] = project.name
             track_list = [util.to_datagrid(grid, tracks, "Track Listing", len(tracks)>0)]
 
         else :
@@ -65,22 +66,19 @@ class TrackController(BaseController):
 
         # track list
 
-        t = handler.help.tooltip['track']
+        t = handler.help.tooltip['main']
         
         # project list
         project_list = [(p.id, p.name,) for p in user.projects]
-        project_list.insert(0, (None, 'All tracks'))
 
-
+        # shared projects
         shared_with_rights = handler.project.get_shared_projects(user)
         sorted_projects = sorted(shared_with_rights.iteritems(), key=lambda k : k[0].name)
-        for shared, rights in sorted_projects:
-            project_list.append((shared.id, shared.name, ''.join([r[0] for r in rights])))
+        shared_project_list = [(p.id, p.name, ''.join([r[0] for r in rights])) for p, rights in sorted_projects]
 
-        print 'got upload ? %s' % kw.get('upload', None)
-        print 'got project_id ? %s' % kw.get('pid', None)
         return dict(page='tracks', model='track', form_title="new track", track_list=track_list,
-            project_list=project_list, value=kw, tooltip=t, project_id=kw.get('pid', None), upload=kw.get('upload', None))
+            project_list=project_list, shared_project_list=shared_project_list, value=kw,
+            tooltip=t, project_id=kw.get('pid', None), upload=kw.get('upload', None), project_name=kw.get('pn', None))
 
 
 

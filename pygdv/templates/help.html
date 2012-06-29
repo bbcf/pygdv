@@ -11,16 +11,12 @@
   <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
   <title py:replace="page"></title>
 </head>
-<style>
-#menu_items {
-  padding:0px 12px 0px 2px;
-  list-style-type:None
-}
-</style>
 
-<body class="tundra">
+<body>
   
-  <div class="getting_started">
+  <div class="ui-layout-center">
+    ${flash()}
+    <div class="getting_started">
     
 
 
@@ -77,6 +73,23 @@
     </p>
     In order to use it, you will need a <span class="imp">key</span> that you can <a href="mailto:webmaster.bbcf@epfl.ch?subject=[GDV] Ask for an API key">ask</a>.
   </div>
+
+</div>
+
+
+   <div id="south" class="ui-layout-south">
+    ${footer()}
+  </div>
+   
+
+<div id="north" class="ui-layout-north">
+      ${header()}
+      ${mainmenu()}
+      
+</div>
+    
+
+
 
 </body>
 </html>
