@@ -21,8 +21,8 @@ $(document).ready(function() {
 	north__size:120,
 	west__size: 180,
 	spacing_open : 0 ,
+	west__spacing_open : 1 ,
 	south__size: 35,
-	
     });
 });
 
@@ -96,15 +96,15 @@ $(document).ready(function() {
 	}
     });
     // set color on parameters
-    $('.grid tbody tr').each(function(ind, dome){
-	var color = $(dome).find('.tr_color').html();
-	if ((color) && !(color == 'None')){
-	    color = color.toLowerCase();
-	    $(dome).css('color', color);
-	} else {
-	    $(dome).css('color', 'blue');
-	}
-    });
+    // $('.grid tbody tr').each(function(ind, dome){
+    // 	var color = $(dome).find('.tr_color').html();
+    // 	if ((color) && !(color == 'None')){
+    // 	    color = color.toLowerCase();
+    // 	    $(dome).css('color', color);
+    // 	} else {
+    // 	    $(dome).css('color', 'blue');
+    // 	}
+    // });
     // dynamic forms
     $('#add_user_c').click(function(){
 	$('.add_user_c').toggle('normal')});

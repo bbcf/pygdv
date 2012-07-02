@@ -136,6 +136,14 @@ def get_track_color(track):
     if track.parameters is not None:
         return track.parameters.color
 
+def track_color(track):
+    color = None
+    if track.parameters is not None:
+        color = track.parameters.color
+    if color is None:
+        color = constants.default_track_color
+    return '''<div class="track-color" style="background-color:%s;"></div>''' % color
+
 def get_export_link(obj_id, param='track_id', rights=None, tmp=False):
     '''
     Return a HTML export link.

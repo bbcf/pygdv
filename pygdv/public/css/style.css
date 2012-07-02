@@ -372,6 +372,11 @@ a {
     background-color:red;
 }
 
+.track-color{
+    height:2em;
+
+}
+
 .circle_select, .track_select{
 height:18em;
 max-width:20em;
@@ -387,16 +392,17 @@ max-width:20em;
 
 
 ul#left_stack {
-    margin: 0;
+    margin:0px 1px 0px 0px;
     color:black;
+    border-right: 1px solid #CCCCCC;
+    box-shadow: 0 0px 4px #000000;
 }
 
 
 ul#left_stack li {
     list-style-image: url('../img/directory.png');
     margin: 1px;
-    /* border: 1px solid #CCCCCC; */
-    /* box-shadow: 0 0px 4px #000000; */
+
     width:100%;
     /* overflow:hidden; */
     height:26px;

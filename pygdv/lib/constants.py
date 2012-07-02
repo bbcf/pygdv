@@ -19,6 +19,7 @@ SUCCESS = 'SUCCESS'
 ERROR = 'FAILURE'
 RUNNING = 'RUNNING'
 
+default_track_color = 'red'
 
 # IMAGES TYPES IN GDV
 FEATURE_TRACK = 'FeatureTrack'

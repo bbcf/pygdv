@@ -87,11 +87,11 @@ track_grid = twf.DataGrid(fields=[
     (hidden_info, lambda obj : hide_info({
                     'tr_id' : obj.id,
                     'tr_status': obj.status,
-                    'tr_color' : helpers.get_track_color(obj),
                     'tr_actions' :
                         helpers.export_link(obj.id)
                     + helpers.edit_link(obj.id, url('/tracks')),
                     })),
+    ('Color', lambda obj : genshi.Markup(helpers.track_color(obj))),
      ('Created', 'created'),
      ('Assembly', 'sequence'),
      ('Type', 'vizu'),
@@ -106,11 +106,11 @@ track_read_grid = twf.DataGrid(fields=[
     (hidden_info, lambda obj : hide_info({
         'tr_id' : obj.id,
         'tr_status': obj.status,
-        'tr_color' : helpers.get_track_color(obj),
         'tr_actions' :
             helpers.export_link(obj.id)
             + helpers.edit_link(obj.id, url('/tracks')),
         })),
+    ('Color', lambda obj: genshi.Markup(helpers.track_color(obj))),
     ('Created', 'created'),
     ('Assembly', 'sequence'),
     ('Type', 'vizu'),
