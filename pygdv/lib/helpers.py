@@ -16,12 +16,12 @@ from pygdv.lib import constants
 
 def get_circles_edit_link(obj_id):
     return '''
-    <a class="action edit_link" title="%s" href="circles/edit/%s" style="text-decoration:none"></a>
-           ''' % ('edit', obj_id)
+    <a class="action" title="edit" href="circles/edit/%s" style="text-decoration:none"><img src="../images/pencil.png" width="16px" height="16px"/></a>
+           ''' % (obj_id)
 
 
 def edit_link(id, model):
-    return '''<a class="action edit_link" title="edit" href="%s/edit/%s" style="text-decoration:none"></a>''' % (model, id)
+    return '''<a class="action" title="edit" href="%s/edit/%s" style="text-decoration:none"><img src="../images/pencil.png" width="16px" height="16px"/>Edit</a>''' % (model, id)
 
 
 def share_link(id):
@@ -36,21 +36,28 @@ def project_link(name, id=None):
     return '''<a class="project_link" href="/tracks?pid=%s">%s</a> ''' % (id, name)
 
 
-def delete_link(id, action='post_delete'):
-    return '''
- <form method="POST" action=%s class="button-to">
-       <input class="action delete-button" title="delete" onclick="return confirm('Are you sure?');"
-        value="" style="background-color: transparent; float:left;
-        border:0; color: #286571; display: inline;"type="submit"/>
-    <input type="hidden" name='id' value="%s"/>
-</form>
-        ''' % (action, id)
+def delete_link(id, model):
+    return '''<a class="action" onclick="return confirm('Are you sure?')"; title="delete" href="%s/delete/%s" style="text-decoration:none"><img src="../images/delete.png"
+     width="15px" height="15px"/>Delete</a>''' % (model, id)
 
-def export_link(obj_id):
+def get_delete_circle_description_link(user_id, circle_id):
+    return '''<a class="action" onclick="return confirm('Are you sure?')"; title="delete" href="%s" style="text-decoration:none"><img src="images/delete.png"
+     width="15px" height="15px"/>Delete</a>''' % (url('/circles/delete_user', params={'id':circle_id, 'user_id' :user_id }))
+
+    '''
+# <form method="POST" action=%s class="button-to">
+#       <input class="action" title="delete" onclick="return confirm('Are you sure?');"
+#        value="" style="background-color: transparent; float:left;
+#        border:0; color: #286571; display: inline;"type="image" src="../../images/delete.png" width="16px" height="16px"/>
+#        Delete
+#    <input type="hidden" name='id' value="%s"/>
+#        ''' % (action, id)
+
+def export_link(obj_id, model):
     '''
     Return a HTML export link.
     '''
-    return ''' <a class='action export_link' title="export" href="tracks/link/%s"></a>''' % obj_id
+    return ''' <a class='action' title="download the track" href="%s/link/%s"><img src="../images/export.png" width="16px" height="16px"/>Download</a>''' % (model, obj_id)
 
 
 
@@ -84,9 +91,7 @@ def get_delete_link(obj_id, rights = None):
         ''' % (obj_id, 'delete')
     return ''
 
-def get_delete_circle_description_link(user_id, circle_id):
-    return ''' <a class='action delete_link' title="%s" href="%s"></a>''' \
-    %('delete user from circle', url('/circles/delete_user', params={'id':circle_id, 'user_id' :user_id }))
+
 
 
 def get_track_delete_link(obj_id, tmp = False, rights = None):

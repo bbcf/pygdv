@@ -32,10 +32,10 @@ class TrackController(BaseController):
     
     
 
-    @with_trailing_slash
     @expose('pygdv.templates.track_index')
     @expose('json')
     #@paginate('items', items_per_page=10)
+    @with_trailing_slash
     def index(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
 
@@ -83,6 +83,7 @@ class TrackController(BaseController):
 
 
     @require(not_anonymous())
+    @with_trailing_slash
     @expose('pygdv.templates.track_new')
     def new(self, *args, **kw):
 
@@ -103,7 +104,7 @@ class TrackController(BaseController):
 
     @expose('json')
     def create2(self, *args, **kw):
-        print 'create %s, %s ' % (args, kw)
+
         return {}
 
     @expose('json')
@@ -128,9 +129,11 @@ class TrackController(BaseController):
                 project_id=kw.get('project_id', None),
                 sequence_id=kw.get('sequence_id', None))
         except Exception as e:
+            if kw.has_key('project_id'):
+                reply.error(request, str(e), tg.url('./new', {'pid' : kw.get('project_id')}), {})
             return reply.error(request, str(e), tg.url('./new'), {})
 
-
+        print 'get params'
         # get parameters
         track_name, extension, sequence_id = handler.track.fetch_track_parameters(
             url=kw.get('url', None),
@@ -173,7 +176,9 @@ class TrackController(BaseController):
         
         # update the track
         handler.track.update(track=_track, params={'task_id' : async.task_id})
-
+        if kw.has_key('project_id'):
+            return reply.normal(request,'Processing launched', tg.url('./', {'pid' : kw.get('project_id')}), {'task_id' : async.task_id,
+                                                                                                              'track_id' : _track.id})
         return reply.normal(request, 'Processing launched.', './', {'task_id' : async.task_id,
                                                                     'track_id' : _track.id})
 
@@ -194,23 +199,23 @@ class TrackController(BaseController):
         project_id = kw.get('project_id', None)
         urls = kw.get('urls', None)
         fu = kw.get('file_upload', None)
-        if not fu and not urls:
+        if (fu is None or fu == '') and (urls is None or urls == ''):
             flash('Missing field', 'error')
             raise redirect('/tracks/new', {'pid' : project_id})
         return self.create(*args, **kw)
 
     #@expose('genshi:tgext.crud.templates.post_delete')
-    def post_delete(self, *args, **kw):
+    @expose()
+    def delete(self, track_id, **kw):
         user = handler.user.get_user_in_session(request)
-        track_id = kw.get('id', None)
         if track_id is not None:
-            if not checker.can_edit_track(user, track_id) and not checker.user_is_admin(user.id):
+            if not checker.can_edit_track(user, track_id) :
                 flash("You haven't the right to edit any tracks which is not yours", 'error')
                 raise redirect('../')
             handler.track.delete_track(track_id=track_id)
-        raise redirect('./')
+        raise redirect('../')
 
-
+    @with_trailing_slash
     @expose('pygdv.templates.track_edit')
     def edit(self, track_id, **kw):
         user = handler.user.get_user_in_session(request)
@@ -219,23 +224,28 @@ class TrackController(BaseController):
                 flash("You haven't the right to edit any tracks which is not yours", 'error')
                 raise redirect('/tracks')
 
-        widget = form.EditTrack(action='/tracks/edit/%s' % track_id).req()
+        widget = form.EditTrack(action=url('/tracks/edit/%s' % track_id)).req()
 
         track = DBSession.query(Track).filter(Track.id == track_id).first()
 
         d = {}
         d['name'] = track.name
-        d['color'] = track.parameters.color
+        if track.parameters is None:
+            cc = constants.default_track_color
+        else :
+            cc = track.parameters.color
         d['track_id'] = track_id
+        d['color'] = cc
         widget.value = d
         if request.method == 'GET':
-            return dict(title='Edit track', page='track', widget=widget, color=track.parameters.color )
+            return dict(title='Edit track', page='track', widget=widget, color=cc )
 
         if request.method == 'POST':
             try:
                 widget.validate(kw)
             except twc.ValidationError as e:
-                return dict(title='Edit track', page='track', widget=e.widget, color=track.parameters.color )
+                return dict(title='Edit track', page='track', widget=e.widget, color=cc)
+
         handler.track.edit(track=track, name=kw.get('name', None), color=kw.get('color', None))
         raise redirect('/tracks')
 
@@ -275,7 +285,7 @@ class TrackController(BaseController):
     def dump(self, track_id, format,  *args, **kw):
         user = handler.user.get_user_in_session(request)
         if not checker.can_download_track(user.id, track_id)  and not checker.user_is_admin(user.id):
-            flash("You haven't the right to export any tracks which is not yours")
+            flash("You haven't the right to export any tracks which is not yours", 'error')
             raise redirect('../')
         _track = DBSession.query(Track).filter(Track.id == track_id).first()
         if format == 'sqlite':
@@ -292,24 +302,25 @@ class TrackController(BaseController):
     def link(self, track_id, *args, **kw):
         user = handler.user.get_user_in_session(request)
         if not checker.user_own_track(user.id, track_id)  and not checker.user_is_admin(user.id):
-            flash("You haven't the right to download any tracks which is not yours")
+            flash("You haven't the right to download any tracks which is not yours", 'error')
+            raise redirect('/tracks/')
         track = DBSession.query(Track).filter(Track.id == track_id).first()
+        if track.status == constants.ERROR:
+            flash("The track processing failed. You cannot download it.", 'error')
+            raise redirect('/tracks/')
         response.content_type = 'application/x-sqlite3'
         return open(track.path).read()
 
 
 
     @expose()
-    def traceback(self, track_id, tmp):
+    def traceback(self, track_id):
         user = handler.user.get_user_in_session(request)
-        if tmp in ['True']:
-            return DBSession.query(TMPTrack).filter(TMPTrack.id == track_id).first().traceback
 
+        if not checker.user_own_track(user.id, track_id) and not checker.user_is_admin(user.id):
 
-        elif not checker.user_own_track(user.id, track_id) and not checker.user_is_admin(user.id):
-
-            flash("You haven't the right to look at any tracks which is not yours")
-            raise redirect('./')
+            flash("You haven't the right to look at any tracks which is not yours", 'error')
+            raise redirect('/tracks')
         track = DBSession.query(Track).filter(Track.id == track_id).first()
         return track.traceback
 

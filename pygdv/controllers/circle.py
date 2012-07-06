@@ -40,6 +40,7 @@ class CircleController(BaseController):
         raise redirect('/circles')
 
     @expose('pygdv.templates.circle_index')
+    @with_trailing_slash
     def index(self, *args, **kw):
         kw['page']='circle'
         user = handler.user.get_user_in_session(request)
@@ -67,14 +68,16 @@ class CircleController(BaseController):
 
 
 
-
-    def post_delete(self, *args, **kw):
+    @expose()
+    def delete(self, circle_id, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        circle_id = args[0]
         if not checker.user_own_circle(user.id, circle_id):
             flash('you have no right to delete this circle : you are not the creator of it')
-            raise redirect('/circles') 
-        return CrudRestController.post_delete(self, circle_id)
+            raise redirect('/circles')
+        circle = DBSession.query(Circle).filter(Circle.id == circle_id).first()
+        DBSession.delete(circle)
+        DBSession.flush()
+        raise redirect('/circles/')
 
     @expose()
     def delete_user(self, id, user_id):
@@ -90,6 +93,7 @@ class CircleController(BaseController):
 
 
     @expose('pygdv.templates.circle_edit')
+    @with_trailing_slash
     def edit(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
 

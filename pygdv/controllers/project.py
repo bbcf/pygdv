@@ -54,7 +54,7 @@ class ProjectController(BaseController):
 
         if not checker.check_permission(user=user, project_id=project_id, right_id=constants.right_upload_id):
             flash('You must have %s permission to edit the project.' % constants.right_upload, 'error')
-            raise redirect('/tracks', {'pid' : project_id})
+            raise redirect('/tracks/', {'pid' : project_id})
 
 
         widget = form.EditProject(action=url('/projects/edit/%s' % project_id)).req()
@@ -70,7 +70,7 @@ class ProjectController(BaseController):
         if request.method == 'GET':
             widget.child.children[1].value = project.name
             widget.child.children[2].options = [('','')] + [(t.id, t.name) for t in tracks] + [(t.id, t.name, {'selected' : True}) for t in project.tracks]
-            return dict(page='projects', widget=widget, project_id=project_id)
+            return dict(page='tracks', widget=widget, project_id=project_id)
 
         try:
             widget.validate(kw)
@@ -78,7 +78,7 @@ class ProjectController(BaseController):
             w = e.widget
             w.child.children[1].value = project.name
             w.child.children[2].options = [(t.id, t.name) for t in tracks] + [(t.id, t.name, {'selected' : True}) for t in project.tracks]
-            return dict(page='projects', widget=w, project_id=project_id)
+            return dict(page='tracks', widget=w, project_id=project_id)
         track_ids = kw.get('tracks', [])
         if not track_ids: track_ids = []
         if not isinstance(track_ids, list):
@@ -86,7 +86,7 @@ class ProjectController(BaseController):
         if len(track_ids) > 0 and '' in track_ids: track_ids.remove('')
         handler.project.e(project_id=project_id, name=kw.get('name'), track_ids=track_ids)
 
-        raise redirect('/tracks', {'pid' : project_id})
+        raise redirect('/tracks/', {'pid' : project_id})
 
 
 

@@ -189,6 +189,7 @@ class Project(DeclarativeBase):
     @property
     def success_tracks(self):
         return [t for t in self.tracks if t.status == constants.SUCCESS and t.parameters is not None]
+
     @property 
     def get_tracks(self):
         return ', '.join([track.name for track in self.success_tracks])
@@ -327,9 +328,7 @@ class Input(DeclarativeBase):
     @property
     def status(self):
         if self.task is None:
-            if self.task_id is not None:
-                return 'SUCCESS'
-            return 'PENDING'
+            return 'RUNNING'
         return self.task.status
     
     @property

@@ -108,7 +108,6 @@ div.actions {
   height: 2em;
   padding: 0.5em;
   margin-left: 1em;
-  max-width: 25em;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -119,8 +118,29 @@ div.ttactions {
   height: 2em;
   padding: 0.5em;
   margin-left: 1em;
-  max-width: 25em;
 }
+
+
+ul#project_toolbar{
+    display:inline;
+    list-style-type:none,
+}
+ul#project_toolbar li{
+    display:inline;
+}
+ul#project_toolbar li a{
+    border: 2px outset black;
+    margin: 1px;
+    padding: 7px;
+}
+ul#project_toolbar li a:hover{
+    border: 2px inset black;
+    
+}
+#project_toolbar{
+   
+}
+
 
 
 div.dataTables_filter{
@@ -169,14 +189,19 @@ table.grid td {
     text-overflow:ellipsis;
     overflow: hidden;
     white-space: nowrap;
-    text-align:right;
+    text-align:center;
 }
 table.grid th {
-    text-align:right;
+    text-align:center;
 }
 
 table.grid td:first-child, table.grid th:first-child{
     text-align:left;
+    width:25%;
+}
+table.grid td:first-child + td, table.grid th:first-child + th{
+    text-align:left;
+    width:25%;
 }
 table.grid th>:first-child {
     text-align:left;
@@ -195,6 +220,7 @@ div.crud_table .grid .odd.row_hover, div.crud_table .grid .even.row_hover{
     background-color: #F0F0F0;
 }
 div.crud_table .grid{
+
     border-collapse: collapse;
 }
 div.crud_table .grid .row_selected{
@@ -207,7 +233,8 @@ div.crud_table .grid .even{
     background-color: #FEFEFE;
 }
 div.crud_table .grid tr{
-    height: 2em;
+    height: 30px;
+    border: 1px solid #999999;
 }
 
 div.dataTables_length{
@@ -260,7 +287,7 @@ div.paginate_enabled_next{
 
 
 /* actions */
-div.table_hidden{
+div.table_hidden, span.table_hidden{
     display:none;
 }
 
@@ -269,9 +296,8 @@ div.tr_actions{
     width:30em;
     cursor:pointer;
 }
-a.action{
-    width:16px;
-    height:16px;
+a.action, .hoover_actions{
+    font-family:Times New Roman;
     float:left;
     padding-left:1.5em;
 }
@@ -369,7 +395,16 @@ a {
 .track-failure{
     opacity:0.5;
     filter:alpha(opacity=50);
-    background-color:red;
+}
+
+.track-running{
+    opacity:0.5;
+    filter:alpha(opacity=50);
+}
+
+.status_cvf{
+    padding: 1px 10px;
+    position: fixed;
 }
 
 .track-color{
@@ -378,8 +413,9 @@ a {
 }
 
 .circle_select, .track_select{
-height:18em;
-max-width:20em;
+height:350px;
+max-width:600px;
+min-width:250px;
 }
 
 

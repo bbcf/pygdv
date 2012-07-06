@@ -45,13 +45,13 @@ def pre_track_creation(url=None, file_upload=None, fsys=None, project_id=None, s
     """
     Verify track parameters.
     """
-    if file_upload is None and url is None and fsys is None:
+    if (file_upload is None or file_upload == '' ) and (url is None or url == '')and (fsys is None or fsys == ''):
         raise Exception("Missing file to upload.")
 
-    if url is not None:
+    if url is not None and url != '':
         u = urlparse.urlparse(url)
         if not u.hostname:
-            url = 'http://%s' % kw['urls']
+            url = 'http://%s' % url
             u = urlparse.urlparse(url)
             if not u.hostname:
                 raise Exception("Malformed url parameter.")
@@ -74,6 +74,11 @@ def fetch_track_parameters(url=None, file_upload=None, fsys=None, trackname=None
     Fetch track parameters from the request.
     Guess trackname and extension if they are not provided.
     """
+    if url == '' : url = None
+    if file_upload == '' : file_upload = None
+    if fsys == '' : fsys = None
+
+
     if trackname is None:
         if url is not None:
             trackname = os.path.splitext(os.path.split(url)[1])[0]
@@ -458,7 +463,15 @@ def edit(track=None, track_id=None, name=None, color=None):
     if name is not None:
         track.name = name
     if color is not None:
-        track.parameters.color = color
+        if track.parameters is None:
+            params = TrackParameters()
+            params.track = track
+            params.color = color
+            params.build_parameters()
+            DBSession.add(params)
+        else :
+            track.parameters.color = color
+
     DBSession.add(track)
     DBSession.flush()
 

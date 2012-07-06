@@ -4,14 +4,18 @@ import genshi
 from tg import url
 
 
-hidden_info = genshi.Markup("<div class='table_hidden'>hidden_info</div>")
+hidden_info = genshi.Markup("<span class='table_hidden'>hidden_info</span>")
 
+hoover_action = genshi.Markup("<div class='table_hidden'>hidden_info</div>")
+
+
+def hoover_actions(actions):
+    return genshi.Markup("<div class='hoover_actions table_hidden'>%s</div>" % actions)
 
 def hide_info(dict):
     span=''
     for k, v in dict.iteritems():
-        span +="<div class='table_hidden %s'>%s</div>" % (k, v)
-
+        span +="<span class='table_hidden %s'>%s</span>" % (k, v)
     return genshi.Markup("<div class='hidden_info'>%s</div>" % span)
 
 
@@ -34,95 +38,56 @@ def track_grid_permissions(rights=None):
         del_action = None
         right_ids = [r.id for r in rights]
         if constants.right_download_id in right_ids and constants.right_upload_id in right_ids:
-            actions = lambda obj : hide_info({
-                'tr_id' : obj.id,
-                'tr_status': obj.status,
-                'tr_color' : helpers.get_track_color(obj),
-                'tr_actions' :
-                    helpers.export_link(obj.id)
-                    + helpers.edit_link(obj.id, url('/tracks')),
-                })
-            del_action =  lambda obj : hide_info({
-                'tr_actions' :
-                    helpers.delete_link(obj.id)})
+            actions = lambda obj : hoover_actions(
+                helpers.export_link(obj.id, url('/tracks'))
+                + helpers.edit_link(obj.id, url('/tracks'))
+                + helpers.delete_link(obj.id, url('/tracks')))
 
         elif  constants.right_download_id in right_ids:
-            actions = lambda obj : hide_info({
-                'tr_id' : obj.id,
-                'tr_status': obj.status,
-                'tr_color' : helpers.get_track_color(obj),
-                'tr_actions' :
-                    helpers.export_link(obj.id)
-                })
+            actions = lambda obj : hoover_actions(
+                helpers.export_link(obj.id, url('/tracks')))
         elif constants.right_upload_id in right_ids:
-            actions = lambda obj : hide_info({
-                'tr_id' : obj.id,
-                'tr_status': obj.status,
-                'tr_color' : helpers.get_track_color(obj),
-                'tr_actions' :
-                    helpers.edit_link(obj.id, url('/tracks')),
-                })
-            del_action =  lambda obj : hide_info({
-                'tr_actions' :
-                    helpers.delete_link(obj.id)})
+            actions = lambda obj : hoover_actions(
+                helpers.edit_link(obj.id, url('/tracks'))
+                + helpers.delete_link(obj.id, url('/tracks')))
         else :
-            actions = lambda obj : hide_info({
-                'tr_id' : obj.id,
-                'tr_status': obj.status,
-                'tr_color' : helpers.get_track_color(obj),
-                })
+            actions = lambda obj : hoover_actions('')
+
+        h_info = lambda obj : hide_info({
+            'tr_id' : obj.id,
+            'tr_status': obj.status,
+            'tr_color' : helpers.get_track_color(obj),
+            })
+
 
         fields = [ ('Name', 'name'),
-        (hidden_info, actions),
+        (hoover_action, actions),
         ('Created', 'created'),
         ('Assembly', 'sequence'),
         ('Type', 'vizu'),
+        (hidden_info, h_info),
         ]
-        if del_action is not None:
-            fields.append((hidden_info, del_action))
+
     return twf.DataGrid(fields=fields)
 
 track_grid = twf.DataGrid(fields=[
     ('Name', 'name'),
-    (hidden_info, lambda obj : hide_info({
-                    'tr_id' : obj.id,
-                    'tr_status': obj.status,
-                    'tr_actions' :
-                        helpers.export_link(obj.id)
-                    + helpers.edit_link(obj.id, url('/tracks')),
-                    })),
+    (hoover_action, lambda obj : hoover_actions(
+            helpers.export_link(obj.id, url('/tracks'))
+            + helpers.edit_link(obj.id, url('/tracks'))
+            + helpers.delete_link(obj.id, url('/tracks') )
+    )),
     ('Color', lambda obj : genshi.Markup(helpers.track_color(obj))),
      ('Created', 'created'),
      ('Assembly', 'sequence'),
      ('Type', 'vizu'),
     (hidden_info, lambda obj : hide_info({
-        'tr_actions' :
-        helpers.delete_link(obj.id)
-    })),
-    ])
-
-track_read_grid = twf.DataGrid(fields=[
-    ('Name', 'name'),
-    (hidden_info, lambda obj : hide_info({
         'tr_id' : obj.id,
         'tr_status': obj.status,
-        'tr_actions' :
-            helpers.export_link(obj.id)
-            + helpers.edit_link(obj.id, url('/tracks')),
         })),
-    ('Color', lambda obj: genshi.Markup(helpers.track_color(obj))),
-    ('Created', 'created'),
-    ('Assembly', 'sequence'),
-    ('Type', 'vizu'),
-    (hidden_info, lambda obj : hide_info({
-        'tr_actions' :
-            helpers.delete_link(obj.id)
-    })),
-])
 
 
-
-
+    ])
 
 
 project_grid = twf.DataGrid(fields = [
@@ -211,11 +176,10 @@ def get_project_right_sharing_form(circle_right):
 
 circle_grid = twf.DataGrid(fields=[
     ('Name', 'name'),
-    (hidden_info,lambda obj : hide_info({
-        'tr_actions' :
-            helpers.get_delete_link(obj.id, rights = constants.full_rights)
-            + helpers.edit_link(obj.id, url('/circles'))
-        })),
+    (hoover_action, lambda obj : hoover_actions(
+        helpers.edit_link(obj.id, 'circles')
+        + helpers.delete_link(obj.id, 'circles')
+    )),
     ('Description', 'description'),
     ('Members', 'get_users'),
     
@@ -223,10 +187,9 @@ circle_grid = twf.DataGrid(fields=[
 
 circle_description_grid = twf.DataGrid(fields=[
     ('Name', 'name'),
-    (hidden_info,lambda obj : hide_info({
-        'tr_actions' :
+    (hoover_action,lambda obj : hoover_actions(
             helpers.get_delete_circle_description_link(obj.id, obj.cid)
-    })),
+    )),
     ('Firstname', 'firstname'),
     ('Email', 'email'),
     

@@ -24,16 +24,78 @@ $(document).ready(function() {
 	west__spacing_open : 1 ,
 	south__size: 35,
     });
+
+
 });
 
 
+
+function show_status(event, node, status, enter){
+    var c = $('body').find('.status_cvf');
+    var o = node.offset();
+    if (c.length == 0){
+	var n = $('<a class=status_cvf>').html(status);
+	var st = {}
+	if (status == 'RUNNING'){
+	    st['border'] = '1px solid green';
+	    st['color'] = 'green';
+	} else {
+	    st['border'] = '1px solid red';
+	    st['color'] = 'red';
+	    $(n).attr('href', 'traceback?track_id=' + $(node).find('.hidden_info').find('.tr_id').html());
+	}
+	st['top'] = o['top'] + 3;
+	st['left'] = o['left'] + 200;
+
+	$(n).css(st);
+	$('body').append(n);
+	$(node).find('.hoover_actions').toggleClass('table_hidden');
+    } else {
+	var c = $('body').find('.status_cvf');
+	var ofs = c.offset()
+	var ot = ofs['top'];
+
+	if(!enter){// remove status div only if the mouse is leaving the tr, and is not on the status div
+	    if ((event.clientY > ot && event.clientY < (ot + 27)) && (
+		(event.clientX > ofs['left'] && event.clientX  < (ofs['left'] + c.width() + 25)))){
+		
+	    } else {
+		$(node).find('.hoover_actions').toggleClass('table_hidden');
+		c.remove();
+	    }
+	}
+    }
+}
 $(document).ready(function() {
-    $('.crud_table .grid tbody tr').hover( function() {
-     	$(this).find('.hidden_info').find('.tr_actions').toggleClass('table_hidden');
+    var ev = $('.crud_table .grid tbody tr').hover( function(e) {
+	
+	//     	$(this).find('.hidden_info').find('.tr_actions').toggleClass('table_hidden');
+	var tracks = $(this).find('.hidden_info').find('.tr_status'); 
+	if (tracks.length == 0 || tracks.html() == 'SUCCESS'){
+	    $(this).find('.hoover_actions').toggleClass('table_hidden');
+	} else if (tracks.length > 0){
+	    show_status(e, $(this), tracks.html(), true);
+	    
+	}
+	
 	//toggleClass('row_hover');
 	//show_actions($(this));
+    }, 
+						    
+						    function(e) {
+							
+							//     	$(this).find('.hidden_info').find('.tr_actions').toggleClass('table_hidden');
+	var tracks = $(this).find('.hidden_info').find('.tr_status'); 
+	if (tracks.length == 0 || tracks.html() == 'SUCCESS'){
+	    $(this).find('.hoover_actions').toggleClass('table_hidden');
+	} else if (tracks.length > 0){
+	    show_status(e, $(this), tracks.html(), false);
+	}					    
+						    });
+    $('.status_cvf').hover(function(e){
+	$('.crud_table .grid tbody tr').click();
     });
-
+    
     // $('.grid tbody tr').click( function() {
     // 	$('.grid tbody tr').find('.hidden_info').find('.tr_info').hide();
     // 	// $(this).find('.hidden_info').find('.tr_info').toggle('normal');
@@ -89,7 +151,7 @@ $(document).ready(function() {
 	var status = $(dome).find('.tr_status').html();
 	if (status){
 	    status = status.toLowerCase();
-	    if(status == 'failure'){
+	    if(status == 'failure' || status == 'running'){
 		$(dome).removeClass();
 	    }
 	    $(dome).addClass('track-' + status);
@@ -115,16 +177,20 @@ $(document).ready(function() {
 });
 
 function good_content_size(left){
-    /** make the content of a good size */
+    // /** make the content of a good size */
     var new_width = $(window).width() - $('#left_stack').width();
     var max = Math.max(new_width, '800') ;
-    $('#content').width(max);
+    // $('#content').width(max);
 
     /* calculate sizes for table columns */
     var ths = $('.grid').find('th');
-    var nb = ths.length;
-    var  w = max / nb - 5;
+    
+    var nb = ths.length - 1;
+    console.log(nb);
+    var  w = max / nb;
+    console.log(w);
     $(ths).width(w);
+    console.log(ths);
 };
 
 function show_actions(node){
