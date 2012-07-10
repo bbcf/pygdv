@@ -42,7 +42,8 @@
       ${header()}
       ${mainmenu()}
       <div id="controls">
-	<div class="actions"><a href="../${tg.url(model)}s">back</a></div>
+	
+	<div class="actions"><a href="${tg.url('/tracks/')}${('', '?pid=')[defined('project_id') and project_id != None]}${project_id}">back</a></div>
 	<div class="actions">New $model</div>
       </div>
     </div>

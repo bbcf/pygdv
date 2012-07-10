@@ -10,8 +10,9 @@ from celery.task.http import HttpDispatchTask
 
 from pygdv.lib import constants, util
 import track, urllib, urllib2
-
-
+from archive import Archive
+import tempfile
+from pygdv.celery import temporary_directory
 success = 1
 
 
@@ -20,7 +21,42 @@ manager = None
 
 
 
+@task()
+def multiple_track_input(_uploaded, _file, _url, _fsys, sequence_id, user_mail, user_key, project_id, force, delfile, _callback_url):
+    tmp_dir = tempfile.mkdtemp(dir=temporary_directory)
+    print 'multiple in celery %s ' % _file
+    if _uploaded:
+        Archive(_file).extract(out=tmp_dir)
+    else:
+        if len(url.split()) > 1 :
+            for ul in url.split():
+                fname = os.path.splitext(os.path.split(url)[1])[0]
+                with open(os.path.join(tmp_dir, fname)) as tmp_file:
+                    try:
+                        u = urllib2.urlopen(ul)
+                        while True:
+                            buffer = u.read(block_sz)
+                            if not buffer: break
+                            tmp_file.write(buffer)
+                    except HTTPError as e:
+                        print '%s : %s' % (url, e)
+                        raise e
 
+                    if util.is_compressed(fname):
+                        Archive(_file).extract(out=tmp_dir)
+    outs = []
+    for dir, dirs, files in os.walk(tmp_dir):
+        outs.extend([os.path.abspath(os.path.join(dir, f)) for f in files])
+    print "outs    %s " % ", ".join(outs)
+    for _f in outs:
+        callback(_callback_url + '/create', {'fsys' :_f,
+                                             'sequence_id' : sequence_id,
+                                             'mail' : user_mail,
+                                             'key' : user_key,
+                                             'project_id' : project_id,
+                                             'force' : force,
+                                             'delfile' : True,
+        })
 
 
 
@@ -131,7 +167,6 @@ def upload(_uploaded, _file, _urls, _fsys, _track_name, _extension, delfile):
     """
     Upload the track.
     """
-    print "upload %s, %s, %s, %s, %s" % (_uploaded, _file, _urls, _track_name, _extension)
     # file already uploaded
     if _uploaded:
         return _file

@@ -98,29 +98,25 @@ class TrackController(BaseController):
         else:
             project_name=None
             ass_name=None
+            project_id=None
             tmpl_context.widget = track_new_form
         
-        return dict(page='tracks', value=kw, model='track', project_name=project_name, ass_name=ass_name)
-
-    @expose('json')
-    def create2(self, *args, **kw):
-
-        return {}
+        return dict(page='tracks', value=kw, model='track', project_id=project_id, project_name=project_name, ass_name=ass_name)
 
     @expose('json')
     def create(self, *args, **kw):
-        """
-        Entry point for creating track
-
-        """
+        print 'create %s ' % kw
         user = handler.user.get_user_in_session(request)
         # change a parameter name
         if kw.has_key('assembly'):
-            kw['sequence_id']=kw.get('assembly')
+            kw['sequence_id'] = kw.get('assembly')
             del kw['assembly']
         if kw.has_key('urls'):
             kw['url']=kw.get('urls')
             del kw['urls']
+
+
+
         # verify track parameters
         try :
             handler.track.pre_track_creation(url=kw.get('url', None),
@@ -133,7 +129,6 @@ class TrackController(BaseController):
                 reply.error(request, str(e), tg.url('./new', {'pid' : kw.get('project_id')}), {})
             return reply.error(request, str(e), tg.url('./new'), {})
 
-        print 'get params'
         # get parameters
         track_name, extension, sequence_id = handler.track.fetch_track_parameters(
             url=kw.get('url', None),
@@ -143,7 +138,7 @@ class TrackController(BaseController):
             extension=kw.get('extension', None),
             project_id=kw.get('project_id', None),
             sequence_id=kw.get('sequence_id', None))
-                
+
         # upload the track it's from file_upload
         if request.environ[constants.REQUEST_TYPE] == constants.REQUEST_TYPE_BROWSER :
             fu = kw.get('file_upload', None)
@@ -154,33 +149,53 @@ class TrackController(BaseController):
                 kw['file']=_f.name
                 del kw['file_upload']
 
-        # create a new track
-        _track = handler.track.new_track(user.id, track_name, sequence_id=sequence_id, admin=False, project_id=kw.get('project_id', None))
+        # check if multiples url or if zipped file
+        multiple = False
+        if kw.get('uploaded', False):
+            if util.is_compressed(kw.get('file')):
+                multiple = True
+        else:
+            _urls = kw.get('url', '')
+            if len(_urls.split()) > 1 or util.is_compressed(_urls, is_url=True):
+                multiple = True
+        if multiple:
+            async = tasks.multiple_track_input.delay(kw.get('uploaded', None), kw.get('file', None), kw.get('url', None), kw.get('fsys', None),
+                sequence_id, user.email, user.key, kw.get('project_id', None), kw.get('force', False), kw.get('delfile', False), constants.callback_track_url(),
+            )
+            return reply.normal(request, 'Processing launched.', './', {'task_id' : async.task_id})
 
-        # format parameters
-        _uploaded = kw.get('uploaded', False)
-        _file = kw.get('file', None)
-        _urls = kw.get('url', None)
-        _fsys=kw.get('fsys', None)
-        _track_name = track_name
-        _extension = extension
-        _callback_url = constants.callback_track_url()
-        _force = kw.get('force', False)
-        _delfile = kw.get('delfile', False)
-        _track_id = _track.id
-        _user_key = user.key
-        _user_mail = user.email
 
-        # launch task with the parameters
-        async = tasks.track_input.delay(_uploaded, _file, _urls, _fsys, _track_name, _extension, _callback_url, _force, _track_id, _user_mail, _user_key, sequence_id, _delfile)
-        
-        # update the track
-        handler.track.update(track=_track, params={'task_id' : async.task_id})
-        if kw.has_key('project_id'):
-            return reply.normal(request,'Processing launched', tg.url('./', {'pid' : kw.get('project_id')}), {'task_id' : async.task_id,
-                                                                                                              'track_id' : _track.id})
-        return reply.normal(request, 'Processing launched.', './', {'task_id' : async.task_id,
-                                                                    'track_id' : _track.id})
+
+        else :
+            # create a new track
+            _track = handler.track.new_track(user.id, track_name, sequence_id=sequence_id, admin=False, project_id=kw.get('project_id', None))
+
+            # format parameters
+            _uploaded = kw.get('uploaded', False)
+            _file = kw.get('file', None)
+            _urls = kw.get('url', None)
+            _fsys=kw.get('fsys', None)
+            _track_name = track_name
+            _extension = extension
+            _callback_url = constants.callback_track_url()
+            _force = kw.get('force', False)
+            _delfile = kw.get('delfile', False)
+            _track_id = _track.id
+            _user_key = user.key
+            _user_mail = user.email
+
+            # launch task with the parameters
+            async = tasks.track_input.delay(_uploaded, _file, _urls, _fsys, _track_name, _extension, _callback_url, _force,
+                _track_id, _user_mail, _user_key, sequence_id, _delfile)
+
+            # update the track
+            handler.track.update(track=_track, params={'task_id' : async.task_id})
+
+            if kw.has_key('project_id'):
+                return reply.normal(request,'Processing launched', tg.url('./', {'pid' : kw.get('project_id')}), {'task_id' : async.task_id,
+                                                                                                                  'track_id' : _track.id})
+            return reply.normal(request, 'Processing launched.', './', {'task_id' : async.task_id,
+                                                                        'track_id' : _track.id})
 
     @expose('json')
     @validate(track_new_form, error_handler=new)
@@ -192,6 +207,7 @@ class TrackController(BaseController):
         if (fu is None or fu == '') and (urls is None or urls == ''):
             flash('Missing field', 'error')
             raise redirect('/tracks/new')
+        print 'posted'
         return self.create(*args, **kw)
     
     @expose('json')
@@ -202,6 +218,7 @@ class TrackController(BaseController):
         if (fu is None or fu == '') and (urls is None or urls == ''):
             flash('Missing field', 'error')
             raise redirect('/tracks/new', {'pid' : project_id})
+        print 'posted2'
         return self.create(*args, **kw)
 
     #@expose('genshi:tgext.crud.templates.post_delete')
@@ -396,7 +413,6 @@ class TrackController(BaseController):
         The input can be 'forced' to be recomputed
         """
         try :
-            print '[x] after sha1 [x] %s and %s' % (fname, sha1)
             _input = DBSession.query(Input).filter(Input.sha1 == sha1).first()
             do_process = True
             if util.str2bool(force) and _input is not None :

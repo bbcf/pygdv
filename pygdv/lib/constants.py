@@ -30,6 +30,15 @@ def json_directory():
     return os.path.join(resource_filename(data_dir, json_dir))
 
 
+
+def temporary_directory():
+    if 'temporary.directory' in tg.config:
+        return tg.config.get('temporary.directory')
+    else :
+        return os.path.join(resource_filename('pygdv', 'tmp'))
+
+
+
 def track_directory():
     return os.path.join(resource_filename(data_dir, tracks_dir))
 

@@ -177,8 +177,8 @@ def get_project_right_sharing_form(circle_right):
 circle_grid = twf.DataGrid(fields=[
     ('Name', 'name'),
     (hoover_action, lambda obj : hoover_actions(
-        helpers.edit_link(obj.id, 'circles')
-        + helpers.delete_link(obj.id, 'circles')
+        helpers.edit_link(obj.id, url('/circles'))
+        + helpers.delete_link(obj.id, url('/circles'))
     )),
     ('Description', 'description'),
     ('Members', 'get_users'),

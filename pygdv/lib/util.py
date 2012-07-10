@@ -5,8 +5,11 @@ import tempfile
 import urllib2, urlparse
 import shutil, os
 import hashlib
+import tg
 from tw.forms.fields import TextArea
 from urllib2 import HTTPError
+from pygdv.lib import constants
+from urlparse import urlparse
 
 def to_datagrid(grid_type, grid_data, grid_title = None, grid_display = None):
     '''
@@ -187,14 +190,22 @@ def file_upload_converter(kw):
 
 
 
+def tmpfile(prefix='', suffix='', delete=False):
+    dir = tg.config.get('temporary.directory')
+    return tempfile.NamedTemporaryFile(prefix=prefix, suffix=suffix, dir=dir, delete=False)
 
+def tmpdir():
+    dir = constants.temporary_directory()
+    return tempfile.mkdtemp(dir=dir)
 
 block_sz = 8192
 def download(url=None, file_upload=None, fsys=None, filename='', extension=''):
     """
     Download the file to a temporary place
     """
-    tmp_file = tempfile.NamedTemporaryFile(prefix=filename, suffix=extension, delete=False)
+    suffix = '.' + extension
+    if suffix == '.': suffix = ''
+    tmp_file = tmpfile(prefix=filename, suffix=suffix, delete=False)
 
     if file_upload is not None:
         #filename = file_upload.filename
@@ -225,3 +236,15 @@ def download(url=None, file_upload=None, fsys=None, filename='', extension=''):
         return tmp_file
 
     raise Exception("Nothing to download")
+
+
+compressed_files_extensions = ('.gz', '.zip', '.tar', '.tgz', '.targz')
+
+def is_compressed(fname, is_url=False):
+    lower = fname.lower()
+    if is_url:
+        params = urlparse(fname).query
+        return any(s.endswith(ext) for ext in compressed_files_extensions for s in params.split('&'))
+    return any(lower.endswith(ext) for ext in compressed_files_extensions)
+
+
