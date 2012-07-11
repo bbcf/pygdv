@@ -22,24 +22,27 @@ manager = None
 
 
 @task()
-def multiple_track_input(_uploaded, _file, _url, _fsys, sequence_id, user_mail, user_key, project_id, force, delfile, _callback_url):
+def multiple_track_input(_uploaded, _file, _url, _fsys, sequence_id, user_mail, user_key, project_id, force, delfile, _callback_url, _extension):
     tmp_dir = tempfile.mkdtemp(dir=temporary_directory)
-    print 'multiple in celery %s ' % _file
+
     if _uploaded:
         Archive(_file).extract(out=tmp_dir)
     else:
-        if len(url.split()) > 1 :
-            for ul in url.split():
-                fname = os.path.splitext(os.path.split(url)[1])[0]
-                with open(os.path.join(tmp_dir, fname)) as tmp_file:
+        if len(_url.split()) > 1 :
+            for ul in _url.split():
+                print ul
+                fname = os.path.splitext(ul.rsplit('/',1)[1])[0]
+                print fname
+                block_sz = 2048
+                with open(os.path.join(tmp_dir, fname), 'w') as tmp_file:
                     try:
                         u = urllib2.urlopen(ul)
                         while True:
                             buffer = u.read(block_sz)
                             if not buffer: break
                             tmp_file.write(buffer)
-                    except HTTPError as e:
-                        print '%s : %s' % (url, e)
+                    except Exception as e:
+                        print '%s : %s' % (ul, e)
                         raise e
 
                     if util.is_compressed(fname):
@@ -56,6 +59,7 @@ def multiple_track_input(_uploaded, _file, _url, _fsys, sequence_id, user_mail, 
                                              'project_id' : project_id,
                                              'force' : force,
                                              'delfile' : True,
+                                             'extension' : _extension
         })
 
 
@@ -178,7 +182,7 @@ def upload(_uploaded, _file, _urls, _fsys, _track_name, _extension, delfile):
 
     # remove original file
     if _fsys is not None:
-        if delfile.lower() in ['1', 'true', 'yes']:
+        if (isinstance(delfile, bool) and delfile) or (isinstance(delfile, basestring) and delfile.lower() in ['1', 'true', 'yes']):
             try:
                 os.remove(_fsys)
             except OSError:

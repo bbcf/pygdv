@@ -157,17 +157,17 @@ class ProjectController(BaseController):
         return self.create(*args, **kw)
 
 
-    @expose()
+    @expose('json')
     def delete(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
         if len(args) > 0:
             project_id = args[0]
             if not checker.check_permission(user=user, project_id=project_id, right_id=constants.right_upload_id):
-                flash('You must have %s permission to delete the project.' % constants.right_upload, 'error')
-                raise redirect('./')
+                return reply.error(request, "You must have %s permission to delete the project." % constants.right_upload,
+                        '/tracks', {'error' : 'wrong credentials'})
 
         handler.project.delete(project_id=project_id)
-        raise redirect('/tracks')
+        return reply.normal(request, 'Project successfully deleted.', '/tracks', {'success' : 'project deleted'})
 
 
     def post_delete(self, *args, **kw):
@@ -277,7 +277,7 @@ class ProjectController(BaseController):
 
         cr_data = [util.to_datagrid(datagrid.project_sharing, project.circles_rights, "Sharing", len(project.circles_rights)>0)]
 
-        widget.child.children[1].options =  [('','')] + [(c.id, c.name) for c in user.circles if c not in project.shared_circles] +\
+        widget.child.children[1].options =  [('','')] + [(c.id, c.name) for c in user.circles_sharing if c not in project.shared_circles] +\
                                             [(c.id, c.name, {'selected' : True}) for c in project.shared_circles]
 
         return dict(page='projects', public=pub, download=down, name=project.name,

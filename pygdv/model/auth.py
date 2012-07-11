@@ -128,10 +128,21 @@ class User(DeclarativeBase):
     projects = relationship('Project', backref='user')
     jobs = relationship('Job', backref='user')
     circles = relationship('Circle', secondary=user_circle_table, backref='users')
-    
-    
+
+    @property
+    def circles_sharing(self):
+        return [c for c in self.circles if c.creator_id == self.id or c.admin]
+
+    @property
+    def circles_owned(self):
+        return [c for c in self.circles if c.creator_id == self.id]
+
+    @property
+    def circles_admin(self):
+        return [c for c in self.circles if c.admin]
+
     def _get_date(self):
-        return self._created.strftime(date_format);
+        return self._created.strftime(date_format)
         
     def _set_date(self,date):
         self._created=date

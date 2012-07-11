@@ -160,7 +160,7 @@ class TrackController(BaseController):
                 multiple = True
         if multiple:
             async = tasks.multiple_track_input.delay(kw.get('uploaded', None), kw.get('file', None), kw.get('url', None), kw.get('fsys', None),
-                sequence_id, user.email, user.key, kw.get('project_id', None), kw.get('force', False), kw.get('delfile', False), constants.callback_track_url(),
+                sequence_id, user.email, user.key, kw.get('project_id', None), kw.get('force', False), kw.get('delfile', False), constants.callback_track_url(), extension,
             )
             return reply.normal(request, 'Processing launched.', './', {'task_id' : async.task_id})
 
@@ -192,7 +192,7 @@ class TrackController(BaseController):
             handler.track.update(track=_track, params={'task_id' : async.task_id})
 
             if kw.has_key('project_id'):
-                return reply.normal(request,'Processing launched', tg.url('./', {'pid' : kw.get('project_id')}), {'task_id' : async.task_id,
+                return reply.normal(request,'Processing launched.', tg.url('./', {'pid' : kw.get('project_id')}), {'task_id' : async.task_id,
                                                                                                                   'track_id' : _track.id})
             return reply.normal(request, 'Processing launched.', './', {'task_id' : async.task_id,
                                                                         'track_id' : _track.id})
@@ -207,7 +207,6 @@ class TrackController(BaseController):
         if (fu is None or fu == '') and (urls is None or urls == ''):
             flash('Missing field', 'error')
             raise redirect('/tracks/new')
-        print 'posted'
         return self.create(*args, **kw)
     
     @expose('json')
@@ -222,15 +221,15 @@ class TrackController(BaseController):
         return self.create(*args, **kw)
 
     #@expose('genshi:tgext.crud.templates.post_delete')
-    @expose()
+
+    @expose('json')
     def delete(self, track_id, **kw):
         user = handler.user.get_user_in_session(request)
         if track_id is not None:
             if not checker.can_edit_track(user, track_id) :
-                flash("You haven't the right to edit any tracks which is not yours", 'error')
-                raise redirect('../')
+                return reply.error(request, "You haven't the right to delete any tracks which is not yours", '/tracks', {'error' : 'wrong credential'})
             handler.track.delete_track(track_id=track_id)
-        raise redirect('../')
+        return reply.normal(request, 'Track successfully deleted.', '/tracks', {'success' : 'track deleted'})
 
     @with_trailing_slash
     @expose('pygdv.templates.track_edit')

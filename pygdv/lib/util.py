@@ -2,7 +2,7 @@ import os,uuid,errno
 from pkg_resources import resource_filename
 from tg import app_globals as gl
 import tempfile
-import urllib2, urlparse
+import urllib2
 import shutil, os
 import hashlib
 import tg
@@ -77,7 +77,7 @@ def upload(file_upload=None, url=None, fsys=None, extension=None, **kw):
         files.append((kw.get('trackname', filename), tmp_file, extension))    
     
     if url is not None:
-        u = urlparse.urlparse(url)
+        u = urlparse(url)
         if u.hostname:
             filename, tmp_file = _download_from_url(u.geturl())
             if filename is not None :
@@ -215,7 +215,7 @@ def download(url=None, file_upload=None, fsys=None, filename='', extension=''):
         return tmp_file
 
     elif url is not None:
-        u = urlparse.urlparse(url)
+        u = urlparse(url)
         if not u.hostname:
             raise HTTPError('%s is not a valid URL.' % url)
         try:

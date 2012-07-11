@@ -44,7 +44,8 @@ class CircleController(BaseController):
     def index(self, *args, **kw):
         kw['page']='circle'
         user = handler.user.get_user_in_session(request)
-        data = util.to_datagrid(datagrid.circle_grid, user.circles, grid_display=len(user.circles)>0)
+
+        data = util.to_datagrid(datagrid.circle_grid, user.circles_owned, grid_display=len(user.circles)>0)
         t = handler.help.tooltip['circle']
 
         widget = form.NewCircle(action=url('/circles/index')).req()
@@ -104,6 +105,11 @@ class CircleController(BaseController):
              circle_id = args[0]
         else :
             circle_id = kw.get('cid')
+        circle_id=int(circle_id)
+        print [c.id for c in user.circles_owned]
+        if circle_id not in [c.id for c in user.circles_owned]:
+            flash('You have no right to edit this circle', 'error')
+            raise redirect('/circles/')
         circle = DBSession.query(Circle).filter(Circle.id == circle_id).first()
         widget = form.AddUser(action=url('/circles/edit/%s' % circle_id)).req()
 

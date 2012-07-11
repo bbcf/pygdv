@@ -199,6 +199,7 @@ class Project(DeclarativeBase):
         for cr in self._circle_right:
             res.append(cr.circle)
         return res
+
     @property
     def shared_circles(self):
         ids = []

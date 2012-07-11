@@ -253,6 +253,7 @@ def delete_track(track=None, track_id=None):
     '''
     if track is None:
         track = DBSession.query(Track).filter(Track.id == track_id).first()
+    if track is None: return
     _input = track.input
     if len(_input.tracks) == 1:
         delete_input(_input.sha1)
