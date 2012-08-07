@@ -158,7 +158,6 @@ JobPane.prototype.display_jobs = function(jobo){
 * Activate or deactivate the routine to fetch jobs from server
 */
 JobPane.prototype.routine = function(bool){
-    console.log("routine");
     if(bool){
 	this.showed = true;
 	this.get_jobs();

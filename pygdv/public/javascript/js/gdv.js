@@ -41,6 +41,7 @@ var _GDV_PLUG_URL = '';
 * @param{readonly} true if the user cannot launch jobs
 */
 function initGDV(browser, project_id, gdv_info, readonly){
+    
     dojo.require("dijit.form.CheckBox");
     dojo.require("dijit.form.Textarea");
     dojo.require("dijit.form.Form");
@@ -56,22 +57,23 @@ function initGDV(browser, project_id, gdv_info, readonly){
     /* if it's a public view, parameters must be instancied diferrently */
 
     if (!_gdv_info.admin){
-    gminer = {};
-    if (_gdv_info.mode == 'download'){
+	gminer = {};
+	if (_gdv_info.mode == 'download'){
         menu_nav = ['Home', 'Copy']
     } else {
         menu_nav = ['Home']
     }
     };
-
+    
     dojo.addOnLoad(function(){
-    /* the search field on top right */
+	console.log("IGDV");
+	/* the search field on top right */
 	try {
 	    _gdvls = new ch.epfl.bbcf.gdv.Livesearch();
 	} catch(err) {console.error(err);}
 	
-    _lp = new LinkPanel();
-
+	_lp = new LinkPanel();
+	
         /* hack for the copy menu */
 	if(!gdv_info.admin){
             var copy_link = dojo.byId('menu_Copy');
@@ -84,8 +86,7 @@ function initGDV(browser, project_id, gdv_info, readonly){
 	};
 	
     });
-
-
+    
 
 
 };

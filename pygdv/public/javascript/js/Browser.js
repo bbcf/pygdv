@@ -485,10 +485,11 @@ Browser.prototype.addTracks = function(trackList, replace) {
  */
 Browser.prototype.navigateTo = function(loc,tag) {
     if (!this.isInitialized) {
-    var brwsr = this;
+	var brwsr = this;
         this.deferredFunctions.push(function() { brwsr.navigateTo(loc); });
         return;
     }
+
     loc = dojo.trim(loc);
     //                                (chromosome)    (    start      )   (  sep     )     (    end   )
     var matches = String(loc).match(/^(((\S*)\s*:)?\s*(-?[0-9',.]*[0-9])\s*(\.\.|-|\s+))?\s*(-?[0-9',.]+)$/i);
