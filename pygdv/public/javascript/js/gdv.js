@@ -56,14 +56,7 @@ function initGDV(browser, project_id, gdv_info, readonly){
 
     /* if it's a public view, parameters must be instancied diferrently */
 
-    if (!_gdv_info.admin){
-	gminer = {};
-	if (_gdv_info.mode == 'download'){
-        menu_nav = ['Home', 'Copy']
-    } else {
-        menu_nav = ['Home']
-    }
-    };
+ 
     
     dojo.addOnLoad(function(){
 	/* the search field on top right */

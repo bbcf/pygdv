@@ -51,36 +51,46 @@ PrincipalContainer.prototype.createContainer = function(browser, menuLeftContain
     var principal = dojo.create('div', {id : 'principal_cont'}, menuLeftContainer);
     var principal_dijit = new dijit.layout.AccordionContainer({
         style: "height: 100%; width: 100%;",
-
+	
         },
         principal);
     this.principal = principal;
     this.principal_dijit = principal_dijit;
 
-    // init some parameters
-    var menu_nav = ['Home', 'Tracks', 'Projects', 'Circles', 'Jobs'];
+    // check mode
+    var mode = 'else';
     if (!_gdv_info.admin){
-        init_operations = ['You must be logged in to use operations'];
-        jobs = ['You must be logged in to view jobs'];
-    if (_gdv_info.mode == 'download'){
-            menu_nav = ['Home', 'Copy']
-        } else {
-            menu_nav = ['Home']
-        }
-    }
-
-    // create additionnal children containers
-    this.navigationContainer(principal, principal_dijit, menu_nav);
-    this.trackContainer(browser);
-    this.selectionContainer(principal, principal_dijit);
-    this.jobContainer(principal, principal_dijit);
-    if (init_operations == 'connect'){
-        console.error('cannot connect to plugin system');
+	init_operations = 'login';
+	mode = _gdv_info.mode;
+    };
+    // build menu
+    if (mode == 'read'){
+	this.navigationContainer(principal, principal_dijit, ['Home']);
+	this.trackContainer(browser);
+	this.selectionContainer(principal, principal_dijit);
+    } else if (mode == 'download'){
+	this.navigationContainer(principal, principal_dijit, ['Home', 'Copy']);
+	this.trackContainer(browser);
+	this.selectionContainer(principal, principal_dijit);
+	this.jobContainer(principal, principal_dijit);
+	this.operationContainer(principal, principal_dijit, init_operations, 
+				viewContainer, formwidget, browserwidget);
     } else {
-        this.operationContainer(principal, principal_dijit, init_operations, viewContainer, formwidget, browserwidget);
+	this.navigationContainer(principal, principal_dijit, ['Home', 'Tracks', 'Projects', 'Circles', 'Jobs']);
+	this.trackContainer(browser);
+	this.selectionContainer(principal, principal_dijit);
+	this.jobContainer(principal, principal_dijit);
+	this.operationContainer(principal, principal_dijit, init_operations, 
+				viewContainer, formwidget, browserwidget);
     }
-    this.fakeContainer(principal, principal_dijit);
 
+
+    // }
+ 	    
+    // 	}
+	// # A fake tab for the "reset" effect if a menu item is clicked twice
+	this.fakeContainer(principal, principal_dijit);
+	
     // Retrieve from a cookie the last element of menu selected
     if (dojo.cookie("menu_current_tab")) {
         this.menu_current_tab = dojo.cookie("menu_current_tab");
@@ -228,7 +238,14 @@ PrincipalContainer.prototype.selectionContainer = function(DomNode, DijitNode){
 * Add the Operations tab
 */
 PrincipalContainer.prototype.operationContainer = function(DomNode, DijitNode, paths, viewContainer, fwdgt, bwdgt){
-
+    if (paths == 'connect'){
+        console.error('cannot connect to plugin system');
+	return;
+    } else if (paths == 'login'){
+    	console.error('You must be logged in to use operations');
+    	return;
+    }
+    
     var cont = dojo.create('div', {}, DomNode);
 
     var ops_container = new dijit.layout.ContentPane({
