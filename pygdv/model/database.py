@@ -395,6 +395,8 @@ class Track(DeclarativeBase):
     
     @property
     def status(self):
+        if self.input is None:
+            return 'PENDING'
         return self.input.status
     
     
@@ -409,6 +411,8 @@ class Track(DeclarativeBase):
     
     @property
     def vizu(self):
+        if self.input is None:
+            return 'not determined'
         return self.input.datatype
 
     @property

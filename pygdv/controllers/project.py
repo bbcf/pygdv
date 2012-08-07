@@ -52,10 +52,11 @@ class ProjectController(BaseController):
         else :
             project_id = kw.get('pid')
 
-        if not checker.check_permission(user=user, project_id=project_id, right_id=constants.right_upload_id):
+        if not checker.check_permission(user=user, project_id=project_id, right_id=constants.right_upload_id) and not checker.is_admin(user=user):
             flash('You must have %s permission to edit the project.' % constants.right_upload, 'error')
             raise redirect('/tracks/', {'pid' : project_id})
-
+        if checker.is_admin(user=user):
+            user = DBSession.query(User).join(Project).filter(Project.id == project_id).first()
 
         widget = form.EditProject(action=url('/projects/edit/%s' % project_id)).req()
         widget.value = {'pid' : project_id}
@@ -162,7 +163,7 @@ class ProjectController(BaseController):
         user = handler.user.get_user_in_session(request)
         if len(args) > 0:
             project_id = args[0]
-            if not checker.check_permission(user=user, project_id=project_id, right_id=constants.right_upload_id):
+            if not checker.check_permission(user=user, project_id=project_id, right_id=constants.right_upload_id) and not checker.is_admin(user=user):
                 return reply.error(request, "You must have %s permission to delete the project." % constants.right_upload,
                         '/tracks', {'error' : 'wrong credentials'})
 
@@ -176,7 +177,7 @@ class ProjectController(BaseController):
         project_id = kw.get('id', None)
 
         if project_id is not None:
-            if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
+            if not checker.check_permission_project(user.id, project_id, constants.right_upload_id) and not checker.is_admin(user=user):
                 flash('You must have %s permission to delete the project.' % constants.right_upload, 'error')
                 raise redirect('./')
         handler.project.delete(project_id=project_id)
@@ -189,7 +190,7 @@ class ProjectController(BaseController):
         if project_id is None:
             raise redirect('./')
         user = handler.user.get_user_in_session(request)
-        if not checker.check_permission_project(user.id, project_id, constants.right_download_id):
+        if not checker.check_permission_project(user.id, project_id, constants.right_download_id) and not checker.is_admin(user=user):
             flash('You must have %s permission to view the project.' % constants.right_download, 'error')
             raise redirect('./')
 
@@ -210,7 +211,7 @@ class ProjectController(BaseController):
     def put(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
         project_id = args[0]
-        if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
+        if not checker.check_permission_project(user.id, project_id, constants.right_upload_id) and not checker.is_admin(user=user):
             flash('You must have %s permission to edit the project.' % constants.right_upload, 'error')
             raise redirect('/projects')
         project = DBSession.query(Project).filter(Project.id == project_id).first()
@@ -234,7 +235,7 @@ class ProjectController(BaseController):
         else :
             project_id = kw.get('pid')
 
-        if not checker.check_permission(user=user, project_id=project_id, right_id=constants.right_upload_id):
+        if not checker.check_permission(user=user, project_id=project_id, right_id=constants.right_upload_id) and not checker.is_admin(user=user):
             flash('You must have %s permission to share the project', 'error') % constants.right_upload
             raise redirect('/tracks', {'pid' : project_id})
 
@@ -286,7 +287,7 @@ class ProjectController(BaseController):
 
     def post_share(self, project_id, circle_id, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        if not checker.user_own_project(user.id, project_id):
+        if not checker.user_own_project(user.id, project_id) and not checker.is_admin(user=user):
             flash('You cannot modify a project which is not yours')
             raise redirect(url('/'))
         
@@ -306,7 +307,7 @@ class ProjectController(BaseController):
 
     def post_share_add(self,project_id, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        if not checker.user_own_project(user.id, project_id):
+        if not checker.user_own_project(user.id, project_id) and not checker.is_admin(user=user):
             flash('You cannot modify a project which is not yours')
             raise redirect(url('/'))
         project = DBSession.query(Project).filter(Project.id == project_id).first()
@@ -327,7 +328,7 @@ class ProjectController(BaseController):
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         data = util.to_datagrid(project_grid, [project])
         user = handler.user.get_user_in_session(request)
-        if not checker.user_own_project(user.id, project_id):
+        if not checker.user_own_project(user.id, project_id) and not checker.is_admin(user=user):
             flash('You cannot modify a project which is not yours')
             raise redirect(url('/'))
         tmpl_context.widget = tracks_available_form
@@ -338,7 +339,7 @@ class ProjectController(BaseController):
 
     def add(self, project_id, tracks, **kw):
         user = handler.user.get_user_in_session(request)
-        if not checker.user_own_project(user.id, project_id):
+        if not checker.user_own_project(user.id, project_id) and not checker.is_admin(user=user):
             flash('You cannot modify a project which is not yours')
             raise redirect(url('/'))
         project = DBSession.query(Project).filter(Project.id == project_id).first()
@@ -361,7 +362,7 @@ class ProjectController(BaseController):
         
         
         user = handler.user.get_user_in_session(request)
-        if not checker.check_permission_project(user.id, project_id, constants.right_read_id):
+        if not checker.check_permission_project(user.id, project_id, constants.right_read_id) and not checker.is_admin(user=user):
             flash('You must have %s permission to view the project.' % constants.right_read, 'error')
             raise redirect(url('/'))
 

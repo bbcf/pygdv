@@ -198,53 +198,72 @@ def tmpdir():
     dir = constants.temporary_directory()
     return tempfile.mkdtemp(dir=dir)
 
+
+
+
+def norm_url(url):
+    if not url.startswith('http://'):
+        url = 'http://%s' % url
+    return url
+
+
+def url_filename(url):
+    u = urlparse(url)
+    if not u.hostname:
+        raise HTTPError('%s is not a valid URL.' % url)
+    try :
+        u = urllib2.urlopen(url)
+        fname = u.info().get('Content-Disposition', None)
+        if fname is not None:
+            fname = fname.split('=')[1]
+    except HTTPError:
+        pass
+    finally:
+        u.close()
+    if fname is None:
+        fname = os.path.splitext(url.rsplit('/',1)[1])[0]
+    return fname
+
+
+
 block_sz = 8192
-def download(url=None, file_upload=None, fsys=None, filename='', extension=''):
+def download(url=None, file_upload=None, fsys=None, filename='noname', extension='noextension'):
     """
     Download the file to a temporary place
     """
-    suffix = '.' + extension
-    if suffix == '.': suffix = ''
-    tmp_file = tmpfile(prefix=filename, suffix=suffix, delete=False)
+    with open(os.path.join(tmpdir(), '%s.%s' % (filename, extension)), 'wb') as tmp_file:
 
-    if file_upload is not None:
-        #filename = file_upload.filename
-        file_value = file_upload.value
-        tmp_file.write(file_value)
-        tmp_file.close()
-        return tmp_file
-
-    elif url is not None:
-        u = urlparse(url)
-        if not u.hostname:
-            raise HTTPError('%s is not a valid URL.' % url)
-        try:
-            u = urllib2.urlopen(url)
-            while True:
-                buffer = u.read(block_sz)
-                if not buffer: break
-                tmp_file.write(buffer)
+        if file_upload is not None:
+            #filename = file_upload.filename
+            file_value = file_upload.value
+            tmp_file.write(file_value)
             tmp_file.close()
             return tmp_file
-        except HTTPError as e:
-            print '%s : %s' % (url, e)
-            raise e
 
-    elif fsys is not None:
-        tmp_file.close()
-        shutil.copy(fsys, tmp_file.name)
-        return tmp_file
+        elif url is not None:
+            url = norm_url(url)
+            try:
+                u = urllib2.urlopen(url)
+                while True:
+                    buffer = u.read(block_sz)
+                    if not buffer: break
+                    tmp_file.write(buffer)
+                tmp_file.close()
+                return tmp_file
+            except HTTPError as e:
+                print '%s : %s' % (url, e)
+                raise e
 
-    raise Exception("Nothing to download")
+        elif fsys is not None:
+            tmp_file.close()
+            shutil.copy(fsys, tmp_file.name)
+            return tmp_file
+
+        raise Exception("Nothing to download")
 
 
-compressed_files_extensions = ('.gz', '.zip', '.tar', '.tgz', '.targz')
+compressed_files_extensions = ('.gz', '.zip', '.tar', '.tgz', '.targz', '.txt.gz', '.tar.gz')
 
-def is_compressed(fname, is_url=False):
-    lower = fname.lower()
-    if is_url:
-        params = urlparse(fname).query
-        return any(s.endswith(ext) for ext in compressed_files_extensions for s in params.split('&'))
-    return any(lower.endswith(ext) for ext in compressed_files_extensions)
-
-
+def is_compressed(extension):
+    if not extension.startswith('.') : extension = '.%s' % extension
+    return any(extension.lower().endswith(ext) for ext in compressed_files_extensions)

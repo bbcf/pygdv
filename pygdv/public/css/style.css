@@ -121,6 +121,12 @@ div.ttactions {
 }
 
 
+
+#center_stack{
+    overflow:auto;
+}
+
+
 ul#project_toolbar{
     display:inline;
     list-style-type:none,

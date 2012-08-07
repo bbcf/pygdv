@@ -7,6 +7,7 @@ from pygdv.lib.constants import json_directory, track_directory, extra_directory
 from celery.result import AsyncResult
 from celery.signals import worker_init
 from celery.task.http import HttpDispatchTask
+from urllib2 import HTTPError
 
 from pygdv.lib import constants, util
 import track, urllib, urllib2
@@ -24,29 +25,30 @@ manager = None
 @task()
 def multiple_track_input(_uploaded, _file, _url, _fsys, sequence_id, user_mail, user_key, project_id, force, delfile, _callback_url, _extension):
     tmp_dir = tempfile.mkdtemp(dir=temporary_directory)
-
     if _uploaded:
         Archive(_file).extract(out=tmp_dir)
+        os.remove(_file)
     else:
-        if len(_url.split()) > 1 :
-            for ul in _url.split():
-                print ul
-                fname = os.path.splitext(ul.rsplit('/',1)[1])[0]
-                print fname
+        for ul in _url.split():
+            ul = util.norm_url(ul)
+            fname = util.url_filename(ul)
+            try :
+                u = urllib2.urlopen(ul)
                 block_sz = 2048
-                with open(os.path.join(tmp_dir, fname), 'w') as tmp_file:
-                    try:
-                        u = urllib2.urlopen(ul)
+                outf = os.path.join(tmp_dir, fname)
+                with open(outf, 'w') as tmp_file:
                         while True:
                             buffer = u.read(block_sz)
                             if not buffer: break
                             tmp_file.write(buffer)
-                    except Exception as e:
-                        print '%s : %s' % (ul, e)
-                        raise e
+            except HTTPError as e:
+                print '%s : %s' % (ul, e)
+                raise e
+            if util.is_compressed(os.path.splitext(fname)[1]):
+                Archive(outf).extract(out=tmp_dir)
+                os.remove(outf)
 
-                    if util.is_compressed(fname):
-                        Archive(_file).extract(out=tmp_dir)
+
     outs = []
     for dir, dirs, files in os.walk(tmp_dir):
         outs.extend([os.path.abspath(os.path.join(dir, f)) for f in files])
@@ -59,7 +61,7 @@ def multiple_track_input(_uploaded, _file, _url, _fsys, sequence_id, user_mail, 
                                              'project_id' : project_id,
                                              'force' : force,
                                              'delfile' : True,
-                                             'extension' : _extension
+                                             'extension' : os.path.splitext(_f)[1]
         })
 
 

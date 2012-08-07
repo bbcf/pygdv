@@ -186,6 +186,7 @@ var Browser = function(params) {
         brwsr.createTrackList(brwsr.container,brwsr.tab_tracks.domNode, params);
 
         containerWidget.startup();
+
         brwsr.isInitialized = true;
 
         // Switch to the last visited menu element

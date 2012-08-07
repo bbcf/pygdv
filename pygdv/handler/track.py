@@ -77,19 +77,22 @@ def fetch_track_parameters(url=None, file_upload=None, fsys=None, trackname=None
     if url == '' : url = None
     if file_upload == '' : file_upload = None
     if fsys == '' : fsys = None
-
-
+    tn = ext = None
     if trackname is None:
         if url is not None:
-            trackname = os.path.splitext(os.path.split(url)[1])[0]
+            url = util.norm_url(url)
+            tn = util.url_filename(url)
+            trackname = os.path.splitext(tn)[0]
         elif file_upload is not None:
             trackname = os.path.splitext(file_upload.filename)[0]
         elif fsys is not None:
             trackname = os.path.splitext(os.path.split(fsys)[1])[0]
-
     if extension is None:
         if url is not None:
-            extension = os.path.splitext(os.path.split(url)[1])[1]
+            if tn is not None:
+                extension =  os.path.splitext(tn)[1]
+            else :
+                extension = os.path.splitext(os.path.split(url)[1])[1]
         elif file_upload is not None:
             extension = os.path.splitext(file_upload.filename)[1]
         elif fsys is not None:

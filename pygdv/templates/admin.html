@@ -19,20 +19,37 @@
 </style>
 
 <body class="tundra">
-  <h1>Hidden queries for users</h1>
-  <ul>
-    <li><a href="${tg.url('tracks/all')}">All tracks</a>.</li>
-    <li><a href="${tg.url('tracks/all?user_id=1')}">Track from an user</a>.</li>
-    <li><a href="${tg.url('projects/admin')}">All projects</a>.</li>
-  </ul>
+  
+  
+  <div id="center_stack"  class="ui-layout-center crud_table">
+    
+    <h1>Hidden queries for users</h1>
+    <ul>
+      <li><a href="${tg.url('tracks/admin')}">All tracks</a>.</li>
+      <li><a href="${tg.url('tracks/admin?user_id=1')}">Track from an user</a>.</li>
+    </ul>
+    
+    <h1> Others admin sections</h1>
+    <ul>
+      <li py:for="item in admin_items">
+	
+	<a href="${tg.url(item)}s">${item}</a>
+      </li>
+    </ul>
+  </div>
+    
+  <div id="south" class="ui-layout-south">
+    ${footer()}
+  </div>
+ 
 
-  <h1> Others admin sections</h1>
-  <ul>
-    <li py:for="item in admin_items">
-
-      <a href="${tg.url(item)}s">${item}</a>
-    </li>
-  </ul>
+  <div id="north" class="ui-layout-north">
+    ${header()}
+    ${mainmenu()}
+    <div id="controls" class="ui-layout-north">
+      
+    </div></div>
+  
 
 
 </body>

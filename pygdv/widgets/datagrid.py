@@ -75,7 +75,7 @@ track_grid = twf.DataGrid(fields=[
     (hoover_action, lambda obj : hoover_actions(
             helpers.export_link(obj.id, url('/tracks'))
             + helpers.edit_link(obj.id, url('/tracks'))
-            + helpers.delete_link(obj.id, url('/tracks') )
+            + helpers.delete_link(obj.id, url('/tracks'))
     )),
     ('Color', lambda obj : genshi.Markup(helpers.track_color(obj))),
      ('Created', 'created'),
@@ -88,6 +88,25 @@ track_grid = twf.DataGrid(fields=[
 
 
     ])
+
+track_admin_grid = twf.DataGrid(fields=[
+    ('Name', 'name'),
+    (hoover_action, lambda obj : hoover_actions(
+        helpers.export_link(obj.id, url('/tracks'), img_src='../../images/export.png')
+        + helpers.edit_link(obj.id, url('/tracks'), img_src='../../images/pencil.png')
+        + helpers.delete_link(obj.id, url('/tracks'), img_src='../../images/delete.png')
+    )),
+    ('User', 'user.email'),
+    ('Created', 'created'),
+    ('Assembly', 'sequence'),
+    ('Type', 'vizu'),
+    (hidden_info, lambda obj : hide_info({
+        'tr_id' : obj.id,
+        'tr_status': obj.status,
+        })),
+
+
+])
 
 
 project_grid = twf.DataGrid(fields = [

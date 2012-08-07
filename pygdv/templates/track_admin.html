@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <xi:include href="master.html" />
+  <xi:include href="definitions.html"/>
+
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
+  <script type="text/javascript" src="${tg.url('/javascript/jslib/tw2.dynforms/dynforms.js')}"></script>
+  <title py:replace="page"></title>
+</head>
+
+<body>
+  
+  
+ 
+    
+    
+  
+    
+	
+  <ul id="left_stack" class="ui-layout-west"> 
+    <h4>Projects</h4>
+    <!-- PROJECT LIST -->
+    <py:for each="dic in project_list">
+      <div py:choose="">
+	<span py:when="project_id == None"><li><a href="${tg.url('/tracks/admin/', {'pid' :dic[0]})}">${dic[1]}</a></li></span>
+	<span py:when="dic[0] == int(project_id)"><li class="selected"><a href="${tg.url('/tracks/admin/')}?pid=${dic[0]}">${dic[1]}</a></li></span>
+	<span py:otherwise=""><li><a href="${tg.url('/tracks/admin/')}?pid=${dic[0]}">${dic[1]}</a></li></span>
+      </div>
+    </py:for>
+    
+    <h4>Shared projects</h4>
+    <!-- SHARED PROJECT LIST -->
+    <py:for each="dic in shared_project_list">
+      <div py:choose="">
+	<span py:when="project_id == None"><li><a href="${tg.url('/tracks/')}?pid=${dic[0]}">${dic[1]} ${dic[2]}</a></li></span>
+	<span py:when="dic[0] == int(project_id)"><li class="selected"><a href="${tg.url('/tracks/')}?pid=${dic[0]}">${dic[1]} ${dic[2]}</a></li></span>
+	<span py:otherwise=""><li><a href="${tg.url('/tracks/')}?pid=${dic[0]}">${dic[1]} ${dic[2]}</a></li></span>
+      </div>
+    </py:for>
+  </ul>
+    
+    
+    
+    
+  <div id="center_stack" class="ui-layout-center crud_table">
+    ${flash()}
+    <div py:for="item in track_list">
+      <div py:choose="item.grid_display">
+	
+	<div py:when="True">
+	  <div py:content="item.grid(item.grid_data)"></div>
+	</div>
+	<div py:when="False">
+	  <h3>No tracks here, you may want to 
+	    <a href="${tg.url('/tracks/new')}${('', '?pid=')[defined('project_id') and project_id != None]}${project_id}">
+	      upload</a> new one.</h3> or
+	  <h3>	<a href="${tg.url('/projects/edit')}/${project_id}">
+	      edit</a> the project.</h3>
+	  
+	</div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="south" class="ui-layout-south">
+    ${footer()}
+  </div>
+  
+  
+  
+  
+  <div id="north" class="ui-layout-north">
+    ${header()}
+    ${mainmenu()}
+    <div id="controls">
+
+      
+      ${project_admin_toolbar(project_id, upload)}
+      
+      
+      <div class="ttactions"><span py:replace="tooltip"/></div>
+    </div>
+  </div>
+ 
+  
+  
+</body>
+</html>

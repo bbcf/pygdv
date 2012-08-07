@@ -22,14 +22,14 @@
     
     
     
-    <div class="ui-layout-center crud_table">
-      ${flash()}
-      <div py:choose="item.grid_display">
-	<div py:when="True">
-	  <div py:content="item.grid(value=item.grid_data)"></div>
-	</div>
-	<div py:when="False">
-	  <h1>No Data</h1>
+  <div id="center_stack"  class="ui-layout-center crud_table">
+    ${flash()}
+    <div py:choose="item.grid_display">
+      <div py:when="True">
+	<div py:content="item.grid(value=item.grid_data)"></div>
+      </div>
+      <div py:when="False">
+	<h1>No Data</h1>
 	  
     </div></div></div>
     

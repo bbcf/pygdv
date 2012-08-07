@@ -221,6 +221,7 @@ def get_rights(project=None, project_id=None, user=None, user_id=None):
     for circle, rights in project.circles_with_rights.iteritems():
         if circle in user.circles:
             return rights
+    return []
 
 def get_shared_projects(user):
     '''

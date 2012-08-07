@@ -90,3 +90,5 @@ tooltip['download'] = make_tooltip('Download permission', '''A circle with this 
 tooltip['upload'] = make_tooltip('Upload permission', '''A circle with this permission can upload data on the project.''')
 
 tooltip['task'] = make_tooltip('Task', '''A task is a job launched on Celery.''')
+
+tooltip['admin'] = make_tooltip('Admin', '''You found the admin secret place :D Congratulations !!! ''')

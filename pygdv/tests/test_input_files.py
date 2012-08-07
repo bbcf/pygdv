@@ -6,7 +6,8 @@ from pkg_resources import resource_filename
 import os, json
 from bbcflib import gdv
 
-samples = {1 : 'features-test.sql', 2 : 'relational-test.sql', 3 : 'signal-test.sql', 4 : 'bed-test.bed', 5 : 'bedgraph-test.bedgraph', 6 : 'gtf-test.gtf', 7 : 'wig-test.wig', 8 : 'compressed-test.tgz'}
+samples = {1 : 'features-test.sql', 2 : 'relational-test.sql', 3 : 'signal-test.sql', 4 : 'bed-test.bed',
+           5 : 'bedgraph-test.bedgraph', 6 : 'gtf-test.gtf', 7 : 'wig-test.wig', 8 : 'compressed-test.tgz'}
 
 samples_path = resource_filename('pygdv.tests', 'test_files')
 
@@ -51,7 +52,7 @@ def upload_fsys(project_id):
     assert mess1['message'] == u'Processing launched.'
 
     f2 = os.path.join(samples_path, samples[6])
-    mess2 = gdv.single_track(mail, key, serv_url=serv, trackname="gtf-test-renamed", assembly_id=12, fsys=f2)
+    mess2 = gdv.single_track(mail, key, serv_url=serv, trackname="gtf-test-renamed", project_id=project_id, fsys=f2)
     t2 = mess2['track_id']
     log('track_id', t2)
     assert mess2['message'] == u'Processing launched.'
@@ -74,14 +75,14 @@ def upload_url(project_id):
     urls = "%s/test_files?id=%s %s/test_files?id=%s %s/test_files?id=%s" % (serv, 1, serv, 2, serv, 8)
     mess2 = gdv.single_track(mail, key, serv_url=serv, extension='sql', project_id=project_id, url=urls)
     assert mess2['message'] == u'Processing launched.'
-    return [t1]
+    return ['']
 
 
 
 def test_input():
     projects = project()
-    tracks = upload_fsys(projects[0])
-    tracks = upload_url(projects[1])
+    upload_fsys(projects[0])
+    upload_url(projects[1])
 
 
 

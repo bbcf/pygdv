@@ -29,7 +29,7 @@
     <!-- <link rel="stylesheet" type="text/css" href="/css/style.css"/> -->
     <script type="text/javascript" src="${tg.url('/javascript/jslib/dojo/dojo.js')}"></script>
     <script type="text/javascript" src="${tg.url('/javascript/jslib/raphael.js')}"></script>
-    <script type="text/javascript" src="${tg.url('/javascript/js/Widget.js')}"></script>
+http://ptbbpc2.epfl.ch/pygdv/_debug/view/1343303068    <script type="text/javascript" src="${tg.url('/javascript/js/Widget.js')}"></script>
     <script type="text/javascript" src="${tg.url('/javascript/js/gdv.js')}"></script>
     <script type="text/javascript" src="${tg.url('/javascript/js/Operations.js')}"></script>
     <script type="text/javascript" src="${tg.url('/javascript/js/Containers.js')}"></script>
@@ -61,7 +61,8 @@
     
     <script type="text/javascript" src="${tg.url('/javascript/jslib/dojo/jbrowse_dojo.js')}"></script>
 
-    
+    <!-- <script type="text/javascript" src="${tg.url('/javascript/jslib/layout.js')}"></script> -->
+
     <!--some javascript control, starting the browser -->
     <script type="text/javascript">
       <span py:replace="ref_seqs"/>
@@ -89,17 +90,15 @@
     </script>
     
   </head>
-  <style>
-    #menu_items {
-    padding:0px 12px 0px 2px;
-    list-style-type:None
-    }
-  </style>
+
   
   <body class="tundra">
-      
+    
     <div id="GenomeBrowser" style="height: 100%; width: 100%; padding: 0; border: 0;"></div>
-    <!-- some parameters -->
+    
+    
+
+      <!-- some parameters -->
     <span id="species_name" style="display:none"><span py:replace="species_name" style="display:none"/></span>
     <span id="nr_assembly_id" style="display:none"><span py:replace="nr_assembly_id"  style="display:none"/></span>
     <span id="project_id" style="display:none"><span py:replace="project_id"  style="display:none"/></span>

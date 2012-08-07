@@ -14,14 +14,14 @@ from pygdv.lib import constants
 
 
 
-def get_circles_edit_link(obj_id):
+def get_circles_edit_link(obj_id, img_src='../images/pencil.png'):
     return '''
-    <a class="action" title="edit" href="circles/edit/%s" style="text-decoration:none"><img src="../images/pencil.png" width="16px" height="16px"/></a>
-           ''' % (obj_id)
+    <a class="action" title="edit" href="circles/edit/%s" style="text-decoration:none"><img src="%s" width="16px" height="16px"/></a>
+           ''' % (obj_id, img_src)
 
 
-def edit_link(id, model):
-    return '''<a class="action" title="edit" href="%s/edit/%s" style="text-decoration:none"><img src="../images/pencil.png" width="16px" height="16px"/>Edit</a>''' % (model, id)
+def edit_link(id, model, img_src='../images/pencil.png'):
+    return '''<a class="action" title="edit" href="%s/edit/%s" style="text-decoration:none"><img src="%s" width="16px" height="16px"/>Edit</a>''' % (model, id, img_src)
 
 
 def share_link(id):
@@ -36,9 +36,9 @@ def project_link(name, id=None):
     return '''<a class="project_link" href="/tracks?pid=%s">%s</a> ''' % (id, name)
 
 
-def delete_link(id, model):
-    return '''<a class="action" onclick="return confirm('Are you sure?')"; title="delete" href="%s/delete/%s" style="text-decoration:none"><img src="../images/delete.png"
-     width="15px" height="15px"/>Delete</a>''' % (model, id)
+def delete_link(id, model, img_src='../images/delete.png'):
+    return '''<a class="action" onclick="return confirm('Are you sure?')"; title="delete" href="%s/delete/%s" style="text-decoration:none"><img src="%s"
+     width="15px" height="15px"/>Delete</a>''' % (model, id, img_src)
 
 def get_delete_circle_description_link(user_id, circle_id):
     return '''<a class="action" onclick="return confirm('Are you sure?')"; title="delete" href="%s" style="text-decoration:none"><img src="images/delete.png"
@@ -53,11 +53,11 @@ def get_delete_circle_description_link(user_id, circle_id):
 #    <input type="hidden" name='id' value="%s"/>
 #        ''' % (action, id)
 
-def export_link(obj_id, model):
+def export_link(obj_id, model, img_src='../images/export.png'):
     '''
     Return a HTML export link.
     '''
-    return ''' <a class='action' title="download the track" href="%s/link/%s"><img src="../images/export.png" width="16px" height="16px"/>Download</a>''' % (model, obj_id)
+    return ''' <a class='action' title="download the track" href="%s/link/%s"><img src="%s" width="16px" height="16px"/>Download</a>''' % (model, obj_id, img_src)
 
 
 

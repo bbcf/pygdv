@@ -43,7 +43,7 @@ class TrackController(BaseController):
         if kw.has_key('pid'):
             project_id = kw.get('pid')
             project = DBSession.query(Project).filter(Project.id == project_id).first()
-            if not checker.check_permission(user=user, project=project, right_id=constants.right_read_id):
+            if not checker.check_permission(user=user, project=project, right_id=constants.right_read_id) and not checker.is_admin(user=user):
                 flash('You must have %s permission to view the project.' % constants.right_read, 'error')
                 raise redirect('/tracks')
             tracks = project.tracks
@@ -114,7 +114,8 @@ class TrackController(BaseController):
         if kw.has_key('urls'):
             kw['url']=kw.get('urls')
             del kw['urls']
-
+        for k, v in kw.iteritems():
+            if v == 'None': kw[k] = None
 
 
         # verify track parameters
@@ -125,6 +126,7 @@ class TrackController(BaseController):
                 project_id=kw.get('project_id', None),
                 sequence_id=kw.get('sequence_id', None))
         except Exception as e:
+            print 'Bad params : %s' %e
             if kw.has_key('project_id'):
                 reply.error(request, str(e), tg.url('./new', {'pid' : kw.get('project_id')}), {})
             return reply.error(request, str(e), tg.url('./new'), {})
@@ -150,22 +152,12 @@ class TrackController(BaseController):
                 del kw['file_upload']
 
         # check if multiples url or if zipped file
-        multiple = False
-        if kw.get('uploaded', False):
-            if util.is_compressed(kw.get('file')):
-                multiple = True
-        else:
-            _urls = kw.get('url', '')
-            if len(_urls.split()) > 1 or util.is_compressed(_urls, is_url=True):
-                multiple = True
-        if multiple:
+        if util.is_compressed(extension) or (kw.get('url', None)!=None and len(kw.get('url', '').split())>1):
+            print 'multiple'
             async = tasks.multiple_track_input.delay(kw.get('uploaded', None), kw.get('file', None), kw.get('url', None), kw.get('fsys', None),
-                sequence_id, user.email, user.key, kw.get('project_id', None), kw.get('force', False), kw.get('delfile', False), constants.callback_track_url(), extension,
-            )
-            return reply.normal(request, 'Processing launched.', './', {'task_id' : async.task_id})
-
-
-
+                sequence_id, user.email, user.key, kw.get('project_id', None), kw.get('force', False), kw.get('delfile', False),
+                constants.callback_track_url(), extension)
+            return reply.normal(request, 'Processing launched.', '/tracks/', {'task_id' : async.task_id})
         else :
             # create a new track
             _track = handler.track.new_track(user.id, track_name, sequence_id=sequence_id, admin=False, project_id=kw.get('project_id', None))
@@ -192,14 +184,15 @@ class TrackController(BaseController):
             handler.track.update(track=_track, params={'task_id' : async.task_id})
 
             if kw.has_key('project_id'):
-                return reply.normal(request,'Processing launched.', tg.url('./', {'pid' : kw.get('project_id')}), {'task_id' : async.task_id,
+                return reply.normal(request,'Processing launched.', tg.url('/tracks/', {'pid' : kw.get('project_id')}), {'task_id' : async.task_id,
                                                                                                                   'track_id' : _track.id})
-            return reply.normal(request, 'Processing launched.', './', {'task_id' : async.task_id,
+            return reply.normal(request, 'Processing launched.', '/tracks/', {'task_id' : async.task_id,
                                                                         'track_id' : _track.id})
 
     @expose('json')
     @validate(track_new_form, error_handler=new)
     def post(self, *args, **kw):
+        print 'post %s' % kw
         project_id = kw.get('project_id', None)
         urls = kw.get('urls', None)
         fu = kw.get('file_upload', None)
@@ -207,6 +200,8 @@ class TrackController(BaseController):
         if (fu is None or fu == '') and (urls is None or urls == ''):
             flash('Missing field', 'error')
             raise redirect('/tracks/new')
+
+        print 'before create'
         return self.create(*args, **kw)
     
     @expose('json')
@@ -300,7 +295,7 @@ class TrackController(BaseController):
     @expose()
     def dump(self, track_id, format,  *args, **kw):
         user = handler.user.get_user_in_session(request)
-        if not checker.can_download_track(user.id, track_id)  and not checker.user_is_admin(user.id):
+        if not checker.can_download_track(user.id, track_id) and not checker.user_is_admin(user.id):
             flash("You haven't the right to export any tracks which is not yours", 'error')
             raise redirect('../')
         _track = DBSession.query(Track).filter(Track.id == track_id).first()
@@ -325,6 +320,7 @@ class TrackController(BaseController):
             flash("The track processing failed. You cannot download it.", 'error')
             raise redirect('/tracks/')
         response.content_type = 'application/x-sqlite3'
+        response.headerlist.append(('Content-Disposition', 'attachment;filename=%s.sqlite' % track.name))
         return open(track.path).read()
 
 
@@ -377,26 +373,42 @@ class TrackController(BaseController):
         return reply.normal(request, 'Task launched.', '/home', {'task_id' : task_id})
 
     @require(has_permission('admin', msg='Only for admins'))
-    @expose('pygdv.templates.list')
+    @expose('pygdv.templates.track_admin')
+    @expose('json')
+    #@paginate('items', items_per_page=10)
+    @with_trailing_slash
     def admin(self, **kw):
-        sequences = DBSession.query(Sequence).all()
-        tracks = []
-        for sequence in sequences:
-            tracks += sequence.default_tracks
-        data = [util.to_datagrid(track_grid, tracks, "Track Listing", len(tracks)>0)]
-        t = handler.help.tooltip['track']
-        return dict(page='tracks', model='track', tooltip=t, form_title="admin tracks",items=data,value=kw)
+        # view on a specific project
+        grid = datagrid.track_admin_grid
+        if kw.has_key('pid'):
+            project_id = kw.get('pid')
+            project = DBSession.query(Project).filter(Project.id == project_id).first()
+            tracks = project.tracks
+            kw['upload'] = True
 
-    @require(has_permission('admin', msg='Only for admins'))
-    @expose('pygdv.templates.list')
-    def all(self, *args, **kw):
-        if 'user_id' in kw:
-            tracks = DBSession.query(Track).filter(Track.user_id == kw['user_id']).all()
+            kw['pn'] = project.name
+            track_list = [util.to_datagrid(grid, tracks, "Track Listing", len(tracks)>0)]
+
         else :
-            tracks = DBSession.query(Track).all()
-        t = handler.help.tooltip['track']
-        data = [util.to_datagrid(track_grid, tracks, "Track Listing", len(tracks)>0)]
-        return dict(page='tracks', model='track', tooltip=t, form_title="new track",items=data,value=kw)
+            if 'user_id' in kw:
+                tracks = DBSession.query(Track).filter(Track.user_id == kw['user_id']).all()
+            else :
+                tracks = DBSession.query(Track).all()
+            track_list = [util.to_datagrid(grid, tracks, "Track Listing", len(tracks)>0)]
+            kw['upload'] = True
+
+        # track list
+
+        t = handler.help.tooltip['admin']
+
+        # project list
+        all_projects = DBSession.query(Project).all()
+        project_list = [(p.id, p.name,) for p in all_projects]
+
+
+        return dict(page='tracks', model='track', form_title="new track", track_list=track_list,
+            project_list=project_list, shared_project_list=[], value=kw,
+            tooltip=t, project_id=kw.get('pid', None), upload=kw.get('upload', None), project_name=kw.get('pn', None))
 
 
 

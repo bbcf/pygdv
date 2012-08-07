@@ -91,7 +91,7 @@ class RootController(BaseController):
         return dict(page='index')
 
     
-    @require(has_permission('admin', msg='Only for admins'))
+    #@require(has_permission('admin', msg='Only for admins'))
     @expose()
     def test_files(self, id):
         import os
@@ -99,9 +99,11 @@ class RootController(BaseController):
         from pygdv.tests.test_input_files import samples
         from tg import response
         samples_path = resource_filename('pygdv.tests', 'test_files')
-        print samples
+        print samples[int(id)]
+
         _f = open(os.path.join(samples_path, samples[int(id)]))
         response.content_type = 'plain/text'
+        response.headerlist.append(('Content-Disposition', 'attachment;filename=%s' % samples[int(id)]))
         return _f.read()
 
     @expose('pygdv.templates.about')
