@@ -27,6 +27,7 @@ class CircleController(BaseController):
     allow_only = has_any_permission(constants.perm_admin, constants.perm_user)
 
     def new(self, *args, **kw):
+        print 'new'
         widget = form.NewCircle(action=url('/circles/new')).req()
         if request.method == 'GET':
             return dict(page='circles', model='circle', widget=widget)
@@ -60,8 +61,7 @@ class CircleController(BaseController):
 
         user = handler.user.get_user_in_session(request)
         handler.circle.create(kw['name'], kw['description'], user)
-
-
+        data = util.to_datagrid(datagrid.circle_grid, user.circles_owned, grid_display=len(user.circles)>0)
         return dict(page='circles', model='circle', item=data, widget=widget, tooltip=t)
 
 
@@ -106,7 +106,7 @@ class CircleController(BaseController):
         else :
             circle_id = kw.get('cid')
         circle_id=int(circle_id)
-        print [c.id for c in user.circles_owned]
+
         if circle_id not in [c.id for c in user.circles_owned]:
             flash('You have no right to edit this circle', 'error')
             raise redirect('/circles/')

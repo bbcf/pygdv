@@ -20,6 +20,7 @@ from pygdv.lib import util, plugin
 import os, json, urllib2
 from pygdv.widgets import form
 import transaction
+from pygdv import handler
 from pygdv.lib import checker
 from pygdv.lib.jbrowse import util as jb
 from pygdv.lib import constants, reply
@@ -360,104 +361,16 @@ class ProjectController(BaseController):
 #        if not GenRep().is_up():
 #            raise redirect(url('/error', {'m': 'Genrep service is down. Please try again later.'}))
         
-        
+
+
         user = handler.user.get_user_in_session(request)
         if not checker.check_permission_project(user.id, project_id, constants.right_read_id) and not checker.is_admin(user=user):
             flash('You must have %s permission to view the project.' % constants.right_read, 'error')
             raise redirect(url('/'))
 
-        # get the project
-        project = DBSession.query(Project).filter(Project.id == project_id).first()
-        tracks = project.success_tracks
+        d = handler.view.prepare_view(project_id, *args, **kw)
 
-        seq = project.sequence
-        default_tracks = seq.default_tracks
-        all_tracks = tracks + default_tracks
-        
-        # test if all track names are differents
-        trackNames = []
-        for t in all_tracks:
-            while t.name in trackNames:
-                ind = 0
-                while(t.name[-(ind + 1)].isdigit()):
-                    ind += 1
-                cpt = t.name[-ind:]
-                try : 
-                    cpt = int(cpt)
-                except ValueError:
-                    cpt = 0
-                cpt += 1
-                
-                tmp_name = t.name
-                if ind > 0:
-                    tmp_name = t.name[:-ind]
-                t.name = tmp_name + str(cpt)
-            
-            t.accessed
-            DBSession.add(t)
-            DBSession.flush()
-            trackNames.append(t.name)
-        
-        # prepare some different parameters
-        refSeqs = 'refSeqs = %s' % json.dumps(jb.ref_seqs(project.sequence_id))
-        
-        trackInfo = 'trackInfo = %s' % json.dumps(jb.track_info(all_tracks, assembly_id=project.sequence_id))
-        parameters = 'var b = new Browser(%s)' % jb.browser_parameters(
-                        constants.data_root(), constants.style_root(), constants.image_root(), ','.join([track.name for track in all_tracks]))
-        
-        style_control = '''function getFeatureStyle(type, div){
-        div.style.backgroundColor='#3333D7';div.className='basic';
-        switch(type){
-        %s
-        }};
-        ''' % jb.features_style(all_tracks)
-        
-        
-        selections = 'init_locations = %s' % handler.selection.selections(project_id)
-        
-        # prepare _gdv_info
-        info = {}
-        prefix = tg.config.get('prefix')
-        if prefix : info['prefix'] = prefix
-        info['sequence_id'] = project.sequence_id
-        info['admin'] = True
-        info['plug_url'] = url('/plugins')
-
-        info = json.dumps(info)
-
-        control = 'b.showTracks();initGDV(b, %s, %s);' % (project.id, info)
-        
-        
-        if 'loc' in kw:
-            control += 'b.navigateTo("%s");' % kw['loc']
-        
-        # get jobs
-        jobs = 'init_jobs = %s' % handler.job.jobs(project_id)
-        
-        # get operations
-        try :
-            ops = plugin.util.get_plugin_path()
-            operations_path = 'init_operations = %s' % ops
-            plug_url = plugin.util.form_url
-        except Exception as e:
-            print e
-            ops = '[]'
-            operations_path = 'init_operations = "connect"'
-            plug_url = ''
-
-        return dict(species_name=project.species.name, 
-                    nr_assembly_id=project.sequence_id, 
-                    project_id=project.id,
-                    is_admin=True,
-                    ref_seqs = refSeqs,
-                    track_info = trackInfo,
-                    parameters = parameters,
-                    style_control = style_control,
-                    control = control,
-                    selections = selections,
-                    operations_path = operations_path,
-                    jobs = jobs,
-                    page = 'view')
+        return d
     
     def copy(self, project_id, **kw):
         user = handler.user.get_user_in_session(request)
