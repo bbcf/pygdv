@@ -6,15 +6,10 @@
       py:strip="">
 
   
-  <!-- <xi:include href="master.html" /> -->
-  <!-- <xi:include href="definitions.html"/> -->
+  
   <head>
   
     <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
-    <!-- <title py:replace="page"></title> -->
-    
-    
-     
     <meta http-equiv="Author" content="Jarosz Yohan"/>
     <meta http-equiv="Cache-control" content="public"/>
     <meta http-equiv="Content-Style-Type" content="text/css"/> 
@@ -29,7 +24,7 @@
     <!-- <link rel="stylesheet" type="text/css" href="/css/style.css"/> -->
     <script type="text/javascript" src="${tg.url('/javascript/jslib/dojo/dojo.js')}"></script>
     <script type="text/javascript" src="${tg.url('/javascript/jslib/raphael.js')}"></script>
-http://ptbbpc2.epfl.ch/pygdv/_debug/view/1343303068    <script type="text/javascript" src="${tg.url('/javascript/js/Widget.js')}"></script>
+    <script type="text/javascript" src="${tg.url('/javascript/js/Widget.js')}"></script>
     <script type="text/javascript" src="${tg.url('/javascript/js/gdv.js')}"></script>
     <script type="text/javascript" src="${tg.url('/javascript/js/Operations.js')}"></script>
     <script type="text/javascript" src="${tg.url('/javascript/js/Containers.js')}"></script>
@@ -96,7 +91,6 @@ http://ptbbpc2.epfl.ch/pygdv/_debug/view/1343303068    <script type="text/javasc
     
     <div id="GenomeBrowser" style="height: 100%; width: 100%; padding: 0; border: 0;"></div>
     
-    
 
       <!-- some parameters -->
     <span id="species_name" style="display:none"><span py:replace="species_name" style="display:none"/></span>
@@ -106,4 +100,11 @@ http://ptbbpc2.epfl.ch/pygdv/_debug/view/1343303068    <script type="text/javasc
 
   
   </body>
+
+<script type="text/javascript">
+      window.onerror=function(msg){
+      document.body.setAttribute("JSError",msg);
+      }
+    </script>
+
 </html>

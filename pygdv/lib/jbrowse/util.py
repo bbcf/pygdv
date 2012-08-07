@@ -3,6 +3,7 @@ from bbcflib import genrep_cache as genrep
 from pygdv.lib.jbrowse import SEQUENCE_CHUNK_SIZE
 from pygdv.model import Track
 import json
+
 '''
 Contains utility methods for buildings JSON informations that the browser need.
 '''
