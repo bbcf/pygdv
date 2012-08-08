@@ -392,3 +392,4 @@ class ProjectController(BaseController):
         data_projects = [util.to_datagrid(project_admin_grid, projects, "All projects", len(projects)>0)]
         t = handler.help.tooltip['project']
         return dict(page='projects', model='project', tooltip=t, form_title="new project", projects=data_projects, value={})
+

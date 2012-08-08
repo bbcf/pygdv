@@ -1,7 +1,7 @@
 import urllib, urllib2, json
 import tg
 
-operation_list = '/form/methods.json'
+operation_list = '/form/list.json'
 form_url = '/form/index'
 
 def get_service_url():

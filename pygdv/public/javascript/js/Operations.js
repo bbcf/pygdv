@@ -14,8 +14,8 @@ function Operations(){
 */
 Operations.prototype.menu_add_child = function(parent, node){
     var c = node.childs;
-    var l = c.length;
-    if(l>0){
+    if(c){
+	var l = c.length;
     // node has childs (build a menu & add childs to it)
         var m = new dijit.Menu({});
 
