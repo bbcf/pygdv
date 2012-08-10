@@ -11,7 +11,7 @@ import tg
 from pygdv.model import DBSession, Project, Job
 from pygdv.lib.jbrowse import util as jb
 from pygdv.lib import constants, reply
-from pygdv.celery import tasks
+from pygdv.worker import tasks
 import json
 from sqlalchemy import and_, not_
 

@@ -8,11 +8,20 @@ function JobPane(){
 
 JobPane.prototype.init_panel = function(DomNode, DijitNode){
     var cont = dojo.create('div', {}, DomNode);
+    
+
+    
+    // add a div for bs plugins
+    var opdiv = dojo.create('div', {id:'bs_operations'}, cont);
+
     var job_container = new dijit.layout.ContentPane({
 	title: "Jobs",
 	id:'tab_jobs'
     }, cont);
     DijitNode.addChild(job_container);
+    
+
+    
     
     this.jobs = job_container;
     

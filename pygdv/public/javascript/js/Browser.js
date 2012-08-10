@@ -96,12 +96,13 @@ var Browser = function(params) {
                                                        style : {overflow:'hidden'}}, menuleft);
         var formElem;
         var formWidget;
-        //add a layout for the operation form
-        if (!(init_operations == 'connect')){
-            formElem = dojo.create('div', {id:'op_form'}, brwsr.container);
-            formWidget = new dijit.layout.ContentPane({region: "right", splitter:false,
-                style : {overflow:'hidden'}}, formElem);
-        }
+        // //add a layout for the bs plugin sytem
+        
+    //     formElem = dojo.create('div', {id:'op_form'}, brwsr.container);
+	
+    // 	formWidget = new dijit.layout.ContentPane({region: "right", splitter:false,
+    // 						   style : {overflow:'hidden'}}, formElem);
+    // }
 
         //var bottomWidget = new dijit.layout.ContentPane({region: "bottom",splitter:true}, bottomPane);
 

@@ -31,7 +31,7 @@ Operations.prototype.menu_add_child = function(parent, node){
         var ctx = this;
         var m = new dijit.MenuItem({label : node.key,
                         onClick : function(e){
-                            ctx.serv_get_form(node.id, node.fl);
+                            ctx.serv_get_form(node.id);
                             ctx.show_form();
                             dojo.stopEvent(e);
                         }});
@@ -87,10 +87,10 @@ Operations.prototype.hide_form = function(){
 * OP SERV
 * Get the form from the server with the uid.
 * form_id : the id provided by *joblauncher application*
-* fl : the file list provided by *joblauncher application*
+* info : the operation info
 */
-Operations.prototype.serv_get_form = function(form_id, fl){
-    this.ifr.src = _GDV_PLUG_URL + '?id=' + form_id + '&project_id=' + _gdv_info.project_id + '&fl=' + dojo.toJson(fl) ;
+Operations.prototype.serv_get_form = function(form_id){
+    this.ifr.src = _GDV_PLUG_URL + '?id=' + form_id + '&project_id=' + _gdv_info.project_id;
 };
 
 Operations.prototype.iframe_loaded = function(){

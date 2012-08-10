@@ -76,5 +76,4 @@ token = 'GDV'
 
 
 
-import pygdv.celery
 

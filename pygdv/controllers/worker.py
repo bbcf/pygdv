@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from pygdv.lib.base import BaseController
 from tg import expose, request
 from repoze.what.predicates import has_any_permission
-from pygdv.celery import tasks
+from pygdv.worker import tasks
 from celery.task import chord
 from pygdv import handler
 from pygdv.model import DBSession, Project, Job

@@ -16,7 +16,7 @@ from pygdv.widgets.track import track_table, track_export, track_table_filler, t
 from pygdv.widgets import datagrid, form
 from pygdv import handler
 from pygdv.lib import util, constants, checker, reply
-from pygdv.celery import tasks
+from pygdv.worker import tasks
 import tempfile, track
 import tw2.core as twc
 __all__ = ['TrackController']

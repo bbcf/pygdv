@@ -73,15 +73,13 @@ PrincipalContainer.prototype.createContainer = function(browser, menuLeftContain
 	this.trackContainer(browser);
 	this.selectionContainer(principal, principal_dijit);
 	this.jobContainer(principal, principal_dijit);
-	this.operationContainer(principal, principal_dijit, init_operations, 
-				viewContainer, formwidget, browserwidget);
+
     } else {
 	this.navigationContainer(principal, principal_dijit, ['Home', 'Tracks', 'Projects', 'Circles', 'Jobs']);
 	this.trackContainer(browser);
 	this.selectionContainer(principal, principal_dijit);
 	this.jobContainer(principal, principal_dijit);
-	this.operationContainer(principal, principal_dijit, init_operations, 
-				viewContainer, formwidget, browserwidget);
+
     }
 
 
@@ -237,43 +235,35 @@ PrincipalContainer.prototype.selectionContainer = function(DomNode, DijitNode){
 /**
 * Add the Operations tab
 */
-PrincipalContainer.prototype.operationContainer = function(DomNode, DijitNode, paths, viewContainer, fwdgt, bwdgt){
-    if (paths == 'connect'){
-        console.error('cannot connect to plugin system');
-	return;
-    } else if (paths == 'login'){
-    	console.error('You must be logged in to use operations');
-    	return;
-    }
-    
+PrincipalContainer.prototype.operationContainer = function(DomNode, DijitNode,  viewContainer, fwdgt, bwdgt){
     var cont = dojo.create('div', {}, DomNode);
 
     var ops_container = new dijit.layout.ContentPane({
         title: "Operations",
-        id:'tab_ops'
+        id:'bs_operations'
     }, cont);
-    DijitNode.addChild(ops_container);
-    this.operations = ops_container;
+    // DijitNode.addChild(ops_container);
+    // this.operations = ops_container;
 
-    // initialize the operations
-    var op = new Operations();
-    op.pane = cont;
-    _gdv_info.operations = op;
+    // // initialize the operations
+    // var op = new Operations();
+    // op.pane = cont;
+    // _gdv_info.operations = op;
 
-    var menu = new dijit.Menu({colspan : 1,
-                   style : {width : '10em'}
-               });
-    var c = paths.childs;
-    var l = c.length;
-    for(var i=0;i<l;i++){
-        op.menu_add_child(menu, c[i]);
-    }
-    menu.placeAt('tab_ops');
+    // var menu = new dijit.Menu({colspan : 1,
+    //                style : {width : '10em'}
+    //            });
+    // var c = paths.childs;
+    // var l = c.length;
+    // for(var i=0;i<l;i++){
+    //     op.menu_add_child(menu, c[i]);
+    // }
+    // menu.placeAt('tab_ops');
 
 
     // initialize the iframe that will be showed
     // if an user click on an Operation button
-    op.create_frame(viewContainer, fwdgt, bwdgt);
+//    op.create_frame(viewContainer, fwdgt, bwdgt);
 
 
     // initialize the print button

@@ -7,7 +7,7 @@ from pygdv.model import DBSession, Input, Track, TrackParameters, Task, Sequence
 import os, shutil, tg
 from pygdv.model import constants
 from pygdv.lib import util
-from pygdv.celery import tasks
+from pygdv.worker import tasks
 from pygdv.lib.constants import track_directory
 from track.util import determine_format
 from pygdv.lib import constants

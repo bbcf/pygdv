@@ -13,7 +13,7 @@ from pygdv.lib import constants, util
 import track, urllib, urllib2
 from archive import Archive
 import tempfile
-from pygdv.celery import temporary_directory
+from pygdv.worker import temporary_directory
 success = 1
 
 
