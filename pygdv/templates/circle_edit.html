@@ -40,17 +40,21 @@
     <div id="north" class="ui-layout-north">
       ${header()}
       ${mainmenu()}
-      <div id="controls" class="ui-layout-north">
-	<div class="actions"><a href="${tg.url('/circles')}">back</a></div>
-	<div class="actions">Editing circle</div>
-	<div class="actions">
-	  <a id="add_user_c" href="#">Add user</a>
-	  <div class="add_user_c" style="${('display:none', '')[defined('au_error')]}">
-	    <span py:replace="widget.display()">Add User Form</span></div>
-	</div>
-      </div>
+      <ul id="controls" class="ui-layout-north">
+        <li>
+            <a href="${tg.url('/circles')}">back</a>
+        </li>
+        <li><span>Editing circle</span></li>
+        <li>
+          <a id="add_user_c" href="#">Add user</a>
+        </li>
+        <li>
+            <div class="add_user_c" style="${('display:none', '')[defined('au_error')]}">
+            <span py:replace="widget.display()">Add User Form</span>
+            </div>
+        </li>
+      </ul>
     </div>
-    
 
 
 </body>

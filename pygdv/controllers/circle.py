@@ -27,7 +27,6 @@ class CircleController(BaseController):
     allow_only = has_any_permission(constants.perm_admin, constants.perm_user)
 
     def new(self, *args, **kw):
-        print 'new'
         widget = form.NewCircle(action=url('/circles/new')).req()
         if request.method == 'GET':
             return dict(page='circles', model='circle', widget=widget)

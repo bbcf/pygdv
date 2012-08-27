@@ -24,30 +24,41 @@
 	
 
 
-    <ul id="left_stack" class="ui-layout-west"> 
-      <h4>Projects</h4>
-      <!-- PROJECT LIST -->
-      <py:for each="dic in project_list">
-	<div py:choose="">
-	  <span py:when="project_id == None"><li><a href="${tg.url('/tracks/', {'pid' :dic[0]})}">${dic[1]}</a></li></span>
-	  <span py:when="dic[0] == int(project_id)"><li class="selected"><a href="${tg.url('/tracks/')}?pid=${dic[0]}">${dic[1]}</a></li></span>
-	  <span py:otherwise=""><li><a href="${tg.url('/tracks/')}?pid=${dic[0]}">${dic[1]}</a></li></span>
-	</div>
-      </py:for>
+    <ul id="left_stack" class="ui-layout-west">
+        <div class="ui-layout-center">
+            <div class="heade">Projects</div>
 
-      <h4>Shared projects</h4>
-      <!-- SHARED PROJECT LIST -->
-      <py:for each="dic in shared_project_list">
-	<div py:choose="">
-	  <span py:when="project_id == None"><li><a href="${tg.url('/tracks/')}?pid=${dic[0]}">${dic[1]} ${dic[2]}</a></li></span>
-	  <span py:when="dic[0] == int(project_id)"><li class="selected"><a href="${tg.url('/tracks/')}?pid=${dic[0]}">${dic[1]} ${dic[2]}</a></li></span>
-	  <span py:otherwise=""><li><a href="${tg.url('/tracks/')}?pid=${dic[0]}">${dic[1]} ${dic[2]}</a></li></span>
-	</div>
-      </py:for>
-      </ul>
+            <!-- PROJECT LIST -->
+            <py:for each="dic in project_list">
+                <div py:choose="">
+                  <span py:when="project_id == None"><li><a href="${tg.url('/tracks/', {'pid' :dic[0]})}">${dic[1]}</a></li></span>
+                  <span py:when="dic[0] == int(project_id)"><li class="selected"><a href="${tg.url('/tracks/')}?pid=${dic[0]}">${dic[1]}</a></li></span>
+                  <span py:otherwise=""><li><a href="${tg.url('/tracks/')}?pid=${dic[0]}">${dic[1]}</a></li></span>
+                </div>
+            </py:for>
+
+            <div class="heade">Shared projects</div>
+            <!-- SHARED PROJECT LIST -->
+            <py:for each="dic in shared_project_list">
+                <div py:choose="">
+                  <span py:when="project_id == None"><li><a href="${tg.url('/tracks/')}?pid=${dic[0]}">${dic[1]} ${dic[2]}</a></li></span>
+                  <span py:when="dic[0] == int(project_id)"><li class="selected"><a href="${tg.url('/tracks/')}?pid=${dic[0]}">${dic[1]} ${dic[2]}</a></li></span>
+                  <span py:otherwise=""><li><a href="${tg.url('/tracks/')}?pid=${dic[0]}">${dic[1]} ${dic[2]}</a></li></span>
+                </div>
+            </py:for>
+        </div>
+
+        <div class="ui-layout-south left-stack-bottom">
+            <a class="action" href="${tg.url('/projects/new')}">
+            <img src="../images/add.png" width="15" height="15" style="position:relative;top:5px;"/>New Project</a>
+        </div>
+
+    </ul>
     
-    
-    
+
+
+
+
     
     <div id="center_stack" class="ui-layout-center crud_table">
     ${flash()}
@@ -79,22 +90,22 @@
   <div id="north" class="ui-layout-north">
     ${header()}
     ${mainmenu()}
-    <div id="controls">
-
-      <div id="upload_track" class="ttactions">
-	<a href="${tg.url('/tracks/new')}${('', '?pid=')[defined('project_id') and project_id != None]}${project_id}">Upload Track</a>
-      </div>
+    <ul id="controls">
+      <li>
+	    <a class="action" href="${tg.url('/tracks/new')}${('', '?pid=')[defined('project_id') and project_id != None]}${project_id}">
+        <img src="../images/upload.png" width="20" height="16" style="position:relative;top:5px;"/>Upload</a>
+      </li>
       
-      <div id="add_project" class="ttactions">
-	<a id="add_project_c" href="${tg.url('/projects/new')}">New Project</a>
-      </div>
 
-      
-      ${project_toolbar(project_id, upload)}
+
+       <py:if test="defined('project_id') and project_id != None">
+           ${project_toolbar(project_id, upload)}
+       </py:if>
+
       
       
       <div class="ttactions"><span py:replace="tooltip"/></div>
-    </div>
+    </ul>
   </div>
  
   

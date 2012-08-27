@@ -45,53 +45,54 @@
 
 
 <py:def function="project_toolbar(project_id, upload)">
-
-  <ul id="project_toolbar" style="${('display:none', '')[defined('project_id') and project_id != None]}">
-    
     <li>
-      <a id="view_project" href="${tg.url('/projects/view/')}/${project_id}"><img src="../images/view.png" width="21" height="16" style="position:relative;top:5px;"/></a>
+      <a class="action" href="${tg.url('/projects/view/')}/${project_id}">
+          <img src="../images/view.png" width="15" height="10" style="position:relative;top:5px;"/>View</a>
     </li>
-    
     <!-- action visible only if you have the upload permission on the project -->
-    
     <li style="${('display:none', '')[defined('upload') and upload != None]}">
-      <a id="edit_project" href="${tg.url('/projects/edit')}/${project_id}"><img src="../images/pencil.png" width="21" height="21" style="position:relative;top:5px;"/></a>
+      <a class="action" href="${tg.url('/projects/edit')}/${project_id}">
+          <img src="../images/pencil.png" width="15" height="15" style="position:relative;top:5px;"/>Edit</a>
     </li>
-    
     <li style="${('display:none', '')[defined('upload') and upload != None]}">
-      <a id="share_project" href="${tg.url('/projects/share')}/${project_id}"><img src="../images/share.png" width="16" height="16" style="position:relative;top:6px;"/></a>
+      <a class="action" href="${tg.url('/projects/share')}/${project_id}">
+          <img src="../images/share.png" width="15" height="15" style="position:relative;top:6px;"/>Share</a>
     </li>
-    
     <li style="${('display:none', '')[defined('upload') and upload != None]}">
-      <a id="remove_project" href="${tg.url('/projects/delete')}/${project_id}"><img src="../images/delete.png" width="16" height="16" style="position:relative;top:5px;"/></a>
+      <a class="action" href="${tg.url('/projects/delete')}/${project_id}">
+          <img src="../images/delete.png" width="15" height="15" style="position:relative;top:5px;"/>Delete</a>
     </li>
-    
-  </ul>
-  
 </py:def>
 
 
 
 <py:def function="project_admin_toolbar(project_id, upload)">
-
   <ul id="project_toolbar" style="${('display:none', '')[defined('project_id') and project_id != None]}">
     
     <li>
-      <a id="view_project" href="${tg.url('/projects/view/')}/${project_id}"><img src="../../images/view.png" width="21" height="16" style="position:relative;top:5px;"/></a>
+      <a class="action" id="view_project" href="${tg.url('/projects/view/')}/${project_id}">
+          <img src="../../images/view.png" width="21" height="16" style="position:relative;top:5px;"/>
+      View</a>
     </li>
     
     <!-- action visible only if you have the upload permission on the project -->
     
     <li style="${('display:none', '')[defined('upload') and upload != None]}">
-      <a id="edit_project" href="${tg.url('/projects/edit')}/${project_id}"><img src="../../images/pencil.png" width="21" height="21" style="position:relative;top:5px;"/></a>
+      <a class="action" id="edit_project" href="${tg.url('/projects/edit')}/${project_id}">
+          <img src="../../images/pencil.png" width="21" height="21" style="position:relative;top:5px;"/>
+      Edit</a>
     </li>
     
     <li style="${('display:none', '')[defined('upload') and upload != None]}">
-      <a id="share_project" href="${tg.url('/projects/share')}/${project_id}"><img src="../../images/share.png" width="16" height="16" style="position:relative;top:6px;"/></a>
+      <a class="action" id="share_project" href="${tg.url('/projects/share')}/${project_id}">
+          <img src="../../images/share.png" width="16" height="16" style="position:relative;top:6px;"/>
+      Share</a>
     </li>
     
     <li style="${('display:none', '')[defined('upload') and upload != None]}">
-      <a id="remove_project" href="${tg.url('/projects/delete')}/${project_id}"><img src="../../images/delete.png" width="16" height="16" style="position:relative;top:5px;"/></a>
+      <a class="action" id="remove_project" href="${tg.url('/projects/delete')}/${project_id}">
+          <img src="../../images/delete.png" width="16" height="16" style="position:relative;top:5px;"/>
+      Delete</a>
     </li>
     
   </ul>

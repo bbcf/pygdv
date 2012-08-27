@@ -9,7 +9,6 @@ a {
     color: #286571;
 }
 
-
 /** HEADER  */
 
 #header {
@@ -29,7 +28,6 @@ a {
 
 
 /** MENU */
-
 ul#navigation{
     background: none repeat scroll 0 0 #CCCCCC;
     height: 40px;
@@ -39,12 +37,14 @@ ul#navigation{
     width: 100%;
     z-index: 50;
 }
+
 ul#navigation li{
     display:inline;
     list-style-type:none;
     float: left;
     padding: 0 0.5em;
 }
+
 ul#navigation a{
     color: black;
   display: block;
@@ -57,6 +57,7 @@ ul#navigation li a.active {
     background-color: #2261AB;
     color: white;
 }
+
 ul#navigation li a:hover{
     background-color: #1D2D44;
     color: white;
@@ -96,14 +97,28 @@ li > a.menu_circles{
 
 /* controls */
 
-div#controls {
+ul#controls {
   background: none repeat scroll 0 0 #F7F7F7;
   height: 40px;
   z-index: 50;
+   padding: 0;
+   margin:0;
+  list-style-type: none;
 }
 
+ul#controls li {
+    display: inline;
+}
 
-div.actions {
+ul#controls li a{
+    padding: 5px 10px;
+}
+
+ul#controls li a img{
+    padding-right: 5px;
+}
+
+li.actions {
   float: left;
   height: 2em;
   padding: 0.5em;
@@ -425,6 +440,13 @@ min-width:250px;
 }
 
 
+/**
+LEFT STACK
+*/
+
+
+
+
 #left_stack{
     overflow-x:hidden; 
     border-right: 1px solid #EEEEEE;
@@ -485,6 +507,29 @@ ul#left_stack li a:hover{
     background-color: #1D2D44;
     color: white;
 }
+
+.left-stack-bottom{
+    padding-bottom: 5px;
+}
+
+
+.heade{
+    position: relative;
+    left: -37px;
+    color:#CCCCCC;
+}
+
+
+
+
+
+
+
+
+
+/**
+NOTICES
+*/
 
 
 #flash, .notice {
