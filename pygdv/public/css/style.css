@@ -9,6 +9,17 @@ a {
     color: #286571;
 }
 
+
+/**
+Layout
+*/
+
+#center_stack .ui-layout-pane{
+    overflow: auto;
+}
+
+
+
 /** HEADER  */
 
 #header {
@@ -108,6 +119,8 @@ ul#controls {
 
 ul#controls li {
     display: inline;
+    float: left;
+    padding: 5px;
 }
 
 ul#controls li a{
@@ -171,6 +184,20 @@ div.dataTables_filter{
 }
 
 
+/**
+HELP
+*/
+div.help_section{
+    font-size: large;
+    margin: 1px;
+    padding: 10px;
+    margin-top: 50px;
+}
+div.help_section_first{
+    font-size: large;
+    margin: 1px;
+    padding: 10px;
+}
 /* tooltips */
 
 
@@ -388,6 +415,7 @@ div.add_user_c, div.add_project_c, div.add_track_c, div.add_circle_c{
     z-index: 600;
     position:absolute;
     padding: 5px;
+    top:120px;
 }
 
 /** FOOTER */
@@ -582,3 +610,6 @@ clear:both;
     white-space: normal;
     text-align:left;
 }
+
+
+

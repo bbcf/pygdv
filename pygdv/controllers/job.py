@@ -5,7 +5,7 @@ from pygdv.lib import tequila, constants
 from pygdv.lib.base import BaseController
 from tg import expose, url, flash, request, response, tmpl_context
 from tg.controllers import redirect
-from pygdv.model import User, Group, DBSession, Job
+from pygdv.model import User, Group, DBSession, Job, Result
 from pygdv.config.app_cfg import token
 import transaction
 import datetime
@@ -28,7 +28,7 @@ class JobController(BaseController):
     allow_only = has_any_permission(constants.perm_user, constants.perm_admin)
 
     @with_trailing_slash
-    @expose('pygdv.templates.list')
+    @expose('pygdv.templates.jobs_index')
     def index(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
         if request.method == 'POST':
@@ -39,10 +39,14 @@ class JobController(BaseController):
                 flash('not authorized')
 
         jobs = DBSession.query(Job).filter(Job.user_id == user.id).all()
-        data = [util.to_datagrid(datagrid.job_grid, jobs, "Job Listing", len(jobs)>0)]
-        t = handler.help.tooltip['job']
 
-        return dict(page='jobs', model='job', form_title="new job", items=data, value=kw, tooltip=t)
+        data = [{'title' : job.name,
+                 'isFolder' : True,
+                 'children' : [{'title' : res.rtype} for res in job.results ]} for job in jobs]
+        data = util.to_datagrid(datagrid.job_grid, jobs, "Job Listing", grid_display=len(jobs)>0)
+        t = handler.help.help_address(url('/help'), 'jobs', 'How to compute new data')
+
+        return dict(page='jobs', model='job', form_title="new job", item=data, value=kw, tooltip=t)
     
     @without_trailing_slash
     @expose()
@@ -53,17 +57,16 @@ class JobController(BaseController):
     
     @expose('pygdv.templates.job')
     def result(self, id):
-        job = DBSession.query(Job).filter(Job.id == id).first()
-        if job is not None:
-            data = util.to_datagrid(job_grid, [job])
-            if job.output == constants.JOB_IMAGE :
-                src = constants.extra_url() + '/' + str(job.data)
-                return dict(page='jobs', model='Job', src=src, info=data)
-            if job.output == constants.JOB_TRACK :
-                raise redirect('/tracks/%s/edit' % job.data)
 
-        raise redirect(url('/jobs/get_all'))
-    
+        res = DBSession.query(Result).filter(Result.id == id).first()
+        checker.check_permission(user=handler.user.get_user_in_session(request),
+            project=res.job.project, right_id=constants.right_download_id)
+        if res.rtype in constants.track_types:
+            raise redirect(url('/tracks/links/%s' % res.track_id))
+
+        src = constants.extra_url() + '/' + res.rpath
+        return dict(page='jobs', model='Job', src=src)
+
     
     @expose('genshi:tgext.crud.templates.post_delete')
     def post_delete(self, *args, **kw):

@@ -22,14 +22,16 @@ def hide_info(dict):
 job_grid = twf.DataGrid(fields=[
     ('Name', 'name'),
     ('Description', 'description'),
+    ('Status', 'status'),
+    ('Results', lambda obj : genshi.Markup(helpers.get_job_results_display(obj,  url('/jobs')))),
     ('Output', 'output_display'),
+
     (hidden_info, lambda obj : hide_info({
         'tr_status': obj.status,
-        'tr_actions' : helpers.delete_link(obj.id, action='.'),
+        'tr_actions' : helpers.delete_link(obj.id, url('/jobs')),
         'tr_info' : obj.traceback
     }))
 ])
-
 
 
 
@@ -213,4 +215,11 @@ circle_description_grid = twf.DataGrid(fields=[
     ('Email', 'email'),
     
 ])
+
+
+
+
+
+
+
 

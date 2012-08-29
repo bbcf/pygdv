@@ -40,6 +40,13 @@ def delete_link(id, model, img_src='../images/delete.png'):
     return '''<a class="action" onclick="return confirm('Are you sure?')"; title="delete" href="%s/delete/%s" style="text-decoration:none"><img src="%s"
      width="15px" height="15px"/>Delete</a>''' % (model, id, img_src)
 
+def get_job_results_display(job, u):
+    def link(rid, rname):
+        return '<a href="%s/result?id=%s">%s</a>' % (u, rid, rname)
+    return ', '.join([link(res.id, res.name) for res in job.results])
+
+
+
 def get_delete_circle_description_link(user_id, circle_id):
     return '''<a class="action" onclick="return confirm('Are you sure?')"; title="delete" href="%s" style="text-decoration:none"><img src="images/delete.png"
      width="15px" height="15px"/>Delete</a>''' % (url('/circles/delete_user', params={'id':circle_id, 'user_id' :user_id }))

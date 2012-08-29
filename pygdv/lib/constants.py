@@ -25,6 +25,7 @@ default_track_color = 'red'
 FEATURE_TRACK = 'FeatureTrack'
 IMAGE_TRACK = 'ImageTrack'
 
+track_types = ['track', 'bed', 'wig', 'gff', 'gtf', 'bedgraph']
 # DATA DIRECTORIES
 def json_directory():
     return os.path.join(resource_filename(data_dir, json_dir))

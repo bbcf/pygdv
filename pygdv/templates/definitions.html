@@ -8,17 +8,36 @@
       <div py:if="flash" py:content="XML(flash)" />
     </py:with>
   </py:def>
+
+
+<py:def function="jquery">
+  <script type="text/javascript" src="${tg.url('/javascript/jslib/DataTables-1.8.2/media/js/jquery.js')}"></script>
+</py:def>
+
+<py:def function="datatable">
+    <script type="text/javascript" src="${tg.url('/javascript/jslib/DataTables-1.8.2/media/js/jquery.dataTables.js')}"></script>
+    <script type="text/javascript" src="${tg.url('/javascript/js/DataTables.js')}"></script>
+</py:def>
+
+
+<py:def function="layout">
+  <script type="text/javascript" src="${tg.url('/javascript/jslib/layout.js')}"></script>
+    <script type="text/javascript" src="${tg.url('/javascript/js/Style.js')}"></script>
+</py:def>
+
+
 <!-- Menu bar for GDV -->
 
 <py:def function="mainmenu">
     <ul id="navigation">
       <!-- <li class="first"><a href="${tg.url('/')}" class="${('', 'active')[defined('page') and page=='index']} menu_home">Home</a></li> -->
       <li><a href="${tg.url('/tracks')}" class="${('', 'active')[defined('page') and page=='tracks']} menu_tracks">Tracks</a></li>      
-      <li><a href="${tg.url('/circles')}" class="${('', 'active')[defined('page') and page=='circles']} menu_circles">Circles</a></li>           
-      <!-- <li><a href="${tg.url('/jobs')}" class="${('', 'active')[defined('page') and page=='jobs']} menu_jobs">Jobs</a></li>  -->          
+      <li><a href="${tg.url('/circles')}" class="${('', 'active')[defined('page') and page=='circles']} menu_circles">Circles</a></li>
+       <li><a href="${tg.url('/jobs')}" class="${('', 'active')[defined('page') and page=='jobs']} menu_jobs">Data</a></li>
+        <!-- <li><a href="${tg.url('/jobs')}" class="${('', 'active')[defined('page') and page=='jobs']} menu_jobs">Jobs</a></li>  -->
       <li><a href="${tg.url('/help')}" class="${('', 'active')[defined('page') and page=='help']} menu_help">Help</a></li>           
       <span py:if="tg.auth_stack_enabled" py:strip="True">
-	<li py:if="request.identity" id="login" class="loginlogout ${('', 'active')[defined('page') and page=='admin']}"><a href="${tg.url('/admin')}">Admin</a></li>
+	<li py:if="request.identity and request.identity['userdata'].split('|')[1] == True" id="login" class="loginlogout ${('', 'active')[defined('page') and page=='admin']}"><a href="${tg.url('/admin')}">Admin</a></li>
 	<li py:if="not request.identity" id="login" class="loginlogout"><a href="${tg.url('/login')}">Login</a></li>
 	<li py:if="request.identity" id="login" class="loginlogout"><a href="${tg.url('/login/out')}">Logout</a></li>
 	

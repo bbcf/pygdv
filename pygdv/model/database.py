@@ -25,7 +25,8 @@ __all__ = ['Right', 'Circle', 'Project',
            'Track', 'Task', 'Input',
            'Sequence',
            'Species',
-           'Job', 'TMPTrack', 'Selection', 'Location']
+           'Job', 'Result', 'TMPTrack',
+           'Selection', 'Location']
 
 
 statuses = Enum('UPLOADING', 'FAILURE', name='track_status')
@@ -515,10 +516,27 @@ class TrackParameters(DeclarativeBase):
             self.type = constants.IMAGE_TRACK
 
 
-    
+class Result(DeclarativeBase):
+    """
+    Represent each result of a bioscript job
+    """
+    __tablename__='JobResult'
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    job_id = Column(Integer, ForeignKey('Job.id',  onupdate='CASCADE', ondelete="CASCADE"),
+        nullable=False)
+    job = relationship('Job', uselist=False, backref='results', cascade='delete')
+    name = Column(Unicode(255), nullable=False)
+    rtype = Column(Unicode(255), nullable=False)
+    rpath = Column(Unicode(255), nullable=False)
+    rmore = Column(Unicode(255), nullable=True)
+    track_id = Column(Integer, ForeignKey('Track.id',  onupdate='CASCADE', ondelete="CASCADE"),
+        nullable=True)
+
+
+
 class Job(DeclarativeBase):
     '''
-    Represent all jobs that are submitted to GDV.
+    Represent external jobs submitted by GDV to BioScript.
     '''
     __tablename__='Job'
     
@@ -528,17 +546,15 @@ class Job(DeclarativeBase):
     description = Column(Text(), nullable=False)
     
     _created = Column(DateTime, nullable=False, default=datetime.now)
-    
     user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=False)
-    
     project_id = Column(Integer, ForeignKey('Project.id', ondelete="CASCADE"), nullable=True)
     
     #task_id = Column(Integer, ForeignKey('celery_taskmeta.id', ondelete="CASCADE"), nullable=False)
     #task = relationship('Task', uselist=False, backref='job')
-    task_id = Column(VARCHAR(255))
-    task = relationship('Task', uselist=False, primaryjoin='Job.task_id == Task.task_id', foreign_keys='Task.task_id')
-
-    # external task_id from job launcher
+    #task_id = Column(VARCHAR(255))
+    #task = relationship('Task', uselist=False, primaryjoin='Job.task_id == Task.task_id', foreign_keys='Task.task_id')
+    status = Column(Unicode(255))
+    # external task_id from bs
     ext_task_id = Column(VARCHAR(255), unique=True)
     # the result of the job
     data = Column(Text())
@@ -555,22 +571,15 @@ class Job(DeclarativeBase):
     
     @property
     def traceback(self):
-        if self.task is not None:
-            return self.task.traceback
         return self.data
     @property
     def get_type(self):
         return self.parameters.type
     
-    @property
-    def status(self):
-        if self.task is not None:
-            return self.task.status
-        return self.output
 
     def __repr__(self):
-        return 'Job < id : %s, name %s, desc: %s, data : %s , task_id : %s, output : %s>' % (
-                        self.id, self.name, self.description, self.data, self.task_id, self.output)
+        return 'Job < id : %s, name %s, desc: %s, data : %s , , output : %s>' % (
+                        self.id, self.name, self.description, self.data, self.output)
     @property
     def output_display(self):
         if self.output == constants.JOB_IMAGE : return 'Image'

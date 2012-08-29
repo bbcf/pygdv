@@ -5,7 +5,7 @@ from tg import expose, flash, require, request, url
 
 from pygdv.lib.base import BaseController
 from pygdv.model import DBSession, Project
-from repoze.what.predicates import has_permission
+from repoze.what.predicates import has_permission, has_any_permission
 from tg.controllers import redirect
 from pygdv.lib import util
 from pygdv.widgets.project import project_admin_grid
@@ -115,9 +115,10 @@ class RootController(BaseController):
     @expose()
     def home(self,*args,**kw):
         raise redirect('/')
-    
-    
-    
+    @expose()
+    def koo(self):
+        print request.identity['userdata'].split('|')[1]
+
     
     ## DEVELOPMENT PAGES ##
     
@@ -133,7 +134,15 @@ class RootController(BaseController):
 #    def data(self, **kw):
 #        """This method showcases how you can use the same controller for a data page and a display page"""
 #        return dict(page='data',params=kw)
-    
+
+    @require(has_any_permission('admin', 'user', msg='You must be logged'))
+    @expose()
+    def private_key(self):
+        from pygdv import handler
+        user = handler.user.get_user_in_session(request)
+        return user.key
+
+
     @expose('pygdv.templates.test')
     def test(self, **kw):
         print 'test %s' % kw
@@ -189,7 +198,6 @@ class RootController(BaseController):
         data = [{'id' : koopa.blou, 'cell' : [koopa.blou, koopa.blou]} for koopa in koopas]
 
         return dict(rows=data, total=5, counts=5)
-
 
 
 

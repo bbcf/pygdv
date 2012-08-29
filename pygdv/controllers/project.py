@@ -254,8 +254,7 @@ class ProjectController(BaseController):
 
         widget.value = {'pid' : project_id}
 
-        tl = handler.help.tooltip['links']
-        tp = handler.help.tooltip['permissions']
+        tl = handler.help.help_address(url('help'), '#share', 'sharing projects')
 
 
         if request.method == 'POST':
@@ -283,7 +282,7 @@ class ProjectController(BaseController):
                                             [(c.id, c.name, {'selected' : True}) for c in project.shared_circles]
 
         return dict(page='projects', public=pub, download=down, name=project.name,
-                    tooltip_permissions=tp, tooltip_links=tl, widget=widget, items=cr_data, project_id=project_id)
+            tooltip_links=tl, widget=widget, items=cr_data, project_id=project_id)
 
 
     def post_share(self, project_id, circle_id, *args, **kw):
@@ -364,6 +363,7 @@ class ProjectController(BaseController):
 
 
         user = handler.user.get_user_in_session(request)
+
         if not checker.check_permission_project(user.id, project_id, constants.right_read_id) and not checker.is_admin(user=user):
             flash('You must have %s permission to view the project.' % constants.right_read, 'error')
             raise redirect(url('/'))

@@ -96,7 +96,9 @@ class LoginController(BaseController):
         DBSession.flush()
         # create the authentication ticket
         user = DBSession.query(User).filter(User.email == mail).first()
-        userdata=str(user.id)
+
+        userdata = "%s|%s" % (user.id, user in group_admins.users)
+
         ticket = auth_tkt.AuthTicket( 
                                        secret, user.email, remote_addr, tokens=token, 
                                        user_data=userdata, time=None, cookie_name=cookiename, 

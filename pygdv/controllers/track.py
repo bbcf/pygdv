@@ -43,6 +43,9 @@ class TrackController(BaseController):
         if kw.has_key('pid'):
             project_id = kw.get('pid')
             project = DBSession.query(Project).filter(Project.id == project_id).first()
+            if project is None:
+                flash("Project doesn't exists", "error")
+                raise redirect('/tracks')
             if not checker.check_permission(user=user, project=project, right_id=constants.right_read_id) and not checker.is_admin(user=user):
                 flash('You must have %s permission to view the project.' % constants.right_read, 'error')
                 raise redirect('/tracks')
@@ -64,10 +67,8 @@ class TrackController(BaseController):
             track_list = [util.to_datagrid(datagrid.track_grid, tracks, "Track Listing", len(tracks)>0)]
             kw['upload'] = True
 
-        # track list
+        t = handler.help.help_address(url('/help'), 'main', 'track list help')
 
-        t = handler.help.tooltip['main']
-        
         # project list
         project_list = [(p.id, p.name,) for p in user.projects]
 
@@ -105,7 +106,6 @@ class TrackController(BaseController):
 
     @expose('json')
     def create(self, *args, **kw):
-        print 'create %s ' % kw
         user = handler.user.get_user_in_session(request)
         # change a parameter name
         if kw.has_key('assembly'):
@@ -153,7 +153,6 @@ class TrackController(BaseController):
 
         # check if multiples url or if zipped file
         if util.is_compressed(extension) or (kw.get('url', None)!=None and len(kw.get('url', '').split())>1):
-            print 'multiple'
             async = tasks.multiple_track_input.delay(kw.get('uploaded', None), kw.get('file', None), kw.get('url', None), kw.get('fsys', None),
                 sequence_id, user.email, user.key, kw.get('project_id', None), kw.get('force', False), kw.get('delfile', False),
                 constants.callback_track_url(), extension)

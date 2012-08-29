@@ -9,6 +9,8 @@
 <head>
   <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
   <title py:replace="page"></title>
+    ${jquery()}
+    ${layout()}
 </head>
 
 <body>
@@ -49,14 +51,13 @@
     ${mainmenu()}
 
 
-      <div id="controls">
-	<div class="actions"><a href="${tg.url('/tracks')}?pid=$project_id">back</a></div>
-	<div class="actions"> Share project ${name}</div>
-	<div class="ttactions"><div py:replace="tooltip_links">Title</div></div>
-	<div class="actions"><a href='$public'>public link</a></div>
-	<div class="actions"><a href='$download'>import link</a></div>
-	<div class="ttactions"><div py:replace="tooltip_permissions">Title</div></div>
-      </div>
+    <ul id="controls">
+	    <li><a class="action" href="${tg.url('/tracks')}?pid=$project_id">back</a></li>
+        <li>Share project <b>${name}</b></li>
+        <li><py:replace value="tooltip_links">Title</py:replace></li>
+        <li><a class="action" href='$public'>public link</a></li>
+        <li><a class="action" href='$download'>import link</a></li>
+    </ul>
 
       
  </div>

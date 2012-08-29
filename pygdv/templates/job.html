@@ -10,19 +10,37 @@
 <head>
   <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
   <title py:replace="page"></title>
+    ${jquery()}
+    ${layout()}
 </head>
-<style>
-#menu_items {
-  padding:0px 12px 0px 2px;
-  list-style-type:None
-}
-</style>
 
-<body class="tundra">
-  
-${item_info(info)}
+<body>
 
-<img src="${src}"/>
+
+
+
+    <div id="center_stack"  class="ui-layout-center crud_table">
+        ${flash()}
+        <img src="${src}"/>
+    </div>
+
+    <div id="south" class="ui-layout-south">
+        ${footer()}
+    </div>
+
+
+
+    <div id="north" class="ui-layout-north">
+        ${header()}
+        ${mainmenu()}
+
+        <ul id="controls">
+            <li></li>
+        </ul>
+    </div>
+
+
+
 
 
 </body>

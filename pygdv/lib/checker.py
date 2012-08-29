@@ -13,6 +13,9 @@ def can_edit_track(user, track_id):
     return False
             
 def check_permission(project=None, project_id=None, user=None, user_id=None, right_id=None):
+    """
+    Check if an user can "right" the project
+    """
     if project is None:
         project = DBSession.query(Project).filter(Project.id == project_id).first()
     if project is None: return False
@@ -26,6 +29,9 @@ def check_permission(project=None, project_id=None, user=None, user_id=None, rig
     return False
 
 def own(user=None, user_id=None, project=None, project_id=None):
+    """
+    Check if an user own a project
+    """
     if user_id is None:
         user_id = user.id
     if project is None:

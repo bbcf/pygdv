@@ -46,7 +46,7 @@ class CircleController(BaseController):
         user = handler.user.get_user_in_session(request)
 
         data = util.to_datagrid(datagrid.circle_grid, user.circles_owned, grid_display=len(user.circles)>0)
-        t = handler.help.tooltip['circle']
+        t = handler.help.help_address(url('/help'), 'circles', 'help about circles')
 
         widget = form.NewCircle(action=url('/circles/index')).req()
         if request.method == 'GET':

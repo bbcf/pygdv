@@ -2,7 +2,16 @@ from pygdv.lib import constants
 from tg import url
 import genshi
 
-tooltip={}
+tooltip = {}
+
+def help_address(hurl, section, title):
+    return genshi.Markup(
+         '''
+        <a href="%s#%s" title="%s">
+        <img src="../images/question.png" width="16" height="16"/></a>
+        </a>
+         ''' % (hurl, section, title)
+    )
 
 def make_tooltip(title, message):
     return genshi.Markup(
@@ -18,10 +27,7 @@ def make_tooltip(title, message):
 
 
 
-tooltip['main'] = make_tooltip('Main view', '''This is the main view where you find all files (called 'tracks') that you have uploaded.
-They are displayed on the center. On the right, this is a list of 'Projects'. It's a playlist that regroup some tracks that you can vizualise on
- the genome browser. You can also share Projects among collaborators. Add a project by clicking 'New project link'.
-''')
+
 
 
 tooltip['circle'] = make_tooltip('Circle', '''A circle is a group of person you may want to collaborate with.

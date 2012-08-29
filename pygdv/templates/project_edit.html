@@ -10,6 +10,8 @@
 <head>
   <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
   <title py:replace="page"></title>
+    ${jquery()}
+    ${layout()}
 </head>
 
 <body>
@@ -39,13 +41,13 @@
   <div id="north" class="ui-layout-north">
     ${header()}
     ${mainmenu()}
-    <div id="controls">
+    <ul id="controls">
       
-      <div class="actions"><a href="${tg.url('/tracks')}?pid=$project_id">back</a></div>
-      <div class="actions">Editing project</div>
+      <li><a class="action" href="{tg.url('/tracks')}?pid=$project_id">back</a></li>
+      <li>Editing project</li>
 
 
-    </div>
+    </ul>
   </div>
  
 
