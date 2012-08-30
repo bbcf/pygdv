@@ -14,23 +14,23 @@
 </head>
 
 <body>
-  
+
 
   <div class="ui-layout-center">
     <div class="circle_form">
-      <div py:replace="widget.display()">Share Form</div>  
+      <div py:replace="widget.display()">Share Form</div>
     </div>
-    
+
     <div class="share_table crud_table" >
       <div py:for="item in items">
 	<div py:choose="item.grid_display">
 	  <span py:when="True">
 	    <div py:content="item.grid(item.grid_data)"></div>
 	  </span>
-	  
+
 	  <span py:when="False">
 	  </span>
-	  
+
 	</div>
       </div>
     </div>
@@ -41,9 +41,6 @@
  <div id="south" class="ui-layout-south">
     ${footer()}
   </div>
-
-
-
 
 
  <div id="north" class="ui-layout-north">
@@ -59,16 +56,9 @@
         <li><a class="action" href='$download'>import link</a></li>
     </ul>
 
-      
+
  </div>
- 
 
 
-
-
-
-
-
-  
 </body>
 </html>

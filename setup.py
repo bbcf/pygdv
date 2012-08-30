@@ -22,7 +22,7 @@ from distutils.command.install_data import install_data
 
 class post_install(install_data):
     def run(self):
-        # Call parent 
+        # Call parent
         install_data.run(self)
         # Execute commands
         print "Post script"
@@ -31,11 +31,8 @@ class post_install(install_data):
 
 
 testpkgs=['WebTest >= 1.2.3',
-               'nose',
-               'coverage',
-               'wsgiref',
-               'repoze.who-testutil >= 1.0.1',
-               ]
+	'nose','coverage','wsgiref',
+	'repoze.who-testutil >= 1.0.1',]
 install_requires=[
     "TurboGears2 >= 2.1.5",
     "Genshi",
@@ -55,7 +52,7 @@ install_requires=[
     "kombu-sqlalchemy",
     "tw.dojo",
     "celery",
-    
+
     ]
 
 if sys.version_info[:2] == (2,4):
