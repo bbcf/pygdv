@@ -101,11 +101,16 @@
 
        <py:if test="defined('project_id') and project_id != None">
            ${project_toolbar(project_id, upload)}
-           <li>Project shared with : <i><span py:replace="shared_with"/></i> circle(s).</li>
+
        </py:if>
 
+        <py:if test="owner">
+            <li>Project shared with : <i><span py:replace="shared_with"/></i> circle(s).</li>
+        </py:if>
 
-
+        <py:if test="defined('shared_by') and shared_by != None">
+            <li>Project shared by : <i><span py:replace="shared_by"/></i>.</li>
+        </py:if>
       
       <div class="ttactions"><span py:replace="tooltip"/></div>
     </ul>
