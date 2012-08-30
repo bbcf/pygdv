@@ -61,8 +61,10 @@ class TrackController(BaseController):
                 grid = datagrid.track_grid_permissions(rights=rights)
             kw['pn'] = project.name
             track_list = [util.to_datagrid(grid, tracks, "Track Listing", len(tracks)>0)]
+            shared_with = project.get_circle_with_right_display
 
         else :
+            shared_with = ''
             tracks = user.tracks
             track_list = [util.to_datagrid(datagrid.track_grid, tracks, "Track Listing", len(tracks)>0)]
             kw['upload'] = True
@@ -79,7 +81,7 @@ class TrackController(BaseController):
 
         return dict(page='tracks', model='track', form_title="new track", track_list=track_list,
             project_list=project_list, shared_project_list=shared_project_list, value=kw,
-            tooltip=t, project_id=kw.get('pid', None), upload=kw.get('upload', None), project_name=kw.get('pn', None))
+            tooltip=t, project_id=kw.get('pid', None), upload=kw.get('upload', None), project_name=kw.get('pn', None), shared_with=shared_with)
 
 
 

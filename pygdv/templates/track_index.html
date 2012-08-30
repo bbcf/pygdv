@@ -98,14 +98,14 @@
 	    <a class="action" href="${tg.url('/tracks/new')}${('', '?pid=')[defined('project_id') and project_id != None]}${project_id}">
         <img src="../images/upload.png" width="20" height="16" style="position:relative;top:5px;"/>Upload</a>
       </li>
-      
-
 
        <py:if test="defined('project_id') and project_id != None">
            ${project_toolbar(project_id, upload)}
+           <li>Project shared with : <i><span py:replace="shared_with"/></i> circle(s).</li>
        </py:if>
 
-      
+
+
       
       <div class="ttactions"><span py:replace="tooltip"/></div>
     </ul>
