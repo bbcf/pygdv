@@ -6,10 +6,12 @@ from sqlalchemy.sql import and_, or_
 def can_edit_track(user, track_id):
     for track in user.tracks :
         if int(track_id) == track.id : return True
-    if user_is_admin(user.id) : return True
-    track = DBSession.query(Track).filter(Track.id == track_id).first()
-    for project in track.projects:
-        if check_permission(project=project, user=user, right_id=constants.right_upload_id) : return True
+    if user_is_admin(user.id) :
+        print 'Using admin privilege : edit track'
+        return True
+#    track = DBSession.query(Track).filter(Track.id == track_id).first()
+#    for project in track.projects:
+#        if check_permission(project=project, user=user, right_id=constants.right_upload_id) : return True
     return False
             
 def check_permission(project=None, project_id=None, user=None, user_id=None, right_id=None):

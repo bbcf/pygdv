@@ -50,19 +50,24 @@ class TrackController(BaseController):
                 flash('You must have %s permission to view the project.' % constants.right_read, 'error')
                 raise redirect('/tracks')
             tracks = project.tracks
+            # view on user project
             if checker.own(user=user, project=project):
                 kw['own'] = True
                 kw['upload'] = True
                 grid = datagrid.track_grid
+
+            # view from a shared user
             else :
                 rights = handler.project.get_rights(project=project, user=user)
                 if constants.right_upload_id in [r.id for r in rights]:
                     kw['upload'] = True
-                grid = datagrid.track_grid_permissions(rights=rights)
+                grid = datagrid.track_grid_permissions(user=user, rights=rights)
+                shared_by = "%s %s" % (project.user.firstname, project.user.name[0].upper())
             kw['pn'] = project.name
             track_list = [util.to_datagrid(grid, tracks, "Track Listing", len(tracks)>0)]
             shared_with = project.get_circle_with_right_display
-            shared_by = "%s %s" % (project.user.firstname, project.user.name[0].upper())
+
+        # view all user tracks
         else :
             shared_with = ''
             tracks = user.tracks

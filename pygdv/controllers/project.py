@@ -26,6 +26,7 @@ from pygdv.lib.jbrowse import util as jb
 from pygdv.lib import constants, reply
 import tw2.core as twc
 from sqlalchemy.sql import and_, or_, not_
+from sqlalchemy.orm import aliased
 import re
 
 __all__ = ['ProjectController']
@@ -56,8 +57,8 @@ class ProjectController(BaseController):
         if not checker.check_permission(user=user, project_id=project_id, right_id=constants.right_upload_id) and not checker.is_admin(user=user):
             flash('You must have %s permission to edit the project.' % constants.right_upload, 'error')
             raise redirect('/tracks/', {'pid' : project_id})
-        if checker.is_admin(user=user):
-            user = DBSession.query(User).join(Project).filter(Project.id == project_id).first()
+        #if checker.is_admin(user=user):
+            #user = DBSession.query(User).join(Project).filter(Project.id == project_id).first()
 
         widget = form.EditProject(action=url('/projects/edit/%s' % project_id)).req()
         widget.value = {'pid' : project_id}
