@@ -30,8 +30,7 @@ def _now():  #pragma NO COVERAGE
         return _NOW_TESTING
     return datetime.datetime.now()
 
-def make_plugin(serv_url,
-                secret=None,
+def make_plugin(secret=None,
                 secretfile=None,
                 cookie_name='auth_tkt',
                 secure=False,
@@ -59,7 +58,7 @@ def make_plugin(serv_url,
         reissue_time = int(reissue_time)
     if userid_checker is not None:
         userid_checker = resolveDotted(userid_checker)
-    plugin = CustomCookiePlugin(secret, serv_url,
+    plugin = CustomCookiePlugin(secret,
                                  cookie_name,
                                  _bool(secure),
                                  _bool(include_ip),
@@ -103,10 +102,9 @@ class CustomCookiePlugin(object):
         }
     
   
-    def __init__(self, secret, serv_url, cookie_name='auth_tkt',
+    def __init__(self, secret, cookie_name='auth_tkt',
                  secure=False, include_ip=False,
                  timeout=None, reissue_time=None, userid_checker=None):
-        self.serv_url = serv_url
         self.secret = secret
         self.cookie_name = cookie_name
         self.include_ip = include_ip
