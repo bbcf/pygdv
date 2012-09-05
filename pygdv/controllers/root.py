@@ -12,7 +12,7 @@ from pygdv.widgets.project import project_admin_grid
 
 
 from pygdv.controllers import ErrorController, LoginController, GroupController
-from pygdv.controllers import PermissionController, UserController, TrackController
+from pygdv.controllers import UserController, TrackController
 from pygdv.controllers import SequenceController, ProjectController, CircleController
 from pygdv.controllers import RightController, WorkerController, TaskController
 from pygdv.controllers import InputController, DatabaseController, JobController
@@ -63,7 +63,6 @@ class RootController(BaseController):
     
     
     groups = GroupController(DBSession, menu_items=models)
-    permissions = PermissionController(DBSession, menu_items=models)
     users = UserController(DBSession, menu_items=models)
     sequences = SequenceController(DBSession, menu_items=models)
     tasks = TaskController(DBSession, menu_items=models)
