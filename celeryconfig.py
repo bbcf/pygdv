@@ -1,4 +1,4 @@
-cd CELERY_IMPORTS = ('pygdv.worker.tasks',)
+CELERY_IMPORTS = ('pygdv.worker.tasks',)
 
 # Result storage settings
 CELERY_RESULT_BACKEND = 'database'
