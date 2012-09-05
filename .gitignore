@@ -6,7 +6,6 @@
 *~
 *.log
 #*#
-/celeryconfig.py
 *.log.*
 /who.ini
 /production.ini
