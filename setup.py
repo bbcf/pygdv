@@ -25,7 +25,6 @@ class post_install(install_data):
         # Call parent
         install_data.run(self)
         # Execute commands
-        print "Post script"
 
 
 
@@ -49,9 +48,12 @@ install_requires=[
     "repoze.what.plugins.sql>=1.0.1",
     "tw.forms",
     "tw.dynforms",
+    "tw2.forms",
+    "tw2.dynforms",
     "kombu-sqlalchemy",
     "tw.dojo",
     "celery",
+    "psycopg2",
 
     ]
 

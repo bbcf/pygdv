@@ -37,7 +37,7 @@ def make_app(global_conf, full_stack=True, **app_conf):
     # Wrap your base TurboGears 2 application with custom middleware here
     # This custom middleware is about authentication
 
-    # get securuty file from config file
+    # get security file from config file
     secfile = app_conf.get("security.file")
 
     app = make_middleware_with_config(
