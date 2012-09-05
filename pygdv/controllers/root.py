@@ -199,7 +199,9 @@ class RootController(BaseController):
 
         return dict(rows=data, total=5, counts=5)
 
-
+    @expose('mako:pygdv.templates.test')
+    def luigi(self):
+        return {}
 
 import tw2.jqplugins.jqgrid as jq
 

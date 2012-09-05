@@ -86,7 +86,7 @@ def prepare_view(project_id, *args, **kw):
     try :
         control_op = 'bs_redirect = %s; bs_operations_path = %s;' % (json.dumps(url('/plugins/index')), json.dumps(plugin.util.get_plugin_path()))
     except Exception as e:
-        print e
+        print "Exception with plugin system : " + str(e)
         control_op = 'init_operations = "connect"'
 
     return dict(species_name=project.species.name,

@@ -23,10 +23,41 @@ class LoginController(BaseController):
 
    
     @expose('pygdv.templates.index')
-    def index(self):
+    def index(self, came_from='/'):
         '''
         Redirect user on tequila page in order to log him
         '''
+        if tg.config.get('authentication.disable').lower() in ['t', 'true']:
+            print constants.admin_user_email()
+
+            environ = request.environ
+            authentication_plugins = environ['repoze.who.plugins']
+            identifier = authentication_plugins['ticket']
+            secret = identifier.secret
+            cookiename = identifier.cookie_name
+            remote_addr = environ['REMOTE_ADDR']
+            user = DBSession.query(User).filter(User.email == constants.admin_user_email()).first()
+            admins = tg.config.get('admin.mails')
+            group_admins = DBSession.query(Group).filter(Group.id == constants.group_admins_id).first()
+            if user.email in admins:
+                user not in group_admins.users and group_admins.users.append(user)
+            else :
+                user in group_admins.users and group_admins.users.remove(user)
+            DBSession.flush()
+            userdata = "%s|%s" % (user.id, user in group_admins.users)
+
+            ticket = auth_tkt.AuthTicket(
+                secret, user.email, remote_addr, tokens=token,
+                user_data=userdata, time=None, cookie_name=cookiename,
+                secure=True)
+
+            val = ticket.cookie_value()
+            # set it in the cookies
+            response.set_cookie(
+                cookiename, value=val, max_age=None, path='/', domain=None, secure=False,
+                httponly=False, comment=None, expires=None, overwrite=False)
+            raise redirect(came_from)
+
         u = resolve_relative_url(url(), request.environ)
         res = tequila.create_request(u+'/login/auth','tequila.epfl.ch')
         raise redirect('https://tequila.epfl.ch/cgi-bin/tequila/requestauth?request'+res)
@@ -165,7 +196,6 @@ class LoginController(BaseController):
                     
                     
     def check_circles_with_user(self, user, principal):
-        
         '''
         Check if the groups that are in tequila and add the user to it.
         This method is here because at first, circles was not created with `allunits` parameters but with `groups`

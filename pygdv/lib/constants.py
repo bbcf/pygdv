@@ -12,7 +12,6 @@ tracks_dir = 'tracks'
 plugin_dir = 'plugins'
 extra_dir = 'extras'
 
-public_user_email = 'webmaster.bbcf@epfl.ch'
 # STATUSES
 PENDING = 'PENDING'
 SUCCESS = 'SUCCESS'
@@ -30,7 +29,11 @@ track_types = ['track', 'bed', 'wig', 'gff', 'gtf', 'bedgraph']
 def json_directory():
     return os.path.join(resource_filename(data_dir, json_dir))
 
+def admin_user_email():
+    return tg.config.get('admin.user.email')
 
+def admin_user_key():
+    return tg.config.get('admin.user.key')
 
 def temporary_directory():
     if 'temporary.directory' in tg.config:

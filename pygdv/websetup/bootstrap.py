@@ -8,8 +8,8 @@ import transaction
 
 
 from pygdv.lib.constants import right_upload, right_download, right_read, group_admins, perm_admin, group_users, perm_user
-from pygdv.lib.constants import right_download_id, right_read_id, right_upload_id, public_user_email, group_users_id, group_admins_id
-
+from pygdv.lib.constants import right_download_id, right_read_id, right_upload_id, group_users_id, group_admins_id
+from pygdv.lib import constants
 def bootstrap(command, conf, vars):
     """Place any commands to setup turbotequila here.
     Note that you will have to log in the application one before launching the bootstrap."""
@@ -63,17 +63,19 @@ def bootstrap(command, conf, vars):
             read.description = u'A group with this permission can view the project.'
             model.DBSession.add(read)
             
-            print 'adding a special user'
+            print 'adding ADMIN user'
             u = model.User()
-            u.name = 'webmaster'
-            u.firstname = 'bbcf'
-            u.email = public_user_email
-    
+            u.name = 'user'
+            u.firstname = 'admin'
+            u.key = constants.admin_user_key()
+            u.email = constants.admin_user_email()
+
+            admins.users.append(u)
             users.users.append(u)
             
             model.DBSession.add(u)
             model.DBSession.add(users)
-            
+            model.DBSession.add(admins)
             
             transaction.commit()
            

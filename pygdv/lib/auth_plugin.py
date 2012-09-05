@@ -30,8 +30,6 @@ def _now():  #pragma NO COVERAGE
         return _NOW_TESTING
     return datetime.datetime.now()
 
-
-
 def make_plugin(serv_url,
                 secret=None,
                 secretfile=None,
@@ -74,14 +72,17 @@ def make_plugin(serv_url,
 
 
 def make_plugin_auth(check_fn=None):
-    '''
-    Build the authentifier plugin
-    '''
     return CustomAuthPlugin(check_fn)
 
 
 
-    
+def make_plugin_cl(*args, **kw):
+    return CustomCommandLinePlugin()
+
+
+
+
+
 
 
 class CustomCookiePlugin(object):
@@ -375,8 +376,6 @@ class CustomCommandLinePlugin(object):
    
    
 
-def make_plugin_cl(*args, **kw):
-    return CustomCommandLinePlugin()
 
 
 

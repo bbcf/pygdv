@@ -5,8 +5,8 @@
       xmlns:xi="http://www.w3.org/2001/XInclude"
       py:strip="">
 
-  
-  
+
+    <xi:include href="definitions.html"/>
   <head>
   
     <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
@@ -14,9 +14,10 @@
     <meta http-equiv="Cache-control" content="public"/>
     <meta http-equiv="Content-Style-Type" content="text/css"/> 
     <meta http-equiv="Content-Script-Type" content="text/javascript"/> 
-    <meta name="Keywords" content="genome,browser,browsing"/> 
-    
-    
+    <meta name="Keywords" content="genome,browser,browsing"/>
+      ${jquery()}
+      ${layout()}
+
     <!-- <link rel="stylesheet" type="text/css" href="gdv_style.css"/> -->
     <link rel="stylesheet" type="text/css" href="${tg.url('/javascript/jslib/dijit/themes/tundra/tundra.css')}"/>
     <link rel="stylesheet" type="text/css" href="${tg.url('/javascript/jslib/dojo/resources/dojo.css')}"/>
@@ -93,8 +94,8 @@
   
   <body class="tundra">
     
-    <div id="GenomeBrowser" style="height: 100%; width: 100%; padding: 0; border: 0;"></div>
-    
+    <div id="GenomeBrowser" class="ui-layout-center" style="height: 100%; width: 100%; padding: 0; border: 0;"></div>
+    <iframe id="bs_ifrm" class="ui-layout-east" src="http://google.com"></iframe>
 
       <!-- some parameters -->
     <span id="species_name" style="display:none"><span py:replace="species_name" style="display:none"/></span>
