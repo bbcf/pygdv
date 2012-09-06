@@ -14,7 +14,7 @@ from pygdv.widgets.project import project_admin_grid
 from pygdv.controllers import ErrorController, LoginController
 from pygdv.controllers import UserController, TrackController
 from pygdv.controllers import  ProjectController, CircleController
-from pygdv.controllers import WorkerController
+from pygdv.controllers import WorkerController, SequenceController
 from pygdv.controllers import  DatabaseController, JobController
 from pygdv.controllers import PublicController, HelpController, GenRepController
 from pygdv.controllers import SelectionController, PluginController, AdminController
@@ -63,7 +63,7 @@ class RootController(BaseController):
     
     
     users = UserController(DBSession, menu_items=models)
-    #sequences = SequenceController(DBSession, menu_items=models)
+    sequences = SequenceController()
     tracks = TrackController()
     projects = ProjectController()
     circles = CircleController()

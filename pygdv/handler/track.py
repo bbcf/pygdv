@@ -270,7 +270,7 @@ def delete_track(track=None, track_id=None):
 
 
 
-def create_track(user_id, sequence, f=None, trackname=None, project=None, session=None, admin=False, **kw):
+def create_track(user_id=None, sequence=None, f=None, trackname=None, project=None, session=None, admin=False, **kw):
     if session is None:
         session = DBSession
     '''

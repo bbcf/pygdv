@@ -3,7 +3,7 @@ from pygdv.lib import util
 from pygdv.handler import track
 from bbcflib.genrep import Assembly
 
-def add_new_sequence(user_id, sequence):
+def add_new_sequence(sequence):
     '''
     Method called when a new sequence is created on GDV.
     It should import fast from JBrowsoR
@@ -16,7 +16,7 @@ def add_new_sequence(user_id, sequence):
         print e
     if len(files) > 0:
         filename, tmp_file, extension = files[0]
-        track.create_track(user_id, sequence, trackname='Genes', f=tmp_file.name, admin=True)
+        track.create_track(None, sequence, trackname='Genes', f=tmp_file.name, admin=True)
     
     
     

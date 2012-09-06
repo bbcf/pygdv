@@ -95,3 +95,8 @@ class NewProject(twf.TableForm):
     submit = twf.SubmitButton(id="submit", value="New")
 
 
+class NewSequenceForm(twf.ListForm):
+    smapping = twf.HiddenField()
+    species = twf.SingleSelectField(label='Species : ', options=[])
+    assembly = twf.SingleSelectField(label='Assembly :', options=[])
+    submit = twf.SubmitButton(id="submit", value="New")

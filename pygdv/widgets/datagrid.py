@@ -18,6 +18,11 @@ def hide_info(dict):
         span +="<span class='table_hidden %s'>%s</span>" % (k, v)
     return genshi.Markup("<div class='hidden_info'>%s</div>" % span)
 
+sequences_grid = twf.DataGrid(fields=[
+    ('ID', 'id'),
+    ('SPECIES', 'species.name'),
+    ('NAME', 'name')
+])
 
 job_grid = twf.DataGrid(fields=[
     ('Name', 'name'),
