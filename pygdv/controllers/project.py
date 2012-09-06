@@ -12,7 +12,7 @@ import tg
 from pygdv.widgets import datagrid
 
 from pygdv.model import DBSession, Project, User, RightCircleAssociation, Track, Job, Sequence
-from pygdv.widgets.project import project_table,  project_admin_grid, project_with_right, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid,circles_available_form, tracks_available_form, project_sharing_grid, project_grid_sharing
+from pygdv.widgets.project import project_admin_grid, project_new_form
 from pygdv.widgets.track import track_in_project_grid
 from pygdv.widgets import ModelWithRight
 from pygdv import handler
@@ -111,32 +111,6 @@ class ProjectController(BaseController):
             return reply.normal(request, 'You can upload track on this project', './', {'project' : project})
         
         
-    #@paginate('items', items_per_page=10)
-    def index(self, *args, **kw):
-        user = handler.user.get_user_in_session(request)
-        
-        # user project
-        user_projects = [util.to_datagrid(datagrid.project_grid, user.projects, "Project Listing", len(user.projects)>0)]
-        # shared projects
-#        project_with_rights = handler.project.get_shared_projects(user)
-#
-#        sp = []
-#        for project, rights in project_with_rights.iteritems():
-#            sp.append(ModelWithRight(project, {constants.right_read : constants.right_read in rights,
-#                                               constants.right_download : constants.right_download in rights,
-#                                               constants.right_upload : constants.right_upload in rights}))
-#        shared_projects = [util.to_datagrid(project_with_right, sp, "Shared projects", len(sp)>0)]
-        #TODO check with permissions
-        
-        control = '''
-       
-        '''
-        t = handler.help.tooltip['project']
-        return dict(page='projects', model='project',form_title="New project", items=user_projects, value=kw, tooltip=t)
-    
-
-
-
 
     @expose('json')
     def create(self, *args, **kw):
@@ -171,60 +145,6 @@ class ProjectController(BaseController):
 
         handler.project.delete(project_id=project_id)
         return reply.normal(request, 'Project successfully deleted.', '/tracks', {'success' : 'project deleted'})
-
-
-    def post_delete(self, *args, **kw):
-        user = handler.user.get_user_in_session(request)
-
-        project_id = kw.get('id', None)
-
-        if project_id is not None:
-            if not checker.check_permission_project(user.id, project_id, constants.right_upload_id) and not checker.is_admin(user=user):
-                flash('You must have %s permission to delete the project.' % constants.right_upload, 'error')
-                raise redirect('./')
-        handler.project.delete(project_id=project_id)
-        raise redirect('./')
-
-
-
-
-    def detail(self, project_id):
-        if project_id is None:
-            raise redirect('./')
-        user = handler.user.get_user_in_session(request)
-        if not checker.check_permission_project(user.id, project_id, constants.right_download_id) and not checker.is_admin(user=user):
-            flash('You must have %s permission to view the project.' % constants.right_download, 'error')
-            raise redirect('./')
-
-        # project info
-        project = DBSession.query(Project).filter(Project.id == project_id).first()
-        data = util.to_datagrid(project_grid, [project])
-
-        # track list
-        track_list = [util.to_datagrid(track_in_project_grid, project.tracks, "Tracks associated", len(project.tracks)>0)]
-
-        
-        return dict(page='projects', model='Project detail', info=data,
-                    track_list=track_list)
-
-
-
-
-    def put(self, *args, **kw):
-        user = handler.user.get_user_in_session(request)
-        project_id = args[0]
-        if not checker.check_permission_project(user.id, project_id, constants.right_upload_id) and not checker.is_admin(user=user):
-            flash('You must have %s permission to edit the project.' % constants.right_upload, 'error')
-            raise redirect('/projects')
-        project = DBSession.query(Project).filter(Project.id == project_id).first()
-        handler.project.edit(project, kw['name'],
-                                     project.user_id, tracks=kw['tracks'])
-        raise redirect('/projects')
-
-
-
-
-
 
 
 
@@ -286,106 +206,17 @@ class ProjectController(BaseController):
             tooltip_links=tl, widget=widget, items=cr_data, project_id=project_id)
 
 
-    def post_share(self, project_id, circle_id, *args, **kw):
-        user = handler.user.get_user_in_session(request)
-        if not checker.user_own_project(user.id, project_id) and not checker.is_admin(user=user):
-            flash('You cannot modify a project which is not yours')
-            raise redirect(url('/'))
-        
-        
-        if 'rights_checkboxes' in kw:
-            rights_checkboxes = kw['rights_checkboxes']
-            if not isinstance(rights_checkboxes,list):
-                rights = []
-                rights.append(rights_checkboxes)
-            else :
-                rights = rights_checkboxes
-            handler.project.change_rights(project_id, circle_id, rights)
-
-        else :
-            handler.project.change_rights(project_id, circle_id)
-        raise redirect(url('/projects/share', {'project_id':project_id}))
-
-    def post_share_add(self,project_id, *args, **kw):
-        user = handler.user.get_user_in_session(request)
-        if not checker.user_own_project(user.id, project_id) and not checker.is_admin(user=user):
-            flash('You cannot modify a project which is not yours')
-            raise redirect(url('/'))
-        project = DBSession.query(Project).filter(Project.id == project_id).first()
-        if 'circles' in kw:
-            if isinstance(kw['circles'], list):
-                handler.project.add_read_right_to_circles_ids(project, kw['circles'])
-            else :
-                handler.project.add_read_right(project, kw['circles'])
-        raise redirect(url('/projects/share', {'project_id':project_id}))
-
-    def test(self, n):
-        user = handler.user.get_user_in_session(request)
-        p = handler.project.get_projects_with_permission(user.id, n)
-        raise redirect('./')
-
-    def add_track(self, project_id, *args, **kw):
-        # project info
-        project = DBSession.query(Project).filter(Project.id == project_id).first()
-        data = util.to_datagrid(project_grid, [project])
-        user = handler.user.get_user_in_session(request)
-        if not checker.user_own_project(user.id, project_id) and not checker.is_admin(user=user):
-            flash('You cannot modify a project which is not yours')
-            raise redirect(url('/'))
-        tmpl_context.widget = tracks_available_form
-        tmpl_context.tracks = user.tracks
-        kw['project_id'] = project_id
-        return dict(page='projects', model='Project', info=data, form_title='Add track(s)',
-                    value=kw)
-
-    def add(self, project_id, tracks, **kw):
-        user = handler.user.get_user_in_session(request)
-        if not checker.user_own_project(user.id, project_id) and not checker.is_admin(user=user):
-            flash('You cannot modify a project which is not yours')
-            raise redirect(url('/'))
-        project = DBSession.query(Project).filter(Project.id == project_id).first()
-        if not isinstance(tracks,list):
-                handler.project.add_tracks(project,[tracks])
-        else :
-            handler.project.add_tracks(project,tracks)
-        raise redirect(url('/projects/add_track', {'project_id':project_id}))
-
-
-
-
-
 
     @expose('pygdv.templates.view')
     def view(self, project_id, *args, **kw):
-        
-#        if not GenRep().is_up():
-#            raise redirect(url('/error', {'m': 'Genrep service is down. Please try again later.'}))
-        
-
-
         user = handler.user.get_user_in_session(request)
-
         if not checker.check_permission_project(user.id, project_id, constants.right_read_id) and not checker.is_admin(user=user):
             flash('You must have %s permission to view the project.' % constants.right_read, 'error')
             raise redirect(url('/'))
-
         d = handler.view.prepare_view(project_id, *args, **kw)
-
         return d
     
-    def copy(self, project_id, **kw):
-        user = handler.user.get_user_in_session(request)
-        if 'k' in kw:
-            project = DBSession.query(Project).filter(Project.id == project_id).first()
-            if not kw['k'] == project.download_key:
-                return reply.error(request, 'You have no right to copy this project in your profile.', './', {})
-        elif not checker.check_permission_project(user.id, project_id, constants.right_download_id):
-            return reply.error(request, 'You have no right to copy this project in your profile.', './', {})
-        handler.project.copy(user.id, project_id)
-        return reply.normal(request, 'Copy successfull', '/projects', {})
-        
-        
-        
+
     @require(has_permission('admin', msg='Only for admins'))
     @expose('pygdv.templates.admin_project')
     def admin(self):
