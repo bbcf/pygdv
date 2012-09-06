@@ -14,8 +14,6 @@ import tg, os
 from repoze.what.predicates import has_any_permission
 from pygdv import handler
 from pygdv.lib import util, constants, checker
-from pygdv.widgets.job import job_grid
-from pygdv.widgets.job import job_edit_filler, job_edit_form, job_grid, job_new_form, job_table, job_table_filler
 from tg.decorators import paginate, with_trailing_slash,without_trailing_slash
 from sqlalchemy.sql import and_, or_, not_
 from pygdv.widgets import datagrid
