@@ -12,6 +12,7 @@ import tg
 from pygdv.widgets import datagrid
 
 from pygdv.model import DBSession, Project, User, RightCircleAssociation, Track, Job, Sequence
+from pygdv.widgets.project import project_table,  project_admin_grid, project_with_right, project_table_filler, project_new_form, project_edit_filler, project_edit_form, project_grid,circles_available_form, tracks_available_form, project_sharing_grid, project_grid_sharing
 from pygdv.widgets.track import track_in_project_grid
 from pygdv.widgets import ModelWithRight
 from pygdv import handler
