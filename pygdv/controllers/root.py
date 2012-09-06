@@ -199,7 +199,6 @@ class RootController(BaseController):
     def luigi(self):
         return {}
 
-import tw2.jqplugins.jqgrid as jq
 
 
 class Koopa(object):
