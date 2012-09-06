@@ -64,7 +64,6 @@ class RootController(BaseController):
     
     users = UserController(DBSession, menu_items=models)
     #sequences = SequenceController(DBSession, menu_items=models)
-    tasks = TaskController(DBSession, menu_items=models)
     tracks = TrackController()
     projects = ProjectController()
     circles = CircleController()
