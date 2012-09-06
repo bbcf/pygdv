@@ -8,7 +8,6 @@ from pygdv.controllers.track import TrackController
 from pygdv.controllers.project import ProjectController
 from pygdv.controllers.circle import CircleController
 from pygdv.controllers.worker import WorkerController
-from pygdv.controllers.task import TaskController
 from pygdv.controllers.database import DatabaseController
 from pygdv.controllers.job import JobController
 from pygdv.controllers.public import PublicController
