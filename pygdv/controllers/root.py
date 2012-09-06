@@ -11,11 +11,11 @@ from pygdv.lib import util
 from pygdv.widgets.project import project_admin_grid
 
 
-from pygdv.controllers import ErrorController, LoginController, GroupController
+from pygdv.controllers import ErrorController, LoginController
 from pygdv.controllers import UserController, TrackController
-from pygdv.controllers import SequenceController, ProjectController, CircleController
+from pygdv.controllers import  ProjectController, CircleController
 from pygdv.controllers import RightController, WorkerController, TaskController
-from pygdv.controllers import InputController, DatabaseController, JobController
+from pygdv.controllers import  DatabaseController, JobController
 from pygdv.controllers import PublicController, HelpController, GenRepController
 from pygdv.controllers import SelectionController, PluginController, AdminController
 
@@ -62,11 +62,9 @@ class RootController(BaseController):
    
     
     
-    groups = GroupController(DBSession, menu_items=models)
     users = UserController(DBSession, menu_items=models)
-    sequences = SequenceController(DBSession, menu_items=models)
+    #sequences = SequenceController(DBSession, menu_items=models)
     tasks = TaskController(DBSession, menu_items=models)
-    inputs = InputController(DBSession, menu_items=models)
     tracks = TrackController()
     projects = ProjectController()
     circles = CircleController()

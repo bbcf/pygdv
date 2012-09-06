@@ -11,6 +11,7 @@
   <title py:replace="page"></title>
       ${jquery()}
       ${layout()}
+      ${species()}
   </head>
   
   <body>
@@ -19,7 +20,7 @@
 
     <div class="ui-layout-center">
       <div class="new_form">
-	<div py:replace="tmpl_context.widget(value=value)">Input Form</div>
+	   ${widget.display()}
       </div>
     </div>
     

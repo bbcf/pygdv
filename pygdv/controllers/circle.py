@@ -11,7 +11,6 @@ from tg.decorators import paginate ,with_trailing_slash, without_trailing_slash
 from pygdv.lib.base import BaseController
 
 from pygdv.model import DBSession, Circle, Species, User
-from pygdv.widgets.circle import circle_table, circle_table_filler, circle_new_form, circle_edit_filler, circle_edit_form, circle_grid
 from pygdv.widgets import datagrid, form
 from pygdv import handler
 from pygdv.lib import util, checker, constants

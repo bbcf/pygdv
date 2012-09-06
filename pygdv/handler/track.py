@@ -47,7 +47,7 @@ def pre_track_creation(url=None, file_upload=None, fsys=None, project_id=None, s
     """
     if (file_upload is None or file_upload == '' ) and (url is None or url == '')and (fsys is None or fsys == ''):
         raise Exception("Missing file to upload.")
-
+    if project_id == '': project_id = None
     if url is not None and url != '':
         u = urlparse.urlparse(url)
         if not u.hostname:

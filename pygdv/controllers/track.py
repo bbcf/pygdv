@@ -12,13 +12,13 @@ from tg.controllers import redirect
 from tg.decorators import with_trailing_slash
 
 from pygdv.model import DBSession, Track, Sequence, Input, Task, Project, Species
-from pygdv.widgets.track import track_table, track_export, track_table_filler, track_new_form, track_new_form2, OneMissingSchema, track_edit_form, track_grid, default_track_form
 from pygdv.widgets import datagrid, form
 from pygdv import handler
 from pygdv.lib import util, constants, checker, reply
 from pygdv.worker import tasks
 import tempfile, track
 import tw2.core as twc
+import json
 __all__ = ['TrackController']
 
 
@@ -95,22 +95,26 @@ class TrackController(BaseController):
     @with_trailing_slash
     @expose('pygdv.templates.track_new')
     def new(self, *args, **kw):
-
+        new_form = form.NewTrack(action=url('/tracks/create')).req()
+        project_name = None
+        ass_name = None
+        project_id = None
+        value = {}
         if kw.has_key('pid'):
             project_id = kw.get('pid')
             project = DBSession.query(Project).filter(Project.id == project_id).first()
             project_name = project.name
-            ass_name=project.sequence.name
-            tmpl_context.widget = track_new_form2
-            kw['project_id']=project_id
-            del kw['pid']
+            ass_name = project.sequence.name
+            value['project_id'] = project_id
         else:
-            project_name=None
-            ass_name=None
-            project_id=None
-            tmpl_context.widget = track_new_form
-        
-        return dict(page='tracks', value=kw, model='track', project_id=project_id, project_name=project_name, ass_name=ass_name)
+            species = DBSession.query(Species).all()
+            sp_opts =  [(sp.id,sp.name) for sp in species]
+            new_form.child.children[4].options = sp_opts
+            mapping = json.dumps(dict([(sp.id, [(seq.id, seq.name) for seq in sp.sequences]) for sp in species]))
+            value['smapping'] = mapping
+
+        new_form.value = value
+        return dict(page='tracks', widget=new_form, project_id=project_id, project_name=project_name, ass_name=ass_name)
 
     @expose('json')
     def create(self, *args, **kw):
@@ -125,18 +129,19 @@ class TrackController(BaseController):
         for k, v in kw.iteritems():
             if v == 'None': kw[k] = None
 
-
+        project_id = kw.get('project_id', '')
+        if project_id == '' : project_id = None
         # verify track parameters
         try :
             handler.track.pre_track_creation(url=kw.get('url', None),
                 file_upload=kw.get('file_upload', None),
                 fsys=kw.get('fsys', None),
-                project_id=kw.get('project_id', None),
+                project_id=project_id,
                 sequence_id=kw.get('sequence_id', None))
         except Exception as e:
             print 'Bad params : %s' %e
-            if kw.has_key('project_id'):
-                reply.error(request, str(e), tg.url('./new', {'pid' : kw.get('project_id')}), {})
+            if project_id is not None:
+                reply.error(request, str(e), tg.url('./new', {'pid' : project_id}), {})
             return reply.error(request, str(e), tg.url('./new'), {})
 
         # get parameters
@@ -146,7 +151,7 @@ class TrackController(BaseController):
             fsys=kw.get('fsys', None),
             trackname=kw.get('trackname', None),
             extension=kw.get('extension', None),
-            project_id=kw.get('project_id', None),
+            project_id=project_id,
             sequence_id=kw.get('sequence_id', None))
 
         # upload the track it's from file_upload
@@ -162,12 +167,12 @@ class TrackController(BaseController):
         # check if multiples url or if zipped file
         if util.is_compressed(extension) or (kw.get('url', None)!=None and len(kw.get('url', '').split())>1):
             async = tasks.multiple_track_input.delay(kw.get('uploaded', None), kw.get('file', None), kw.get('url', None), kw.get('fsys', None),
-                sequence_id, user.email, user.key, kw.get('project_id', None), kw.get('force', False), kw.get('delfile', False),
+                sequence_id, user.email, user.key, project_id, kw.get('force', False), kw.get('delfile', False),
                 constants.callback_track_url(), extension)
             return reply.normal(request, 'Processing launched.', '/tracks/', {'task_id' : async.task_id})
         else :
             # create a new track
-            _track = handler.track.new_track(user.id, track_name, sequence_id=sequence_id, admin=False, project_id=kw.get('project_id', None))
+            _track = handler.track.new_track(user.id, track_name, sequence_id=sequence_id, admin=False, project_id=project_id)
 
             # format parameters
             _uploaded = kw.get('uploaded', False)
@@ -190,14 +195,13 @@ class TrackController(BaseController):
             # update the track
             handler.track.update(track=_track, params={'task_id' : async.task_id})
 
-            if kw.has_key('project_id'):
-                return reply.normal(request,'Processing launched.', tg.url('/tracks/', {'pid' : kw.get('project_id')}), {'task_id' : async.task_id,
+            if project_id is not None:
+                return reply.normal(request,'Processing launched.', tg.url('/tracks/', {'pid' : project_id}), {'task_id' : async.task_id,
                                                                                                                   'track_id' : _track.id})
             return reply.normal(request, 'Processing launched.', '/tracks/', {'task_id' : async.task_id,
                                                                         'track_id' : _track.id})
 
     @expose('json')
-    @validate(track_new_form, error_handler=new)
     def post(self, *args, **kw):
         print 'post %s' % kw
         project_id = kw.get('project_id', None)
@@ -267,22 +271,7 @@ class TrackController(BaseController):
         handler.track.edit(track=track, name=kw.get('name', None), color=kw.get('color', None))
         raise redirect('/tracks')
 
-    @expose()
-    @validate(track_edit_form, error_handler=edit)
-    def put(self, *args, **kw):
-        user = handler.user.get_user_in_session(request)
-        _id = args[0]
 
-        if not checker.can_edit_track(user, _id) and not checker.user_is_admin(user.id):
-            flash("You haven't the right to edit any tracks which is not yours")
-            raise redirect('../')
-
-        track = DBSession.query(Track).filter(Track.id == _id).first()
-        track.name = kw['name']
-        if 'color' in kw:
-            track.parameters.color = kw.get('color')
-        DBSession.flush()
-        redirect('../')
 
 
 
@@ -362,22 +351,8 @@ class TrackController(BaseController):
 
 
 
-    @require(has_permission('admin', msg='Only for admins'))
-    @expose('pygdv.templates.form')
-    def default_tracks(self, **kw):
-        tmpl_context.widget = default_track_form
-        return dict(page='tracks', value=kw, title='new default track (visible on all projects with the same assembly)')
 
-    @expose()
-    @require(has_permission('admin', msg='Only for admins'))
-    @validate(default_track_form, error_handler=default_tracks)
-    def default_tracks_upload(self, *args, **kw):
-        user = handler.user.get_user_in_session(request)
-        kw['admin'] = True
-        util.file_upload_converter(kw)
 
-        task_id = tasks.process_track.delay(user.id, **kw)
-        return reply.normal(request, 'Task launched.', '/home', {'task_id' : task_id})
 
     @require(has_permission('admin', msg='Only for admins'))
     @expose('pygdv.templates.track_admin')

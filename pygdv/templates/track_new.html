@@ -11,6 +11,7 @@
   <title py:replace="page"></title>
       ${jquery()}
       ${layout()}
+      ${species()}
   </head>
   
   <body>
@@ -26,12 +27,14 @@
 	  If you want to upload the track on a different assembly, please go <a id="add_track_c" href="${tg.url('/tracks/new')}">here</a>.
 	</p>
       </div>
- 
-      <div class="new_form">
-	<div py:replace="tmpl_context.widget(value=value)">New track formForm</div>
+
+
+        <div class="ui-layout-center">
+            <div class="new_form">
+                ${widget.display()}
+            </div>
+        </div>
       </div>
-    </div>
-    
     
 
       <div id="south" class="ui-layout-south">
@@ -49,7 +52,7 @@
     <ul id="controls">
 
 	    <li><a class="action" href="${tg.url('/tracks/')}${('', '?pid=')[defined('project_id') and project_id != None]}${project_id}">back</a></li>
-	    <li>New $model</li>
+	    <li>New track</li>
     </ul>
 
 

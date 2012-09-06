@@ -11,23 +11,18 @@ from tg.decorators import paginate, with_trailing_slash, without_trailing_slash
 import tg
 from pygdv.widgets import datagrid
 
-from pygdv.model import DBSession, Project, User, RightCircleAssociation, Track, Job, Sequence
-from pygdv.widgets.project import project_admin_grid, project_new_form
-from pygdv.widgets.track import track_in_project_grid
-from pygdv.widgets import ModelWithRight
+from pygdv.model import DBSession, Project, User, Species, Track, Job, Sequence
+from pygdv.widgets import datagrid, form
 from pygdv import handler
 from pygdv.lib import util, plugin
 import os, json, urllib2
-from pygdv.widgets import form
 import transaction
-from pygdv import handler
 from pygdv.lib import checker
-from pygdv.lib.jbrowse import util as jb
 from pygdv.lib import constants, reply
 import tw2.core as twc
 from sqlalchemy.sql import and_, or_, not_
 from sqlalchemy.orm import aliased
-import re
+import json
 
 __all__ = ['ProjectController']
 
@@ -36,12 +31,16 @@ class ProjectController(BaseController):
     allow_only = has_any_permission(constants.perm_user, constants.perm_admin)
 
 
+
     @expose('pygdv.templates.project_new')
     def new(self, *args, **kw):
-        tmpl_context.widget = project_new_form
-        user = handler.user.get_user_in_session(request)
-        #tmpl_context.circles=user.circles
-        return dict(page='projects', value=kw, model='project')
+        new_form = form.NewProject(action=url('/projects/create')).req()
+        species = DBSession.query(Species).all()
+        sp_opts =  [(sp.id,sp.name) for sp in species]
+        new_form.child.children[2].options = sp_opts
+        mapping = json.dumps(dict([(sp.id, [(seq.id, seq.name) for seq in sp.sequences]) for sp in species]))
+        new_form.value = {'smapping' : mapping}
+        return dict(page='projects', widget=new_form)
 
 
     @with_trailing_slash
@@ -114,22 +113,22 @@ class ProjectController(BaseController):
 
     @expose('json')
     def create(self, *args, **kw):
+        print 'create %s, %s' % (args, kw)
         user = handler.user.get_user_in_session(request)
         if not 'name' in kw:
-            return reply.error(request, 'Missing project `name`.', './', {})
+            return reply.error(request, 'Missing project `name`.', url('/tracks'), {})
         
         if not 'assembly' in kw:
-            return reply.error(request, 'Missing project `assembly` identifier.', './', {})
+            return reply.error(request, 'Missing project `assembly` identifier.',  url('/tracks'), {})
 
         sequence = DBSession.query(Sequence).filter(Sequence.id == int(kw.get('assembly'))).first()
         if sequence is None:
             return reply.error(request, "Assembly doesn't exist in GDV.", './', {})
 
         project = handler.project.create(kw['name'], kw['assembly'], user.id)
-        return reply.normal(request, 'Project successfully created.', '/tracks', {'project' : project})  
+        return reply.normal(request, 'Project successfully created.',  url('/tracks'), {'project' : project})
     
     @expose()
-    @validate(project_new_form, error_handler=new)
     def post(self, *args, **kw):
         return self.create(*args, **kw)
 

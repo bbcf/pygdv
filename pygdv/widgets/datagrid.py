@@ -251,7 +251,18 @@ circle_description_grid = twf.DataGrid(fields=[
 
 
 
-
+project_admin_grid = twf.DataGrid(fields=[
+    ('Id', 'id'),
+    ('Name', 'name'),
+    ('User', 'user'),
+    ('Created', 'created'),
+    ('Assembly', 'assembly'),
+    ('Circles', 'get_circle_with_right_display'),
+    ('Tracks', 'get_tracks'),
+    ('Action', lambda obj:genshi.Markup(
+        helpers.get_view_link(obj.id, 'project_id', constants.full_rights)
+    ))
+])
 
 
 
