@@ -8,7 +8,6 @@
 #*#
 *.log.*
 /production.ini
-/pygdv/public/data/*
 /*_ctl
 *.class
 .idea

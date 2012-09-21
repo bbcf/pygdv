@@ -95,21 +95,23 @@ class TrackController(BaseController):
     @with_trailing_slash
     @expose('pygdv.templates.track_new')
     def new(self, *args, **kw):
-        new_form = form.NewTrack(action=url('/tracks/create')).req()
+
         project_name = None
         ass_name = None
         project_id = None
         value = {}
         if kw.has_key('pid'):
+            new_form = form.NewTrackPrefilled(action=url('/tracks/create')).req()
             project_id = kw.get('pid')
             project = DBSession.query(Project).filter(Project.id == project_id).first()
             project_name = project.name
             ass_name = project.sequence.name
             value['project_id'] = project_id
         else:
+            new_form = form.NewTrack(action=url('/tracks/create')).req()
             species = DBSession.query(Species).all()
             sp_opts =  [(sp.id,sp.name) for sp in species]
-            new_form.child.children[4].options = sp_opts
+            new_form.child.children[3].options = sp_opts
             mapping = json.dumps(dict([(sp.id, [(seq.id, seq.name) for seq in sp.sequences]) for sp in species]))
             value['smapping'] = mapping
 

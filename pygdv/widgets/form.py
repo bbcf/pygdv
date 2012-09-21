@@ -73,12 +73,16 @@ class MultipleFileUpload(twd.GrowingGridLayout):
 class NewTrack(twf.TableForm):
     file_upload = twf.FileField(label='Upload : ', help_text='Upload file from filesystem')
     url = twf.TextField(label='Url : ', help_text='Provide an url')
-    project_id = twf.HiddenField()
     smapping = twf.HiddenField()
-    species = twf.SingleSelectField(label='Species : ')
+    species = twf.SingleSelectField(label='Species :')
     assembly = twf.SingleSelectField(label='Assembly :', options=[])
     submit = twf.SubmitButton(id="submit", value="New")
 
+class NewTrackPrefilled(twf.TableForm):
+    file_upload = twf.FileField(label='Upload : ', help_text='Upload file from filesystem')
+    url = twf.TextField(label='Url : ', help_text='Provide an url')
+    project_id = twf.HiddenField()
+    submit = twf.SubmitButton(id="submit", value="New")
 
     # project
 class EditProject(twf.TableForm):
