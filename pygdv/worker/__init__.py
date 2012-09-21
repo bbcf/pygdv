@@ -4,7 +4,9 @@ from pkg_resources import resource_filename
 
 import tg
 #
-os.environ['CELERY_CONFIG_MODULE'] = tg.config['celery.config.file']
+
+if 'celery.config.file' in tg.config:
+    os.environ['CELERY_CONFIG_MODULE'] = tg.config['celery.config.file']
 #import celery
 #print dir(celery)
 #
