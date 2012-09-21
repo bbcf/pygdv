@@ -4,17 +4,15 @@
 from tg import expose, flash, require, request, url
 
 from pygdv.lib.base import BaseController
-from pygdv.model import DBSession, Project
+from pygdv.model import DBSession
 from repoze.what.predicates import has_permission, has_any_permission
 from tg.controllers import redirect
-from pygdv.lib import util
-from pygdv.widgets.project import project_admin_grid
 
 
 from pygdv.controllers import ErrorController, LoginController
 from pygdv.controllers import TrackController
 from pygdv.controllers import  ProjectController, CircleController
-from pygdv.controllers import WorkerController, SequenceController
+from pygdv.controllers import  SequenceController
 from pygdv.controllers import  DatabaseController, JobController
 from pygdv.controllers import PublicController, HelpController, GenRepController
 from pygdv.controllers import SelectionController, PluginController, AdminController
@@ -69,7 +67,6 @@ class RootController(BaseController):
     jobs = JobController()
     public = PublicController()
     admin = AdminController()
-    #workers = WorkerController()
     help = HelpController()
     genrep = GenRepController()
     database = DatabaseController()
