@@ -3,7 +3,6 @@
 
 from pygdv.controllers.error import ErrorController
 from pygdv.controllers.login import LoginController
-from pygdv.controllers.user import UserController
 from pygdv.controllers.track import TrackController
 from pygdv.controllers.project import ProjectController
 from pygdv.controllers.circle import CircleController
