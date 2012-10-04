@@ -158,7 +158,8 @@ class TrackController(BaseController):
 
         # upload the track it's from file_upload
         if request.environ[constants.REQUEST_TYPE] == constants.REQUEST_TYPE_BROWSER :
-            fu = kw.get('file_upload', None)
+            fu = kw.get('file_upload', '')
+            if fu == '': fu = None
             if fu is not None:
                 kw['uploaded']=True
                 _f = util.download(file_upload=fu,
