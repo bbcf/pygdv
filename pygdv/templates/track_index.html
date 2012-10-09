@@ -65,22 +65,33 @@
     
     <div id="center_stack" class="ui-layout-center crud_table">
     ${flash()}
-      <div py:for="item in track_list">
-	<div py:choose="item.grid_display">
+        <div py:for="item in track_list">
+	    <div py:choose="item.grid_display">
 	  
-	  <div py:when="True">
-	    <div py:content="item.grid(item.grid_data)"></div>
-	  </div>
-	  <div py:when="False">
-	      <h3>No tracks here, you may want to 
-		<a href="${tg.url('/tracks/new')}${('', '?pid=')[defined('project_id') and project_id != None]}${project_id}">
-		  upload</a> new one.</h3> or
-	      <h3>	<a href="${tg.url('/projects/edit')}/${project_id}">
-		  edit</a> the project.</h3>
-	      
-	  </div>
-	</div>
-      </div>
+	        <div py:when="True">
+	            <div py:content="item.grid(item.grid_data)"></div>
+	        </div>
+
+            <div py:when="False">
+	            <h3>No tracks here, you may want to
+		        <a href="${tg.url('/tracks/new')}${('', '?pid=')[defined('project_id') and project_id != None]}${project_id}">
+		        upload</a> new one.</h3> or
+
+                <div py:choose="len(project_list) > 0">
+                    <div py:when="True">
+                        <h3>	<a href="${tg.url('/projects/edit')}/${project_id}">
+                        edit</a> the project.</h3>
+                    </div>
+
+                    <div py:when="False">
+                        <h3>	<a href="${tg.url('/projects/new')}">
+                        create</a> a new project.</h3>
+                    </div>
+
+                </div>
+	        </div>
+	    </div>
+        </div>
     </div>
   
   <div id="south" class="ui-layout-south">
