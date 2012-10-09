@@ -5,7 +5,7 @@
 
 //MODIFY HERE
 var _GDV_PROXY = 'http://' + window.location.host;
-var _GDV_PREFIX = "/pygdv"
+var _GDV_PREFIX = "";
 var _GDV_URL=_GDV_PROXY + _GDV_PREFIX;
 
 //GLOBAL VARIABLES
