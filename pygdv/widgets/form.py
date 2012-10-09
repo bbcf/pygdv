@@ -84,6 +84,13 @@ class NewTrackPrefilled(twf.TableForm):
     project_id = twf.HiddenField()
     submit = twf.SubmitButton(id="submit", value="New")
 
+class NewTrackSequence(twf.TableForm):
+    file_upload = twf.FileField(label='Upload : ', help_text='Upload file from filesystem')
+    url = twf.TextField(label='Url : ', help_text='Provide an url')
+    sequence_id = twf.HiddenField()
+    track_admin = twf.HiddenField()
+    submit = twf.SubmitButton(id="submit", value="New")
+
     # project
 class EditProject(twf.TableForm):
     pid = twf.HiddenField()

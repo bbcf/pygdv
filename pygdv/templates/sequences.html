@@ -11,6 +11,7 @@
   <title py:replace="page"></title>
       ${jquery()}
       ${layout()}
+      ${datatable()}
       ${species()}
   </head>
   
@@ -22,7 +23,7 @@
       <div class="new_form">
 	   ${widget.display()}
       </div>
-       <div class="center_stack">
+       <div class="center_stack crud_table">
            <div py:for="item in grid">
                <div py:choose="item.grid_display">
                    <div py:when="True">

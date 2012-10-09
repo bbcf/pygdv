@@ -25,7 +25,7 @@ __all__ = ['Right', 'Circle', 'Project',
            'Track', 'Task', 'Input',
            'Sequence',
            'Species',
-           'Job', 'Result', 'TMPTrack',
+           'Job', 'Result',
            'Selection', 'Location']
 
 
@@ -56,6 +56,15 @@ default_track_table = Table('default_tracks', metadata,
          ondelete="CASCADE"), primary_key=True),
         Column('sequence_id', Integer, ForeignKey('Sequence.id',
          ondelete="CASCADE"), primary_key=True)
+)
+
+
+
+sequence_users_table = Table('sequence_users', metadata,
+    Column('sequence_id', Integer, ForeignKey('Sequence.id',
+        ondelete="CASCADE"), primary_key=True),
+    Column('user_id', Integer, ForeignKey('User.id',
+        ondelete="CASCADE"), primary_key=True)
 )
 
 class Right(DeclarativeBase):
@@ -240,14 +249,16 @@ class Sequence(DeclarativeBase):
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Unicode(255), nullable=False)
     species_id = Column(Integer, ForeignKey('Species.id', ondelete="CASCADE"), nullable=False)
-    
+    public = Column(Boolean, default=True)
     default_tracks = relationship('Track', secondary=default_track_table)
-    
+    users = relationship('User', secondary=sequence_users_table)
+
     def __repr__(self):
         return '<Sequence: id=%r, name=%r, species_id=%r>' % (self.id,self.name,self.species_id)
     def __str__(self):
-        return self.name  
-    
+        return self.name
+
+
 class Species(DeclarativeBase):
     '''
     Species.
@@ -444,34 +455,6 @@ class Track(DeclarativeBase):
         return self.input.sha1 + '.sql'
     
 
-class TMPTrack(DeclarativeBase):
-    '''
-    Represent a track on the view.
-    '''
-    __tablename__ = 'TMPTrack'
-    
-    
-    # columns
-    id = Column(Integer, autoincrement=True, primary_key=True)
-    name = Column(Unicode(255), nullable=False)
-    user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=True)
-    
-    status = Column(statuses, nullable=False, default='UPLOADING')
-    
-    sequence_id = Column(Integer, ForeignKey('Sequence.id', ondelete="CASCADE"), nullable=False)
-    sequence = relationship("Sequence")
-    
-    traceback = Column(Text)
-    
-    @property
-    def vizu(self):
-        return '-'
-    @property
-    def created(self):
-        return '-'
-    @property
-    def tmp(self):
-        return True
     
     
 class TrackParameters(DeclarativeBase):

@@ -93,7 +93,7 @@ $(document).ready(function() {
     $('.crud_table .grid').dataTable( {
         "bStateSave" : true,
         "aaSorting": [ [0,'asc'], [1,'asc'] ],
-        "bPaginate" : false,
+        "bPaginate" : false
     });
 
 });

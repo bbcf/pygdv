@@ -66,7 +66,7 @@ def pre_track_creation(url=None, file_upload=None, fsys=None, project_id=None, s
     if sequence_id is None:
         sequence_id = project.sequence_id
     sequence = DBSession.query(Sequence).filter(Sequence.id == sequence_id).first()
-    if sequence is None:
+    if sequence is None or sequence == '':
         raise Exception('Sequence not found on GDV. Ask an admin to upload it.')
 
 def fetch_track_parameters(url=None, file_upload=None, fsys=None, trackname=None, extension=None, project_id=None, sequence_id=None):
@@ -135,6 +135,12 @@ def new_track(user_id, track_name, sequence_id, admin=False, project_id=None):
         DBSession.add(project)
 
     DBSession.add(_track)
+
+    if admin:
+        seq = DBSession.query(Sequence).filter(Sequence.id == sequence_id).first()
+        seq.default_tracks.append(_track)
+        DBSession.add(seq)
+
     DBSession.flush()
 
     return _track

@@ -2,10 +2,10 @@ from pygdv.lib.base import BaseController
 
 
 from repoze.what.predicates import has_permission
-from tg import expose, flash, request, url
+from tg import expose, flash, request, url, abort
 from tg.controllers import redirect
 import json
-from pygdv.model import DBSession, Sequence, Species
+from pygdv.model import DBSession, Sequence, Species, Group
 from pygdv.widgets import datagrid, form
 from pygdv.lib import constants, util
 from pygdv.handler import genrep
@@ -71,3 +71,65 @@ class SequenceController(BaseController):
             sequences = DBSession.query(Sequence).all()
             seq_grid = [util.to_datagrid(grid, sequences, "Sequences", len(sequences)>0)]
             return dict(page="sequences", widget=seq_form, grid=seq_grid)
+
+    @expose('pygdv.templates.sequence_edit')
+    def edit(self, *args, **kw):
+        user = handler.user.get_user_in_session(request)
+
+        # get circle id
+        if request.method == 'GET':
+            sequence_id = args[0]
+        else :
+            sequence_id = kw.get('cid')
+
+        sequence_id=int(sequence_id)
+        sequence = DBSession.query(Sequence).filter(Sequence.id == sequence_id).first()
+        if not sequence:
+            abort(404, 'Sequence with id %s not found' % sequence_id)
+
+        if not sequence.public:
+            add_user_widget = form.AddUser(action=url('/sequences/edit/%s' % sequence_id)).req()
+
+            if request.method == 'POST':
+                # add an user
+                mail = kw.get('mail')
+                try:
+                    add_user_widget.validate({'cid' : sequence_id, 'mail' : mail})
+                except twc.ValidationError as e:
+                    users = ', '.join(['%s' % u.email for u in sequence.users])
+                    default_tracks = ', '.join(['%s' % t.name for t in sequence.default_tracks])
+                    kw['cid'] = sequence_id
+                    widget = e.widget
+                    widget.value = kw
+                    return dict(page='sequences', users=users, add_user_widget=widget, default_tracks=default_tracks, au_error=True, seq_id=sequence_id)
+
+                to_add = DBSession.query(User).filter(User.email == mail).first()
+                if to_add is None:
+                    to_add = handler.user.create_tmp_user(mail)
+                sequence.users.append(to_add)
+                DBSession.flush()
+
+            kw['cid'] = sequence_id
+            add_user_widget.value = kw
+
+        else:
+            add_user_widget = None
+
+        users = ['%s' % u.email for u in sequence.users]
+        default_tracks = ['%s' % t.name for t in sequence.default_tracks]
+
+
+        return dict(page='sequences', users=users, add_user_widget=add_user_widget, default_tracks=default_tracks, au_error=False, seq_id=sequence_id)
+
+
+    @expose('pygdv.templates.sequence_add')
+    def add(self, *args, **kw):
+
+        sequence_id = int(args[0])
+        value = {}
+        new_form = form.NewTrackSequence(action=url('/tracks/create')).req()
+        value['sequence_id'] = sequence_id
+        value['track_admin'] = True
+        new_form.value = value
+        return dict(page='sequences', widget=new_form, seq_id=sequence_id)
+

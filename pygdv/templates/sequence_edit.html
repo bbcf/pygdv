@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:pf="http://www.w3.org/1999/html">
+
+  <xi:include href="master.html" />
+  <xi:include href="definitions.html"/>
+
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
+  <title py:replace="page"></title>
+    ${jquery()}
+    ${layout()}
+    ${datatable()}
+</head>
+<body>
+  
+
+
+    
+    <div class="ui-layout-center crud_table">
+      ${flash()}
+
+        Read access granted to :
+        <py:if test="add_user_widget or add_user_widget == None">
+            Everyone
+      </py:if>
+      <ul py:for="item in users">
+          <li>${item}</li>
+       </ul>
+
+       <br/><br/><br/><br/>
+
+        Default tracks are :
+        <ul py:for="item in default_tracks">
+            <li>${item}</li>
+        </ul>
+       <br/>  <br/>
+        <a href="${tg.url('/sequences/add/')}${seq_id}">Add a Track</a>.
+    </div>
+
+     <div id="south" class="ui-layout-south">
+    ${footer()}
+  </div>
+     
+
+    <div id="north" class="ui-layout-north">
+      ${header()}
+      ${mainmenu()}
+      <ul id="controls" class="ui-layout-north">
+        <li>
+            <a href="${tg.url('/sequences')}">back</a>
+        </li>
+        <li><span>Editing sequence</span></li>
+          <py:if test="add_user_widget and add_user_widget != None">
+            <li>
+              <a id="add_user_c" href="#">Add user</a>
+            </li>
+            <li>
+                <div class="add_user_c" style="${('display:none', '')[defined('au_error')]}">
+                    <span py:replace="add_user_widget.display()">Add User Form</span>
+                </div>
+            </li>
+          </py:if>
+      </ul>
+    </div>
+
+
+</body>
+</html>

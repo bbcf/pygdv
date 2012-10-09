@@ -20,9 +20,17 @@ def hide_info(dict):
 
 sequences_grid = twf.DataGrid(fields=[
     ('ID', 'id'),
+    (hoover_action, lambda obj : hoover_actions(
+        helpers.edit_link(obj.id, url('/sequences'))
+    )),
     ('SPECIES', 'species.name'),
-    ('NAME', 'name')
+    ('NAME', 'name'),
+    ('TRACKS', lambda obj: ', '.join(['%s' % (t.name) for t in obj.default_tracks])),
+    ('PUBLIC', 'public'),
+    ('USERS', lambda obj: ', '.join(['%s' % (u.email) for u in obj.users]))
+
 ])
+
 
 job_grid = twf.DataGrid(fields=[
     ('Name', 'name'),

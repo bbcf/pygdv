@@ -20,5 +20,3 @@ def add_new_sequence(sequence):
     
     
     
-
-
