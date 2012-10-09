@@ -5,7 +5,7 @@ from repoze.what.predicates import has_permission
 from tg import expose, flash, request, url, abort
 from tg.controllers import redirect
 import json
-from pygdv.model import DBSession, Sequence, Species, Group
+from pygdv.model import DBSession, Sequence, Species, Group, Track
 from pygdv.widgets import datagrid, form
 from pygdv.lib import constants, util
 from pygdv.handler import genrep
@@ -99,9 +99,12 @@ class SequenceController(BaseController):
                     users = ', '.join(['%s' % u.email for u in sequence.users])
                     default_tracks = ', '.join(['%s' % t.name for t in sequence.default_tracks])
                     kw['cid'] = sequence_id
+                    users = sequence.users
+                    for u in users:
+                        u.__dict__['sid'] = sequence_id
                     widget = e.widget
                     widget.value = kw
-                    return dict(page='sequences', users=users, add_user_widget=widget, default_tracks=default_tracks, au_error=True, seq_id=sequence_id)
+                    return dict(page='sequences', users=users, add_user=add_user, add_user_widget=add_user_widget, default_tracks=default_tracks, au_error=True, seq_id=sequence_id)
 
                 to_add = DBSession.query(User).filter(User.email == mail).first()
                 if to_add is None:
@@ -115,11 +118,19 @@ class SequenceController(BaseController):
         else:
             add_user_widget = None
 
-        users = ['%s' % u.email for u in sequence.users]
-        default_tracks = ['%s' % t.name for t in sequence.default_tracks]
+        users = sequence.users
+        for u in users:
+            u.__dict__['sid'] = sequence_id
 
+        tracks = sequence.default_tracks
+        for t in tracks:
+            t.__dict__['sid'] = sequence_id
 
-        return dict(page='sequences', users=users, add_user_widget=add_user_widget, default_tracks=default_tracks, au_error=False, seq_id=sequence_id)
+        add_user = util.to_datagrid(datagrid.sequence_user_grid, users, "Users", len(users)>0)
+
+        def_tracks = util.to_datagrid(datagrid.sequence_default_tracks, tracks, "Default tracks", len(tracks)>0)
+
+        return dict(page='sequences', users=users, add_user=add_user, add_user_widget=add_user_widget, default_tracks=def_tracks, au_error=False, seq_id=sequence_id)
 
 
     @expose('pygdv.templates.sequence_add')
@@ -133,3 +144,20 @@ class SequenceController(BaseController):
         new_form.value = value
         return dict(page='sequences', widget=new_form, seq_id=sequence_id)
 
+    @expose()
+    def delete_user(self, user_id, sequence_id):
+        user = handler.user.get_user_in_session(request)
+        s = DBSession.query(Sequence).filter(Sequence.id == sequence_id).first()
+        u = DBSession.query(User).filter(User.id == user_id).first()
+        s.users.remove(u)
+        DBSession.flush()
+        raise redirect('/sequences/edit/%s' % sequence_id)
+
+    @expose()
+    def delete_track(self, sequence_id, track_id):
+        user = handler.user.get_user_in_session(request)
+        s = DBSession.query(Sequence).filter(Sequence.id == sequence_id).first()
+        t = DBSession.query(Track).filter(Track.id == track_id).first()
+        s.default_tracks.remove(t)
+        DBSession.flush()
+        raise redirect('/sequences/edit/%s' % sequence_id)

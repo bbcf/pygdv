@@ -23,19 +23,28 @@
       ${flash()}
 
         Read access granted to :
-        <py:if test="add_user_widget or add_user_widget == None">
-            Everyone
-      </py:if>
-      <ul py:for="item in users">
-          <li>${item}</li>
-       </ul>
+
+        <div py:choose="add_user.grid_display">
+            <div py:when="True">
+                <div py:content="add_user.grid(add_user.grid_data)"></div>
+            </div>
+            <div py:when="False">
+            Everyone.
+            </div>
+        </div>
+
 
        <br/><br/><br/><br/>
 
         Default tracks are :
-        <ul py:for="item in default_tracks">
-            <li>${item}</li>
-        </ul>
+        <div py:choose="default_tracks.grid_display">
+            <div py:when="True">
+                <div py:content="default_tracks.grid(default_tracks.grid_data)"></div>
+            </div>
+            <div py:when="False">
+                No tracks.
+            </div>
+        </div>
        <br/>  <br/>
         <a href="${tg.url('/sequences/add/')}${seq_id}">Add a Track</a>.
     </div>
@@ -53,7 +62,8 @@
             <a href="${tg.url('/sequences')}">back</a>
         </li>
         <li><span>Editing sequence</span></li>
-          <py:if test="add_user_widget and add_user_widget != None">
+
+          <py:if test="add_user.grid_display">
             <li>
               <a id="add_user_c" href="#">Add user</a>
             </li>

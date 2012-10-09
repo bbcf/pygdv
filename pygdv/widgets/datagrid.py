@@ -163,7 +163,7 @@ project_grid = twf.DataGrid(fields = [
         helpers.get_view_link(obj.id, 'project_id', constants.full_rights)
                     + helpers.share_link(obj.id)
                     #+ helpers.get_copy_project_link(obj.id, constants.full_rights)
-                    + helpers.edit_link(obj.id, url('/projects')),
+                    + helpers.edit_link(obj.id, url('/projects'))
                     #+ helpers.get_detail_link(obj.id, 'project_id', constants.full_rights)
                     })),
         ('Created', 'created'),
@@ -261,8 +261,30 @@ circle_description_grid = twf.DataGrid(fields=[
     
 ])
 
+sequence_user_grid = twf.DataGrid(fields=[
+    ('Name', 'name'),
+        (hoover_action,lambda obj : hoover_actions(
+        helpers.get_remove_user_from_sequence_link(obj.id, obj.sid)
+    )),
+    ('Firstname', 'firstname'),
+    ('Email', 'email')
+])
 
-
+sequence_default_tracks = twf.DataGrid(fields=[
+    ('Name', 'name'),
+        (hoover_action, lambda obj : hoover_actions(
+        helpers.edit_link(obj.id, url('/tracks'))
+        + helpers.get_remove_track_from_sequence_link(obj.id, obj.sid)
+    )),
+    ('Color', lambda obj : genshi.Markup(helpers.track_color(obj))),
+    ('Created', 'created'),
+    ('Assembly', 'sequence'),
+    ('Type', 'vizu'),
+    (hidden_info, lambda obj : hide_info({
+        'tr_id' : obj.id,
+        'tr_status': obj.status,
+        })),
+])
 
 project_admin_grid = twf.DataGrid(fields=[
     ('Id', 'id'),
