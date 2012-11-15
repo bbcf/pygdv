@@ -100,13 +100,20 @@ class ProjectController(BaseController):
     @with_trailing_slash
     @expose('json')
     def get(self, project_key, **kw):
-        project = DBSession.query(Project).filter(Project.key == project_key).first()
+       if project_key is None and project_id is None:
+            projects = DBSession.query(Project).filter(Project.key == project_key).all()
+            return replay.normal(request, 'You can upload track on these projects', './', {'projects': projects})
+        project = None
+        if project_id is not None:
+            project = DBSession.query(Project).filter(Project.id == project_id).first()
+        else:
+            project = DBSession.query(Project).filter(Project.key == project_key).first()
         if project is None:
             return reply.error(request, 'Wrong key', './', {})
         user = handler.user.get_user_in_session(request)
         if not checker.check_permission_project(user.id, project.id, constants.right_upload_id):
             return reply.error(request, 'Wrong key', './', {})
-        else :
+        else:
             return reply.normal(request, 'You can upload track on this project', './', {'project' : project})
         
         
