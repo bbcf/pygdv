@@ -93,14 +93,9 @@ class ProjectController(BaseController):
 
 
 
-
-
-
-
-    
     @with_trailing_slash
     @expose('json')
-    def get(self, project_key, **kw):
+    def get(self, project_key=None, project_id=None, **kw):
         if project_key is None and project_id is None:
             projects = DBSession.query(Project).filter(Project.key == project_key).all()
             return replay.normal(request, 'You can upload track on these projects', './', {'projects': projects})
