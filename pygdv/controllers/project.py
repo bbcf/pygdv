@@ -96,12 +96,12 @@ class ProjectController(BaseController):
     @with_trailing_slash
     @expose('json')
     def get(self, project_key=None, project_id=None, **kw):
-        if project_key is None and project_id is None:
+        if not project_key and not project_id:
             projects = DBSession.query(Project).filter(Project.key == project_key).all()
             return replay.normal(request, 'You can upload track on these projects', './', {'projects': projects})
         project = None
         if project_id is not None:
-            project = DBSession.query(Project).filter(Project.id == project_id).first()
+            project = DBSession.query(Project).filter(Project.id == int(project_id)).first()
         else:
             project = DBSession.query(Project).filter(Project.key == project_key).first()
         if project is None:
