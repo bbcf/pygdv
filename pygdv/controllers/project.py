@@ -98,7 +98,7 @@ class ProjectController(BaseController):
     def get(self, project_key=None, project_id=None, **kw):
         if not project_key and not project_id:
             projects = DBSession.query(Project).filter(Project.key == project_key).all()
-            return replay.normal(request, 'You can upload track on these projects', './', {'projects': projects})
+            return reply.normal(request, 'You can upload track on these projects', './', {'projects': projects})
         project = None
         if project_id is not None:
             project = DBSession.query(Project).filter(Project.id == int(project_id)).first()
