@@ -11,7 +11,7 @@ from tg import expose, flash, require, tmpl_context, validate, request, response
 from tg.controllers import redirect
 from tg.decorators import with_trailing_slash
 
-from pygdv.model import DBSession, Track, Sequence, Input, Task, Project, Species
+from pygdv.model import DBSession, Track, Sequence, Input, Task, Project, Species, Group
 from pygdv.widgets import datagrid, form
 from pygdv import handler
 from pygdv.lib import util, constants, checker, reply
@@ -146,6 +146,12 @@ class TrackController(BaseController):
                 reply.error(request, str(e), tg.url('./new', {'pid' : project_id}), {})
             return reply.error(request, str(e), tg.url('./new'), {})
 
+        admin = kw.get('track_admin', False)
+        if admin:
+            # check if really admin
+            group_admin = DBSession.query(Group).filter(Group.id == constants.group_admins_id).first()
+            if user not in group_admin.users:
+                admin = False
         # get parameters
         track_name, extension, sequence_id = handler.track.fetch_track_parameters(
             url=kw.get('url', None),
@@ -158,7 +164,8 @@ class TrackController(BaseController):
 
         # upload the track it's from file_upload
         if request.environ[constants.REQUEST_TYPE] == constants.REQUEST_TYPE_BROWSER :
-            fu = kw.get('file_upload', None)
+            fu = kw.get('file_upload', '')
+            if fu == '': fu = None
             if fu is not None:
                 kw['uploaded']=True
                 _f = util.download(file_upload=fu,
@@ -174,7 +181,7 @@ class TrackController(BaseController):
             return reply.normal(request, 'Processing launched.', '/tracks/', {'task_id' : async.task_id})
         else :
             # create a new track
-            _track = handler.track.new_track(user.id, track_name, sequence_id=sequence_id, admin=False, project_id=project_id)
+            _track = handler.track.new_track(user.id, track_name, sequence_id=sequence_id, admin=admin, project_id=project_id)
 
             # format parameters
             _uploaded = kw.get('uploaded', False)

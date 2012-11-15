@@ -44,5 +44,6 @@ def get_assemblies_not_created_from_species_id(species_id):
 
 
 
-
+def checkright(sequence, user):
+    return True
 

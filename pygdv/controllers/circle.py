@@ -119,8 +119,8 @@ class CircleController(BaseController):
             except twc.ValidationError as e:
                 for u in circle.users:
                     u.__dict__['cid'] = circle_id
-                    wrappers = [u for u in circle.users if u.id != user.id]
-                    data = [util.to_datagrid(datagrid.circle_description_grid, wrappers, grid_display=len(wrappers)>0)]
+                wrappers = [u for u in circle.users if u.id != user.id]
+                data = [util.to_datagrid(datagrid.circle_description_grid, wrappers, grid_display=len(wrappers)>0)]
                 return dict(page='circles', name=circle.name, widget=e.widget, items=data, value=kw, tooltip=t, au_error=True)
 
             to_add = DBSession.query(User).filter(User.email == mail).first()

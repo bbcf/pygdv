@@ -46,6 +46,14 @@ def get_job_results_display(job, u):
     return ', '.join([link(res.id, res.name) for res in job.results])
 
 
+def get_remove_user_from_sequence_link(user_id, sequence_id):
+    return '''<a class="action" onclick="return confirm('Are you sure?')"; title="delete" href="%s" style="text-decoration:none"><img src="images/delete.png"
+     width="15px" height="15px"/>Delete</a>''' % (url('/sequences/delete_user', params={'sequence_id': sequence_id, 'user_id' :user_id }))
+
+
+def get_remove_track_from_sequence_link(track_id, sequence_id):
+    return '''<a class="action" onclick="return confirm('Are you sure?')"; title="delete" href="%s" style="text-decoration:none"><img src="images/delete.png"
+     width="15px" height="15px"/>Delete</a>''' % (url('/sequences/delete_track', params={'track_id': track_id, 'sequence_id' :sequence_id }))
 
 def get_delete_circle_description_link(user_id, circle_id):
     return '''<a class="action" onclick="return confirm('Are you sure?')"; title="delete" href="%s" style="text-decoration:none"><img src="images/delete.png"

@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:pf="http://www.w3.org/1999/html">
+
+  <xi:include href="master.html" />
+  <xi:include href="definitions.html"/>
+
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
+  <title py:replace="page"></title>
+    ${jquery()}
+    ${layout()}
+    ${datatable()}
+</head>
+<body>
+  
+
+
+    
+    <div class="ui-layout-center crud_table">
+      ${flash()}
+
+        Read access granted to :
+
+        <div py:choose="add_user.grid_display">
+            <div py:when="True">
+                <div py:content="add_user.grid(add_user.grid_data)"></div>
+            </div>
+            <div py:when="False">
+            Everyone.
+            </div>
+        </div>
+
+
+       <br/><br/><br/><br/>
+
+        Default tracks are :
+        <div py:choose="default_tracks.grid_display">
+            <div py:when="True">
+                <div py:content="default_tracks.grid(default_tracks.grid_data)"></div>
+            </div>
+            <div py:when="False">
+                No tracks.
+            </div>
+        </div>
+       <br/>  <br/>
+        <a href="${tg.url('/sequences/add/')}${seq_id}">Add a Track</a>.
+    </div>
+
+     <div id="south" class="ui-layout-south">
+    ${footer()}
+  </div>
+     
+
+    <div id="north" class="ui-layout-north">
+      ${header()}
+      ${mainmenu()}
+      <ul id="controls" class="ui-layout-north">
+        <li>
+            <a href="${tg.url('/sequences')}">back</a>
+        </li>
+        <li><span>Editing sequence</span></li>
+
+          <py:if test="add_user.grid_display">
+            <li>
+              <a id="add_user_c" href="#">Add user</a>
+            </li>
+            <li>
+                <div class="add_user_c" style="${('display:none', '')[defined('au_error')]}">
+                    <span py:replace="add_user_widget.display()">Add User Form</span>
+                </div>
+            </li>
+          </py:if>
+      </ul>
+    </div>
+
+
+</body>
+</html>
