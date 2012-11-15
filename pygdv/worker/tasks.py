@@ -20,8 +20,6 @@ success = 1
 manager = None
 
 
-
-
 @task()
 def multiple_track_input(_uploaded, _file, _url, _fsys, sequence_id, user_mail, user_key, project_id, force, delfile, _callback_url, _extension):
     tmp_dir = tempfile.mkdtemp(dir=temporary_directory)
@@ -32,17 +30,18 @@ def multiple_track_input(_uploaded, _file, _url, _fsys, sequence_id, user_mail, 
         for ul in _url.split():
             ul = util.norm_url(ul)
             fname = util.url_filename(ul)
-            try :
+            try:
                 u = urllib2.urlopen(ul)
                 block_sz = 2048
                 outf = os.path.join(tmp_dir, fname)
                 with open(outf, 'w') as tmp_file:
                         while True:
                             buffer = u.read(block_sz)
-                            if not buffer: break
+                            if not buffer:
+                                break
                             tmp_file.write(buffer)
             except HTTPError as e:
-                print '%s : %s' % (ul, e)
+                print '%s: %s' % (ul, e)
                 raise e
             if util.is_compressed(os.path.splitext(fname)[1]):
                 Archive(outf).extract(out=tmp_dir)
@@ -54,56 +53,54 @@ def multiple_track_input(_uploaded, _file, _url, _fsys, sequence_id, user_mail, 
         outs.extend([os.path.abspath(os.path.join(dir, f)) for f in files])
     print "outs    %s " % ", ".join(outs)
     for _f in outs:
-        callback(_callback_url + '/create', {'fsys' :_f,
-                                             'sequence_id' : sequence_id,
-                                             'mail' : user_mail,
-                                             'key' : user_key,
-                                             'project_id' : project_id,
-                                             'force' : force,
-                                             'delfile' : True,
-                                             'extension' : os.path.splitext(_f)[1]
+        callback(_callback_url + '/create', {'fsys':_f,
+                                             'sequence_id': sequence_id,
+                                             'mail': user_mail,
+                                             'key': user_key,
+                                             'project_id': project_id,
+                                             'force': force,
+                                             'delfile': True,
+                                             'extension': os.path.splitext(_f)[1]
         })
-
 
 
 @task()
 def track_input(_uploaded, _file, _urls, _fsys, _track_name, _extension, _callback_url, _force, _track_id, _user_mail, _user_key, _sequence_id, delfile):
     """
-    First Entry point for track processing : 
+    First Entry point for track processing:
     1) the track is uploaded (if it's not already the case)
     2) the sha1 of the track is calculated.
-    3) callback at any time if the process fail, or at the end with success 
+    3) callback at any time if the process fail, or at the end with success
     """
 
     task_id = track_input.request.id
     _fname = upload(_uploaded, _file, _urls, _fsys, _track_name, _extension, delfile)
     sha1 = util.get_file_sha1(_fname)
-    result = callback(_callback_url + '/after_sha1', {'fname' : _fname,
-                                                 'sha1' : sha1,
-                                                 'force' : _force,
-                                                 'callback_url' : _callback_url,
-                                                 'track_id' : _track_id,
-                                                 'mail' : _user_mail,
-                                                 'key' : _user_key,
-                                                 'old_task_id' : task_id,
-                                                 'sequence_id' : _sequence_id,
-                                                 'extension' : _extension,
-                                                 'trackname' : _track_name
+    result = callback(_callback_url + '/after_sha1', {'fname': _fname,
+                                                 'sha1': sha1,
+                                                 'force': _force,
+                                                 'callback_url': _callback_url,
+                                                 'track_id': _track_id,
+                                                 'mail': _user_mail,
+                                                 'key': _user_key,
+                                                 'old_task_id': task_id,
+                                                 'sequence_id': _sequence_id,
+                                                 'extension': _extension,
+                                                 'trackname': _track_name
                                                   })
     if result.has_key('error'):
         raise Exception(result.get('error'))
 
 
-
 @task()
 def track_process(_usermail, _userkey, old_task_id, fname, sha1, callback_url, track_id, sequence_name, extension, trackname, _callback_url):
     """
-    Second entry point for track processing :
+    Second entry point for track processing:
      4) the track is converted to sqlite format (if it's not already the case)
-     5) the sqlite track is computed with two differents process for 
-         signal track : with an external jar file (psd.jar)
-         features track : with jbrowse internal library
-     6) callback at any time if the process fail, or at the end with success 
+     5) the sqlite track is computed with two differents process for
+         signal track: with an external jar file (psd.jar)
+         features track: with jbrowse internal library
+     6) callback at any time if the process fail, or at the end with success
      """
     from pygdv import handler
 
@@ -118,10 +115,10 @@ def track_process(_usermail, _userkey, old_task_id, fname, sha1, callback_url, t
             datatype = t.datatype
         shutil.move(fname, dst)
         if datatype is None:
-            raise Exception("The datatype of your SQLite file is not defined : set it to 'signal' or 'features'.")
+            raise Exception("The datatype of your SQLite file is not defined: set it to 'signal' or 'features'.")
     # process text file
-    else :
-        try :
+    else:
+        try:
             track.convert(extension and (fname, extension) or fname, dst)
             datatype = handler.track.guess_datatype(extension)
             with track.load(dst, 'sql', readonly=False) as t:
@@ -129,43 +126,43 @@ def track_process(_usermail, _userkey, old_task_id, fname, sha1, callback_url, t
                 t.assembly = sequence_name
             try:
                 os.remove(os.path.abspath(fname))
-            except OSError :
+            except OSError:
                 pass
         except Exception as e:
             etype, value, tb = sys.exc_info()
             traceback.print_exception(etype, value, tb)
-            callback(_callback_url + '/after_process', {'old_task_id' : old_task_id,
-                                                        'mail' : _usermail,
-                                                        'key' : _userkey,
-                                                        'track_id' : 'None',
-                                                        'datatype' : datatype
+            callback(_callback_url + '/after_process', {'old_task_id': old_task_id,
+                                                        'mail': _usermail,
+                                                        'key': _userkey,
+                                                        'track_id': 'None',
+                                                        'datatype': datatype
             })
             raise e
 
     # process sqlite file
-    if datatype == constants.NOT_DETERMINED_DATATYPE :
+    if datatype == constants.NOT_DETERMINED_DATATYPE:
         raise Exception("Extension %s is not supported." % extension)
 
-    try :
+    try:
         dispatch = _sqlite_dispatch.get(datatype.lower())
         dispatch(dst, sha1, trackname)
     except Exception as e:
         etype, value, tb = sys.exc_info()
         traceback.print_exception(etype, value, tb)
         os.remove(dst)
-        result = callback(_callback_url + '/after_process', {'old_task_id' : old_task_id,
-                                                             'mail' : _usermail,
-                                                             'key' : _userkey,
-                                                             'track_id' : 'None',
-                                                             'datatype' : datatype
+        result = callback(_callback_url + '/after_process', {'old_task_id': old_task_id,
+                                                             'mail': _usermail,
+                                                             'key': _userkey,
+                                                             'track_id': 'None',
+                                                             'datatype': datatype
         })
         raise e
 
-    result = callback(_callback_url + '/after_process', {'old_task_id' : old_task_id,
-                                                         'mail' : _usermail,
-                                                         'key' : _userkey,
-                                                         'track_id' : track_id,
-                                                         'datatype' : datatype
+    result = callback(_callback_url + '/after_process', {'old_task_id': old_task_id,
+                                                         'mail': _usermail,
+                                                         'key': _userkey,
+                                                         'track_id': track_id,
+                                                         'datatype': datatype
     })
 
 
@@ -213,14 +210,14 @@ import subprocess
 
 
 
-_sqlite_dispatch = {'quantitative' : lambda *args, **kw : _signal_database(*args, **kw),
-                 constants.SIGNAL : lambda *args, **kw : _signal_database(*args, **kw),
+_sqlite_dispatch = {'quantitative': lambda *args, **kw: _signal_database(*args, **kw),
+                 constants.SIGNAL: lambda *args, **kw: _signal_database(*args, **kw),
 
-                 'qualitative' :  lambda *args, **kw : _features_database(*args, **kw),
-                 constants.FEATURES :  lambda *args, **kw : _features_database(*args, **kw),
+                 'qualitative':  lambda *args, **kw: _features_database(*args, **kw),
+                 constants.FEATURES:  lambda *args, **kw: _features_database(*args, **kw),
 
-                 'extended' :  lambda *args, **kw : _relational_database(*args, **kw),
-                  constants.RELATIONAL :  lambda *args, **kw : _relational_database(*args, **kw)
+                 'extended':  lambda *args, **kw: _relational_database(*args, **kw),
+                  constants.RELATIONAL:  lambda *args, **kw: _relational_database(*args, **kw)
                   }
 
 
@@ -232,7 +229,8 @@ def _signal_database(path, sha1, name):
     '''
     output_dir = json_directory()
     bin_dir = constants.bin_directory()
-    print '[x] starting task ``compute scores`` : db (%s), sha1(%s)' % (path, sha1)
+    path = os.path.abspath(path)
+    print '[x] starting task ``compute scores``: db (%s), sha1(%s)' % (path, sha1)
     script = 'psd.jar'
     efile = os.path.join(bin_dir, script)
     p = subprocess.Popen(['java', '-jar', efile, path, sha1, output_dir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
