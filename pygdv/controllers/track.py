@@ -7,6 +7,7 @@ from tgext.crud import CrudRestController
 
 from repoze.what.predicates import not_anonymous, has_any_permission, has_permission
 import tg, sys, traceback
+import os
 from tg import expose, flash, require, tmpl_context, validate, request, response, url
 from tg.controllers import redirect
 from tg.decorators import with_trailing_slash
@@ -19,18 +20,11 @@ from pygdv.worker import tasks
 import tempfile, track
 import tw2.core as twc
 import json
-__all__ = ['TrackController']
-
-
-
-
+from pygdv.lib import filemanager
 
 
 class TrackController(BaseController):
     allow_only = has_any_permission(constants.perm_user, constants.perm_admin)
-    
-    
-    
 
     @expose('pygdv.templates.track_index')
     @expose('json')
@@ -40,7 +34,7 @@ class TrackController(BaseController):
         user = handler.user.get_user_in_session(request)
         shared_by = None
         # view on a specific project
-        if kw.has_key('pid'):
+        if 'pid' in kw:
             project_id = kw.get('pid')
             project = DBSession.query(Project).filter(Project.id == project_id).first()
             if project is None:
@@ -57,21 +51,21 @@ class TrackController(BaseController):
                 grid = datagrid.track_grid
 
             # view from a shared user
-            else :
+            else:
                 rights = handler.project.get_rights(project=project, user=user)
                 if constants.right_upload_id in [r.id for r in rights]:
                     kw['upload'] = True
                 grid = datagrid.track_grid_permissions(user=user, rights=rights)
                 shared_by = "%s %s" % (project.user.firstname, project.user.name[0].upper())
             kw['pn'] = project.name
-            track_list = [util.to_datagrid(grid, tracks, "Track Listing", len(tracks)>0)]
+            track_list = [util.to_datagrid(grid, tracks, "Track Listing", len(tracks) > 0)]
             shared_with = project.get_circle_with_right_display
 
         # view all user tracks
-        else :
+        else:
             shared_with = ''
             tracks = user.tracks
-            track_list = [util.to_datagrid(datagrid.track_grid, tracks, "Track Listing", len(tracks)>0)]
+            track_list = [util.to_datagrid(datagrid.track_grid, tracks, "Track Listing", len(tracks) > 0)]
             kw['upload'] = True
 
         t = handler.help.help_address(url('/help'), 'main', 'track list help')
@@ -81,15 +75,13 @@ class TrackController(BaseController):
 
         # shared projects
         shared_with_rights = handler.project.get_shared_projects(user)
-        sorted_projects = sorted(shared_with_rights.iteritems(), key=lambda k : k[0].name)
+        sorted_projects = sorted(shared_with_rights.iteritems(), key=lambda k: k[0].name)
         shared_project_list = [(p.id, p.name, ''.join([r[0] for r in rights])) for p, rights in sorted_projects]
 
         return dict(page='tracks', model='track', form_title="new track", track_list=track_list,
             project_list=project_list, shared_project_list=shared_project_list, value=kw,
             tooltip=t, project_id=kw.get('pid', None), upload=kw.get('upload', None), project_name=kw.get('pn', None),
-            shared_with=shared_with, owner=kw.get('own', False), shared= not kw.get('own', False), shared_by=shared_by)
-
-
+            shared_with=shared_with, owner=kw.get('own', False), shared=not kw.get('own', False), shared_by=shared_by)
 
     @require(not_anonymous())
     @with_trailing_slash
@@ -100,7 +92,7 @@ class TrackController(BaseController):
         ass_name = None
         project_id = None
         value = {}
-        if kw.has_key('pid'):
+        if 'pid' in kw:
             new_form = form.NewTrackPrefilled(action=url('/tracks/create')).req()
             project_id = kw.get('pid')
             project = DBSession.query(Project).filter(Project.id == project_id).first()
@@ -110,7 +102,7 @@ class TrackController(BaseController):
         else:
             new_form = form.NewTrack(action=url('/tracks/create')).req()
             species = DBSession.query(Species).all()
-            sp_opts =  [(sp.id,sp.name) for sp in species]
+            sp_opts = [(sp.id, sp.name) for sp in species]
             new_form.child.children[3].options = sp_opts
             mapping = json.dumps(dict([(sp.id, [(seq.id, seq.name) for seq in sp.sequences]) for sp in species]))
             value['smapping'] = mapping
@@ -121,94 +113,129 @@ class TrackController(BaseController):
     @expose('json')
     def create(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        # change a parameter name
-        if kw.has_key('assembly'):
-            kw['sequence_id'] = kw.get('assembly')
-            del kw['assembly']
-        if kw.has_key('urls'):
-            kw['url']=kw.get('urls')
-            del kw['urls']
-        for k, v in kw.iteritems():
-            if v == 'None': kw[k] = None
+        # get sequence
+        sequence = None
+        if 'assembly' in kw and kw.get('assembly'):
+            assembly = int(kw.get('assembly'))
+            sequence = DBSession.query(Sequence).filter(Sequence.id == assembly).first()
+        elif 'sequence_id' in kw and kw.get('sequence_id'):
+            sequence_id = int(kw.get('sequence_id'))
+            sequence = DBSession.query(Sequence).filter(Sequence.id == sequence_id).first()
+        elif 'sequence_id' in kw and kw.get('sequence_id'):
+            sequence_id = int(kw.get('sequence_id'))
+            sequence = DBSession.query(Sequence).filter(Sequence.id == sequence_id).first()
+        elif 'project_id' in kw and kw.get('project_id'):
+            project_id = int(kw.get('project_id'))
+            project = DBSession.query(Project).filter(Project.id == project_id).first()
+            if project is None:
+                reply.error(request, 'Project with id %s not found on GDV.' % project_id, tg.url('./new', {'pid': project_id}), {})
+            sequence = DBSession.query(Sequence).filter(Sequence.id == project.sequence_id).first()
+        if not sequence:
+            reply.error(request, 'Sequence not found on GDV.', tg.url('./new'), {})
 
-        project_id = kw.get('project_id', '')
-        if project_id == '' : project_id = None
-        # verify track parameters
-        try :
-            handler.track.pre_track_creation(url=kw.get('url', None),
-                file_upload=kw.get('file_upload', None),
-                fsys=kw.get('fsys', None),
-                project_id=project_id,
-                sequence_id=kw.get('sequence_id', None))
-        except Exception as e:
-            print 'Bad params : %s' %e
-            if project_id is not None:
-                reply.error(request, str(e), tg.url('./new', {'pid' : project_id}), {})
-            return reply.error(request, str(e), tg.url('./new'), {})
+        # know if file is comming from url, fileupload or filsystem
+        filetoget = None
+        inputtype = None
+        print kw
+        if 'url' in kw and kw.get('url'):
+            filetoget = kw.get('url')
+            if not filetoget.startswith('http://'):
+                filetoget = 'http://%s' % filetoget
+            inputtype = 'url'
+        elif 'fsys' in kw and kw.get('fsys'):
+            filetoget = kw.get('fsys')
+            inputtype = 'fsys'
+        elif 'file_upload' in kw and kw.get('file_upload'):
+            filetoget = kw.get('file_upload')
+            inputtype = 'fu'
+        if not filetoget:
+            reply.error(request, 'No file to upload', tg.url('./new'), {})
 
-        admin = kw.get('track_admin', False)
-        if admin:
+        # get file name
+        trackname = None
+        if 'trackname' in kw and kw.get('trackname'):
+            trackname = kw.get(trackname)
+        else:
+            if inputtype == 'url':
+                trackname = os.path.split(filetoget)[1].split('?')[0]
+            elif inputtype == 'fsys':
+                trackname = os.path.split(filetoget)[-1]
+            elif inputtype == 'fu':
+                trackname = filetoget.filename
+        if not trackname:
+            reply.error(request, 'No trackname found', tg.url('./new'), {})
+
+        print 'trackname: %s' % trackname
+        # get extension
+        extension = None
+        if 'extension' in kw and kw.get('extension'):
+            extension = kw.get('extension')
+        elif 'ext' in kw and kw.get('ext'):
+            extension = kw.get('ext')
+        else:
+            extension = os.path.splitext(trackname)[-1]
+        if not extension:
+            reply.error(request, 'No extension found', tg.url('./new'), {})
+
+        # is the track "admin"
+        admin = False
+        if 'track_admin' in kw and kw.get('track_admin'):
             # check if really admin
             group_admin = DBSession.query(Group).filter(Group.id == constants.group_admins_id).first()
-            if user not in group_admin.users:
-                admin = False
-        # get parameters
-        track_name, extension, sequence_id = handler.track.fetch_track_parameters(
-            url=kw.get('url', None),
-            file_upload=kw.get('file_upload', None),
-            fsys=kw.get('fsys', None),
-            trackname=kw.get('trackname', None),
-            extension=kw.get('extension', None),
-            project_id=project_id,
-            sequence_id=kw.get('sequence_id', None))
+            if user in group_admin.users:
+                admin = True
 
+        #store information in a dummy object
+        out = os.path.join(filemanager.temporary_directory(), trackname)
+        fileinfo = filemanager.FileInfo(inputtype=inputtype, inpath=filetoget, trackname=trackname, extension=extension, outpath=out, admin=admin)
+
+        print "got fileinfo : %s" % fileinfo
+        tid = tasks.test.delay()
+        print 'giot task id %s ' % tid
         # upload the track it's from file_upload
-        if request.environ[constants.REQUEST_TYPE] == constants.REQUEST_TYPE_BROWSER :
-            fu = kw.get('file_upload', '')
-            if fu == '': fu = None
-            if fu is not None:
-                kw['uploaded']=True
-                _f = util.download(file_upload=fu,
-                    filename=track_name, extension=extension)
-                kw['file']=_f.name
-                del kw['file_upload']
+        # if inputtype == 'file_upload':
+        #     filemanager.download_file_field(fileinfo.paths['in'], fileinfo.paths['upload_to'])
+        #     fileinfo.uploaded = True
 
-        # check if multiples url or if zipped file
-        if util.is_compressed(extension) or (kw.get('url', None)!=None and len(kw.get('url', '').split())>1):
-            async = tasks.multiple_track_input.delay(kw.get('uploaded', None), kw.get('file', None), kw.get('url', None), kw.get('fsys', None),
-                sequence_id, user.email, user.key, project_id, kw.get('force', False), kw.get('delfile', False),
-                constants.callback_track_url(), extension)
-            return reply.normal(request, 'Processing launched.', '/tracks/', {'task_id' : async.task_id})
-        else :
-            # create a new track
-            _track = handler.track.new_track(user.id, track_name, sequence_id=sequence_id, admin=admin, project_id=project_id)
+        # determine processes to launch
 
-            # format parameters
-            _uploaded = kw.get('uploaded', False)
-            _file = kw.get('file', None)
-            _urls = kw.get('url', None)
-            _fsys=kw.get('fsys', None)
-            _track_name = track_name
-            _extension = extension
-            _callback_url = constants.callback_track_url()
-            _force = kw.get('force', False)
-            _delfile = kw.get('delfile', False)
-            _track_id = _track.id
-            _user_key = user.key
-            _user_mail = user.email
 
-            # launch task with the parameters
-            async = tasks.track_input.delay(_uploaded, _file, _urls, _fsys, _track_name, _extension, _callback_url, _force,
-                _track_id, _user_mail, _user_key, sequence_id, _delfile)
+        # # check if multiples url or if zipped file
+        # if util.is_compressed(extension) or (kw.get('url', None)!=None and len(kw.get('url', '').split())>1):
+        #     async = tasks.multiple_track_input.delay(kw.get('uploaded', None), kw.get('file', None), kw.get('url', None), kw.get('fsys', None),
+        #         sequence_id, user.email, user.key, project_id, kw.get('force', False), kw.get('delfile', False),
+        #         constants.callback_track_url(), extension)
+        #     return reply.normal(request, 'Processing launched.', '/tracks/', {'task_id' : async.task_id})
+        # else :
+        #     # create a new track
+        #     _track = handler.track.new_track(user.id, track_name, sequence_id=sequence_id, admin=admin, project_id=project_id)
 
-            # update the track
-            handler.track.update(track=_track, params={'task_id' : async.task_id})
+        #     # format parameters
+        #     _uploaded = kw.get('uploaded', False)
+        #     _file = kw.get('file', None)
+        #     _urls = kw.get('url', None)
+        #     _fsys=kw.get('fsys', None)
+        #     _track_name = track_name
+        #     _extension = extension
+        #     _callback_url = constants.callback_track_url()
+        #     _force = kw.get('force', False)
+        #     _delfile = kw.get('delfile', False)
+        #     _track_id = _track.id
+        #     _user_key = user.key
+        #     _user_mail = user.email
 
-            if project_id is not None:
-                return reply.normal(request,'Processing launched.', tg.url('/tracks/', {'pid' : project_id}), {'task_id' : async.task_id,
-                                                                                                                  'track_id' : _track.id})
-            return reply.normal(request, 'Processing launched.', '/tracks/', {'task_id' : async.task_id,
-                                                                        'track_id' : _track.id})
+        #     # launch task with the parameters
+        #     async = tasks.track_input.delay(_uploaded, _file, _urls, _fsys, _track_name, _extension, _callback_url, _force,
+        #         _track_id, _user_mail, _user_key, sequence_id, _delfile)
+
+        #     # update the track
+        #     handler.track.update(track=_track, params={'task_id' : async.task_id})
+
+        #     if project_id is not None:
+        #         return reply.normal(request,'Processing launched.', tg.url('/tracks/', {'pid' : project_id}), {'task_id' : async.task_id,
+        #                                                                                                           'track_id' : _track.id})
+        #     return reply.normal(request, 'Processing launched.', '/tracks/', {'task_id' : async.task_id,
+        #                                                                 'track_id' : _track.id})
 
     @expose('json')
     def post(self, *args, **kw):

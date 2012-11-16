@@ -26,14 +26,19 @@ IMAGE_TRACK = 'ImageTrack'
 
 track_types = ['track', 'bed', 'wig', 'gff', 'gtf', 'bedgraph']
 # DATA DIRECTORIES
+
+
 def json_directory():
     return os.path.join(resource_filename(data_dir, json_dir))
+
 
 def admin_user_email():
     return tg.config.get('admin.user.email')
 
+
 def admin_user_key():
     return tg.config.get('admin.user.key')
+
 
 def temporary_directory():
     if 'temporary.directory' in tg.config:

@@ -102,7 +102,6 @@ class RootController(BaseController):
         """Handle the 'about' page."""
         return dict(page='about')
 
-    
     @expose()
     def home(self, *args, **kw):
         raise redirect('/')
@@ -113,7 +112,7 @@ class RootController(BaseController):
     @expose('pygdv.templates.environ')
     def environ(self):
         """This method showcases TG's access to the wsgi environment."""
-        return dict(page='environ',environment=request.environ)
+        return dict(page='environ', environment=request.environ)
 
 #    @require(has_permission('admin', msg='Only for admins'))
 #    @expose('pygdv.templates.data')

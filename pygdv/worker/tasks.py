@@ -13,19 +13,35 @@ from pygdv.lib import constants, util
 import track, urllib, urllib2
 from archive import Archive
 import tempfile
-from pygdv.worker import temporary_directory
-success = 1
+from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+from pygdv import model
 
 
-manager = None
+def init_model():
+    import celery
+    database_url = celery.current_app.conf['CELERY_RESULT_DBURI']
+
+    maker = sessionmaker(autoflush=False, autocommit=False)
+    DBSession = scoped_session(maker)
+    DeclarativeBase = declarative_base()
+    #metadata = DeclarativeBase.metadata
+
+    DBSession.configure(bind=create_engine(database_url))
+    return DBSession
+
+DBSession = init_model()
 
 
 class TR(object):
     """
-    Dummy object for simple result propagation between chained tasks
+    Dummy object for simple result propagation between chained tasks.
+    More meaingful than using *args and indexes
     """
     def __init__(self):
         self.r = {}
+
 
 
 @task()

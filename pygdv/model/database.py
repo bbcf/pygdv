@@ -309,14 +309,10 @@ class Input(DeclarativeBase):
     _last_access = Column(DateTime, default=datetime.now, nullable=False)
     path = Column(Unicode, nullable=True)
 
-    # task_id = Column(VARCHAR(255))
-    # task = relationship('Task', uselist=False, primaryjoin='Input.task_id == Task.task_id', foreign_keys='Task.task_id')
+    task_id = Column(VARCHAR(255), ForeignKey('Input.id', ondelete="CASCADE"), nullable=True)
+    task = relationship('Task', uselist=False, primaryjoin='Input.task_id == Task.task_id', foreign_keys='Task.task_id')
 
-    # datatype = Column(datatypes, nullable=True, default=constants.NOT_DETERMINED_DATATYPE)
-
-    @property
-    def path(self):
-        return os.path.join(constants.track_directory(), '%s.%s' % (self.sha1, 'sql'))
+    tracks = relationship('Track', backref='input', primaryjoin='Input.id == Track.input_id')
 
     # special methods
     def __repr__(self):
@@ -364,18 +360,18 @@ class Track(DeclarativeBase):
     _created = Column(DateTime, nullable=False, default=datetime.now)
     _last_access = Column(DateTime, default=datetime.now, nullable=False)
     input_id = Column(Integer, ForeignKey('Input.id', ondelete="CASCADE"), nullable=False)
-    track = relationship('Track', backref='tracks')
     user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=True)
     sequence_id = Column(Integer, ForeignKey('Sequence.id', ondelete="CASCADE"), nullable=False)
     sequence = relationship("Sequence")
 
-    parameters = relationship('TrackParameters', uselist=False, backref='track', cascade='delete')
+    parameters = Column(JSONEncodedDict, nullable=True)
+    visualization = Column(Unicode(255), default='not determined')
 
-    # task_id = Column(VARCHAR(255))
-    # task = relationship('Task', uselist=False, primaryjoin='Input.task_id == Task.task_id', foreign_keys='Task.task_id')
+    path = Column(Unicode(), nullable=True)
 
-    # datatype = Column(datatypes, nullable=True, default=constants.NOT_DETERMINED_DATATYPE)
-    # special methods
+    task_id = Column(VARCHAR(255), ForeignKey('Input.id', ondelete="CASCADE"), nullable=True)
+    task = relationship('Task', uselist=False, primaryjoin='Input.task_id == Task.task_id', foreign_keys='Task.task_id')
+
     def __repr__(self):
         return '<Track: id=%r, name=%r, created=%r, vizu=%r, user_id=%r>' % (self.id, self.name, self.created, self.vizu, self.user_id)
 
