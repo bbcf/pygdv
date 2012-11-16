@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from celery.task import task
+from celery import task
 
 import shutil, os, sys, traceback, json
 from pygdv.lib.jbrowse import jsongen, scores
@@ -8,7 +8,7 @@ from celery.result import AsyncResult
 from celery.signals import worker_init
 from celery.task.http import HttpDispatchTask
 from urllib2 import HTTPError
-
+import time
 from pygdv.lib import constants, util
 import track, urllib, urllib2
 from archive import Archive
@@ -18,6 +18,14 @@ success = 1
 
 
 manager = None
+
+
+class TR(object):
+    """
+    Dummy object for simple result propagation between chained tasks
+    """
+    def __init__(self):
+        self.r = {}
 
 
 @task()

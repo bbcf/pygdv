@@ -15,7 +15,7 @@ from pygdv.controllers import  ProjectController, CircleController
 from pygdv.controllers import  SequenceController
 from pygdv.controllers import  DatabaseController, JobController
 from pygdv.controllers import PublicController, HelpController, GenRepController
-from pygdv.controllers import SelectionController, PluginController, AdminController
+from pygdv.controllers import SelectionController, PluginController
 
 import pygdv
 
@@ -66,7 +66,6 @@ class RootController(BaseController):
     circles = CircleController()
     jobs = JobController()
     public = PublicController()
-    admin = AdminController()
     help = HelpController()
     genrep = GenRepController()
     database = DatabaseController()
@@ -105,12 +104,8 @@ class RootController(BaseController):
 
     
     @expose()
-    def home(self,*args,**kw):
+    def home(self, *args, **kw):
         raise redirect('/')
-    @expose()
-    def koo(self):
-        print request.identity['userdata'].split('|')[1]
-
     
     ## DEVELOPMENT PAGES ##
     
@@ -134,72 +129,3 @@ class RootController(BaseController):
         user = handler.user.get_user_in_session(request)
         return user.key
 
-
-    @expose('pygdv.templates.test')
-    def test(self, **kw):
-        print 'test %s' % kw
-        from tg import url
-        from pygdv.widgets import form
-        w = form.TestForm(action=url('./test'))
-        return dict(page='root', widget=w)
-    
-
-    @expose('pygdv.templates.koopa')
-    def koopa(self, *args, **kw):
-        from tw.api import js_callback
-        colModel = [
-                {'display' : 'ID', 'name' : 'id', 'width': 20, 'align' : 'center'},
-                {'display' : 'ID2', 'name' : 'blou', 'width': 20, 'align' : 'center'},
-        ]
-        buttons = [{'name' : 'add', 'bclass' : 'add', 'onpress' : js_callback('add_record')},
-                {'name' : 'del', 'bclass' : 'delete', 'onpress' : js_callback('delete_record')}]
-
-
-        _id = 'test'
-        from tg import url, tmpl_context
-        fetchURL = url('/troopa')
-        import tw.jquery as twjq
-        grid = twjq.FlexiGrid(id=_id, buttons=buttons, fetchURL=fetchURL, colModel=colModel, title='koopa',
-        useRp=True, rp=10, width=500, height=200, showTableToggleButton=True, usepager=True)
-        data = [Koopa(i) for i in xrange(5)]
-        tmpl_context.grid = grid
-
-        return dict(page='koopa', data=data)
-
-    @expose('pygdv.templates.peach')
-    def peach(self, *args, **kw):
-        import tw2.jqplugins.jqgrid as jq
-        colNames = ['ID', 'SAME']
-        colModel = [{'name' : 'blou', 'width' : 50, 'align' : 'center'},
-        {'name' : 'blou'}]
-        from tg import url
-        opts = {'pager' : 'module-0-demo_pager', 'colNames' : colNames, 'colModel' : colModel, 'url' : url('/troopa')}
-        pager_opts = {'refresh' : True}
-        widget = jq.jqGridWidget(id='test', options=opts, pager_options=pager_opts).req()
-        return dict(widget=widget, page='peach')
-
-    @expose('json')
-    def bowser(self, *args, **kw):
-        print 'bowser %s, %s' % (args, kw)
-        return {}
-
-    @expose('json')
-    def troopa(self, *args, **kw):
-        print 'called troopa %s'% kw
-        koopas = [Koopa(i) for i in xrange(5)]
-        data = [{'id' : koopa.blou, 'cell' : [koopa.blou, koopa.blou]} for koopa in koopas]
-
-        return dict(rows=data, total=5, counts=5)
-
-    @expose('mako:pygdv.templates.test')
-    def luigi(self):
-        return {}
-
-
-
-class Koopa(object):
-    def __init__(self, _id):
-        self.blou = str(_id)
-
-    def __repr__(self):
-        return json.dumps(self.__dict__)
