@@ -191,7 +191,7 @@ class TrackController(BaseController):
 
         print "got fileinfo : %s" % fileinfo
         tid = tasks.test.delay()
-        print 'giot task id %s ' % tid
+        print 'got task id %s ' % tid
         # upload the track it's from file_upload
         # if inputtype == 'file_upload':
         #     filemanager.download_file_field(fileinfo.paths['in'], fileinfo.paths['upload_to'])

@@ -1,6 +1,8 @@
 import tempfile
 import tg
 import os
+import urllib2
+import shutil
 from pkg_resources import resource_filename
 
 
@@ -20,6 +22,22 @@ def download_file_field(file_field, to):
         outf.close()
 
 
+def download_url(url, to, block_sz=2048 * 4):
+        file_size_dl = 0
+        stream = urllib2.urlopen(url)
+        with open(to, 'wb') as outf:
+            while True:
+                buffer = stream.read(block_sz)
+                if not buffer:
+                    break
+            file_size_dl += len(buffer)
+            outf.write(buffer)
+
+
+def download_fsys(infile, to):
+    shutil.cp(infile, to)
+
+
 class FileInfo(object):
     """
     Dummy object to store information about a file (uploaded, paths, ...)
@@ -28,11 +46,33 @@ class FileInfo(object):
         self.inputtype = inputtype
         self.paths = {
             'in': inpath,
-            'upload_to': outpath
+            'upload_to': outpath,
+            'store': None
         }
         self.trackname = trackname
-        self.uploaded = False
-        self.admin = admin
+        self.extension = extension
+        self.info = {}
+        self.states = {
+            'tmpdel': False,
+            'instore': False,
+            'tosql': False,
+            'admin': admin,
+            'uploaded': False
+        }
+
+    def download(self):
+        """
+        Download the file in the system.
+        """
+        if self.inputtype == 'fsys':
+            download_fsys(self.paths['in'], self.paths['upload_to'])
+            self.states['uploaded'] = True
+        elif self.inputtype == 'url':
+            download_url(self.paths['in'], self.paths['upload_to'])
+            self.states['uploaded'] = True
+        elif self.inputtype == 'file_upload':
+            self.download_file_field(self.paths['in'], self.paths['upload_to'])
+            self.states['uploaded'] = True
 
     def __repr__(self):
         return """<fi> intype: %s | name: %s | uploaded: %s | admin: %s

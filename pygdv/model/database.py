@@ -309,10 +309,12 @@ class Input(DeclarativeBase):
     _last_access = Column(DateTime, default=datetime.now, nullable=False)
     path = Column(Unicode, nullable=True)
 
-    task_id = Column(VARCHAR(255), ForeignKey('Input.id', ondelete="CASCADE"), nullable=True)
-    task = relationship('Task', uselist=False, primaryjoin='Input.task_id == Task.task_id', foreign_keys='Task.task_id')
+    task_id = Column(VARCHAR(255), ForeignKey('celery_taskmeta.task_id', ondelete="CASCADE"), nullable=True)
+#    task = relationship('Task', uselist=False, primaryjoin='Input.task_id == Task.task_id', foreign_keys='Task.task_id')
+    task = relationship('Task', uselist=False)
 
-    tracks = relationship('Track', backref='input', primaryjoin='Input.id == Track.input_id')
+    parent_id = Column(Integer, ForeignKey('Input.id'), nullable=True)
+    children = relationship("Input")
 
     # special methods
     def __repr__(self):
@@ -361,11 +363,12 @@ class Track(DeclarativeBase):
     _last_access = Column(DateTime, default=datetime.now, nullable=False)
     input_id = Column(Integer, ForeignKey('Input.id', ondelete="CASCADE"), nullable=False)
     user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=True)
+    input = relationship('Input', backref='tracks', primaryjoin='Input.id == Track.input_id')
     sequence_id = Column(Integer, ForeignKey('Sequence.id', ondelete="CASCADE"), nullable=False)
     sequence = relationship("Sequence")
 
     parameters = Column(JSONEncodedDict, nullable=True)
-    visualization = Column(Unicode(255), default='not determined')
+    visualization = Column(VARCHAR(255), default='not determined')
 
     path = Column(Unicode(), nullable=True)
 

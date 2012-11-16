@@ -10,13 +10,18 @@ from celery.task.http import HttpDispatchTask
 from urllib2 import HTTPError
 import time
 from pygdv.lib import constants, util
-import track, urllib, urllib2
+import urllib, urllib2
 from archive import Archive
 import tempfile
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from pygdv import model
+from pygdv.lib import filemanager
+from bbcflib import btrack
+import hashlib
+
+#convert("myfile.bed", "myfile.wig")
 
 
 def init_model():
@@ -33,6 +38,10 @@ def init_model():
 
 DBSession = init_model()
 
+mappings = {
+
+}
+
 
 class TR(object):
     """
@@ -42,6 +51,115 @@ class TR(object):
     def __init__(self):
         self.r = {}
 
+
+@task()
+def new_input(user_info, fileinfo, sequence_info):
+    """
+    Add an new input in GDV.
+    fileinfo: a file info object.
+    sequence_id: the sequence id
+    """
+    # upload | get sha1
+    fileinfo = (upload.s(fileinfo) | sha1.s())().get()
+    s = fileinfo.info['sha1']
+
+    # TODO find fileinfo store
+    # TODO set to sql to true or false
+
+    # get the input
+    inp = DBSession.query(model.Input).filter(model.Input.sha1 == s).first()
+
+    # get the sequence
+    seq = DBSession.query(model.Sequence).filter(model.Sequence.id == sequence_id).first()
+
+    if inp is None:
+        inp = model.Input()
+        inp.sha1 = s
+        inp.path = fileinfo.paths['store']
+        inp.task_id = new_input.request.id
+        DBSession.add(inp)
+        DBSession.flush()
+
+        if fileinfo.tosql:
+            # transform to sql
+            fileinfo = (tosql.s(fileinfo, sequence_info['name']))().get()
+        else:
+            # move to store |
+            fileinfo = (tostore.s(fileinfo))().get()
+
+    # delete tmp directory
+    fileinfo = deltmp.s(fileinfo).get()
+
+    fileinfo.info['input_id'] = inp.id
+
+    # Track constructions
+    # TODO mapping vizu
+    # TODO launche processes => may contruct more than one track
+    track = model.Track()
+    track.name = fileinfo.trackname
+    track.input_id = inp.id
+    track.user_id = user_info['id']
+    track.sequence_id = sequence_info['id']
+    #parameters = Column(JSONEncodedDict, nullable=True)
+    #visualization = Column(VARCHAR(255), default='not determined')
+    #path = Column(Unicode(), nullable=True)    depend on vizu
+
+    #task_id = Column(VARCHAR(255), ForeignKey('Input.id', ondelete="CASCADE"), nullable=True)
+    return finfo
+
+
+@task()
+def upload(fileinfo):
+    """
+    Upload a file.
+    """
+    if not fileinfo.states['uploaded']:
+        fileinfo.download()
+    return fileinfo
+
+
+@task()
+def sha1(fileinfo):
+    """
+    Compute the hex sha1 of a file.
+    """
+    if not 'sha1' in fileinfo.info:
+        s = hashlib.sha1()
+        with open(fileinfo.paths['upload_to'], 'rb') as infile:
+            for chunk in iter(lambda: infile.read(128 * 64), ''):
+                s.update(chunk)
+        fileinfo.info['sha1'] = s.hexdigest()
+    return fileinfo
+
+
+@task()
+def tosql(fileinfo, seq_name):
+    """
+    Transform a input file to an sql one.
+    """
+    btrack.convert(fileinfo.paths['upload_to'], fileinfo.paths['store'], chrmeta=seq_name)
+
+
+@task()
+def deltmp(fileinfo):
+    """
+    Delete the original uploaded file.
+    """
+    if not fileinfo.states['tmpdel']:
+        shutil.rmtree(os.path.split(fileinfo.paths['upload_to'][0]))
+        fileinfo.states['tmpdel'] = True
+    return fileinfo
+
+
+@task()
+def tostore(fileinfo):
+    """
+    Move a file to it's storage location.
+    """
+    if not fileinfo.states['instore']:
+        shutil.move(fileinfo.paths['upload_to'], fileinfo.paths['store'])
+        fileinfo.states['instore'] = True
+    return fileinfo
 
 
 @task()
