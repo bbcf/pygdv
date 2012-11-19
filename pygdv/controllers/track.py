@@ -189,9 +189,24 @@ class TrackController(BaseController):
         out = os.path.join(filemanager.temporary_directory(), trackname)
         fileinfo = filemanager.FileInfo(inputtype=inputtype, inpath=filetoget, trackname=trackname, extension=extension, outpath=out, admin=admin)
 
-        print "got fileinfo : %s" % fileinfo
-        tid = tasks.test.delay()
+        # get additionnal information
+        user_info = {'id': user.id, 'name': user.name, 'email': user.email}
+        sequence_info = {'id': sequence.id, 'name': sequence.name}
+
+        # create a track that the user can see something
+        t = Track()
+        t.name = fileinfo.trackname
+        t.sequence_id = sequence_id
+        DBSession.add(t)
+        DBSession.flush()
+        # send task
+        async = tasks.new_input.delay(user_info, fileinfo, sequence_info, t.id)
+        t.task_id = async.task_id
+        DBSession.add(t)
+        DBSession.flush()
         print 'got task id %s ' % tid
+        reply.normal(request, 'Processing launched.', '/tracks/', {'track_id': _track.id})
+
         # upload the track it's from file_upload
         # if inputtype == 'file_upload':
         #     filemanager.download_file_field(fileinfo.paths['in'], fileinfo.paths['upload_to'])

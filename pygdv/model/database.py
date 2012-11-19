@@ -361,9 +361,10 @@ class Track(DeclarativeBase):
     _name = Column(Unicode(255), nullable=False)
     _created = Column(DateTime, nullable=False, default=datetime.now)
     _last_access = Column(DateTime, default=datetime.now, nullable=False)
-    input_id = Column(Integer, ForeignKey('Input.id', ondelete="CASCADE"), nullable=False)
+    input_id = Column(Integer, ForeignKey('Input.id', ondelete="CASCADE"), nullable=True)
     user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=True)
     input = relationship('Input', backref='tracks', primaryjoin='Input.id == Track.input_id')
+    #input = relationship('Input', backref='tracks')
     sequence_id = Column(Integer, ForeignKey('Sequence.id', ondelete="CASCADE"), nullable=False)
     sequence = relationship("Sequence")
 
@@ -373,7 +374,8 @@ class Track(DeclarativeBase):
     path = Column(Unicode(), nullable=True)
 
     task_id = Column(VARCHAR(255), ForeignKey('Input.id', ondelete="CASCADE"), nullable=True)
-    task = relationship('Task', uselist=False, primaryjoin='Input.task_id == Task.task_id', foreign_keys='Task.task_id')
+#    task = relationship('Task', uselist=False, primaryjoin='Track.task_id == Task.task_id', foreign_keys='Task.task_id')
+    task = relationship('Task', uselist=False)
 
     def __repr__(self):
         return '<Track: id=%r, name=%r, created=%r, vizu=%r, user_id=%r>' % (self.id, self.name, self.created, self.vizu, self.user_id)

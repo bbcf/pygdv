@@ -2,6 +2,36 @@ from pkg_resources import resource_filename
 import os
 from tg import url
 import tg
+from pygdv import PROJECT_ROOT
+
+
+data_store_path = os.path.join(PROJECT_ROOT, 'public', 'data')
+tracks_store_path = os.path.join(data_store_path, 'tracks')
+jsons_store_path = os.path.join(data_store_path, 'json')
+
+storage = {
+    'data': {
+        'sql': os.path.join(tracks_store_path, 'sql'),
+        'bam': os.path.join(tracks_store_path, 'bam')
+    },
+    'vizu': {
+        'signal': os.path.join(jsons_store_path, 'signal'),
+        'relational': os.path.join(jsons_store_path, 'relational'),
+        'features': os.path.join(jsons_store_path, 'features'),
+        'bam_coverage': os.path.join(jsons_store_path, 'bam_coverage'),
+    }
+}
+
+bin_directory_path = os.path.join(PROJECT_ROOT, 'bin')
+
+
+vizualisations = {
+    'signal': 'signal',
+    'relational': 'relational',
+    'features': 'features',
+    'bam': ['bam_coverage', 'bam_feature']
+}
+
 
 mother_dir = 'pygdv'
 bin_dir = 'bin'

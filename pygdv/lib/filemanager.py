@@ -50,7 +50,7 @@ class FileInfo(object):
             'store': None
         }
         self.trackname = trackname
-        self.extension = extension
+        self.extension = extension.lower()
         self.info = {}
         self.states = {
             'tmpdel': False,
@@ -59,6 +59,7 @@ class FileInfo(object):
             'admin': admin,
             'uploaded': False
         }
+        self.visualizations = []
 
     def download(self):
         """
