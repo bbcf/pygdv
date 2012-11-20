@@ -8,11 +8,9 @@ from repoze.what.predicates import has_any_permission
 import sqlite3, os
 from pygdv.lib import constants
 from sqlite3 import OperationalError
-import track
+from bbcflib.btrack import track
 
 class DatabaseController(BaseController):
-
-
 
     @expose('json')
     def scores(self,  sha1, chr_zoom, imgs, **kw):
@@ -28,14 +26,11 @@ class DatabaseController(BaseController):
 
 
         name = '%s/%s' % (sha1, chr_zoom)
-
         conn = sqlite3.connect(os.path.join(constants.json_directory(), sha1, chr_zoom))
-
         data = {}
         db_data = {}
 
         for im in imgs.split(',') :
-
             im_data = []
             cur = conn.cursor()
             try :
@@ -72,14 +67,13 @@ class DatabaseController(BaseController):
             return {}
         t = default[0]
         chrs = {}
-        with track.load(t.path, 'sql', readonly=True) as t:
-            gene_name_alias =  t.find_column_name(['name', 'gene_name', 'gene name', 'gname', 'Name', 'product'])
+        with track(t.path, format='sql', readonly=True) as t:
+            gene_column = t.column_by_name(['name', 'gene_name', 'gene name', 'gname', 'Name', 'product'],num=False)
             try :
-                for row in t.search({gene_name_alias : term}, [gene_name_alias, 'start', 'end']):
+                for row in t.read(selection={gene_column: term}, 
+                                  fields=['chr',gene_name_alias, 'start', 'end']):
                     chr, name, start, stop = row
-                    if chr not in chrs:
-                        chrs[chr] = {}
-
+                    if chr not in chrs: chrs[chr] = {}
                     names = chrs[chr]
                     if name in names:
                         old = names[name]
@@ -88,7 +82,6 @@ class DatabaseController(BaseController):
                     names[name] = [start, stop]
             except Exception as e:
                 return {}
-
 
         #result[chr].append([name, start, stop])
         result = {}

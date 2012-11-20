@@ -8,7 +8,7 @@ from repoze.what.predicates import has_any_permission
 import sqlite3, os
 from pygdv.lib import constants
 from sqlite3 import OperationalError
-import track, urllib2, urllib
+import urllib2, urllib
 
 
 

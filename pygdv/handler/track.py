@@ -11,7 +11,8 @@ from pygdv.worker import tasks
 from pygdv.lib.constants import track_directory
 from track.util import determine_format
 from pygdv.lib import constants
-import track, urlparse
+from bbcflib.btrack import track
+import urlparse
 from celery.task import task, chord, subtask, TaskSet
 from pygdv.lib.constants import json_directory, track_directory
 
@@ -376,13 +377,12 @@ def create_input(f, trackname, sequence_name, session, force=False, extension=No
         
         # format is sql => datatype can be signal or feature or extended
         elif datatype == constants.NOT_DETERMINED_DATATYPE:
-            with track.load(file_path) as t:
-                if t.datatype is not None:
-                    datatype = _datatypes.get(t.datatype, constants.NOT_DETERMINED_DATATYPE)
+            with track(file_path, format='sql') as t:
+                datatype = _datatypes.get(t.info['datatype'], constants.NOT_DETERMINED_DATATYPE)
         
         
         if datatype == constants.NOT_DETERMINED_DATATYPE:
-            return datatype     
+            return datatype
 
         if trackname is None:
             trackname = f

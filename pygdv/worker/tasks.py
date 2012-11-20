@@ -253,19 +253,18 @@ def track_process(_usermail, _userkey, old_task_id, fname, sha1, callback_url, t
 
     # move sqlite file
     if handler.track.is_sqlite_file(fname):
-        with track.load(fname, 'sql', readonly=True) as t:
-            datatype = t.datatype
+        datatype = btrack.track(fname, format='sql', readonly=True).info.get('datatype')
         shutil.move(fname, dst)
         if datatype is None:
             raise Exception("The datatype of your SQLite file is not defined: set it to 'signal' or 'features'.")
     # process text file
     else:
         try:
-            track.convert(extension and (fname, extension) or fname, dst)
+            btrack.convert(extension and (fname, extension) or fname, dst)
             datatype = handler.track.guess_datatype(extension)
-            with track.load(dst, 'sql', readonly=False) as t:
-                t.datatype = datatype
-                t.assembly = sequence_name
+            with btrack.track(dst, format='sql', info={'datatype': datatype},
+                              assembly=sequence_name) as t:
+                t.save()
             try:
                 os.remove(os.path.abspath(fname))
             except OSError:

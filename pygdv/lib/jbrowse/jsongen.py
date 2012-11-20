@@ -6,7 +6,7 @@ import os, sqlite3, json, math
 #from lib.jbrowse import higher_zoom, TYPE, zooms, JSON_HEIGHT, SUBLIST_INDEX, CHUNK_SIZE, LAZY_INDEX, ARROWHEAD_CLASS, CLASSNAME, HIST_CHUNK_SIZE
 from pygdv.lib.jbrowse import higher_zoom, TYPE, zooms, JSON_HEIGHT, SUBLIST_INDEX, CHUNK_SIZE, LAZY_INDEX, ARROWHEAD_CLASS, CLASSNAME
 import numpy as np
-import track
+from bbcflib.btrack import track
 
 #####################################################################
 #    QUANTITATIVE DATA
@@ -43,9 +43,9 @@ def _prepare_zoom_levels(sha1, chromosome):
 
 
 def _prepare_track_data(headers, subfeature_headers, sublist_index, lazy_index, 
-                       histogram_meta, hist_stats, subfeature_classes, feature_NCList, 
-                       client_config, feature_count, key, arrowhead_class, _type, 
-                       label, lasyfeature_url_template, classname):
+                        histogram_meta, hist_stats, subfeature_classes, feature_NCList, 
+                        client_config, feature_count, key, arrowhead_class, _type, 
+                        label, lasyfeature_url_template, classname):
     '''
     Prepare the track data for qualitative tracks.
     '''
@@ -77,10 +77,6 @@ _basic_fields = ('start', 'end', 'score', 'name', 'strand', 'attributes')
 _extended_headers = ('start', 'end', 'name', 'strand', 'subfeatures')
 _subfeature_headers = ('start', 'end', 'score', 'name', 'strand', 'type', 'attributes')
 _extended_fields = ('start', 'end', 'score', 'name', 'strand', 'type', 'attributes', 'id')
-
-
-
-
 _extended_client_config = {'labelScale':5, 'subfeatureScale':10, 
         'featureCallback':'(function(feat, fields, div){if(fields.type){getFeatureStyle(feat[fields.type],div);}})'}
 
@@ -192,9 +188,9 @@ def _count_features(cursor, loop, chr_length):
     array = np.zeros(nb)
     
     for row in cursor:
-        start = row['start']
+        start = row[0]
         start_pos = _get_array_index(start, loop)
-        end = row['end']
+        end = row[1]
         end_pos = _get_array_index(end, loop)
         array[start_pos:end_pos+1]+=1
     return array
@@ -318,9 +314,6 @@ def _write_histo_stats(generator, threshold, output):
         chunk_nb += 1
         with open(os.path.join(output, 'hist-%s-%s.json' % (threshold, chunk_nb)), 'w', -1) as f:
             f.write(json.dumps(array.tolist()))
-             
-     
-    
 
     
 def _calculate_histo_stats(array, threshold, chr_length):
@@ -330,7 +323,7 @@ def _calculate_histo_stats(array, threshold, chr_length):
     '''
     data = []
     for zoom in zooms:
-        base = zoom * threshold;
+        base = zoom * threshold
         if base < chr_length :
             sum_array = array.reshape(array.size/zoom, zoom).sum(axis=1)
             stats = _prepare_hist_stats(base, sum_array.mean(), sum_array.max())
@@ -343,27 +336,24 @@ def _generate_hist_outputs(array, bins, array_length):
     Generate the hist-output. 
     '''
     for i in xrange(1, array_length, bins):
-        yield array[i:i + bins]      
-    
-    
+        yield array[i:i+bins]
+
+
 def _threshold(chr_length, feature_count):
     '''
-    Get the threshold : when the view switch from feature to histogram
-    @param chr_length : the chromosome's length
+    Get the threshold when the view switch from feature to histogram
+    @param chr_length : the chromosome length
     @param feature_count : the total number of features
-    @return the threshold
     '''
-    t = (chr_length * 2.5 ) / feature_count;
-    for zoom in zooms :
-        t = zoom
-        if zoom > t : break;
-    return t
+    t = (chr_length * 2.5 ) / feature_count
+    for z in zooms:
+        t = z
+        if z > t : break;#### THIS IS ALWAYS FALSE
+    return t ##### THIS IS ALWAYS LAST ZOOM !!!!!!!
 
 
-
-    
-    
-def jsonify(database_path, name, sha1, output_root_directory, public_url, browser_url, extended = False):
+def jsonify(database_path, name, sha1, output_root_directory, 
+            public_url, browser_url, extended=False):
     '''
     Make a JSON representation of the database.
     @param database_path : the path to the sqlite database
@@ -379,13 +369,15 @@ def jsonify(database_path, name, sha1, output_root_directory, public_url, browse
     out_public_url = os.path.join(public_url, sha1)
     out_browser_url = os.path.join(browser_url, sha1)
     os.mkdir(output_path)
-    with track.load(database_path, 'sql', readonly=False) as t :
-        for chr_name in t:
-            chr_length = t.chrmeta[chr_name]['length']
+    with track(database_path, format='sql') as t :
+        for chr_name, chr_info in t.chrmeta.iteritems():
             out = os.path.join(output_path, chr_name)
             os.mkdir(out)
-            lazy_url = os.path.join(out_browser_url, chr_name, 'lazyfeatures-{chunk}.json')
-            _jsonify(t, name, chr_length, chr_name, os.path.join(out_public_url, chr_name), lazy_url, out, extended)
+            lazy_url = os.path.join(out_browser_url, 
+                                    chr_name, 'lazyfeatures-{chunk}.json')
+            _jsonify(t, name, chr_info['length'], chr_name, 
+                     os.path.join(out_public_url, chr_name), 
+                     lazy_url, out, extended)
     return 1
 
 def jsonify_quantitative(sha1, output_root_directory, database_path):
@@ -394,50 +386,32 @@ def jsonify_quantitative(sha1, output_root_directory, database_path):
         os.mkdir(output_path)
     except OSError: 
         pass
-    conn = sqlite3.connect(database_path)
-    cursor = conn.cursor()
-    cursor.execute('select name from chrNames;')
-    for row in cursor:
-        chr_name = row[0]
+
+    t = track(database_path,format='sql')
+    for chr_name in t.chrmeta:
         out = os.path.join(output_path, chr_name)
         try :
             os.mkdir(out)
         except OSError: 
             pass
-        cur = conn.cursor()
-        result = None
-        try:
-            result = cur.execute('select min(score), max(score) from "%s" ;' % chr_name).fetchone()
-        except sqlite3.OperationalError as e:
-            pass
-        if result:
+        result = t.get_range(selection=chr_name,fields=['score'])
+        if all(result):
             data = _prepare_quantitative_json(200, result[0], result[1], sha1, chr_name)
-            json_data = json.dumps(data)
             output = os.path.join(out, 'trackData.json')
-            with open(output, 'w', -1) as f:
-                f.write(json_data)
-            cur.close()
-        
-    cursor.close()
-    conn.close()
+            with open(output, 'w', -1) as f: json.dump(data,f)
     return 1
 
-def _gen_gen(t, chr_name,  gene_name_alias, gene_identifier_alias):
+def _gen_gen(t, chr_name,  gene_name, gene_id):
     prev_id = None
     l = []
-    #for row in t.read(chr_name, ['start', 'end', 'score', 'name', 'strand', 'type', 'attributes', 'id'], cursor=True):
-    for row in t.aggregated_read(chr_name, ('start', 'end', 'score', gene_name_alias, 'strand', 'type', gene_identifier_alias), order_by=gene_identifier_alias):
-        
-        idi = row[6]
-        if prev_id is not None:
-            if prev_id == idi :
-                l.append(row[0:6] + row[7:])
-            else :
-                yield prev_id, json.dumps(l)
-                l = []
-                l.append(row[0:6] + row[7:])
+    for row in t.read(selection=chr_name, order=t.fields[gene_id]):
+        idi = row[gene_id]
+        if prev_id is None or prev_id == idi :
+            l.append(row[:gene_id] + row[gene_id+1:])
         else :
-            l.append(row[0:6] + row[7:])
+            yield prev_id, json.dumps(l)
+            l = []
+            l.append(row[:gene_id] + row[gene_id+1:])
         prev_id = idi
     if prev_id is not None:
         yield prev_id, json.dumps(l)
@@ -446,23 +420,24 @@ def _gen_gen2(t, chr_name,  gene_name_alias, gene_identifier_alias):
     for row in t.aggregated_read(chr_name, ('start', 'end', 'score', gene_name_alias, 'strand', 'type', gene_identifier_alias)):
         yield row
 
-def _prepare_database(t, chr_name, gene_name_alias, gene_identifier_alias):
+def _prepare_database(t, chr_name, gene_name, gene_id):
     '''
     Add a table that will reference all sub-features for a feature.
     :return: the table name to erase after
     '''
-    
-    
-    table_name = 'tmp_%s' % chr_name
-    t.cursor().execute('drop table if exists "%s";' % table_name)
+    table_name = 'tmp_%s' %chr_name
+    t.cursor.execute('drop table if exists "%s"' %table_name)
     ##  'create table tmp_%s' % chr_name
-    t.cursor().execute('create table "%s"(id text, subs text, foreign key(id) references "%s"(id));' % (table_name, chr_name))
-    t.write(table_name, _gen_gen(t, chr_name, gene_name_alias, gene_identifier_alias) , ('id', 'subs'))
+    t.cursor.execute('create table "%s" (id text, subs text, foreign key(id) references "%s"(id))' % (table_name, chr_name))
+    t.write(_gen_gen(t, chr_name, gene_name, gene_id), 
+            chrom=table_name, fields=['id', 'subs'])
     table_name2 = 'tmp_%s2' % chr_name
     ##  'create table tmp_%s2' % chr_name
-    t.cursor().execute('drop table if exists "%s";' % table_name2)
-    t.cursor().execute('create table "%s"(start int, end int, score float, name text, strand int , type text, id text, attributes text);' % (table_name2))
-    t.write(table_name2, _gen_gen2(t, chr_name, gene_name_alias, gene_identifier_alias) , ('start', 'end', 'score', 'name', 'strand', 'type', 'id', 'attributes'))
+    t.cursor.execute('drop table if exists "%s"' %table_name2)
+    t.cursor.execute('create table "%s"(start int, end int, score float, name text, strand int , type text, id text, attributes text)' %table_name2)
+    t.write(_gen_gen2(t, chr_name, gene_name, gene_id) , 
+            chrom=table_name2, 
+            fields=['start', 'end', 'score', 'name', 'strand', 'type', 'id', 'attributes'])
     
     return table_name, table_name2
     
@@ -475,40 +450,31 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
     @param url_output : url access to the ressources
     '''
     
-    gene_name_alias =  t.find_column_name(['name', 'gene_name', 'gene name', 'gname', 'Name', 'product'])
-    att_name = '%s' % gene_name_alias
-    if gene_name_alias == '':
-        att_name = 'name'
-            
+    gene_column = t.column_by_name(['name', 'gene_name', 'gene name', 'gname', 'Name', 'product'])
+    att_name = t.fields[gene_column] or 'name'
     if extended :
-        gene_identifier_alias =  t.find_column_name(['id', 'gene_id', 'gene id', 'Id', 'identifier', 'Identifier', 'protein_id'])
+        geneid_column = t.column_by_name(['id', 'gene_id', 'gene id', 'Id', 'identifier', 'Identifier', 'protein_id'])
         headers = _extended_headers
         subfeature_headers = _subfeature_headers
-
-        
         client_config = _extended_client_config
-        ##  'preparedb'
-        table_name , table_name2 = _prepare_database(t, chr_name, att_name, gene_identifier_alias)
-        
-        #t.cursor.execute('select min(t1.start), max(t1.end), t1.score, t1.name, t1.strand, t1.type, t1.attributes, t1.id, count(t1.id), t2.subs from "%s" as t1 inner join "%s" as t2 on t1.id = t2.id group by t1.id order by t1.start asc, t1.end asc ;' % (chr_name, table_name))
-        cursor = t.cursor().execute('select min(t1.start), max(t1.end), t1.score, t1.name, t1.strand, t1.type, t1.attributes, t1.id, count(t1.id), t2.subs from "%s" as t1 inner join "%s" as t2 on t1.id = t2.id group by t1.id order by t1.start asc, t1.end asc ;' % (table_name2, table_name))
+        table_name , table_name2 = _prepare_database(t, chr_name, att_name, geneid_column)
+        cursor = t.cursor.execute('select min(t1.start), max(t1.end), t1.score, t1.name, t1.strand, t1.type, t1.attributes, t1.id, count(t1.id), t2.subs from "%s" as t1 inner join "%s" as t2 on t1.id = t2.id group by t1.id order by t1.start asc, t1.end asc' % (table_name2, table_name))
         
         ## ' calculate lazy features'
         lazy_feats = _generate_lazy_output(
-                    _generate_nested_extended_features(cursor, keep_field=7, count_index=8, 
-                                    subfeatures_index=9, start_index=0, end_index=1, name_index=3, strand_index=4))
-        
+            _generate_nested_extended_features(cursor, keep_field=7, count_index=8, subfeatures_index=9, start_index=0, end_index=1, name_index=3, strand_index=4))
     else :
         headers = _basic_headers
         subfeature_headers = _basic_subfeature_headers
         client_config = _basic_client_config
         ## ' calculate lazy features'
-        
-        gen =  t.aggregated_read(chr_name, ('start', 'end', 'score', att_name, 'strand'), order_by='start asc, end asc');
-        #cursor = t.cursor().execute('select t1.start, t1.end, t1.score, %s , t1.strand, t1.attributes from "%s" as t1 order by t1.start asc, t1.end asc ;' % (att_name, chr_name) )
+        gen = t.aggregated_read(chr_name, 
+                                fields=['start', 'end', 'score', att_name, 'strand'], 
+                                order='start asc, end asc')
+        #cursor = t.cursor().execute('select t1.start, t1.end, t1.score, %s , t1.strand, t1.attributes from "%s" as t1 order by t1.start asc, t1.end asc' % (att_name, chr_name) )
         
         lazy_feats = _generate_lazy_output(
-                            _generate_nested_features(gen, keep_field=6, start_index=0, end_index=1))
+            _generate_nested_features(gen, keep_field=6, start_index=0, end_index=1))
    
    
     ## 'NCLIST'
@@ -523,31 +489,18 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
     
     if extended :
         
-        ## 'erase table'
-        ## 'drop table %s'% table_name
-        t._cursor.execute('drop table "%s";' % table_name)
-        
-        ## 'drop table %s'% table_name2
-        t._cursor.execute('drop table "%s";' % table_name2)
-        t.vacuum()
-        #t.cursor.execute('vacuum')
-        ## 'dropped'
-            
+        t.cursor.execute('drop table "%s"' % table_name)
+        t.cursor.execute('drop table "%s"' % table_name2)
+        t.cursor.execute('vacuum')
     if feature_count == 0 : feature_count = 1
-    
-    ## ' threshold %s, %s ' % (chr_length, feature_count)
     threshold = _threshold(chr_length, feature_count)
-    
-    ## ' histogram meta %s, %s, %s' % (chr_length, threshold, url_output)
-    
-    
-    cursor = t.cursor().execute("select * from '%s' ;" % (chr_name))
+    cursor = t.read(chr_name,fields=['start','end'])
     array = _count_features(cursor, threshold, chr_length)
     
     ## ' hists stats'
     hist_stats = _calculate_histo_stats(array, threshold, chr_length)
-
-    histogram_meta = write_histogram_meta(chr_length, threshold, array, url_output, output_directory, zooms)
+    histogram_meta = write_histogram_meta(chr_length, threshold, array, 
+                                          url_output, output_directory, zooms)
     
     data = _prepare_track_data(
                                headers, 
@@ -568,14 +521,8 @@ def _jsonify(t, name, chr_length, chr_name, url_output, lazy_url, output_directo
                                CLASSNAME
                                )
     
-    
-    
-    ## ' convert to json'
-    json_data = json.dumps(data)
-    ## ' write track data'
     track_data_output = os.path.join(output_directory, 'trackData.json')
-    with open(track_data_output, 'w', -1) as f:
-            f.write(json_data)
+    with open(track_data_output, 'w', -1) as f: json.dump(data,f)
 
     return 1
 

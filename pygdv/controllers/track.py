@@ -17,7 +17,8 @@ from pygdv.widgets import datagrid, form
 from pygdv import handler
 from pygdv.lib import util, constants, checker, reply
 from pygdv.worker import tasks
-import tempfile, track
+import tempfile
+from bbcflib import btrack
 import tw2.core as twc
 import json
 from pygdv.lib import filemanager
@@ -337,7 +338,7 @@ class TrackController(BaseController):
         else :
             tmp_file = tempfile.NamedTemporaryFile(delete=True)
             tmp_file.close()
-            track.convert(_track.path, (tmp_file.name, format))
+            btrack.convert(_track.path, (tmp_file.name, format))
             response.content_type = 'text/plain'
             return open(tmp_file.name).read()
 

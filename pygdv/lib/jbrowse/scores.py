@@ -5,7 +5,7 @@ import math, sqlite3, shutil, os
 import numpy as np
 from pygdv.lib.util import float_equals
 from pygdv.lib.jbrowse import TAB_WIDTH, zooms
-import track
+from bbcflib.btrack import track
 from ConfigParser import ParsingError
 from bbcflib.common import timer
 
@@ -187,13 +187,13 @@ def pre_compute_sql_scores(database_path, sha1, output_dir):
     
     #print 'prepare connection'
     
-    with track.load(database_path, format='sql', readonly=True) as t:
-        for chromosome in t:
+    with track(database_path, format='sql', readonly=True) as t:
+        for chromosome in t.chrmeta:
             #       print 'doing chr %s' % chromosome
-            max = get_last_feature_stop(t, chromosome)
+            min, max = t.get_range(chromosome)
             if max is not None:
                 #          print 'generating score array'
-                array = generate_array(t.read(chromosome, ('start', 'end', 'score')), max, 100000)
+                array = generate_array(t.read(chromosome, fields=['start', 'end', 'score']), max, 100000)
     
                 #         print 'doing for each zoom'            
                 for zoom in zooms:

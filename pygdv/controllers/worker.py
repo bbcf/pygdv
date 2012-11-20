@@ -7,13 +7,14 @@ from pygdv.worker import tasks
 from celery.task import chord
 from pygdv import handler
 from pygdv.model import DBSession, Project, Job
-import track, json
+from bbcflib.btrack import track
+import json
 from pygdv.lib import util, constants
 import sys, traceback
 
 __all__ = ['WorkerController']
 
-simple_fields = ('start', 'end', 'score', 'name', 'strand', 'attributes')
+simple_fields = ['start', 'end', 'score', 'name', 'strand', 'attributes']
 
 class WorkerController(BaseController):
     allow_only = has_any_permission(constants.perm_admin, constants.perm_user)
@@ -35,14 +36,16 @@ class WorkerController(BaseController):
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         if project is None :
             return {'error' : "project id %s doesn't exist" % project_id}
-        path = track.common.temporary_path()
-        
-        with track.new(path, 'sql') as t:
-            t.fields = simple_fields
-            for chromosome in sels:
-                t.write(chromosome, ((marquee['start'], marquee['end'], 0, '', 0 , '') for marquee in sels[chromosome]))
-            t.datatype = constants.FEATURES
-            t.assembly = project.sequence.name
+        tmp_file = tempfile.NamedTemporaryFile(delete=True)
+        tmp_file.close()
+        with track(tmp_file.path, format='sql', 
+                   fields=simple_fields,
+                   info={'datatype': constants.FEATURES}, 
+                   assembly=project.sequence.name) as t:
+            for chrom, mar in sels.iteritems():
+                t.write(chrom, 
+                        track.FeatureStream(((m['start'], m['end']) for m in mar),
+                        fields=['start','end']))
             
         task_id, track_id = handler.track.create_track(user.id, project.sequence, f=path, trackname='%s %s' 
                                          % (job_name, job_description), project=project)
