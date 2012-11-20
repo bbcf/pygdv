@@ -59,7 +59,7 @@ class FileInfo(object):
             'admin': admin,
             'uploaded': False
         }
-        self.visualizations = []
+        self.vizualisations = []
 
     def download(self):
         """
@@ -68,14 +68,23 @@ class FileInfo(object):
         if self.inputtype == 'fsys':
             download_fsys(self.paths['in'], self.paths['upload_to'])
             self.states['uploaded'] = True
+            self.states['from'] = self.paths['in']
+            self.paths['in'] = None
         elif self.inputtype == 'url':
             download_url(self.paths['in'], self.paths['upload_to'])
             self.states['uploaded'] = True
-        elif self.inputtype == 'file_upload':
-            self.download_file_field(self.paths['in'], self.paths['upload_to'])
+            self.states['from'] = self.paths['in']
+            self.paths['in'] = None
+        elif self.inputtype == 'fu':
+            download_file_field(self.paths['in'], self.paths['upload_to'])
             self.states['uploaded'] = True
+            self.states['from'] = 'filefield'
+            self.paths['in'] = None
 
     def __repr__(self):
-        return """<fi> intype: %s | name: %s | uploaded: %s | admin: %s
-        paths: %s
-        """ % (self.inputtype, self.trackname, self.uploaded, self.admin, ' | '.join(['%s : %s' % (k, v) for k, v in self.paths.iteritems()]))
+        return """<fi> intype: %s | name: %s | extension: %s
+                        paths: %s
+                        states: %s
+        """ % (self.inputtype, self.trackname, self.extension,
+            ' | '.join(['%s : %s' % (k, v) for k, v in self.paths.iteritems()]),
+                ' | '.join(['%s : %s' % (k, v) for k, v in self.states.iteritems()]))

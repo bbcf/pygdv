@@ -22,6 +22,13 @@ import tw2.core as twc
 import json
 from pygdv.lib import filemanager
 
+DEBUG_LEVEL = 1
+
+
+def debug(s, t=0):
+    if DEBUG_LEVEL > 0:
+        print '[track] %s%s' % ('\t' * t, s)
+
 
 class TrackController(BaseController):
     allow_only = has_any_permission(constants.perm_user, constants.perm_admin)
@@ -115,6 +122,7 @@ class TrackController(BaseController):
         user = handler.user.get_user_in_session(request)
         # get sequence
         sequence = None
+        debug('Create track %s' % kw)
         if 'assembly' in kw and kw.get('assembly'):
             assembly = int(kw.get('assembly'))
             sequence = DBSession.query(Sequence).filter(Sequence.id == assembly).first()
@@ -136,36 +144,42 @@ class TrackController(BaseController):
         # know if file is comming from url, fileupload or filsystem
         filetoget = None
         inputtype = None
-        print kw
         if 'url' in kw and kw.get('url'):
+            debug('from url', 1)
             filetoget = kw.get('url')
             if not filetoget.startswith('http://'):
                 filetoget = 'http://%s' % filetoget
             inputtype = 'url'
         elif 'fsys' in kw and kw.get('fsys'):
+            debug('fsys', 1)
             filetoget = kw.get('fsys')
             inputtype = 'fsys'
-        elif 'file_upload' in kw and kw.get('file_upload'):
+        elif 'file_upload' in kw and kw.get('file_upload') is not None:
+            debug('file upload', 1)
             filetoget = kw.get('file_upload')
             inputtype = 'fu'
-        if not filetoget:
+        if filetoget is None:
             reply.error(request, 'No file to upload', tg.url('./new'), {})
 
+        debug('file2get: %s, intype: %s' % (filetoget, inputtype), 2)
         # get file name
         trackname = None
-        if 'trackname' in kw and kw.get('trackname'):
+        if 'trackname' in kw and kw.get('trackname') is not None:
             trackname = kw.get(trackname)
         else:
             if inputtype == 'url':
+                debug('trackname from url', 2)
                 trackname = os.path.split(filetoget)[1].split('?')[0]
             elif inputtype == 'fsys':
+                debug('trackname from fsys', 2)
                 trackname = os.path.split(filetoget)[-1]
             elif inputtype == 'fu':
+                debug('trackname from fu', 2)
                 trackname = filetoget.filename
-        if not trackname:
+        if trackname is None:
             reply.error(request, 'No trackname found', tg.url('./new'), {})
 
-        print 'trackname: %s' % trackname
+        debug('trackname: %s' % trackname, 1)
         # get extension
         extension = None
         if 'extension' in kw and kw.get('extension'):
@@ -174,8 +188,10 @@ class TrackController(BaseController):
             extension = kw.get('ext')
         else:
             extension = os.path.splitext(trackname)[-1]
-        if not extension:
+        if extension is None:
             reply.error(request, 'No extension found', tg.url('./new'), {})
+        if extension.startswith('.'):
+            extension = extension[1:]
 
         # is the track "admin"
         admin = False
@@ -184,19 +200,26 @@ class TrackController(BaseController):
             group_admin = DBSession.query(Group).filter(Group.id == constants.group_admins_id).first()
             if user in group_admin.users:
                 admin = True
-
+        debug('admin: %s' % admin, 1)
         #store information in a dummy object
         out = os.path.join(filemanager.temporary_directory(), trackname)
         fileinfo = filemanager.FileInfo(inputtype=inputtype, inpath=filetoget, trackname=trackname, extension=extension, outpath=out, admin=admin)
-
+        debug('fileinfo: %s' % fileinfo, 1)
         # get additionnal information
         user_info = {'id': user.id, 'name': user.name, 'email': user.email}
         sequence_info = {'id': sequence.id, 'name': sequence.name}
 
+        #upload the track it's from file_upload
+        if inputtype == 'fu':
+            debug('Download', 1)
+            fileinfo.download()
+
+        debug('fileinfo: %s' % fileinfo, 1)
         # create a track that the user can see something
         t = Track()
         t.name = fileinfo.trackname
-        t.sequence_id = sequence_id
+        t.sequence_id = sequence.id
+        t.user_id = user.id
         DBSession.add(t)
         DBSession.flush()
         # send task
@@ -204,13 +227,9 @@ class TrackController(BaseController):
         t.task_id = async.task_id
         DBSession.add(t)
         DBSession.flush()
-        print 'got task id %s ' % tid
-        reply.normal(request, 'Processing launched.', '/tracks/', {'track_id': _track.id})
+        debug('End create')
+        reply.normal(request, 'Processing launched.', '/tracks/', {'track_id': t.id})
 
-        # upload the track it's from file_upload
-        # if inputtype == 'file_upload':
-        #     filemanager.download_file_field(fileinfo.paths['in'], fileinfo.paths['upload_to'])
-        #     fileinfo.uploaded = True
 
         # determine processes to launch
 

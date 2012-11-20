@@ -37,6 +37,35 @@ def init_model():
 
 DBSession = init_model()
 
+
+@task()
+def signal(fileinfo, output_directory):
+    debug('Signal %s' % fileinfo)
+    execfile_path = os.path.join(constants.bin_directory_path, 'psd.jar')
+    input_file_path = fileinfo.paths['store']
+    p = subprocess.Popen(['java', '-jar', execfile_path, input_file_path, fileinfo.info['sha1'], output_directory], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    result = p.wait()
+    if result == 1:
+        err = ', '.join(p.stderr)
+        raise Exception(err)
+    debug('Jsonify signal', 1)
+    jsongen.jsonify_quantitative(fileinfo.info['sha1'], output_directory, input_file_path)
+
+
+@task()
+def features(fileinfo, output_directory):
+    debug('Features %s' % fileinfo)
+    input_file_path = fileinfo.paths['store']
+    jsongen.jsonify(input_file_path, fileinfo.trackname, fileinfo.info['sha1'], output_directory, '/data/jbrowse', '', False)
+
+
+@task()
+def relational(fileinfo, output_directory):
+    debug('Relational %s' % fileinfo)
+    input_file_path = fileinfo.paths['store']
+    jsongen.jsonify(input_file_path, fileinfo.trackname, fileinfo.info['sha1'], output_directory, '/data/jbrowse', '', True)
+
+
 extensions = ['sql', 'bed', 'gff', 'gtf', 'bigwig', 'bw', 'wig', 'wiggle', 'bedgraph', 'bam', 'sam']
 
 mappings = {
@@ -87,9 +116,9 @@ mappings = {
         'relational': constants.vizualisations['relational'],
     },
     'process': {
-        'signal': '',
-        'features': '',
-        'relational': ''
+        'signal': signal,
+        'features': features,
+        'relational': relational
     }
 
 }
@@ -101,55 +130,63 @@ def new_input(user_info, fileinfo, sequence_info, track_id):
     Add an new input in GDV.
     """
     debug('New input uinfo : %s, sequenceinfo :%s, fileinfo : %s' % (user_info, sequence_info, fileinfo))
-    debug('Upload', 1)
-    # upload | get sha1
-    fileinfo = (upload.s(fileinfo) | sha1.s())().get()
-    s = fileinfo.info['sha1']
-    debug('Extension %s' % fileinfo, 1)
-    # guess extension
-    fileinfo = guess_extension.s(fileinfo).get()
-    fileinfo.states['tosql'] = mappings['tosql'][fileinfo.extension]
-    debug('Store %s' % fileinfo, 1)
-    # where put the input file
-    fileinfo.paths['store'] = mappings['store'][fileinfo.extension]
-    debug('Vizu %s' % fileinfo, 1)
-    # which vizualizations to launch
-    fileinfo = guess_vizualisations.s(fileinfo).get()
-    debug('Input %s' % fileinfo, 1)
-    # get the input
-    inp = DBSession.query(model.Input).filter(model.Input.sha1 == s).first()
+    output_directory = None
+    try:
+        # upload | get sha1
+        fileinfo = (upload.s(fileinfo) | sha1.s())().get()
+        s = fileinfo.info['sha1']
+        # guess extension
+        fileinfo = guess_extension.delay(fileinfo).get()
+        fileinfo.states['tosql'] = mappings['tosql'][fileinfo.extension]
+        debug('Store %s' % fileinfo, 1)
+        # where put the input file
+        out_directory = os.path.join(mappings['store'][fileinfo.extension], fileinfo.info['sha1'])
 
-    # get the sequence
-    #seq = DBSession.query(model.Sequence).filter(model.Sequence.id == sequence_info['id']).first()
+        fileinfo.paths['store'] = os.path.join(out_directory, '%s.sql' % fileinfo.trackname.split('.')[0])
+        try:
+            # mk output dir
+            os.mkdir(out_directory)
+        except OSError:
+            pass
+        debug('Vizu %s' % fileinfo, 1)
+        # which vizualizations to launch
+        fileinfo = guess_vizualisations.delay(fileinfo).get()
+        debug('Input %s' % fileinfo, 1)
+        # get the input
+        inp = DBSession.query(model.Input).filter(model.Input.sha1 == s).first()
 
-    if inp is None:
-        debug('New input', 2)
-        inp = model.Input()
-        inp.sha1 = s
-        inp.path = fileinfo.paths['store']
-        inp.task_id = new_input.request.id
-        DBSession.add(inp)
-        DBSession.flush()
+        if inp is None:
+            debug('New input', 2)
+            inp = model.Input()
+            inp.sha1 = s
+            inp.path = fileinfo.paths['store']
+            inp.task_id = new_input.request.id
+            DBSession.add(inp)
+            DBSession.flush()
 
-        if fileinfo.tosql:
-            debug('To sql', 3)
-            # transform to sql
-            fileinfo = (tosql.s(fileinfo, sequence_info['name']))().get()
-        else:
-            debug('To store', 3)
-            # move to store
-            fileinfo = (tostore.s(fileinfo))().get()
-
-    # (if input is already in the store, just delete the file)
-    debug('Delete tmp %s' % fileinfo, 1)
-    # delete tmp directory
-    fileinfo = deltmp.s(fileinfo).get()
+            if fileinfo.states['tosql']:
+                # transform to sql
+                fileinfo = (tosql.s(fileinfo, sequence_info['name']))().get()
+            else:
+                # move to store
+                fileinfo = (tostore.s(fileinfo))().get()
+    except:
+        raise
+    finally:
+        # (if input is already in the store, just delete the file)
+        # delete tmp directory
+        fileinfo = deltmp.delay(fileinfo).get()
+        if output_directory is not None:
+            debug('deleting output dir %s' % out_directory, 3)
+            shutil.rmtree(out_directory)
 
     fileinfo.info['input_id'] = inp.id
+
     debug('Vizualisations %s' % fileinfo, 1)
     # launch vizualisation
     for index, viz in enumerate(fileinfo.vizualisations):
         debug(viz, 2)
+        out_directory = os.path.join(mappings['vizu_store'][viz], fileinfo.info['sha1'])
         if index == 0:
             t = DBSession.query(model.Track).filter(model.Track.id == track_id).first()
         else:
@@ -159,12 +196,17 @@ def new_input(user_info, fileinfo, sequence_info, track_id):
         t.user_id = user_info['id']
         t.sequence_id = sequence_info['id']
         t.visualization = viz
-        t.path = mappings['vizu_store'][viz]
+        t.output_directory = out_directory
+        try:
+            async = mappings['process'][viz].delay(fileinfo, mappings['vizu_store'][viz])
+            async.get()
+            t.task_id = async.task_id
+            DBSession.add(t)
+        except:
+            shutil.rmtree(out_directory, ignore_errors=True)
+            raise
 
-        async = mappings['process'][viz].delay(fileinfo, mappings['vizu_store'][viz])
-        t.task_id = async.task_if
-        DBSession.add(t)
-        DBSession.flush()
+    DBSession.flush()
     #parameters = Column(JSONEncodedDict, nullable=True)
     #visualization = Column(VARCHAR(255), default='not determined')
     #path = Column(Unicode(), nullable=True)    depend on vizu
@@ -176,17 +218,19 @@ def new_input(user_info, fileinfo, sequence_info, track_id):
 
 @task()
 def guess_vizualisations(fileinfo):
+    debug('guess vizu', 3)
     if not fileinfo.extension == 'sql':
-        fileinfo.vizualizations.extends(mappings['viz'][fileinfo.extension])
+        fileinfo.vizualisations.extend(mappings['viz'][fileinfo.extension])
         return fileinfo
     dt = btrack.track(fileinfo.paths['upload_to']).datatype
     if dt and dt.lower() in mappings['viz']:
-        fileinfo.vizualizations.extends(mappings['viz'][dt.lower()])
+        fileinfo.vizualisations.extend(mappings['viz'][dt.lower()])
     raise Exception('Cannot guess the vizualisation for fileinfo "%s".' % fileinfo)
 
 
 @task()
 def guess_extension(fileinfo):
+    debug('guess extension', 3)
     if fileinfo.extension in extensions:
         return fileinfo
     file_path = fileinfo.paths['upload_to']
@@ -205,7 +249,9 @@ def upload(fileinfo):
     Upload a file.
     """
     if not fileinfo.states['uploaded']:
+        debug('Upload', 2)
         fileinfo.download()
+    debug('Uploaded', 2)
     return fileinfo
 
 
@@ -214,12 +260,14 @@ def sha1(fileinfo):
     """
     Compute the hex sha1 of a file.
     """
+    debug('Sha1', 2)
     if not 'sha1' in fileinfo.info:
         s = hashlib.sha1()
         with open(fileinfo.paths['upload_to'], 'rb') as infile:
             for chunk in iter(lambda: infile.read(128 * 64), ''):
                 s.update(chunk)
         fileinfo.info['sha1'] = s.hexdigest()
+    debug('Sha1 %s' % fileinfo.info['sha1'], 2)
     return fileinfo
 
 
@@ -228,8 +276,10 @@ def tosql(fileinfo, seq_name):
     """
     Transform a input file to an sql one.
     """
+    debug('tosql : btrack.convert("%s", "%s", chrmeta="%s")' % (fileinfo.paths['upload_to'], fileinfo.paths['store'], seq_name), 3)
     btrack.convert(fileinfo.paths['upload_to'], fileinfo.paths['store'], chrmeta=seq_name)
     fileinfo.states['instore'] = True
+    return fileinfo
 
 
 @task()
@@ -237,8 +287,9 @@ def deltmp(fileinfo):
     """
     Delete the original uploaded file.
     """
+    debug('del tmp', 3)
     if not fileinfo.states['tmpdel']:
-        shutil.rmtree(os.path.split(fileinfo.paths['upload_to'][0]))
+        shutil.rmtree(os.path.split(fileinfo.paths['upload_to'])[0])
         fileinfo.states['tmpdel'] = True
     return fileinfo
 
@@ -248,38 +299,13 @@ def tostore(fileinfo):
     """
     Move a file to it's storage location.
     """
+    debug('to store', 3)
     if not fileinfo.states['instore']:
         shutil.move(fileinfo.paths['upload_to'], fileinfo.paths['store'])
         fileinfo.states['instore'] = True
     return fileinfo
 
 
-@task()
-def signal(fileinfo, output_directory):
-    debug('Signal %s' % fileinfo)
-    execfile_path = os.path.join(constants.bin_directory_path, 'psd.jar')
-    input_file_path = fileinfo.paths['store']
-    p = subprocess.Popen(['java', '-jar', execfile_path, input_file_path, fileinfo.info['sha1'], output_directory], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    result = p.wait()
-    if result == 1:
-        err = ', '.join(p.stderr)
-        raise Exception(err)
-    debug('Jsonify signal', 1)
-    jsongen.jsonify_quantitative(fileinfo.info['sha1'], output_directory, input_file_path)
-
-
-@task()
-def features(fileinfo, output_directory):
-    debug('Features %s' % fileinfo)
-    input_file_path = fileinfo.paths['store']
-    jsongen.jsonify(input_file_path, fileinfo.trackname, fileinfo.info['sha1'], output_directory, '/data/jbrowse', '', False)
-
-
-@task()
-def relational(fileinfo, output_directory):
-    debug('Relational %s' % fileinfo)
-    input_file_path = fileinfo.paths['store']
-    jsongen.jsonify(input_file_path, fileinfo.trackname, fileinfo.info['sha1'], output_directory, '/data/jbrowse', '', True)
 
 # @task()
 # def multiple_track_input(_uploaded, _file, _url, _fsys, sequence_id, user_mail, user_key, project_id, force, delfile, _callback_url, _extension):

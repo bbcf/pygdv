@@ -309,9 +309,8 @@ class Input(DeclarativeBase):
     _last_access = Column(DateTime, default=datetime.now, nullable=False)
     path = Column(Unicode, nullable=True)
 
-    task_id = Column(VARCHAR(255), ForeignKey('celery_taskmeta.task_id', ondelete="CASCADE"), nullable=True)
-#    task = relationship('Task', uselist=False, primaryjoin='Input.task_id == Task.task_id', foreign_keys='Task.task_id')
-    task = relationship('Task', uselist=False)
+    task_id = Column(VARCHAR(255), nullable=True)
+    task = relationship('Task', uselist=False, primaryjoin='Input.task_id == Task.task_id', foreign_keys='Task.task_id')
 
     parent_id = Column(Integer, ForeignKey('Input.id'), nullable=True)
     children = relationship("Input")
@@ -371,11 +370,10 @@ class Track(DeclarativeBase):
     parameters = Column(JSONEncodedDict, nullable=True)
     visualization = Column(VARCHAR(255), default='not determined')
 
-    path = Column(Unicode(), nullable=True)
+    output_directory = Column(Unicode, nullable=True)
 
-    task_id = Column(VARCHAR(255), ForeignKey('Input.id', ondelete="CASCADE"), nullable=True)
-#    task = relationship('Task', uselist=False, primaryjoin='Track.task_id == Task.task_id', foreign_keys='Task.task_id')
-    task = relationship('Task', uselist=False)
+    task_id = Column(VARCHAR(255), nullable=True)
+    task = relationship('Task', uselist=False, primaryjoin='Track.task_id == Task.task_id', foreign_keys='Task.task_id')
 
     def __repr__(self):
         return '<Track: id=%r, name=%r, created=%r, vizu=%r, user_id=%r>' % (self.id, self.name, self.created, self.vizu, self.user_id)
@@ -406,17 +404,15 @@ class Track(DeclarativeBase):
 
     @property
     def status(self):
-        if self.input is None:
+        if self.task is None:
             return 'PENDING'
-        return self.input.status
-
-    @property
-    def task(self):
-        return self.input.task
+        return self.task.status
 
     @property
     def traceback(self):
-        return self.input.traceback
+        if self.task is None:
+            return ''
+        return self.task.traceback
 
     @property
     def vizu(self):

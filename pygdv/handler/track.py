@@ -102,13 +102,14 @@ def fetch_track_parameters(url=None, file_upload=None, fsys=None, trackname=None
 
     # remove dot in the first position only
     if extension.find('.') == 0:
-        extension = extension.replace('.','',1)
+        extension = extension.replace('.', '',1)
 
     if sequence_id is None:
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         sequence_id = project.sequence_id
         extension = extension.replace('.', '').lower()
     return trackname, extension, sequence_id
+
 
 def new_track(user_id, track_name, sequence_id, admin=False, project_id=None):
     """
@@ -144,6 +145,7 @@ def new_track(user_id, track_name, sequence_id, admin=False, project_id=None):
     DBSession.flush()
 
     return _track
+
 
 def finalize_track_creation(_track=None, track_id=None):
     if _track is None:
@@ -264,9 +266,10 @@ def delete_track(track=None, track_id=None):
         track = DBSession.query(Track).filter(Track.id == track_id).first()
     if track is None: return
     _input = track.input
-    if len(_input.tracks) == 1:
-        delete_input(_input.sha1)
-        DBSession.delete(_input)
+    if _input is not None:
+        if len(_input.tracks) == 1:
+            delete_input(_input.sha1)
+            DBSession.delete(_input)
     DBSession.delete(track)
     DBSession.flush()
 

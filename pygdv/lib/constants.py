@@ -26,9 +26,9 @@ bin_directory_path = os.path.join(PROJECT_ROOT, 'bin')
 
 
 vizualisations = {
-    'signal': 'signal',
-    'relational': 'relational',
-    'features': 'features',
+    'signal': ['signal'],
+    'relational': ['relational'],
+    'features': ['features'],
     'bam': ['bam_coverage', 'bam_feature']
 }
 

@@ -11,7 +11,6 @@ from pygdv import handler
 import json, urllib, urllib2, os
 from pygdv import handler
 from pygdv.model import DBSession, Job, Result
-from bbcflib import gdv
 
 file_tags = ['track', 'wig', 'bed']
 
