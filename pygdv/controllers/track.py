@@ -312,7 +312,7 @@ class TrackController(BaseController):
     def edit(self, track_id, **kw):
         user = handler.user.get_user_in_session(request)
         if track_id is not None:
-            if not checker.can_edit_track(user, track_id) :
+            if not checker.can_edit_track(user, track_id):
                 flash("You haven't the right to edit any tracks which is not yours", 'error')
                 raise redirect('/tracks')
 
@@ -324,20 +324,19 @@ class TrackController(BaseController):
         d['name'] = track.name
         if track.parameters is None:
             cc = constants.default_track_color
-        else :
+        else:
             cc = track.parameters.color
         d['track_id'] = track_id
         d['color'] = cc
         widget.value = d
         if request.method == 'GET':
-            return dict(title='Edit track', page='track', widget=widget, color=cc )
+            return dict(title='Edit track', page='track', widget=widget, color=cc)
 
         if request.method == 'POST':
             try:
                 widget.validate(kw)
             except twc.ValidationError as e:
                 return dict(title='Edit track', page='track', widget=e.widget, color=cc)
-
         handler.track.edit(track=track, name=kw.get('name', None), color=kw.get('color', None))
         raise redirect('/tracks')
 

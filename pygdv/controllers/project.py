@@ -26,42 +26,46 @@ import json
 
 __all__ = ['ProjectController']
 
+DEBUG_LEVEL = 1
+
+
+def debug(s, t=0):
+    if DEBUG_LEVEL > 0:
+        print '[project controller] %s%s' % ('\t' * t, s)
+
 
 class ProjectController(BaseController):
     allow_only = has_any_permission(constants.perm_user, constants.perm_admin)
-
-
 
     @expose('pygdv.templates.project_new')
     def new(self, *args, **kw):
         new_form = form.NewProject(action=url('/projects/create')).req()
         species = DBSession.query(Species).all()
-        sp_opts =  [(sp.id,sp.name) for sp in species]
+        sp_opts = [(sp.id, sp.name) for sp in species]
         new_form.child.children[2].options = sp_opts
         mapping = json.dumps(dict([(sp.id, [(seq.id, seq.name) for seq in sp.sequences
                                                                if seq.public or handler.genrep.checkright(seq, user)]) for sp in species]))
         new_form.value = {'smapping' : mapping}
         return dict(page='projects', widget=new_form)
 
-
     @with_trailing_slash
     @expose('pygdv.templates.project_edit')
     def edit(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-
+        debug("EDIT")
         if request.method == 'GET':
             project_id = args[0]
-        else :
+        else:
             project_id = kw.get('pid')
-
+        debug("check permission", 1)
         if not checker.check_permission(user=user, project_id=project_id, right_id=constants.right_upload_id) and not checker.is_admin(user=user):
             flash('You must have %s permission to edit the project.' % constants.right_upload, 'error')
-            raise redirect('/tracks/', {'pid' : project_id})
+            raise redirect('/tracks/', {'pid': project_id})
         #if checker.is_admin(user=user):
             #user = DBSession.query(User).join(Project).filter(Project.id == project_id).first()
 
         widget = form.EditProject(action=url('/projects/edit/%s' % project_id)).req()
-        widget.value = {'pid' : project_id}
+        widget.value = {'pid': project_id}
         project = DBSession.query(Project).filter(Project.id == project_id).first()
 
         tracks = DBSession.query(Track).join(User.tracks).filter(
@@ -69,27 +73,31 @@ class ProjectController(BaseController):
                 not_(Track.id.in_([t.id for t in project.tracks])))
         ).all()
 
-
         if request.method == 'GET':
+            debug("GET", 2)
             widget.child.children[1].value = project.name
-            widget.child.children[2].options = [('','')] + [(t.id, t.name) for t in tracks] + [(t.id, t.name, {'selected' : True}) for t in project.tracks]
+            widget.child.children[2].options = [('', '')] + [(t.id, t.name) for t in tracks] + [(t.id, t.name, {'selected' : True}) for t in project.tracks]
             return dict(page='tracks', widget=widget, project_id=project_id)
-
+        debug("POST", 2)
         try:
+            debug("validate post", 2)
             widget.validate(kw)
         except twc.ValidationError as e:
+            debug("error", 2)
             w = e.widget
             w.child.children[1].value = project.name
             w.child.children[2].options = [(t.id, t.name) for t in tracks] + [(t.id, t.name, {'selected' : True}) for t in project.tracks]
             return dict(page='tracks', widget=w, project_id=project_id)
+        debug("validation passed")
         track_ids = kw.get('tracks', [])
-        if not track_ids: track_ids = []
+        if not track_ids:
+            track_ids = []
         if not isinstance(track_ids, list):
             track_ids = [track_ids]
-        if len(track_ids) > 0 and '' in track_ids: track_ids.remove('')
+        if len(track_ids) > 0 and '' in track_ids:
+            track_ids.remove('')
         handler.project.e(project_id=project_id, name=kw.get('name'), track_ids=track_ids)
-
-        raise redirect('/tracks/', {'pid' : project_id})
+        raise redirect('/tracks/', {'pid': project_id})
 
 
 

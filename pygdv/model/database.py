@@ -416,9 +416,7 @@ class Track(DeclarativeBase):
 
     @property
     def vizu(self):
-        if self.input is None:
-            return 'not determined'
-        return self.input.datatype
+        self.visualization
 
     @property
     def tmp(self):

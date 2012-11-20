@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 from celery import task
-
+import track
 import shutil
 import os
 from pygdv.lib.jbrowse import jsongen
@@ -27,7 +27,7 @@ def init_model():
     import celery
     database_url = celery.current_app.conf['CELERY_RESULT_DBURI']
 
-    maker = sessionmaker(autoflush=False, autocommit=False)
+    maker = sessionmaker(autoflush=False, autocommit=True)
     DBSession = scoped_session(maker)
     #DeclarativeBase = declarative_base()
     #metadata = DeclarativeBase.metadata
@@ -133,10 +133,11 @@ def new_input(user_info, fileinfo, sequence_info, track_id):
     output_directory = None
     try:
         # upload | get sha1
-        fileinfo = (upload.s(fileinfo) | sha1.s())().get()
+        fileinfo = upload(fileinfo)
+        fileinfo = sha1(fileinfo)
         s = fileinfo.info['sha1']
         # guess extension
-        fileinfo = guess_extension.delay(fileinfo).get()
+        fileinfo = guess_extension(fileinfo)
         fileinfo.states['tosql'] = mappings['tosql'][fileinfo.extension]
         debug('Store %s' % fileinfo, 1)
         # where put the input file
@@ -150,7 +151,7 @@ def new_input(user_info, fileinfo, sequence_info, track_id):
             pass
         debug('Vizu %s' % fileinfo, 1)
         # which vizualizations to launch
-        fileinfo = guess_vizualisations.delay(fileinfo).get()
+        fileinfo = guess_vizualisations(fileinfo)
         debug('Input %s' % fileinfo, 1)
         # get the input
         inp = DBSession.query(model.Input).filter(model.Input.sha1 == s).first()
@@ -163,19 +164,19 @@ def new_input(user_info, fileinfo, sequence_info, track_id):
             inp.task_id = new_input.request.id
             DBSession.add(inp)
             DBSession.flush()
-
+            debug('New input %s' % inp.id, 2)
             if fileinfo.states['tosql']:
                 # transform to sql
-                fileinfo = (tosql.s(fileinfo, sequence_info['name']))().get()
+                fileinfo = tosql(fileinfo, sequence_info['name'])
             else:
                 # move to store
-                fileinfo = (tostore.s(fileinfo))().get()
+                fileinfo = tostore(fileinfo)
     except:
         raise
     finally:
         # (if input is already in the store, just delete the file)
         # delete tmp directory
-        fileinfo = deltmp.delay(fileinfo).get()
+        fileinfo = deltmp(fileinfo)
         if output_directory is not None:
             debug('deleting output dir %s' % out_directory, 3)
             shutil.rmtree(out_directory)
@@ -197,14 +198,17 @@ def new_input(user_info, fileinfo, sequence_info, track_id):
         t.sequence_id = sequence_info['id']
         t.visualization = viz
         t.output_directory = out_directory
-        try:
-            async = mappings['process'][viz].delay(fileinfo, mappings['vizu_store'][viz])
-            async.get()
-            t.task_id = async.task_id
-            DBSession.add(t)
-        except:
-            shutil.rmtree(out_directory, ignore_errors=True)
-            raise
+        if not os.path.exists(out_directory):
+            try:
+                async = mappings['process'][viz].delay(fileinfo, mappings['vizu_store'][viz])
+                t.task_id = async.task_id
+            except:
+                shutil.rmtree(out_directory, ignore_errors=True)
+                raise
+        else:
+            tid = DBSession.query(model.Track).filter(model.Track.output_directory == out_directory).first().task_id
+            t.task_id = tid
+        DBSession.add(t)
 
     DBSession.flush()
     #parameters = Column(JSONEncodedDict, nullable=True)
@@ -276,8 +280,13 @@ def tosql(fileinfo, seq_name):
     """
     Transform a input file to an sql one.
     """
-    debug('tosql : btrack.convert("%s", "%s", chrmeta="%s")' % (fileinfo.paths['upload_to'], fileinfo.paths['store'], seq_name), 3)
-    btrack.convert(fileinfo.paths['upload_to'], fileinfo.paths['store'], chrmeta=seq_name)
+    debug('tosql', 3)
+    track.convert(fileinfo.extension and (fileinfo.paths['upload_to'], fileinfo.extension) or fileinfo.paths['upload_to'], fileinfo.paths['store'])
+    with track.load(fileinfo.paths['store'], 'sql', readonly=False) as t:
+        t.assembly = seq_name
+
+    # debug('tosql : btrack.convert("%s", "%s", chrmeta="%s")' % (fileinfo.paths['upload_to'], fileinfo.paths['store'], seq_name), 3)
+    # btrack.convert(fileinfo.paths['upload_to'], fileinfo.paths['store'], chrmeta=seq_name)
     fileinfo.states['instore'] = True
     return fileinfo
 

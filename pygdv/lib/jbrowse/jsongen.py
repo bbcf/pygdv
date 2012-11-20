@@ -340,12 +340,12 @@ def _calculate_histo_stats(array, threshold, chr_length):
 
 def _generate_hist_outputs(array, bins, array_length):
     '''
-    Generate the hist-output. 
+    Generate the hist-output.
     '''
     for i in xrange(1, array_length, bins):
-        yield array[i:i + bins]      
-    
-    
+        yield array[i:i + bins]
+
+
 def _threshold(chr_length, feature_count):
     '''
     Get the threshold : when the view switch from feature to histogram
@@ -353,16 +353,15 @@ def _threshold(chr_length, feature_count):
     @param feature_count : the total number of features
     @return the threshold
     '''
-    t = (chr_length * 2.5 ) / feature_count;
-    for zoom in zooms :
-        t = zoom
-        if zoom > t : break;
-    return t
+    t = (chr_length * 2.5) / feature_count
+    prev_zoom = zooms[0]
+    for zoom in zooms:
+        if zoom > t:
+            return prev_zoom
+        prev_zoom = zoom
+    return zooms[-1]
 
 
-
-    
-    
 def jsonify(database_path, name, sha1, output_root_directory, public_url, browser_url, extended = False):
     '''
     Make a JSON representation of the database.
