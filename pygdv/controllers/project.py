@@ -223,6 +223,7 @@ class ProjectController(BaseController):
 
     @expose('pygdv.templates.view')
     def view(self, project_id, *args, **kw):
+        debug('VIEW')
         user = handler.user.get_user_in_session(request)
         if not checker.check_permission_project(user.id, project_id, constants.right_read_id) and not checker.is_admin(user=user):
             flash('You must have %s permission to view the project.' % constants.right_read, 'error')

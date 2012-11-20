@@ -30,8 +30,8 @@ def download_url(url, to, block_sz=2048 * 4):
                 buffer = stream.read(block_sz)
                 if not buffer:
                     break
-            file_size_dl += len(buffer)
-            outf.write(buffer)
+                file_size_dl += len(buffer)
+                outf.write(buffer)
 
 
 def download_fsys(infile, to):

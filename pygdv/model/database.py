@@ -202,7 +202,7 @@ class Project(DeclarativeBase):
 
     @property
     def success_tracks(self):
-        return [t for t in self.tracks if t.status == constants.SUCCESS and t.parameters is not None]
+        return [t for t in self.tracks if t.status == constants.SUCCESS]
 
     @property
     def get_tracks(self):
@@ -398,8 +398,9 @@ class Track(DeclarativeBase):
 
     def _set_name(self, value):
         if self.parameters is not None:
-            self.parameters.key = value
-            self.parameters.label = value
+            if 'key' in self.parameters:
+                self.parameters['key'] = value
+                self.parameters['label'] = value
         self._name = value
 
     @property

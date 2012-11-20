@@ -3,11 +3,10 @@ from pygdv.model import DBSession, Project
 from pygdv.lib.jbrowse import util as jb
 from pygdv.lib import constants, plugin
 
-import json, tg
+import json
+import tg
+import os
 from tg import url
-
-
-
 
 
 def prepare_view(project_id, *args, **kw):
@@ -17,6 +16,20 @@ def prepare_view(project_id, *args, **kw):
     project = DBSession.query(Project).filter(Project.id == project_id).first()
     tracks = project.success_tracks
 
+    for t in tracks:
+        if t.parameters is None:
+            t.parameters = {}
+        if not 'url' in t.parameters:
+            t.parameters.update({
+                    'url': os.path.join(t.visualization, t.input.sha1, '{refseq}', constants.track_data),
+                    'label': t.name,
+                    'type': t.visualization == 'signal' and 'ImageTrack' or 'FeatureTrack',
+                    'gdv_id': t.id,
+                    'key': t.name,
+                    'date': t.tiny_date
+                })
+            DBSession.add(t)
+            DBSession.flush()
     seq = project.sequence
     default_tracks = seq.default_tracks
     all_tracks = tracks + default_tracks
@@ -29,7 +42,7 @@ def prepare_view(project_id, *args, **kw):
             while(t.name[-(ind + 1)].isdigit()):
                 ind += 1
             cpt = t.name[-ind:]
-            try :
+            try:
                 cpt = int(cpt)
             except ValueError:
                 cpt = 0

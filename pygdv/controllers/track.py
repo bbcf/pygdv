@@ -122,6 +122,7 @@ class TrackController(BaseController):
         user = handler.user.get_user_in_session(request)
         # get sequence
         sequence = None
+        project_id = None
         debug('Create track %s' % kw)
         if 'assembly' in kw and kw.get('assembly'):
             assembly = int(kw.get('assembly'))
@@ -136,10 +137,10 @@ class TrackController(BaseController):
             project_id = int(kw.get('project_id'))
             project = DBSession.query(Project).filter(Project.id == project_id).first()
             if project is None:
-                reply.error(request, 'Project with id %s not found on GDV.' % project_id, tg.url('./new', {'pid': project_id}), {})
+                return reply.error(request, 'Project with id %s not found on GDV.' % project_id, tg.url('./new', {'pid': project_id}), {})
             sequence = DBSession.query(Sequence).filter(Sequence.id == project.sequence_id).first()
         if not sequence:
-            reply.error(request, 'Sequence not found on GDV.', tg.url('./new'), {})
+            return reply.error(request, 'Sequence not found on GDV.', tg.url('./new'), {})
 
         # know if file is comming from url, fileupload or filsystem
         filetoget = None
@@ -159,7 +160,7 @@ class TrackController(BaseController):
             filetoget = kw.get('file_upload')
             inputtype = 'fu'
         if filetoget is None:
-            reply.error(request, 'No file to upload', tg.url('./new'), {})
+            return reply.error(request, 'No file to upload', tg.url('./new'), {})
 
         debug('file2get: %s, intype: %s' % (filetoget, inputtype), 2)
         # get file name
@@ -177,7 +178,7 @@ class TrackController(BaseController):
                 debug('trackname from fu', 2)
                 trackname = filetoget.filename
         if trackname is None:
-            reply.error(request, 'No trackname found', tg.url('./new'), {})
+            return reply.error(request, 'No trackname found', tg.url('./new'), {})
 
         debug('trackname: %s' % trackname, 1)
         # get extension
@@ -189,7 +190,7 @@ class TrackController(BaseController):
         else:
             extension = os.path.splitext(trackname)[-1]
         if extension is None:
-            reply.error(request, 'No extension found', tg.url('./new'), {})
+            return reply.error(request, 'No extension found', tg.url('./new'), {})
         if extension.startswith('.'):
             extension = extension[1:]
 
@@ -223,12 +224,12 @@ class TrackController(BaseController):
         DBSession.add(t)
         DBSession.flush()
         # send task
-        async = tasks.new_input.delay(user_info, fileinfo, sequence_info, t.id)
+        async = tasks.new_input.delay(user_info, fileinfo, sequence_info, t.id, project_id)
         t.task_id = async.task_id
         DBSession.add(t)
         DBSession.flush()
         debug('End create')
-        reply.normal(request, 'Processing launched.', '/tracks/', {'track_id': t.id})
+        return reply.normal(request, 'Processing launched.', '/tracks/', {'track_id': t.id})
 
 
         # determine processes to launch
@@ -322,10 +323,10 @@ class TrackController(BaseController):
 
         d = {}
         d['name'] = track.name
-        if track.parameters is None:
+        if track.parameters is None or not 'color' in track.parameters:
             cc = constants.default_track_color
         else:
-            cc = track.parameters.color
+            cc = track.parameters['color']
         d['track_id'] = track_id
         d['color'] = cc
         widget.value = d

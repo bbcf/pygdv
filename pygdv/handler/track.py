@@ -5,8 +5,7 @@ Tracks handler.
 
 from pygdv.model import DBSession, Input, Track, TrackParameters, Task, Sequence, Project
 import os, shutil, tg
-from pygdv.model import constants
-from pygdv.lib import util
+from pygdv.lib import util, constants
 from pygdv.worker import tasks
 from pygdv.lib.constants import track_directory
 from track.util import determine_format
@@ -209,7 +208,6 @@ def update(track=None, track_id=None, params=None):
     DBSession.flush()
 
 
-
 def delete_input(sha1):
     '''
     Delete the input with the sha1 specified.
@@ -218,14 +216,10 @@ def delete_input(sha1):
     :param sha1 : the sha1 of the input
     '''
     if sha1 is not None:
-        trackdir = os.path.join(track_directory(), sha1 + '.sql')
-        try :
-            os.remove(trackdir)
-        except OSError:
-            pass
-
-        jsondir = os.path.join(json_directory(), sha1)
-        shutil.rmtree(jsondir, ignore_errors = True)
+        trackdir = os.path.join(constants.storage['data']['sql'], sha1)
+        shutil.rmtree(trackdir)
+        for v in constants.visualisations_list:
+            shutil.rmtree(os.path.join(constants.jsons_store_path, v, sha1), ignore_errors=True)
 
 
 
@@ -452,6 +446,7 @@ def move_database(datatype, assembly_name, path, sha1, name, tmp_file, _format):
     t = tasks.process_sqlite_file.delay(datatype, assembly_name, dst, sha1, name, _format)
     return t
 
+
 def convert_file(datatype, assembly_name, path, sha1, name, tmp_file, _format):
     '''
     Convert a genomic file to a SQLite one using ``track`` package.
@@ -477,14 +472,9 @@ def edit(track=None, track_id=None, name=None, color=None):
         track.name = name
     if color is not None:
         if track.parameters is None:
-            params = TrackParameters()
-            params.track = track
-            params.color = color
-            params.build_parameters()
-            DBSession.add(params)
-        else :
-            track.parameters.color = color
-
+            track.parameters = {'color': color}
+        else:
+            track.parameters.update({'color': color})
     DBSession.add(track)
     DBSession.flush()
 

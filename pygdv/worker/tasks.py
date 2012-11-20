@@ -56,14 +56,14 @@ def signal(fileinfo, output_directory):
 def features(fileinfo, output_directory):
     debug('Features %s' % fileinfo)
     input_file_path = fileinfo.paths['store']
-    jsongen.jsonify(input_file_path, fileinfo.trackname, fileinfo.info['sha1'], output_directory, '/data/jbrowse', '', False)
+    jsongen.jsonify(input_file_path, fileinfo.trackname, fileinfo.info['sha1'], output_directory, '/data/jbrowse/features', 'features', False)
 
 
 @task()
 def relational(fileinfo, output_directory):
     debug('Relational %s' % fileinfo)
     input_file_path = fileinfo.paths['store']
-    jsongen.jsonify(input_file_path, fileinfo.trackname, fileinfo.info['sha1'], output_directory, '/data/jbrowse', '', True)
+    jsongen.jsonify(input_file_path, fileinfo.trackname, fileinfo.info['sha1'], output_directory, '/data/jbrowse/relational', 'relational', True)
 
 
 extensions = ['sql', 'bed', 'gff', 'gtf', 'bigwig', 'bw', 'wig', 'wiggle', 'bedgraph', 'bam', 'sam']
@@ -125,7 +125,7 @@ mappings = {
 
 
 @task()
-def new_input(user_info, fileinfo, sequence_info, track_id):
+def new_input(user_info, fileinfo, sequence_info, track_id, project_id=None):
     """
     Add an new input in GDV.
     """
@@ -184,6 +184,9 @@ def new_input(user_info, fileinfo, sequence_info, track_id):
     fileinfo.info['input_id'] = inp.id
 
     debug('Vizualisations %s' % fileinfo, 1)
+    project = None
+    if project_id is not None:
+        project = DBSession.query(model.Project).filter(model.Project.id == project_id).first()
     # launch vizualisation
     for index, viz in enumerate(fileinfo.vizualisations):
         debug(viz, 2)
@@ -208,6 +211,9 @@ def new_input(user_info, fileinfo, sequence_info, track_id):
         else:
             tid = DBSession.query(model.Track).filter(model.Track.output_directory == out_directory).first().task_id
             t.task_id = tid
+        if project is not None:
+            project.tracks.append(t)
+
         DBSession.add(t)
 
     DBSession.flush()

@@ -16,18 +16,15 @@ def track_info(tracks, assembly_id=None):
     l = []
     if assembly_id is not None:
         l = [{'url':'tinfo_url',
-                  'args': { 'chunkSize' : 20000},
+                  'args': {'chunkSize': 20000},
                   'label':'DNA',
                   'type':'SequenceTrack',
                   'key':'DNA'}]
 
-
-    l += [track.parameters.jb_dict for track in tracks]
+    l += [track.parameters for track in tracks]
     return l
-        
-        
-        
-        
+
+
 def ref_seqs(sequence_id):
     '''
     Build the ``refSeqs`` variable.
@@ -35,10 +32,10 @@ def ref_seqs(sequence_id):
     '''
     ass = genrep.Assembly(sequence_id)
     l = [_chromosome_output(chr) for id, chr in ass.chromosomes.iteritems()]
-    l.sort(key=lambda obj : obj['num'])
+    l.sort(key=lambda obj: obj['num'])
     return l
-    
-    
+
+
 def browser_parameters(data_root, style_root, image_root, tracks_names):
     '''
     Build the browser parameters needed by the view.

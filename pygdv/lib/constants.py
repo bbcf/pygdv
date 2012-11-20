@@ -7,7 +7,7 @@ from pygdv import PROJECT_ROOT
 
 data_store_path = os.path.join(PROJECT_ROOT, 'public', 'data')
 tracks_store_path = os.path.join(data_store_path, 'tracks')
-jsons_store_path = os.path.join(data_store_path, 'json')
+jsons_store_path = os.path.join(data_store_path, 'jbrowse')
 
 storage = {
     'data': {
@@ -24,7 +24,7 @@ storage = {
 
 bin_directory_path = os.path.join(PROJECT_ROOT, 'bin')
 
-
+visualisations_list = ['signal', 'relational', 'features']
 vizualisations = {
     'signal': ['signal'],
     'relational': ['relational'],

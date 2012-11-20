@@ -92,13 +92,13 @@ def get_delete_link(obj_id, rights = None):
     @type obj_id: an integer
     @return: the HTML link
     '''
-    if rights is not None and constants.right_upload in rights :
+    if rights is not None and constants.right_upload in rights:
         if rights[constants.right_upload]:
             return '''
     <form method="POST" action=%s class="button-to">
     <input name="_method" value="DELETE" type="hidden"/>
    
-    <input class="action delete-button" title="%s" onclick="return confirm('Are you sure?');" 
+    <input class="action delete-button" title="%s" onclick="return confirm('Are you sure?');"
         value="" style="background-color: transparent; float:left;
         border:0; color: #286571; display: inline;"
     type="submit"/>
@@ -152,14 +152,22 @@ def get_copy_track_link(obj_id, rights=None):
         return ''' <a class='action copy_link' title="%s" href="%s"></a>''' % ('copy in your profile', url('/tracks/copy', params={'track_id':obj_id}))
     return ''
 
+
 def get_track_color(track):
+    print 'gtc'
+    print track.parameters
     if track.parameters is not None:
-        return track.parameters.color
+        if 'color' in track.parameters:
+            return track.parameter['color']
+
 
 def track_color(track):
     color = None
+    print 'gtc'
+    print track.parameters
     if track.parameters is not None:
-        color = track.parameters.color
+        if 'color' in track.parameters:
+            color = track.parameters['color']
     if color is None:
         color = constants.default_track_color
     return '''<div class="track-color" style="background-color:%s;"></div>''' % color
