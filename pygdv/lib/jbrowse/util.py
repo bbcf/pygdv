@@ -1,8 +1,10 @@
 from tg import app_globals as gl
 from bbcflib import genrep_cache as genrep
 from pygdv.lib.jbrowse import SEQUENCE_CHUNK_SIZE
-from pygdv.model import Track
+from pygdv.model import Track, DBSession
 import json
+import os
+from pygdv.lib import constants
 
 '''
 Contains utility methods for buildings JSON informations that the browser need.
@@ -20,7 +22,17 @@ def track_info(tracks, assembly_id=None):
                   'label':'DNA',
                   'type':'SequenceTrack',
                   'key':'DNA'}]
-
+    for track in tracks:
+        if track.parameters is None:
+            track.parameters = {
+                    'url': os.path.join(track.visualization, track.input.sha1, '{refseq}', constants.track_data),
+                    'label': track.name,
+                    'type': track.visualization == 'signal' and 'ImageTrack' or 'FeatureTrack',
+                    'gdv_id': track.id,
+                    'key': track.name,
+                    'date': track.tiny_date
+                }
+    DBSession.flush()
     l += [track.parameters for track in tracks]
     return l
 
@@ -53,19 +65,20 @@ def features_style(tracks):
     '''
     #toDO
     return '''case 'exon': case 'intron': default: div.style.height='10px';div.style.marginTop='-4px';div.style.zIndex='30';break'''
-    
+
+
 def _chromosome_output(chromosome):
     '''
     Get the chromosome output for the browser.
     :param: chromosome : the chromosome
     '''
     #print '[WARNING] : here is used the chromosome "name" & not the "chr_name"'
-    return {"length" : chromosome['length'],
-            "name" : chromosome['name'],
+    return {"length": chromosome['length'],
+            "name": chromosome['name'],
             "seqDir": 'TODO',
             "start": 0,
             "end": chromosome['length'],
-            "num" : chromosome['num'],
-            "seqChunkSize" : SEQUENCE_CHUNK_SIZE}
+            "num": chromosome['num'],
+            "seqChunkSize": SEQUENCE_CHUNK_SIZE}
 
     

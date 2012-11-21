@@ -29,9 +29,9 @@ def prepare_view(project_id, *args, **kw):
                     'date': t.tiny_date
                 })
             DBSession.add(t)
-            DBSession.flush()
+    DBSession.flush()
     seq = project.sequence
-    default_tracks = seq.default_tracks
+    default_tracks = [d for d in seq.default_tracks if d.status == constants.SUCCESS]
     all_tracks = tracks + default_tracks
 
     # Track names must be different

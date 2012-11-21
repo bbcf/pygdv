@@ -131,6 +131,7 @@ def new_input(user_info, fileinfo, sequence_info, track_id, project_id=None):
     """
     debug('New input uinfo : %s, sequenceinfo :%s, fileinfo : %s' % (user_info, sequence_info, fileinfo))
     output_directory = None
+    trackcreated = DBSession.query(model.Track).filter(model.Track.id == track_id).first()
     try:
         # upload | get sha1
         fileinfo = upload(fileinfo)
@@ -172,6 +173,9 @@ def new_input(user_info, fileinfo, sequence_info, track_id, project_id=None):
                 # move to store
                 fileinfo = tostore(fileinfo)
     except:
+
+        trackcreated.task_id = new_input.request.id
+        DBSession.flush()
         raise
     finally:
         # (if input is already in the store, just delete the file)
@@ -192,7 +196,7 @@ def new_input(user_info, fileinfo, sequence_info, track_id, project_id=None):
         debug(viz, 2)
         out_directory = os.path.join(mappings['vizu_store'][viz], fileinfo.info['sha1'])
         if index == 0:
-            t = DBSession.query(model.Track).filter(model.Track.id == track_id).first()
+            t = trackcreated
         else:
             t = model.Track()
         t.name = fileinfo.trackname
