@@ -69,11 +69,17 @@ def admin_user_email():
 def admin_user_key():
     return tg.config.get('admin.user.key')
 
+admin_user = {
+    'id': 1,
+    'firstname': 'user',
+    'name': 'admin',
+}
+
 
 def temporary_directory():
     if 'temporary.directory' in tg.config:
         return tg.config.get('temporary.directory')
-    else :
+    else:
         return os.path.join(resource_filename('pygdv', 'tmp'))
 
 
@@ -128,7 +134,21 @@ date_format = "%d. %b %Y %Hh%M"
 
 tiny_date_format = "%d/%m/%y"
 
+rights = {
+    'upload': {'id': 1, 'name': 'Upload', 'desc': 'A group with this permission can upload tracks to the project and execute jobs on the web interface.'},
+    'download': {'id': 2, 'name': 'Download', 'desc': 'A group with this permission can download files on a project.'},
+    'read': {'id': 3, 'name': 'Read', 'desc': 'A group with this permission can view the project.'}
+}
 
+permissions = {
+    'admin': {'id': 1, 'name': 'admin', 'desc': 'This permission give admin right to the bearer.'},
+    'read': {'id': 2, 'name': 'read', 'desc': 'This permission give read right to the bearer.'}
+}
+
+groups = {
+    'admin': {'id': 1, 'name': 'Admins'},
+    'user': {'id': 2, 'name': 'Users'},
+}
 
 right_upload = 'Upload'
 right_download = 'Download'

@@ -154,8 +154,6 @@ def get_copy_track_link(obj_id, rights=None):
 
 
 def get_track_color(track):
-    print 'gtc'
-    print track.parameters
     if track.parameters is not None:
         if 'color' in track.parameters:
             return track.parameter['color']
@@ -163,14 +161,13 @@ def get_track_color(track):
 
 def track_color(track):
     color = None
-    print 'gtc'
-    print track.parameters
     if track.parameters is not None:
         if 'color' in track.parameters:
             color = track.parameters['color']
     if color is None:
         color = constants.default_track_color
     return '''<div class="track-color" style="background-color:%s;"></div>''' % color
+
 
 def get_export_link(obj_id, param='track_id', rights=None, tmp=False):
     '''

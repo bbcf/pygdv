@@ -232,9 +232,10 @@ def guess_vizualisations(fileinfo):
     if not fileinfo.extension == 'sql':
         fileinfo.vizualisations.extend(mappings['viz'][fileinfo.extension])
         return fileinfo
-    dt = btrack.track(fileinfo.paths['upload_to']).datatype
-    if dt and dt.lower() in mappings['viz']:
+    dt = btrack.track(fileinfo.paths['upload_to']).info['datatype']
+    if dt is not None and dt.lower() in mappings['viz']:
         fileinfo.vizualisations.extend(mappings['viz'][dt.lower()])
+        return fileinfo
     raise Exception('Cannot guess the vizualisation for fileinfo "%s".' % fileinfo)
 
 
@@ -260,7 +261,10 @@ def upload(fileinfo):
     """
     if not fileinfo.states['uploaded']:
         debug('Upload', 2)
-        fileinfo.download()
+        try:
+            fileinfo.download()
+        except IOError:
+            raise IOError('Cannot download file from %s' % fileinfo.paths['in'])
     debug('Uploaded', 2)
     return fileinfo
 
