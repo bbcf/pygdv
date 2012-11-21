@@ -21,8 +21,8 @@
 
     <div class="help_section_first">Main view</div> <a name="main" href="#main"></a>
       <p>
-          This is the principal interface view. Here you can find all data you have uploaded.
-          From there you can create new projects, add data (tracks) to them and start working/visualizing.<br/>
+          This is the central GDV hub: list the data you have uploaded,
+          create new projects, add more data (tracks) and start working/visualizing them.<br/>
       </p>
     <img src="images/help_main.png" width="1000" height="500" style="position:relative;top:6px;"/>
 
@@ -30,63 +30,59 @@
 
     <div class="help_section">Circles</div><a name="circles" href="#circles"></a>
       <p>
-          With circles you are able to quickly collaborate between people.
-          These are group of persons. You can create and add some people to them.
-          Add people to a circle and you will be able to share your projects with them.
-          Enter the person email with the <i>edit</i> link.
-          You have also possibility to remove people from your circles with the <i>delete</i> link.
+          Circles allow you to setup collaborations: create a circle and add people to it, then share projects with them.
+          To add a circle member enter his/her email via the <i>edit</i> link.
       </p>
 
 
 
     <div class="help_section">Sharing</div><a name="share" href="#share"></a>
-       With GDV you have the possibility to share a project with someone else. You can do it :
+       You can share a GDV project:
         <ul>
-            <li>Via <b>circles</b> : sharing with a group of people.</li>
-            <li>Via <b>links</b> : <i>public</i> and <i>download</i> links.</li>
+            <li>Via <b>circles</b>: share within a group of collaborators.
+              the project will appear in the
+              <i>shared project</i> section on the main interface of all users within the circle.
+              You can give three different <b>permissions</b> to a circle: </li>
+            
+            <ul>
+              <li>Read: User can view the data in the project
+                but not download or add new data to it</li>
+              <li>Download: User can view and download the project data.</li>
+              <li>Upload: User can edit the project and add or delete tracks.</li>
+            </ul>
+
+            <li>Via <b>links</b>: provide <i>public</i> or <i>download</i> access links.</li>
 
             <ul>
-            <li>The public link is an access to the view of your project. User with that link will be able to see all tracks
-            in your project, but not to download or modify the data in it.</li>
-            <li>The download link enable the entire copy of your project by others. It's a permanent access to the data of your project.</li>
+            <li>The public link gives access to view a project. This link allows a user to see all tracks
+            in the project but not to download or modify the data.</li>
+            <li>The download link enables to copy a project and gives permanent access to the project data.</li>
             </ul>
         </ul>
 
-      When you want to share a project with a circle the project will appears in the
-      <i>Shared project</i> section on the main interface of all user that are in the circle.
-      <p>
-          You can give three different <b>permissions</b> to a circle:
-
-      <ul>
-          <li>Read : User is able to see the data in your project
-              but will not be able to download/add data to it</li>
-          <li>Download : User will be able to see and download the data in your project.</li>
-          <li>Upload : User will be able to edit the project (name) including adding or deleting tracks.</li>
-      </ul>
       </p>
 
     <div class="help_section">Jobs</div><a name="share" href="#jobs"></a>
       <p>
-        With GDV you have the possibility to start some computation from the interface.
-      On the project view, you have possibility to choose from some Operations to apply on your tracks.
-      Each operation will appears on the <i>Data</i> panel.
-      It's where you can fetch back result.
+      You can launch computations from within GDV:
+      in the project view, choose an operation from the <i>Data</i> panel and apply it to selected tracks,
+      then fetch the results when the operation is finished.
       </p>
 
     <div class="help_section">Assemblies</div>
     <p>
-      If the assembly you want to use is missing, use <a href="mailto:webmaster.bbcf@epfl.ch?subject=[GDV] Ask for a new assembly">contact</a>.
-        Specify in the mail which assembly you want to have and it will be added. Even if the assembly is not very usual, contact us.
-        It can be added very easily.
+      Additional assemblies can can be provided on demand by <a href="mailto:webmaster.bbcf@epfl.ch?subject=[GDV] Ask for a new assembly">email</a>.
     </p>
 
 
 
     <div class="help_section">API</div><a name="API" href="#API"></a>
     <p>
-      You can access GDV with a simple programming interface. Based on HTTP requests, you can create projects, add tracks,
-        and prepare view without the web interface.
-        There is a <a href="https://raw.github.com/bbcf/bbcfutils/master/Python/pygdv.py">python script</a> that you could use for this purpose. It's part of the <a href="https://github.com/bbcf/bbcfutils/">bbcf utilities</a>.
+      There a simple programming interface to GDV, based on HTTP requests to create projects, add tracks,
+      and prepare view without the web interface.
+      For more information read our python library <a href="http://bbcf.epfl.ch/bbcflib/bbcflib_gdv.html">documentation</a>.
+      
+      There is a <a href="https://raw.github.com/bbcf/bbcfutils/master/Python/pygdv.py">python script</a> that you could use for this purpose. It's part of the <a href="https://github.com/bbcf/bbcfutils/">bbcf utilities</a>.
     </p>
     <p>
       <b>Quick start: </b> 
@@ -96,7 +92,7 @@
       <li>python pygdv --help</li>
     </ul>
     </p>
-    In order to use it, you will need your personal <span class="imp">key</span> that you can get <a name="circles" href="private_key">here</a>.
+    To use the API you need to authenticate with your personal <a name="circles" href="private_key">key</a>.
     <br/><br/><br/><br/>
   </div>
 
