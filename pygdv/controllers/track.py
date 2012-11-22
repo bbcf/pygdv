@@ -124,6 +124,8 @@ class TrackController(BaseController):
         sequence = None
         project_id = None
         debug('Create track %s' % kw)
+
+        debug('Find sequence', 1)
         if 'assembly' in kw and kw.get('assembly'):
             assembly = int(kw.get('assembly'))
             sequence = DBSession.query(Sequence).filter(Sequence.id == assembly).first()
@@ -141,22 +143,24 @@ class TrackController(BaseController):
             sequence = DBSession.query(Sequence).filter(Sequence.id == project.sequence_id).first()
         if not sequence:
             return reply.error(request, 'Sequence not found on GDV.', tg.url('./new'), {})
+        debug('%s' % sequence.name, 2)
 
         # know if file is comming from url, fileupload or filsystem
         filetoget = None
         inputtype = None
+        debug('Find inputtype', 1)
         if 'url' in kw and kw.get('url'):
-            debug('from url', 1)
+            debug('from url', 2)
             filetoget = kw.get('url')
             if not filetoget.startswith('http://'):
                 filetoget = 'http://%s' % filetoget
             inputtype = 'url'
         elif 'fsys' in kw and kw.get('fsys'):
-            debug('fsys', 1)
+            debug('fsys', 2)
             filetoget = kw.get('fsys')
             inputtype = 'fsys'
         elif 'file_upload' in kw and kw.get('file_upload') is not None:
-            debug('file upload', 1)
+            debug('file upload', 2)
             filetoget = kw.get('file_upload')
             inputtype = 'fu'
         if filetoget is None:
@@ -164,9 +168,11 @@ class TrackController(BaseController):
 
         debug('file2get: %s, intype: %s' % (filetoget, inputtype), 2)
         # get file name
+        debug('Find track name', 1)
         trackname = None
         if 'trackname' in kw and kw.get('trackname') is not None:
-            trackname = kw.get(trackname)
+            debug('i params', 2)
+            trackname = kw.get('trackname')
         else:
             if inputtype == 'url':
                 debug('trackname from url', 2)
@@ -180,7 +186,7 @@ class TrackController(BaseController):
         if trackname is None:
             return reply.error(request, 'No trackname found', tg.url('./new'), {})
 
-        debug('trackname: %s' % trackname, 1)
+        debug('%s' % trackname, 2)
         # get extension
         extension = None
         if 'extension' in kw and kw.get('extension'):
