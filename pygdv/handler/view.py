@@ -77,11 +77,13 @@ def prepare_view(project_id, *args, **kw):
     # prepare _gdv_info
     info = {}
     prefix = tg.config.get('prefix')
-    if prefix : info['prefix'] = prefix
+    if prefix:
+        info['prefix'] = prefix
+    info['proxy'] = tg.config.get('main.proxy')
     info['sequence_id'] = project.sequence_id
     info['admin'] = kw.get('admin', True)
     info['plug_url'] = url('/plugins')
-    if kw.has_key('mode'):
+    if 'mode' in kw:
         info['mode'] = kw.get('mode')
 
     info = json.dumps(info)
@@ -96,7 +98,7 @@ def prepare_view(project_id, *args, **kw):
     jobs = 'init_jobs = %s' % handler.job.jobs(project_id)
 
     # prepare operation list
-    try :
+    try:
         control_op = 'bs_redirect = %s; bs_operations_path = %s;' % (json.dumps(url('/plugins/index')), json.dumps(plugin.util.get_plugin_path()))
     except Exception as e:
         print "Exception with plugin system : " + str(e)
@@ -106,7 +108,7 @@ def prepare_view(project_id, *args, **kw):
         nr_assembly_id=project.sequence_id,
         project_id=project.id,
         is_admin=True,
-        ref_seqs = refSeqs,
+        ref_seqs= refSeqs,
         track_info = trackInfo,
         parameters = parameters,
         style_control = style_control,

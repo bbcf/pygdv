@@ -189,7 +189,7 @@ PrincipalContainer.prototype.navigationContainer = function(DomNode, DijitNode, 
         if (i%2==0){ new_tr = dojo.create("tr", null, nav_table); }
         var new_button = dojo.create("td", {className:"nav_table_td"}, new_tr);
         var link = dojo.create('a',{
-                         href : _GDV_URL + '/' + link_end,
+                         href : _gdv_info['proxy'] + '/' + link_end,
                          className:"nav_cell",
                          id : 'menu_' + link_name,
                       }, new_button);
