@@ -43,11 +43,11 @@ JobPane.prototype.job_output = function(job){
         
     switch(job_output){
 	
-    case 'job_image': return dojo.create('a', {target:'_blank', href: _GDV_JOB_URL + '/result?id=' + job.id, innerHTML:'view output'});
+    case 'job_image': return dojo.create('a', {target:'_blank', href: _gdv_info['proxy'] + '/jobs/result?id=' + job.id, innerHTML:'view output'});
 	
     case 'job_failure': 
     case 'FAILURE':
-return dojo.create('a', {target:'_blank', href: _GDV_JOB_URL + '/traceback?id=' + job.id, innerHTML:'failure'});
+return dojo.create('a', {target:'_blank', href: _gdv_info['proxy'] + '/jobs/traceback?id=' + job.id, innerHTML:'failure'});
     
 
     case 'job_track' : return dojo.create('a', {innerHTML : 'reload', href : 'javascript:location.reload(true);'});
@@ -69,7 +69,7 @@ JobPane.prototype.get_jobs = function(){
     var ctx = this;
     var pdata="project_id=" + _gdv_info.project_id;
     var xhrArgs = {
-	url : _GDV_JOB_URL + '/get_jobs',
+	url : _gdv_info['proxy'] + '/jobs/get_jobs',
 	postData : pdata,
 	handleAs : 'json',
 	load : function(data){
@@ -88,7 +88,7 @@ JobPane.prototype.get_jobs = function(){
 JobPane.prototype.deljob = function(job_id){
     var pdata= '_id=' + job_id;
     var xhrArgs = {
-	url : _GDV_JOB_URL + '/_delete',
+	url : _gdv_info['proxy'] + '/jobs/_delete',
 	postData : pdata,
 	handleAs : 'json',
 	load : function(data){

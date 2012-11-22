@@ -83,7 +83,7 @@ Minimap.prototype.drawMinitrack = function(track) {
     track.md5 = track.url.split("/")[0];
 
     dojo.xhrPost({
-        url: _GDV_URL_DB + '/minimap',
+        url: _gdv_info['proxy'] + '/database/minimap',
         postData: "type=" + track.type + "&db=" + track.md5 + "&chr_zoom=" + 100,
         load: function(x) {
             x = JSON.parse(x);

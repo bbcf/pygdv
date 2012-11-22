@@ -138,7 +138,7 @@ ZoneSelection.prototype.updatedSelection = function(){
 */
 ZoneSelection.prototype.update_on_server = function(){
     var xhrArgs = {
-        url : _GDV_SEL_URL + '/save',
+        url : _gdv_info['proxy'] + '/selections/save',
         postData : 'project_id=' + _gdv_info.project_id + '&color=grey&description="desc crip tion"&locations='
                                  + dojo.toJson(this.handler.marquees),
         error : function(data){ console.error(data); }

@@ -72,9 +72,9 @@ GDVPostBuffer.prototype.send = function(){
  */
 GDVPostBuffer.prototype.post = function(database){
     var imgs = this.getTrack(database);
-    var db = database.split('/')
-    var sha1 = db[0]
-    var chrzoom = db[1]
+    var db = database.split('/');
+    var sha1 = db[0];
+    var chrzoom = db[1];
     var pData = 'sha1=' + db[0] + '&chr_zoom=' + db[1] + '&imgs=';
     var pDataL = pData.length;
     var post_buffer = this;
@@ -96,13 +96,13 @@ GDVPostBuffer.prototype.post = function(database){
     pData = pData.substr(0,pData.length-1);
     drawer = new ImageDrawer();
     var xhrArgs = {
-        url: _GDV_URL_SCORES,
+        url: _gdv_info['proxy'] + '/database/scores',
         postData: pData,
         handleAs: "json",
         load: function(data) {
         drawer.putScore(imgs,data);
         }
-    }
+    };
     dojo.xhrPost(xhrArgs);
     }
 };
@@ -192,8 +192,8 @@ ImageDrawer.prototype.drawScores = function(node, jsonText, color, min, max){
         var canvas = node;
         if(!min & !max){
             min = node.min - 1;
-            max = node.max
-        };
+            max = node.max;
+        }
         var inZoom = node.inzoom;
 
         var drawer = this;
@@ -239,7 +239,7 @@ ImageDrawer.prototype.drawScores = function(node, jsonText, color, min, max){
             var conv_pos = cnvs_width * pos / end_pos;
             //console.log(conv_pos);
             var real_score = data[i+1];
-            if(prev_pos != null){
+            if(prev_pos !== null){
                 var width = (conv_pos - prev_pos);
                 var trans_score = - ( prev_score * cnvs_height / d * inZoom );
                 //console.log('xxxx', prev_score, cnvs_height, d, inZoom);
@@ -247,14 +247,14 @@ ImageDrawer.prototype.drawScores = function(node, jsonText, color, min, max){
                 console.log('x: ' + prev_pos + ' y: ' + Z + ' w: ' + width + ' h: ' + trans_score);
                 //var t = conv_pos - prev_pos;
                 //console.log(pos + ' => x ' + prev_pos + ' y ' + Z + ' width ' + width + ' height '+trans_score);
-            };
-            if (pos != null){
+            }
+            if (pos !== null){
                 prev_pos = conv_pos;
                 prev_score = real_score;
             }
         }
 
-        if(prev_pos != null){
+        if(prev_pos !== null){
             //console.log('end loop');
             var width = (end_pos - prev_pos) * baseWidth;
             //console.log('end loop');
@@ -293,7 +293,7 @@ ImageDrawer.prototype.getScore = function(db,img){
     var sc = dojo.byId('sq_' + db + '_' + img);
     if(sc){ return sc.innerHTML; }
     return false;
-}
+};
 
 /**
  * will send a request to gdv to fetch
@@ -321,7 +321,7 @@ ImageDrawer.prototype.getAllScores = function(images){
         });
         GDV_POST_FETCHER.addTrack(db,imgs);
     }
-}
+};
 
 /**
  * write scores in the DOM

@@ -102,7 +102,7 @@ SequenceTrack.prototype.getRange = function(start, end, callback) {
             };
             this.chunks[i] = chunk;
 	    var chr_name = dojo.byId("GenomeBrowser").genomeBrowser.refSeq.name;
-	    var url = _GDV_GR_URL + '/adn?ass=' + _gdv_info['sequence_id'] + '&chr=' + chr_name + '&id=' + i;
+	    var url = Operations.js + '/genrep/adn?ass=' + _gdv_info['sequence_id'] + '&chr=' + chr_name + '&id=' + i;
             dojo.xhrGet({
                             //url: this.baseUrl + i + ".txt",
 		url : url,
