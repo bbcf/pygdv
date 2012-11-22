@@ -219,7 +219,7 @@ def new_input(user_info, fileinfo, sequence_info, track_id, project_id=None):
             else:
                 # no track or other_track not SUCCESS
                 shutil.rmtree(out_directory)
-                async = mappings['process'][viz].delay(fileinfo, mappings['vizu_store'][viz])
+                async = mappings['process'][viz].delay(fileinfo, os.path.abspath(mappings['vizu_store'][viz]))
                 t.task_id = async.task_id
                 if other_track is not None:
                     other_tracks = DBSession.query(model.Track).filter(model.Track.output_directory == out_directory).all()
