@@ -41,7 +41,7 @@ DBSession = init_model()
 @task()
 def signal(fileinfo, output_directory):
     debug('Signal %s' % fileinfo)
-    execfile_path = os.path.join(constants.bin_directory_path, 'psd.jar')
+    execfile_path = os.path.abspath(os.path.join(constants.bin_directory_path, 'psd.jar'))
     input_file_path = fileinfo.paths['store']
     debug('execfile_path : %s, input_file_path: %s, output_directory: %s' % (execfile_path, input_file_path, output_directory), 1)
     p = subprocess.Popen(['java', '-jar', execfile_path, input_file_path, fileinfo.info['sha1'], output_directory], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -143,9 +143,9 @@ def new_input(user_info, fileinfo, sequence_info, track_id, project_id=None):
         fileinfo.states['tosql'] = mappings['tosql'][fileinfo.extension]
 
         # where put the input file
-        out_directory = os.path.join(mappings['store'][fileinfo.extension], fileinfo.info['sha1'])
+        out_directory = os.path.abspath(os.path.join(mappings['store'][fileinfo.extension], fileinfo.info['sha1']))
 
-        fileinfo.paths['store'] = os.path.join(out_directory, '%s.sql' % fileinfo.trackname.split('.')[0])
+        fileinfo.paths['store'] = os.path.abspath(os.path.join(out_directory, '%s.sql' % fileinfo.trackname.split('.')[0]))
         try:
             # mk output dir
             os.mkdir(out_directory)
