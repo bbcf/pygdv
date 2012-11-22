@@ -43,6 +43,7 @@ def signal(fileinfo, output_directory):
     debug('Signal %s' % fileinfo)
     execfile_path = os.path.join(constants.bin_directory_path, 'psd.jar')
     input_file_path = fileinfo.paths['store']
+    debug('execfile_path : %s, input_file_path: %s, output_directory: %s' % (execfile_path, input_file_path, output_directory), 1)
     p = subprocess.Popen(['java', '-jar', execfile_path, input_file_path, fileinfo.info['sha1'], output_directory], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     result = p.wait()
     if result == 1:
@@ -140,7 +141,7 @@ def new_input(user_info, fileinfo, sequence_info, track_id, project_id=None):
         # guess extension
         fileinfo = guess_extension(fileinfo)
         fileinfo.states['tosql'] = mappings['tosql'][fileinfo.extension]
-        debug('Store %s' % fileinfo, 1)
+
         # where put the input file
         out_directory = os.path.join(mappings['store'][fileinfo.extension], fileinfo.info['sha1'])
 
@@ -150,15 +151,13 @@ def new_input(user_info, fileinfo, sequence_info, track_id, project_id=None):
             os.mkdir(out_directory)
         except OSError:
             pass
-        debug('Vizu %s' % fileinfo, 1)
         # which vizualizations to launch
         fileinfo = guess_vizualisations(fileinfo)
-        debug('Input %s' % fileinfo, 1)
+
         # get the input
         inp = DBSession.query(model.Input).filter(model.Input.sha1 == s).first()
 
         if inp is None:
-            debug('New input', 2)
             inp = model.Input()
             inp.sha1 = s
             inp.path = fileinfo.paths['store']
@@ -187,7 +186,6 @@ def new_input(user_info, fileinfo, sequence_info, track_id, project_id=None):
 
     fileinfo.info['input_id'] = inp.id
 
-    debug('Vizualisations %s' % fileinfo, 1)
     project = None
     if project_id is not None:
         project = DBSession.query(model.Project).filter(model.Project.id == project_id).first()
@@ -244,13 +242,15 @@ def new_input(user_info, fileinfo, sequence_info, track_id, project_id=None):
 
 @task()
 def guess_vizualisations(fileinfo):
-    debug('guess vizu', 3)
+    debug('guess vizualisation', 3)
     if not fileinfo.extension == 'sql':
         fileinfo.vizualisations.extend(mappings['viz'][fileinfo.extension])
+        debug(', '.join(fileinfo.vizualisations), 4)
         return fileinfo
     dt = btrack.track(fileinfo.paths['upload_to']).info['datatype']
     if dt is not None and dt.lower() in mappings['viz']:
         fileinfo.vizualisations.extend(mappings['viz'][dt.lower()])
+        debug(', '.join(fileinfo.vizualisations), 4)
         return fileinfo
     raise Exception('Cannot guess the vizualisation for fileinfo "%s".' % fileinfo)
 
@@ -259,6 +259,7 @@ def guess_vizualisations(fileinfo):
 def guess_extension(fileinfo):
     debug('guess extension', 3)
     if fileinfo.extension in extensions:
+        debug(fileinfo.extension, 4)
         return fileinfo
     file_path = fileinfo.paths['upload_to']
     if fileinfo.states['instore']:
@@ -266,6 +267,7 @@ def guess_extension(fileinfo):
     with open(file_path, 'r') as infile:
         if infile.read(15) == 'SQLite format 3':
             fileinfo.extension = 'sql'
+            debug(fileinfo.extension, 4)
             return fileinfo
     raise Exception('Cannot guess the extension for fileinfo "%s".' % fileinfo)
 
@@ -281,7 +283,7 @@ def upload(fileinfo):
             fileinfo.download()
         except IOError:
             raise IOError('Cannot download file from %s' % fileinfo.paths['in'])
-    debug('Uploaded', 2)
+    debug('Uploaded at %s' % fileinfo.paths['upload_to'], 3)
     return fileinfo
 
 
@@ -290,14 +292,14 @@ def sha1(fileinfo):
     """
     Compute the hex sha1 of a file.
     """
-    debug('Sha1', 2)
+    debug('Sha1', 3)
     if not 'sha1' in fileinfo.info:
         s = hashlib.sha1()
         with open(fileinfo.paths['upload_to'], 'rb') as infile:
             for chunk in iter(lambda: infile.read(128 * 64), ''):
                 s.update(chunk)
         fileinfo.info['sha1'] = s.hexdigest()
-    debug('Sha1 %s' % fileinfo.info['sha1'], 2)
+    debug('%s' % fileinfo.info['sha1'], 4)
     return fileinfo
 
 
@@ -306,7 +308,7 @@ def tosql(fileinfo, seq_name):
     """
     Transform a input file to an sql one.
     """
-    debug('tosql', 3)
+    debug('Tosql', 3)
     track.convert(fileinfo.extension and (fileinfo.paths['upload_to'], fileinfo.extension) or fileinfo.paths['upload_to'], fileinfo.paths['store'])
     with track.load(fileinfo.paths['store'], 'sql', readonly=False) as t:
         t.assembly = seq_name
@@ -314,6 +316,7 @@ def tosql(fileinfo, seq_name):
     # debug('tosql : btrack.convert("%s", "%s", chrmeta="%s")' % (fileinfo.paths['upload_to'], fileinfo.paths['store'], seq_name), 3)
     # btrack.convert(fileinfo.paths['upload_to'], fileinfo.paths['store'], chrmeta=seq_name)
     fileinfo.states['instore'] = True
+    debug('done', 4)
     return fileinfo
 
 
