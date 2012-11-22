@@ -213,8 +213,20 @@ def new_input(user_info, fileinfo, sequence_info, track_id, project_id=None):
                 shutil.rmtree(out_directory, ignore_errors=True)
                 raise
         else:
-            tid = DBSession.query(model.Track).filter(model.Track.output_directory == out_directory).first().task_id
-            t.task_id = tid
+            # try to look if there is a track with this task_id
+            # and if it's a SUCCESS, else delete the directory to relauch the job
+            other_track = DBSession.query(model.Track).filter(model.Track.output_directory == out_directory).first()
+            if other_track is not None and other_track.status == constants.SUCCESS:
+                t.task_id = other_track.task_id
+            else:
+                # no track or other_track not SUCCESS
+                shutil.rmtree(out_directory)
+                async = mappings['process'][viz].delay(fileinfo, mappings['vizu_store'][viz])
+                t.task_id = async.task_id
+                if other_track is not None:
+                    other_tracks = DBSession.query(model.Track).filter(model.Track.output_directory == out_directory).all()
+                    for oth in other_tracks:
+                        oth.task_id = async.task_id
         if project is not None:
             project.tracks.append(t)
 
