@@ -22,6 +22,15 @@ storage = {
     }
 }
 
+
+
+
+
+
+
+
+
+
 bin_directory_path = os.path.join(PROJECT_ROOT, 'bin')
 
 visualisations_list = ['signal', 'relational', 'features']
@@ -58,8 +67,7 @@ track_types = ['track', 'bed', 'wig', 'gff', 'gtf', 'bedgraph']
 # DATA DIRECTORIES
 
 
-def json_directory():
-    return os.path.join(resource_filename(data_dir, json_dir))
+
 
 
 def admin_user_email():
@@ -84,39 +92,29 @@ def temporary_directory():
 
 
 
-def track_directory():
-    return os.path.join(resource_filename(data_dir, tracks_dir))
-
-def extra_directory():
-    return os.path.join(resource_filename(data_dir, extra_dir))
-
 def extra_url():
     return url('/data/extras')
-
-def gfeatminer_url():
-    return url('/data/gfeatminer')
 
 
 def bin_directory():
     return os.path.join(resource_filename(mother_dir, bin_dir))
 
-def test_directory():
-    return os.path.join(resource_filename(mother_dir, test_dir))
-
-def plugin_directory():
-    return os.path.join(resource_filename(mother_dir, plugin_dir))
 
 def callback_track_url():
     return tg.config.get('main.proxy') + url('/tracks')
 
+
 # URLS TO PUT IN JSON
 def data_root():
     return url('/data/jbrowse/')
+
+
 def style_root():
     return url('/css/')
+
+
 def image_root():
     return url('/img/')
-
 
 
 track_data = 'trackData.json'
@@ -170,7 +168,7 @@ tmp_user_name = 'user-not-registered'
 
 
 
-full_rights = {right_read : True, right_download : True, right_upload : True}
+full_rights = {right_read: True, right_download: True, right_upload: True}
 
 
 formats_export = ('sqlite', 'wig', 'bed', 'gtf')
@@ -181,7 +179,6 @@ formats_supported = ('GFF', 'GTF', 'WIG', 'BED', 'BEDGRAPH')
 REQUEST_TYPE = 'REQUEST_CLASSIFIER'
 REQUEST_TYPE_COMMAND_LINE = 'command_line'
 REQUEST_TYPE_BROWSER = 'browser'
-
 
 
 JOB_IMAGE = 'job_image'
