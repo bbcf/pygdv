@@ -115,6 +115,9 @@ mappings = {
         'signal': constants.vizualisations['signal'],
         'features': constants.vizualisations['features'],
         'relational': constants.vizualisations['relational'],
+        'qualitative': constants.vizualisations['features'],
+        'quantitative': constants.vizualisations['signal'],
+        'extended': constants.vizualisations['relational'],
     },
     'process': {
         'signal': signal,

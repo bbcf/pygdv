@@ -5,12 +5,14 @@ from pygdv import model
 from sqlalchemy.exc import IntegrityError
 import transaction
 from pygdv.lib import constants
+import os
 
 
 def bootstrap(command, conf, vars):
     """Place any commands to setup turbotequila here.
     Note that you will have to log in the application one before launching the bootstrap."""
     try:
+            print '[pygdv] [DATABASE] Adding default groups and permissions'
             print '[pygdv] [bootstrap] Adding default groups and permissions'
             # ADMIN GROUP
             admins = model.Group()
