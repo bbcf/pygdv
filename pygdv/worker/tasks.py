@@ -205,7 +205,7 @@ def new_input(user_info, fileinfo, sequence_info, track_id, project_id=None):
         t.output_directory = out_directory
         if not os.path.exists(out_directory):
             try:
-                async = mappings['process'][viz].delay(fileinfo, mappings['vizu_store'][viz])
+                async = mappings['process'][viz].delay(fileinfo, os.path.abspath(mappings['vizu_store'][viz]))
                 t.task_id = async.task_id
             except:
                 shutil.rmtree(out_directory, ignore_errors=True)
