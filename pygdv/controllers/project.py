@@ -229,6 +229,7 @@ class ProjectController(BaseController):
             flash('You must have %s permission to view the project.' % constants.right_read, 'error')
             raise redirect(url('/'))
         d = handler.view.prepare_view(project_id, *args, **kw)
+        
         return d
     
 
