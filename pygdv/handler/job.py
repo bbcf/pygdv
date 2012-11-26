@@ -4,15 +4,23 @@ from sqlalchemy.sql import and_, not_
 import json
 import datetime
 import os
+import tg
+import urllib2
+
+bioscript_url = tg.config['plugin.service.url']
+shared_key = tg.config['plugin.shared.key']
 
 
+def operation_list():
+    operations = {}
+    try:
+        operations_url = bioscript_url + '/plugins?ordered=true'
+        operations = urllib2.urlopen(operations_url).read()
+    except urllib2.URLError:
+        pass
+    return operations
 
-
-
-
-
-
-
+operations = operation_list()
 
 
 def new_job(name, description, user_id, project_id, output, ext_task_id=None, task_id=None):

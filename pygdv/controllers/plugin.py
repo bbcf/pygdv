@@ -14,29 +14,32 @@ from pygdv.model import DBSession, Job, Result
 
 file_tags = ['track', 'wig', 'bed']
 
+
 class PluginController(BaseController):
     allow_only = has_any_permission(constants.perm_admin, constants.perm_user)
 
     @expose()
-    def index(self, id, project_id, *args, **kw):
-        url = plugin.util.get_form_url()
-        key = plugin.util.get_shared_key()
-        project = DBSession.query(Project).filter(Project.id == project_id).first()
+    def index(self, id, key, *args, **kw):
+        bsurl = handler.job.bioscript_url
+        shared_key = handler.job.shared_key
+        project = DBSession.query(Project).filter(Project.key == key).first()
         req = {}
         # add private parameters
         user = handler.user.get_user_in_session(request)
-        req['_up'] = json.dumps({"key" : user.key, "mail" : user.email, "project_id" : project_id})
-        req['key'] = key
-        # add prefill for parameters :
+        req['_up'] = json.dumps({"key": user.key, "mail": user.email, "project_key": project.key})
+        req['key'] = shared_key
+        # add prefill for parameters:
         gen_tracks = [[handler.track.plugin_link(track), track.name] for track in project.success_tracks]
-        req['prefill'] = json.dumps({"track" : gen_tracks})
+        req['prefill'] = json.dumps({"track": gen_tracks})
         req['id'] = id
-
-
-        f = urllib2.urlopen(url, urllib.urlencode(req))
+        bs_request_url = bsurl + '/plugins/get'
+        f = urllib2.urlopen(bs_request_url, urllib.urlencode(req))
         return f.read()
 
-
+    @expose()
+    def validation(*args, **kw):
+        print 'validation %s, %s' % (args, kw)
+        return {}
 
     @expose()
     def callback(self, mail, key, project_id, fid, tid, st, tn, td, *args, **kw):
@@ -50,7 +53,7 @@ class PluginController(BaseController):
             job = handler.job.new_job(name=tn, description=td, user_id=user.id, project_id=project_id, output='RUNNING', ext_task_id=tid)
             return {}
 
-        elif st == 'SUCCESS' :
+        elif st == 'SUCCESS':
             # a request is finished
             # look if there is file output
             job = DBSession.query(Job).filter(Job.ext_task_id == tid).first()

@@ -22,6 +22,7 @@
     <link rel="stylesheet" type="text/css" href="${tg.url('/javascript/jslib/dijit/themes/tundra/tundra.css')}"/>
     <link rel="stylesheet" type="text/css" href="${tg.url('/javascript/jslib/dojo/resources/dojo.css')}"/>
     <link rel="stylesheet" type="text/css" href="${tg.url('/css/genome.css')}"/>
+    <link rel="stylesheet" type="text/css" href="${tg.url('/css/bs.css')}"/>
     <!-- <link rel="stylesheet" type="text/css" href="/css/style.css"/> -->
     <script type="text/javascript" src="${tg.url('/javascript/jslib/dojo/dojo.js')}"></script>
     <script type="text/javascript" src="${tg.url('/javascript/js/Widget.js')}"></script>
@@ -58,7 +59,7 @@
     <script type="text/javascript" src="${tg.url('/javascript/jslib/dojo/jbrowse_dojo.js')}"></script>
 
     <!-- <script type="text/javascript" src="${tg.url('/javascript/jslib/layout.js')}"></script> -->
-    <!-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script> -->
+    
     <script type="text/javascript" src="${tg.url('/javascript/js/bs.js')}"></script>
 
     <!--some javascript control, starting the browser -->
@@ -81,15 +82,16 @@
       <span py:replace="selections"/>
     </script>
     <script type="text/javascript">
-      <span py:replace="operations_path"/>
-    </script>
-    <script type="text/javascript">
       <span py:replace="jobs"/>
     </script>
     
+    <script type="text/javascript">
+      var oplist = <span py:replace="oplist"/>;
+      var plug_url = "${tg.url('/plugins/index')}";
+    </script>
   </head>
 
-  
+    
   <body class="tundra">
     
     <div id="GenomeBrowser" class="ui-layout-center" style="height: 100%; width: 100%; padding: 0; border: 0;"></div>
@@ -100,20 +102,43 @@
     <span id="project_id" style="display:none"><span py:replace="project_id"  style="display:none"/></span>
     <span id="is_admin" style="display:none"><span py:replace="is_admin"  style="display:none"/></span>
 
-    <div id="bs_operations"></div>
   </body>
 
 <script>
+//<![CDATA[ 
     window.onload = function(){
+        
+        var form_options = {
+          'bs_server_url' : _gdv_info['bioscript_url'],
+            'validation_successful' : function(plugin_id, task_id){
+              $.ajax({
+                'url': plug_url + 'validation?task_id=' + task_id + '&id=' + plugin_id,
+                'success': function(data){
+                  toggle_bs_form_container(data, plugin_id);
+                }
+              })
+            }
+        }
+  
+
 
         var options = {
+            operation_list : oplist,
             show_plugin : function(plugin_id){
-                window.location = ${"tg.url('/plugins/index')"} + '?id=' + plugin_id;
+              $.ajax({
+                'url' : plug_url + '?id=' + plugin_id + '&key=' + _gdv_info['project_key'],
+                'dataType': 'html',
+                'success': function(data){
+                   toggle_bs_form_container(data, plugin_id);
+                   $('body').bioscript(form_options).bioscript('hack_submit');
+                }
+              })               
             },
             'root_name' : 'Operations'
         }
         $('#bs_operations').bioscript(options).bioscript('operation_list');
     };
+// ]]>
 </script>
 
 </html>

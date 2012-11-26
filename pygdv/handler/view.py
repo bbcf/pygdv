@@ -2,7 +2,7 @@
 from pygdv.model import DBSession, Project
 from pygdv.lib.jbrowse import util as jb
 from pygdv.lib import constants, plugin
-
+import urllib2
 import json
 import tg
 import os
@@ -71,7 +71,6 @@ def prepare_view(project_id, *args, **kw):
             }};
             ''' % jb.features_style(all_tracks)
 
-
     selections = 'init_locations = %s' % handler.selection.selections(project_id)
 
     # prepare _gdv_info
@@ -83,6 +82,10 @@ def prepare_view(project_id, *args, **kw):
     info['sequence_id'] = project.sequence_id
     info['admin'] = kw.get('admin', True)
     info['plug_url'] = url('/plugins')
+    info['project_key'] = project.key
+    if 'plugin.service.url' in tg.config:
+        info['bioscript_url'] = handler.job.bioscript_url
+
     if 'mode' in kw:
         info['mode'] = kw.get('mode')
 
@@ -91,29 +94,28 @@ def prepare_view(project_id, *args, **kw):
     control = 'b.showTracks();initGDV(b, %s, %s);' % (project.id, info)
 
     # add location if it's in url
-    if kw.has_key('loc'):
+    if 'loc' in kw:
         control += 'b.navigateTo("%s");' % kw.get('loc')
 
     # prepare jobs list
     jobs = 'init_jobs = %s' % handler.job.jobs(project_id)
-
-    # prepare operation list
-    try:
-        control_op = 'bs_redirect = %s; bs_operations_path = %s;' % (json.dumps(url('/plugins/index')), json.dumps(plugin.util.get_plugin_path()))
-    except Exception as e:
-        print "Exception with plugin system : " + str(e)
-        control_op = 'init_operations = "connect"'
+    op = '{}'
+    if 'plugin.service.url' in tg.config:
+        try:
+            op = handler.job.operation_list()
+        except urllib2.URLError:
+            pass
 
     return dict(species_name=project.species.name,
         nr_assembly_id=project.sequence_id,
         project_id=project.id,
         is_admin=True,
-        ref_seqs= refSeqs,
-        track_info = trackInfo,
-        parameters = parameters,
-        style_control = style_control,
-        control = control,
-        selections = selections,
-        operations_path = control_op,
-        jobs = jobs,
-        page = 'view')
+        ref_seqs=refSeqs,
+        track_info=trackInfo,
+        parameters=parameters,
+        style_control=style_control,
+        control=control,
+        selections=selections,
+        jobs=jobs,
+        page='view',
+        oplist=op)

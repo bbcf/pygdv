@@ -4,8 +4,7 @@
 */
 function Operations(){
     this.ifr_loaded = false;
-};
-
+}
 
 
 /**
@@ -70,7 +69,7 @@ Operations.prototype.show_form = function(){
         dojo.connect(closer, 'click', function(e){
             ctx.hide_form();
         });
-    };
+    }
 };
 /**
 * OP FORM
@@ -80,7 +79,7 @@ Operations.prototype.hide_form = function(){
     if (this.form_showed){
     this.bwdgt.removeChild(this.fwdgt);
     this.form_showed = false;
-    };
+    }
 };
 
 /**

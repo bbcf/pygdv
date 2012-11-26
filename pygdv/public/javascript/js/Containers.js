@@ -30,14 +30,14 @@ PrincipalContainer.prototype.reset = function(){
 /**
 * Function called when a new tab is selected.
 * It is a hook to launch or stop event.
-* 
+*
 * *** a 'Jobs.get_jobs()' launched when job pane is selected
 *     or stopped
 */
 PrincipalContainer.prototype.tab_selected = function(tab_name){
     switch (tab_name){
-    case "Jobs"      :  this.jobs.routine(true);break;
-    default: this.jobs.routine(false);
+        case "Jobs"      :  this.jobs.routine(true);break;
+        default: this.jobs.routine(false);
     }
 };
 
@@ -50,8 +50,7 @@ PrincipalContainer.prototype.createContainer = function(browser, menuLeftContain
     // the principal container and the corresponding dijit container
     var principal = dojo.create('div', {id : 'principal_cont'}, menuLeftContainer);
     var principal_dijit = new dijit.layout.AccordionContainer({
-        style: "height: 100%; width: 100%;",
-	
+        style: "height: 100%; width: 100%;"
         },
         principal);
     this.principal = principal;
@@ -60,9 +59,9 @@ PrincipalContainer.prototype.createContainer = function(browser, menuLeftContain
     // check mode
     var mode = 'else';
     if (!_gdv_info.admin){
-	init_operations = 'login';
-	mode = _gdv_info.mode;
-    };
+        init_operations = 'login';
+        mode = _gdv_info.mode;
+    }
     // build menu
     if (mode == 'read'){
 	this.navigationContainer(principal, principal_dijit, ['Home']);
@@ -81,11 +80,8 @@ PrincipalContainer.prototype.createContainer = function(browser, menuLeftContain
 	this.jobContainer(principal, principal_dijit);
 
     }
-
-
-    // }
- 	    
-    // 	}
+    //}
+    //}
 	// # A fake tab for the "reset" effect if a menu item is clicked twice
 	this.fakeContainer(principal, principal_dijit);
 	
@@ -96,7 +92,6 @@ PrincipalContainer.prototype.createContainer = function(browser, menuLeftContain
         this.menu_current_tab = "Navigation";
         dojo.cookie("menu_current_tab", this.menu_current_tab);
     }
-
     return principal;
 };
 
@@ -128,12 +123,12 @@ PrincipalContainer.prototype.setOnclickMenuElement = function(){
             } else {
                 dojo.cookie("menu_current_tab", ctx.menu_current_tab);
                 this.open = 1;
-		ctx.tab_selected(ctx.menu_current_tab);
+                ctx.tab_selected(ctx.menu_current_tab);
             }
             dojo.stopEvent(e);
         });
     }
-}
+};
 
 /*
 * Switch to the last visited menu element
@@ -149,7 +144,7 @@ PrincipalContainer.prototype.switchMenuElement = function(){
         default: console.log("ProgrammingError: cannot retrieve menu_current_tab from cookie.");
     }
     this.tab_selected(this.menu_current_tab);
-}
+};
 
 
 /**
@@ -186,12 +181,12 @@ PrincipalContainer.prototype.navigationContainer = function(DomNode, DijitNode, 
     for (var i=0; i<len; i++){
         link_name = menu_nav[i];
         link_end = link_name.toLowerCase();
-        if (i%2==0){ new_tr = dojo.create("tr", null, nav_table); }
+        if (i%2===0){ new_tr = dojo.create("tr", null, nav_table); }
         var new_button = dojo.create("td", {className:"nav_table_td"}, new_tr);
         var link = dojo.create('a',{
                          href : _gdv_info['proxy'] + '/' + link_end,
                          className:"nav_cell",
-                         id : 'menu_' + link_name,
+                         id : 'menu_' + link_name
                       }, new_button);
         var item = dojo.create("table",{className: "gdv_menu_item"}, link);
         var item_label_tr = dojo.create("tr",null,item);
@@ -199,10 +194,10 @@ PrincipalContainer.prototype.navigationContainer = function(DomNode, DijitNode, 
         var item_label = dojo.create("td",{className:'gdv_menu_td'},item_label_tr);
         var item_img = dojo.create("td",{className:'gdv_menu_td'},item_img_tr);
         dojo.create("span", {innerHTML: link_name,
-                         className: 'nav_span',
+                         className: 'nav_span'
                       }, item_label);
         dojo.create('img', {src : window.picsPathRoot + "menu_" + link_end + ".png",
-                         className : 'nav_image',
+                         className : 'nav_image'
                       }, item_img);
     }
     DijitNode.addChild(nav_container);
@@ -226,11 +221,10 @@ PrincipalContainer.prototype.selectionContainer = function(DomNode, DijitNode){
     this.selections = sel_container;
 
     // initialize the selection handler
-    var sel_handler = _gdv_info.gb.view.zoneSel
+    var sel_handler = _gdv_info.gb.view.zoneSel;
     var sp = new SelectionPane(cont, sel_handler);
     sel_handler.sel_pane = sp;
 };
-
 
 /**
 * Add the Operations tab
@@ -240,8 +234,13 @@ PrincipalContainer.prototype.operationContainer = function(DomNode, DijitNode,  
 
     var ops_container = new dijit.layout.ContentPane({
         title: "Operations",
-        id:'bs_operations'
+        id: 'bs_operations'
     }, cont);
+
+ //   $('body').append($('<div/>', {id : 'bs_operations_form_container'}));
+   
+};
+
     // DijitNode.addChild(ops_container);
     // this.operations = ops_container;
 
@@ -263,7 +262,7 @@ PrincipalContainer.prototype.operationContainer = function(DomNode, DijitNode,  
 
     // initialize the iframe that will be showed
     // if an user click on an Operation button
-//    op.create_frame(viewContainer, fwdgt, bwdgt);
+    //    op.create_frame(viewContainer, fwdgt, bwdgt);
 
 
     // initialize the print button
@@ -275,8 +274,6 @@ PrincipalContainer.prototype.operationContainer = function(DomNode, DijitNode,  
     //     dojo.stopEvent(e);
     // });
 
-};
-
 
 /**
 * Add a fake tab for the "reset" effect if a menu item is clicked twice
@@ -285,13 +282,11 @@ PrincipalContainer.prototype.fakeContainer = function(DomNode, DijitNode){
     var fake = dojo.create('div', {}, DomNode);
     var fake_container = new dijit.layout.ContentPane({
         title: "Fake",
-        id:'tab_fake',
+        id:'tab_fake'
     }, fake);
     DijitNode.addChild(fake_container);
     this.fake = fake_container;
 };
-
-
 
 
 /**
@@ -301,4 +296,43 @@ PrincipalContainer.prototype.jobContainer = function(DomNode, DijitNode){
     var job_manager = new JobPane();
     job_manager.init_panel(DomNode, DijitNode);
     this.jobs = job_manager;
+
+    $('body').append($('<div/>', {id : 'bs_operations_form_container'}));
+    $('#bs_operations_form_container').toggle('fast');
+    $('#bs_operations_form_container').attr('showed', '');
+
+    // var formc = dojo.create('div', {}, DomNode);
+    // var formcont = new dijit.layout.ContentPane({
+    //     id:'bs_operations_form_container'
+    // }, formc);
+    // DijitNode.addChild(formcont);
+    // this.formcontainer = formcont;
 };
+
+
+
+function toggle_bs_form_container(data, identifier){
+    var $cont = $('#bs_operations_form_container');
+    var showed = $cont.attr('showed');
+    if (showed == identifier){
+        $cont.html('');
+        $cont.toggle('normal');
+        $cont.attr('showed', '');
+    } else if (showed){
+        $cont.html(data);
+        $cont.attr('showed', identifier);
+    } else {
+        $cont.html(data);
+        $cont.attr('showed', identifier);
+        $cont.toggle('normal');
+    }
+}
+
+
+
+
+
+
+
+
+

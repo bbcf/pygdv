@@ -11,9 +11,9 @@ jQuery.fn.dataTableExt.oSort['string-case-desc'] = function(x,y) {
 function show_status(event, node, status, enter){
     var c = $('body').find('.status_cvf');
     var o = node.offset();
-    if (c.length == 0){
+    if (c.length === 0){
         var n = $('<a class=status_cvf>').html(status);
-        var st = {}
+        var st = {};
         if (status == 'RUNNING'){
             st['border'] = '1px solid green';
             st['color'] = 'green';
@@ -30,7 +30,7 @@ function show_status(event, node, status, enter){
         $(node).find('.hoover_actions').toggleClass('table_hidden');
     } else {
         var c = $('body').find('.status_cvf');
-        var ofs = c.offset()
+        var ofs = c.offset();
         var ot = ofs['top'];
 
         if(!enter){// remove status div only if the mouse is leaving the tr, and is not on the status div
@@ -49,7 +49,7 @@ $(document).ready(function() {
 
             //     	$(this).find('.hidden_info').find('.tr_actions').toggleClass('table_hidden');
             var tracks = $(this).find('.hidden_info').find('.tr_status');
-            if (tracks.length == 0 || tracks.html() == 'SUCCESS'){
+            if (tracks.length === 0 || tracks.html() == 'SUCCESS'){
                 $(this).find('.hoover_actions').toggleClass('table_hidden');
             } else if (tracks.length > 0){
                 show_status(e, $(this), tracks.html(), true);

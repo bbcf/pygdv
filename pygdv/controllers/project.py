@@ -45,7 +45,7 @@ class ProjectController(BaseController):
         new_form.child.children[2].options = sp_opts
         mapping = json.dumps(dict([(sp.id, [(seq.id, seq.name) for seq in sp.sequences
                                                                if seq.public or handler.genrep.checkright(seq, user)]) for sp in species]))
-        new_form.value = {'smapping' : mapping}
+        new_form.value = {'smapping': mapping}
         return dict(page='projects', widget=new_form)
 
     @with_trailing_slash
@@ -76,7 +76,7 @@ class ProjectController(BaseController):
         if request.method == 'GET':
             debug("GET", 2)
             widget.child.children[1].value = project.name
-            widget.child.children[2].options = [('', '')] + [(t.id, t.name) for t in tracks] + [(t.id, t.name, {'selected' : True}) for t in project.tracks]
+            widget.child.children[2].options = [('', '')] + [(t.id, t.name) for t in tracks] + [(t.id, t.name, {'selected': True}) for t in project.tracks]
             return dict(page='tracks', widget=widget, project_id=project_id)
         debug("POST", 2)
         try:
@@ -86,7 +86,7 @@ class ProjectController(BaseController):
             debug("error", 2)
             w = e.widget
             w.child.children[1].value = project.name
-            w.child.children[2].options = [(t.id, t.name) for t in tracks] + [(t.id, t.name, {'selected' : True}) for t in project.tracks]
+            w.child.children[2].options = [(t.id, t.name) for t in tracks] + [(t.id, t.name, {'selected': True}) for t in project.tracks]
             return dict(page='tracks', widget=w, project_id=project_id)
         debug("validation passed")
         track_ids = kw.get('tracks', [])
@@ -122,7 +122,7 @@ class ProjectController(BaseController):
         if not checker.check_permission_project(user.id, project.id, constants.right_upload_id):
             return reply.error(request, 'Wrong key', './', {})
         else:
-            return reply.normal(request, 'You can upload track on this project', './', {'project' : project})
+            return reply.normal(request, 'You can upload track on this project', './', {'project': project})
         
         
 
@@ -141,7 +141,7 @@ class ProjectController(BaseController):
             return reply.error(request, "Assembly doesn't exist in GDV.", './', {})
 
         project = handler.project.create(kw['name'], kw['assembly'], user.id)
-        return reply.normal(request, 'Project successfully created.',  url('/tracks'), {'project' : project})
+        return reply.normal(request, 'Project successfully created.',  url('/tracks'), {'project': project})
     
     @expose()
     def post(self, *args, **kw):
@@ -155,10 +155,10 @@ class ProjectController(BaseController):
             project_id = args[0]
             if not checker.check_permission(user=user, project_id=project_id, right_id=constants.right_upload_id) and not checker.is_admin(user=user):
                 return reply.error(request, "You must have %s permission to delete the project." % constants.right_upload,
-                        '/tracks', {'error' : 'wrong credentials'})
+                        '/tracks', {'error': 'wrong credentials'})
 
         handler.project.delete(project_id=project_id)
-        return reply.normal(request, 'Project successfully deleted.', '/tracks', {'success' : 'project deleted'})
+        return reply.normal(request, 'Project successfully deleted.', '/tracks', {'success': 'project deleted'})
 
 
 
@@ -168,26 +168,26 @@ class ProjectController(BaseController):
 
         if request.method == 'GET':
             project_id = args[0]
-        else :
+        else:
             project_id = kw.get('pid')
 
         if not checker.check_permission(user=user, project_id=project_id, right_id=constants.right_upload_id) and not checker.is_admin(user=user):
             flash('You must have %s permission to share the project', 'error') % constants.right_upload
-            raise redirect('/tracks', {'pid' : project_id})
+            raise redirect('/tracks', {'pid': project_id})
 
         project = DBSession.query(Project).filter(Project.id == project_id).first()
         widget = form.ShareProject(action=url('/projects/share/%s' % project_id))
 
         # public url
-        pub = url('/public/project', {'id' : project_id, 'k' : project.key})
+        pub = url('/public/project', {'id': project_id, 'k': project.key})
        
         # download url
         if project.download_key is None:
             project.download_key = project.setdefaultkey()
-        down = url('/public/project', {'id' : project_id, 'k' : project.download_key})
+        down = url('/public/project', {'id': project_id, 'k': project.download_key})
 
 
-        widget.value = {'pid' : project_id}
+        widget.value = {'pid': project_id}
 
         tl = handler.help.help_address(url('help'), '#share', 'sharing projects')
 
@@ -199,10 +199,10 @@ class ProjectController(BaseController):
                     if not isinstance(rights_checkboxes,list):
                         rights_checkboxes = [rights_checkboxes]
                     handler.project.change_rights(kw.get('pid'), kw.get('cid'), rights=rights_checkboxes)
-                else : handler.project.change_rights(kw.get('pid'), kw.get('cid'))
+                else: handler.project.change_rights(kw.get('pid'), kw.get('cid'))
 
 
-            else :
+            else:
                 circle_ids = kw.get('circles', [])
                 if not circle_ids: circle_ids = []
                 if not isinstance(circle_ids, list):
@@ -214,12 +214,10 @@ class ProjectController(BaseController):
         cr_data = [util.to_datagrid(datagrid.project_sharing, project.circles_rights, "Sharing", len(project.circles_rights)>0)]
 
         widget.child.children[1].options =  [('','')] + [(c.id, c.name) for c in user.circles_sharing if c not in project.shared_circles] +\
-                                            [(c.id, c.name, {'selected' : True}) for c in project.shared_circles]
+                                            [(c.id, c.name, {'selected': True}) for c in project.shared_circles]
 
         return dict(page='projects', public=pub, download=down, name=project.name,
             tooltip_links=tl, widget=widget, items=cr_data, project_id=project_id)
-
-
 
     @expose('pygdv.templates.view')
     def view(self, project_id, *args, **kw):
@@ -229,9 +227,8 @@ class ProjectController(BaseController):
             flash('You must have %s permission to view the project.' % constants.right_read, 'error')
             raise redirect(url('/'))
         d = handler.view.prepare_view(project_id, *args, **kw)
-        
         return d
-    
+
 
     @require(has_permission('admin', msg='Only for admins'))
     @expose('pygdv.templates.admin_project')

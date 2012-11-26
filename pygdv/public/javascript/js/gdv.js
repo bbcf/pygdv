@@ -73,7 +73,7 @@ function initGDV(browser, project_id, gdv_info, readonly){
             var query = uri.substring(uri.indexOf('?') + 1, uri.length);
             var queryO = dojo.queryToObject(query);
             if ('k' in queryO){
-		copy_link.href= _GDV_URL + '/projects/copy?k=' + queryO['k'] + '&project_id=' + _gdv_info.project_id;
+        copy_link.href= _GDV_URL + '/projects/copy?k=' + queryO['k'] + '&project_id=' + _gdv_info.project_id;
             } else {console.fatal('you will not be able to copy the project')};
 	};
 	
