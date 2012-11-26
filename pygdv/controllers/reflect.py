@@ -11,16 +11,13 @@ from sqlite3 import OperationalError
 import track, urllib2, urllib
 
 
-
 reflect_server = 'http://reflect.ws'
-
 reflect_api = 'REST'
-
 reflect_popup = 'GetPopup'
 
-class ReflectController(BaseController):
-    allow_only = has_any_permission(constants.perm_admin, constants.perm_user)
 
+class ReflectController(BaseController):
+    allow_only = has_any_permission(constants.permissions['admin']['name'], constants.permissions['read']['name'])
 
     @expose()
     def links(self, name, assembly_id):

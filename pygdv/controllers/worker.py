@@ -15,15 +15,15 @@ __all__ = ['WorkerController']
 
 simple_fields = ('start', 'end', 'score', 'name', 'strand', 'attributes')
 
+
 class WorkerController(BaseController):
-    allow_only = has_any_permission(constants.perm_admin, constants.perm_user)
-    
-    
-    
+    allow_only = has_any_permission(constants.permissions['admin']['name'], constants.permissions['read']['name'])
+
+
     def index(self, *args, **kw):
         print 'worker received : args : %s, kw : %s' % (args, kw)
         pass
-    
+
     @expose('json')
     def new_selection(self, project_id, s, job_name, job_description, *args, **kw):
         '''

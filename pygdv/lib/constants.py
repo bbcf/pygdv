@@ -148,27 +148,26 @@ groups = {
     'user': {'id': 2, 'name': 'Users'},
 }
 
-right_upload = 'Upload'
-right_download = 'Download'
-right_read = 'Read'
+right_upload = rights['upload']['name']
+right_download = rights['download']['name']
+right_read = rights['read']['name']
 
-right_upload_id = 3
-right_download_id = 2
-right_read_id = 1
+right_upload_id = rights['upload']['id']
+right_download_id = rights['download']['id']
+right_read_id = rights['read']['id']
 
-group_admins = 'Admins'
-group_admins_id = 1
-perm_admin = 'admin'
+# group_admins = 'Admins'
+group_admins_id = groups['admin']['id']
+# perm_admin = 'admin'
 
-group_users = 'Users'
-group_users_id = 2
-perm_user = 'user'
+# group_users = 'Users'
+# group_users_id = 2
+# perm_user = 'user'
 
 tmp_user_name = 'user-not-registered'
 
 
-
-full_rights = {right_read: True, right_download: True, right_upload: True}
+#full_rights = {right_read: True, right_download: True, right_upload: True}
 
 
 formats_export = ('sqlite', 'wig', 'bed', 'gtf')

@@ -16,7 +16,7 @@ file_tags = ['track', 'wig', 'bed']
 
 
 class PluginController(BaseController):
-    allow_only = has_any_permission(constants.perm_admin, constants.perm_user)
+    allow_only = has_any_permission(constants.permissions['admin']['name'], constants.permissions['read']['name'])
 
     @expose()
     def index(self, id, key, *args, **kw):

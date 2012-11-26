@@ -18,10 +18,8 @@ from pygdv import handler
 __all__ = ['LoginController']
 
 
-
 class LoginController(BaseController):
 
-   
     @expose('pygdv.templates.index')
     def index(self, came_from='/'):
         '''
@@ -29,7 +27,7 @@ class LoginController(BaseController):
         '''
         if tg.config.get('authentication.disable').lower() in ['t', 'true']:
             print constants.admin_user_email()
-
+    
             environ = request.environ
             authentication_plugins = environ['repoze.who.plugins']
             identifier = authentication_plugins['ticket']
@@ -41,7 +39,7 @@ class LoginController(BaseController):
             group_admins = DBSession.query(Group).filter(Group.id == constants.group_admins_id).first()
             if user.email in admins:
                 user not in group_admins.users and group_admins.users.append(user)
-            else :
+            else:
                 user in group_admins.users and group_admins.users.remove(user)
             DBSession.flush()
             userdata = "%s|%s" % (user.id, user in group_admins.users)
@@ -59,18 +57,18 @@ class LoginController(BaseController):
             raise redirect(came_from)
 
         u = resolve_relative_url(url(), request.environ)
-        res = tequila.create_request(u+'/login/auth','tequila.epfl.ch')
-        raise redirect('https://tequila.epfl.ch/cgi-bin/tequila/requestauth?request'+res)
-        
+        res = tequila.create_request(u + '/login/auth', 'tequila.epfl.ch')
+        raise redirect('https://tequila.epfl.ch/cgi-bin/tequila/requestauth?request' + res)
+
 
     @expose('pygdv.templates.index')
-    def auth(self,came_from='/',**kw):
+    def auth(self, came_from='/', **kw):
         '''
         Fetch user back from tequila.
         Validate the key from tequila.
         Log user.
         '''
-        if not kw.has_key('key'):
+        if not 'key' in kw:
             raise redirect(came_from)
 
         # take parameters
@@ -82,7 +80,7 @@ class LoginController(BaseController):
         cookiename = identifier.cookie_name
         remote_addr = environ['REMOTE_ADDR']
         # get user
-        principal = tequila.validate_key(key,'tequila.epfl.ch')
+        principal = tequila.validate_key(key, 'tequila.epfl.ch')
         if principal is None:
             raise redirect('./login')
         tmp_user = self.build_user(principal)
@@ -96,7 +94,7 @@ class LoginController(BaseController):
             DBSession.flush()
             #transaction.commit()
             user = DBSession.query(User).filter(User.email == mail).first()
-            flash( 'Your account has been created')
+            flash('Your account has been created')
             DBSession.flush()
             self.build_circles_with_user(tmp_user, principal)
             DBSession.flush()
@@ -107,22 +105,22 @@ class LoginController(BaseController):
             user._set_date(datetime.datetime.now())
             user_group = DBSession.query(Group).filter(Group.name == constants.group_users_id).first()
             user_group.users.append(tmp_user)
-            flash( 'Your account has been created')
+            flash('Your account has been created')
             DBSession.add(user)
             DBSession.flush()
             self.build_circles_with_user(tmp_user, principal)
             DBSession.flush()
             #transaction.commit()
-        else :
-            flash( 'Welcome back', 'notice')
+        else:
+            flash('Welcome back', 'notice')
             self.check_circles_with_user(user, principal)
-        
+
         # look if an user is admin or not
         admins = tg.config.get('admin.mails')
         group_admins = DBSession.query(Group).filter(Group.id == constants.group_admins_id).first()
         if user.email in admins:
             user not in group_admins.users and group_admins.users.append(user)
-        else :
+        else:
             user in group_admins.users and group_admins.users.remove(user)
         DBSession.flush()
         # create the authentication ticket
@@ -130,10 +128,10 @@ class LoginController(BaseController):
 
         userdata = "%s|%s" % (user.id, user in group_admins.users)
 
-        ticket = auth_tkt.AuthTicket( 
-                                       secret, user.email, remote_addr, tokens=token, 
-                                       user_data=userdata, time=None, cookie_name=cookiename, 
-                                       secure=True) 
+        ticket = auth_tkt.AuthTicket(
+                                       secret, user.email, remote_addr, tokens=token,
+                                       user_data=userdata, time=None, cookie_name=cookiename,
+                                       secure=True)
         val = ticket.cookie_value()
         # set it in the cookies
         response.set_cookie(

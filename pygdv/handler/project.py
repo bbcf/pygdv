@@ -17,11 +17,12 @@ def create(name, sequence_id, user_id, tracks=None, isPublic=False, circles=None
     '''
     return edit(Project(), name, user_id, sequence_id=sequence_id, tracks=tracks, isPublic=isPublic, circles=circles)
 
+
 def e(project=None, project_id=None, name=None, track_ids=None, circle_ids=None):
     if project is None:
         project = DBSession.query(Project).filter(Project.id == project_id).first()
 
-    if name is not None :
+    if name is not None:
         project.name = name
 
     if track_ids is not None:
@@ -36,22 +37,23 @@ def e(project=None, project_id=None, name=None, track_ids=None, circle_ids=None)
         circle_ids = [int(i) for i in circle_ids]
         to_del = []
         for shared in project._circle_right:
-            if shared.circle.id not in circle_ids : 
+            if shared.circle.id not in circle_ids:
                 to_del.append(shared)
-        for d in to_del :
+        for d in to_del:
             DBSession.delete(d)
             project._circle_right.remove(d)
         DBSession.flush()
-        
-        shared_ids = [c.id for c in project.shared_circles] 
-        read_right = DBSession.query(Right).filter(Right.name == constants.right_read).first()
+
+        shared_ids = [c.id for c in project.shared_circles]
+        read_right = DBSession.query(Right).filter(Right.id == constants.rights['read']['id']).first()
         for new_id in circle_ids:
-            if new_id not in shared_ids :
+            if new_id not in shared_ids:
                 add_right(project=project, circle_id=new_id, right=read_right)
         DBSession.flush()
     DBSession.add(project)
     DBSession.flush()
     return project
+
 
 def add_right(project=None, project_id=None, circle=None, circle_id=None, right=None, right_id=None):
     if project is None:

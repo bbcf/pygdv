@@ -23,7 +23,7 @@ __all__ = ['JobController']
 
 
 class JobController(BaseController):
-    allow_only = has_any_permission(constants.perm_user, constants.perm_admin)
+    allow_only = has_any_permission(constants.permissions['admin']['name'], constants.permissions['read']['name'])
 
     @with_trailing_slash
     @expose('pygdv.templates.jobs_index')

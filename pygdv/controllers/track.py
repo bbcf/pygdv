@@ -31,7 +31,7 @@ def debug(s, t=0):
 
 
 class TrackController(BaseController):
-    allow_only = has_any_permission(constants.perm_user, constants.perm_admin)
+    allow_only = has_any_permission(constants.permissions['admin']['name'], constants.permissions['read']['name'])
 
     @expose('pygdv.templates.track_index')
     @expose('json')

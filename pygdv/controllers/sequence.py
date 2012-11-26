@@ -11,8 +11,9 @@ from pygdv.lib import constants, util
 from pygdv.handler import genrep
 from pygdv import handler
 
+
 class SequenceController(BaseController):
-    allow_only = has_permission(constants.perm_admin)
+    allow_only = has_permission(constants.permissions['admin']['name'])
 
 
     @expose('pygdv.templates.sequences')

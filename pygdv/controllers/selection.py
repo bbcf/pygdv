@@ -13,18 +13,17 @@ __all__ = ['SelectionController']
 
 chunk = 20000
 
-class SelectionController(object):
 
+class SelectionController(object):
+    allow_only = has_any_permission(constants.permissions['admin']['name'], constants.permissions['read']['name'])
 
     @expose()
-    @require(has_any_permission(constants.perm_user, constants.perm_admin))
     def index(self):
         return ''
 
 
 
     @expose()
-    @require(has_any_permission(constants.perm_user, constants.perm_admin))
     def save(self, project_id, color, description, locations):
         user = handler.user.get_user_in_session(request)
         if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
@@ -72,7 +71,6 @@ class SelectionController(object):
 
 
     @expose()
-    @require(has_any_permission(constants.perm_user, constants.perm_admin))
     def delete(self, project_id, selection_id):
         user = handler.user.get_user_in_session(request)
         if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
