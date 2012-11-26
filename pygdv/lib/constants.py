@@ -162,7 +162,7 @@ perm_admin = permissions['admin']['name']
 
 group_users = groups['user']['name']
 group_users_id = groups['user']['id']
-perm_user = permissions['user']['name']
+perm_user = permissions['read']['name']
 
 tmp_user_name = 'user-not-registered'
 
