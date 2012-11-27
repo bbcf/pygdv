@@ -105,7 +105,7 @@ class LoginController(BaseController):
             #user_group.users.append(tmp_user)
             flash('Your account has been created')
             DBSession.flush()
-            self.build_circles_with_user(tmp_user, principal)
+            self.build_circles_with_user(tmp_user, principal, user)
             DBSession.flush()
             #transaction.commit()
         else:
@@ -173,7 +173,7 @@ class LoginController(BaseController):
             user.firstname = hash.get('firstname')
         return user
 
-    def build_circles_with_user(self, user, principal):
+    def build_circles_with_user(self, user, principal, u=None):
         '''
         Build the groups that are in tequila and add the user to it.
         Must use the ``fake user``
@@ -185,7 +185,10 @@ class LoginController(BaseController):
                 circle = handler.circle.get_tequila_circle(group_name)
                 if circle is None:
                     circle = handler.circle.create_admin(group_name)
-                circle.users.append(user)
+                if u:
+                    circle.users.append(u)
+                else:
+                    circle.users.append(user)
                 DBSession.flush()
 
     def check_circles_with_user(self, user, principal):
