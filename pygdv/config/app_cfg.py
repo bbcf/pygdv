@@ -7,17 +7,16 @@ This file complements development/deployment.ini.
 Please note that **all the argument values are strings**. If you want to
 convert them into boolean, for example, you should use the
 :func:`paste.deploy.converters.asbool` function, as in::
-    
+
     from paste.deploy.converters import asbool
     setting = asbool(global_conf.get('the_setting'))
- 
+
 """
 
 from tg.configuration import AppConfig
 
 import pygdv
 from pygdv import model
-from pygdv.lib import app_globals, helpers 
 import tg
 
 base_config = AppConfig()
@@ -31,7 +30,7 @@ base_config.renderers.append('json')
 #Set the default renderer
 base_config.default_renderer = 'genshi'
 base_config.renderers.append('genshi')
-base_config.renderers.append('mako')
+#base_config.renderers.append('mako')
 
 # if you want raw speed and have installed chameleon.genshi
 # you should try to use this renderer instead.
@@ -41,24 +40,23 @@ base_config.renderers.append('mako')
 base_config.use_sqlalchemy = True
 base_config.model = model
 base_config.DBSession = model.DBSession
-base_config.use_transaction_manager=True
+base_config.use_transaction_manager = True
 
 
-base_config.use_toscawidgets=True
-base_config.use_toscawidgets2=True
-
-
+base_config.use_toscawidgets = True
+base_config.use_toscawidgets2 = True
 
 
 # HOOKS
 def on_startup():
     import datetime
-    print ' --- starting application --- '+str(datetime.datetime.now())
+    print ' --- starting application --- ' + str(datetime.datetime.now())
     if tg.config.get('plugin.service.url') is None:
         print 'WARNING : YOU MUST SET THE "plugin.service.url" in your config file.'
 
     if tg.config.get('plugin.shared.key') is None:
         print 'WARNING : YOU MUST SET THE "plugin.shared.key" in your config file.'
+
 
 def on_shutdown():
     print '--- stopping application --- '
