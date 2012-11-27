@@ -3,7 +3,7 @@
 
 from pygdv.lib.base import BaseController
 from pygdv.lib import tequila, constants
-from tg import expose,url,flash,request,response
+from tg import expose, url, flash, request, response
 from tg.controllers import redirect
 from pygdv.model import User, Group, DBSession
 from paste.auth import auth_tkt
@@ -11,7 +11,6 @@ from pygdv.config.app_cfg import token
 from paste.request import resolve_relative_url
 import transaction
 import datetime
-from tg import app_globals as gl
 import tg
 from pygdv import handler
 
@@ -27,7 +26,7 @@ class LoginController(BaseController):
         '''
         if tg.config.get('authentication.disable').lower() in ['t', 'true']:
             print constants.admin_user_email()
-    
+
             environ = request.environ
             authentication_plugins = environ['repoze.who.plugins']
             identifier = authentication_plugins['ticket']
@@ -176,7 +175,7 @@ class LoginController(BaseController):
         if(hash.has_key('firstname')):
             user.firstname = hash.get('firstname')
         return user
-    
+
     def build_circles_with_user(self, user, principal):
         '''
         Build the groups that are in tequila and add the user to it.
@@ -191,8 +190,7 @@ class LoginController(BaseController):
                     circle = handler.circle.create_admin(group_name)
                 circle.users.append(user)
                 DBSession.flush()
-                    
-                    
+
     def check_circles_with_user(self, user, principal):
         '''
         Check if the groups that are in tequila and add the user to it.
@@ -208,12 +206,3 @@ class LoginController(BaseController):
                     circle = handler.circle.create_admin(group_name)
                 circle.users.append(user)
                 DBSession.flush()
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-    

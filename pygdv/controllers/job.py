@@ -1,25 +1,18 @@
 # -*- coding: utf-8 -*-
 
-from tgext.crud import CrudRestController
-from pygdv.lib import tequila, constants
+from pygdv.lib import constants
 from pygdv.lib.base import BaseController
-from tg import expose, url, flash, request, response, tmpl_context
+from tg import expose, url, flash, request
 from tg.controllers import redirect
-from pygdv.model import User, Group, DBSession, Job, Result
-from pygdv.config.app_cfg import token
-import transaction
-import datetime
-from tg import app_globals as gl
-import tg, os
+from pygdv.model import DBSession, Job, Result
 from repoze.what.predicates import has_any_permission
 from pygdv import handler
-from pygdv.lib import util, constants, checker
-from tg.decorators import paginate, with_trailing_slash,without_trailing_slash
-from sqlalchemy.sql import and_, or_, not_
+from pygdv.lib import util, checker
+from tg.decorators import with_trailing_slash, without_trailing_slash
+from sqlalchemy.sql import and_, not_
 from pygdv.widgets import datagrid
 
 __all__ = ['JobController']
-
 
 
 class JobController(BaseController):
@@ -38,20 +31,20 @@ class JobController(BaseController):
 
         jobs = DBSession.query(Job).filter(Job.user_id == user.id).all()
 
-        data = [{'title' : job.name,
-                 'isFolder' : True,
-                 'children' : [{'title' : res.rtype} for res in job.results ]} for job in jobs]
-        data = util.to_datagrid(datagrid.job_grid, jobs, "Job Listing", grid_display=len(jobs)>0)
+        data = [{'title': job.name,
+                 'isFolder': True,
+                 'children': [{'title': res.rtype} for res in job.results]} for job in jobs]
+        data = util.to_datagrid(datagrid.job_grid, jobs, "Job Listing", grid_display=len(jobs) > 0)
         t = handler.help.help_address(url('/help'), 'jobs', 'How to compute new data')
 
         return dict(page='jobs', model='job', form_title="new job", item=data, value=kw, tooltip=t)
-    
+
     @without_trailing_slash
     @expose()
     def new(self, *args, **kw):
         return "You can launch jobs from project view"
-    
-    
+
+
     
     @expose('pygdv.templates.job')
     def result(self, id):

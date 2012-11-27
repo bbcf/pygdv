@@ -1,27 +1,20 @@
 """Project Controller"""
-from tgext.crud import CrudRestController
-from tgext.crud.decorators import registered_validate
 
-from repoze.what.predicates import not_anonymous, has_any_permission, has_permission
+from repoze.what.predicates import has_any_permission, has_permission
 from pygdv.lib.base import BaseController
-from tg import expose, flash, require, error, request, tmpl_context, validate, url
-from tg import app_globals as gl
+from tg import expose, flash, require, request, url
 from tg.controllers import redirect
-from tg.decorators import paginate, with_trailing_slash, without_trailing_slash
-import tg
+from tg.decorators import with_trailing_slash
 from pygdv.widgets import datagrid
 
-from pygdv.model import DBSession, Project, User, Species, Track, Job, Sequence
-from pygdv.widgets import datagrid, form
+from pygdv.model import DBSession, Project, User, Species, Track, Sequence
+from pygdv.widgets import form
 from pygdv import handler
-from pygdv.lib import util, plugin
-import os, json, urllib2
-import transaction
+from pygdv.lib import util
 from pygdv.lib import checker
 from pygdv.lib import constants, reply
 import tw2.core as twc
-from sqlalchemy.sql import and_, or_, not_
-from sqlalchemy.orm import aliased
+from sqlalchemy.sql import and_, not_
 import json
 
 __all__ = ['ProjectController']

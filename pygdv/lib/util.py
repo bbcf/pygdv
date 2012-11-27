@@ -1,47 +1,48 @@
-import os,uuid,errno
+import os
+import uuid
+import errno
 from pkg_resources import resource_filename
-from tg import app_globals as gl
 import tempfile
 import urllib2
-import shutil, os
+import shutil
 import hashlib
 import tg
-from tw.forms.fields import TextArea
 from urllib2 import HTTPError
 from pygdv.lib import constants
 from urlparse import urlparse
 
-def to_datagrid(grid_type, grid_data, grid_title = None, grid_display = None):
+
+def to_datagrid(grid_type, grid_data, grid_title=None, grid_display=None):
     '''
     Special method which format the parameters to fit
     on the datagrid template.
-    @param grid_type : The DataGrid.
-    @type grid_type : a DataGrid Object
-    @param grid_data : The data.
-    @type grid_data : a list of Object to fill in the DataGrid
-    @param grid_title : DataGrid title
-    @type grid_title : A string.
-    @param grid_display :True if the DataGrid has to be displayed.
-    @type grid_display : a boolean. (Normally it's the len() of the 'grid_data' )
+    @param grid_type: The DataGrid.
+    @type grid_type: a DataGrid Object
+    @param grid_data: The data.
+    @type grid_data: a list of Object to fill in the DataGrid
+    @param grid_title: DataGrid title
+    @type grid_title: A string.
+    @param grid_display:True if the DataGrid has to be displayed.
+    @type grid_display: a boolean. (Normally it's the len() of the 'grid_data' )
     '''
-    data = {'grid':grid_type, 
-    'grid_data':grid_data}
-    if grid_title is not None :
+    data = {'grid': grid_type,
+    'grid_data': grid_data}
+    if grid_title is not None:
         data['grid_title'] = grid_title
-    if grid_display is not None :
+    if grid_display is not None:
         data['grid_display'] = grid_display
     return data
 
 
 def get_unique_tmp_directory():
     '''
-    Return a String representation of the path to the 
+    Return a String representation of the path to the
     'temporary' directory of GDV.
     This directory is unique, and is builded with this call.
     '''
     uid = str(uuid.uuid4())
     public_dirname = os.path.join(os.path.abspath(resource_filename(gl.tmp_pkg, uid)))
-    try:    
+    try:
         os.mkdir(public_dirname)
     except OSError, e:
         if e.errno == errno.EEXIST:
@@ -56,15 +57,15 @@ block_sz = 8192
 def upload(file_upload=None, url=None, fsys=None, extension=None, **kw):
     '''
     Upload the file and make it temporary.
-    @param file_upload : if the file is uploaded from a FileUpload HTML field.
-    @param url : if the file is uploaded from an url
-    @param urls : a list of urls separated by whitespaces.
-    @param fsys : if the file is on the same file system, a filesystem path
-    @param fsys_list :  a list of fsys separated by whitespaces.
-    @param file_names : a list of file name, in the same order than the files uploaded.
+    @param file_upload: if the file is uploaded from a FileUpload HTML field.
+    @param url: if the file is uploaded from an url
+    @param urls: a list of urls separated by whitespaces.
+    @param fsys: if the file is on the same file system, a filesystem path
+    @param fsys_list:  a list of fsys separated by whitespaces.
+    @param file_names: a list of file name, in the same order than the files uploaded.
     If there is differents parameters given, the first file uploaded will be file_upload, 
     then urls, url, fsys and finally fsys_list
-    @return a list of tuples : (filename, tmp_file, extension).
+    @return a list of tuples: (filename, tmp_file, extension).
     '''
     files = []
     url = kw.get('urls', url)
@@ -80,15 +81,15 @@ def upload(file_upload=None, url=None, fsys=None, extension=None, **kw):
         u = urlparse(url)
         if u.hostname:
             filename, tmp_file = _download_from_url(u.geturl())
-            if filename is not None :
+            if filename is not None:
                 files.append((kw.get('trackname', filename), tmp_file, extension))
     return files
         
 def _download_from_url(url, filename=None):
     '''
     Download a file from an url.
-    @param url : the url
-    @return a tuple : (filename, tmp_file).
+    @param url: the url
+    @return a tuple: (filename, tmp_file).
     '''
     if filename is None:
         filename = url.split('/')[-1]
@@ -116,7 +117,7 @@ def _download_from_url(url, filename=None):
         import sys, traceback
         etype, value, tb = sys.exc_info()
         traceback.print_exception(etype, value, tb)
-        print '%s : %s' % (url, e)
+        print '%s: %s' % (url, e)
         raise e
 
 
@@ -126,7 +127,7 @@ def str2bool(str):
 def get_file_sha1(file_path):
     '''                                                                                                                                                                                                    
     Get the sha1 hex digest of a file.                                                                                                                                                                     
-    @param file_path : the absolute path to the file.   
+    @param file_path: the absolute path to the file.   
     @return the sha1 digest en hexa                                                                                                                                             
     '''
     sha1 = hashlib.sha1()
@@ -151,8 +152,8 @@ def obfuscate_email(mail):
 def get_directory(tag, filename):
     '''
     Get a pathname for the resource specified.
-    @param tag : a string telling the path to get from ``pygdv.lib.app_globals``, representing the path were to put the file
-    @param filename : the filename
+    @param tag: a string telling the path to get from ``pygdv.lib.app_globals``, representing the path were to put the file
+    @param filename: the filename
     ''' 
     return resource_filename(getattr(gl, tag), filename)
 
@@ -211,7 +212,7 @@ def url_filename(url):
     u = urlparse(url)
     if not u.hostname:
         raise HTTPError('%s is not a valid URL.' % url)
-    try :
+    try:
         u = urllib2.urlopen(url)
         fname = u.info().get('Content-Disposition', None)
         if fname is not None:
@@ -251,7 +252,7 @@ def download(url=None, file_upload=None, fsys=None, filename='noname', extension
                 tmp_file.close()
                 return tmp_file
             except HTTPError as e:
-                print '%s : %s' % (url, e)
+                print '%s: %s' % (url, e)
                 raise e
 
         elif fsys is not None:
@@ -265,5 +266,5 @@ def download(url=None, file_upload=None, fsys=None, filename='noname', extension
 compressed_files_extensions = ('.gz', '.zip', '.tar', '.tgz', '.targz', '.txt.gz', '.tar.gz')
 
 def is_compressed(extension):
-    if not extension.startswith('.') : extension = '.%s' % extension
+    if not extension.startswith('.'): extension = '.%s' % extension
     return any(extension.lower().endswith(ext) for ext in compressed_files_extensions)

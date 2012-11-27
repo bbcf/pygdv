@@ -1,8 +1,6 @@
-from tg import app_globals as gl
 from bbcflib import genrep_cache as genrep
 from pygdv.lib.jbrowse import SEQUENCE_CHUNK_SIZE
-from pygdv.model import Track, DBSession
-import json
+from pygdv.model import DBSession
 import os
 from pygdv.lib import constants
 
