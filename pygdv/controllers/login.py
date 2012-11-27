@@ -59,7 +59,6 @@ class LoginController(BaseController):
         res = tequila.create_request(u + '/login/auth', 'tequila.epfl.ch')
         raise redirect('https://tequila.epfl.ch/cgi-bin/tequila/requestauth?request' + res)
 
-
     @expose('pygdv.templates.index')
     def auth(self, came_from='/', **kw):
         '''
@@ -102,7 +101,7 @@ class LoginController(BaseController):
             user.name = tmp_user.name
             user.firstname = tmp_user.firstname
             user._set_date(datetime.datetime.now())
-            user_group = DBSession.query(Group).filter(Group.name == constants.group_users_id).first()
+            user_group = DBSession.query(Group).filter(Group.id == constants.group_users_id).first()
             user_group.users.append(tmp_user)
             flash('Your account has been created')
             DBSession.add(user)
@@ -134,19 +133,19 @@ class LoginController(BaseController):
         val = ticket.cookie_value()
         # set it in the cookies
         response.set_cookie(
-                     cookiename, 
-                     value=val, 
-                     max_age=None, 
-                     path='/', 
-                     domain=None, 
-                     secure=False, 
-                     httponly=False, 
-                     comment=None, 
-                     expires=None, 
+                     cookiename,
+                     value=val,
+                     max_age=None,
+                     path='/',
+                     domain=None,
+                     secure=False,
+                     httponly=False,
+                     comment=None,
+                     expires=None,
                      overwrite=False)
         transaction.commit()
         raise redirect(came_from)
-      
+
     @expose('pygdv.templates.index')
     def out(self):
         '''
@@ -158,21 +157,20 @@ class LoginController(BaseController):
         cookiename = identifier.cookie_name
         response.delete_cookie(cookiename)
         raise redirect('/')
-    
-    
+
     def build_user(self, principal):
         '''
         Build an User from a principal hash from Tequila
         @param principal: the hash from Tequila
         @return: an User
         '''
-        hash = dict(item.split('=') for item in principal.split('\n') if len(item.split('='))>1)
+        hash = dict(item.split('=') for item in principal.split('\n') if len(item.split('=')) > 1)
         user = User()
-        if(hash.has_key('name')):
+        if 'name' in hash:
             user.name = hash.get('name')
-        if(hash.has_key('email')):
+        if 'email' in hash:
             user.email = hash.get('email')
-        if(hash.has_key('firstname')):
+        if 'firstname' in hash:
             user.firstname = hash.get('firstname')
         return user
 
@@ -181,8 +179,8 @@ class LoginController(BaseController):
         Build the groups that are in tequila and add the user to it.
         Must use the ``fake user``
         '''
-        hash = dict(item.split('=') for item in principal.split('\n') if len(item.split('='))>1)
-        if(hash.has_key('allunits')):
+        hash = dict(item.split('=') for item in principal.split('\n') if len(item.split('=')) > 1)
+        if 'allunits' in hash:
             group_list = hash.get('allunits').split(',')
             for group_name in group_list:
                 circle = handler.circle.get_tequila_circle(group_name)
@@ -197,8 +195,8 @@ class LoginController(BaseController):
         This method is here because at first, circles was not created with `allunits` parameters but with `groups`
         one. So users that are logged already must be re-added to the right groups
         '''
-        hash = dict(item.split('=') for item in principal.split('\n') if len(item.split('='))>1)
-        if(hash.has_key('allunits')):
+        hash = dict(item.split('=') for item in principal.split('\n') if len(item.split('=')) > 1)
+        if 'allunits' in hash:
             group_list = hash.get('allunits').split(',')
             for group_name in group_list:
                 circle = handler.circle.get_tequila_circle(group_name)
