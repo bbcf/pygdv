@@ -104,7 +104,7 @@ class LoginController(BaseController):
             user_group = DBSession.query(Group).filter(Group.id == constants.group_users_id).first()
             user_group.users.append(tmp_user)
             flash('Your account has been created')
-            DBSession.add(user)
+            #DBSession.add(user)
             DBSession.flush()
             self.build_circles_with_user(tmp_user, principal)
             DBSession.flush()
