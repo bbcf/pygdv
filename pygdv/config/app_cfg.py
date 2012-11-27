@@ -17,6 +17,7 @@ from tg.configuration import AppConfig
 
 import pygdv
 from pygdv import model
+from pygdv.lib import app_globals, helpers
 import tg
 
 base_config = AppConfig()
