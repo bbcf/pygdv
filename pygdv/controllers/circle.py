@@ -50,16 +50,10 @@ class CircleController(BaseController):
             except twc.ValidationError as e:
                 return dict(page='circles',  item=data, tooltip=t, widget=e.widget, ac_error=True)
 
-
         user = handler.user.get_user_in_session(request)
         handler.circle.create(kw['name'], kw['description'], user)
-        data = util.to_datagrid(datagrid.circle_grid, user.circles_owned, grid_display=len(user.circles)>0)
+        data = util.to_datagrid(datagrid.circle_grid, user.circles_owned, grid_display=len(user.circles) > 0)
         return dict(page='circles', model='circle', item=data, widget=widget, tooltip=t)
-
-
-
-
-
 
     @expose()
     def delete(self, circle_id, *args, **kw):
@@ -84,7 +78,6 @@ class CircleController(BaseController):
         DBSession.flush()
         raise redirect('/circles/edit/%s' % id)
 
-
     @expose('pygdv.templates.circle_edit')
     @with_trailing_slash
     def edit(self, *args, **kw):
@@ -94,10 +87,10 @@ class CircleController(BaseController):
 
         # get circle id
         if request.method == 'GET':
-             circle_id = args[0]
+            circle_id = args[0]
         else:
             circle_id = kw.get('cid')
-        circle_id=int(circle_id)
+        circle_id = int(circle_id)
 
         if circle_id not in [c.id for c in user.circles_owned]:
             flash('You have no right to edit this circle', 'error')
@@ -114,9 +107,9 @@ class CircleController(BaseController):
                 for u in circle.users:
                     u.__dict__['cid'] = circle_id
                 wrappers = [u for u in circle.users if u.id != user.id]
-                data = [util.to_datagrid(datagrid.circle_description_grid, wrappers, grid_display=len(wrappers)>0)]
+                data = [util.to_datagrid(datagrid.circle_description_grid, wrappers, grid_display=len(wrappers) > 0)]
                 return dict(page='circles', name=circle.name, widget=e.widget, items=data, value=kw, tooltip=t, au_error=True)
-
+            mail = mail.lower()
             to_add = DBSession.query(User).filter(User.email == mail).first()
             if to_add is None:
                 to_add = handler.user.create_tmp_user(mail)
@@ -131,9 +124,9 @@ class CircleController(BaseController):
             u.__dict__['cid'] = circle_id
         wrappers = [u for u in circle.users if u.id != user.id]
 
-        data = [util.to_datagrid(datagrid.circle_description_grid, wrappers, grid_display=len(wrappers)>0)]
+        data = [util.to_datagrid(datagrid.circle_description_grid, wrappers, grid_display=len(wrappers) > 0)]
 
-        kw['cid']=circle_id
+        kw['cid'] = circle_id
         widget.value = kw
         return dict(page='circles', name=circle.name, widget=widget, items=data, tooltip=t)
 
@@ -149,13 +142,10 @@ class CircleController(BaseController):
 #        handler.circle.edit(circle, kw['name'], kw['description'], user, kw['users'])
 #        raise redirect('/circles')
 
-
     @require(has_permission('admin', msg='Only for admins'))
     @expose('pygdv.templates.list')
     def admin(self):
         c = DBSession.query(Circle).all()
-        dc = [util.to_datagrid(circle_grid, c, "All circles", len(c)>0)]
+        dc = [util.to_datagrid(circle_grid, c, "All circles", len(c) > 0)]
         t = handler.help.tooltip['circle']
         return dict(page='circles', model='circle', tooltip=t, items=dc, value={})
-    
-     

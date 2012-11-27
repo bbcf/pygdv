@@ -1,6 +1,7 @@
 from pygdv.model import DBSession, Circle, User, Group
 from sqlalchemy.sql import and_
 
+
 def create(name, description, creator, users=None):
     '''
     Create a new circle.
@@ -11,20 +12,22 @@ def create(name, description, creator, users=None):
     '''
     edit(Circle(), name, description, creator, users)
 
+
 def edit(c, name, description, creator, users=None):
     c.name = name
     c.description = description
     c.creator_id = creator.id
     c.users = []
     if users is not None:
-        for user_id in users :
+        for user_id in users:
             if not int(user_id) == creator.id:
                 u = DBSession.query(User).filter(User.id == user_id).first()
                 c.users.append(u)
     c.users.append(creator)
     DBSession.add(c)
     DBSession.flush()
-    
+
+
 def add_user(circle=None, circle_id=None, user=None, user_id=None):
     if user is None:
         user = DBSession.query(User).filter(User.id == user_id).first()
@@ -32,6 +35,7 @@ def add_user(circle=None, circle_id=None, user=None, user_id=None):
         circle = DBSession.query(Circle).filter(Circle.id == circle_id).first()
     circle.users.append(user)
     DBSession.flush()
+
 
 def create_admin(name):
     '''
@@ -45,6 +49,7 @@ def create_admin(name):
     DBSession.add(c)
     DBSession.flush()
     return c
+
 
 def get_tequila_circle(name):
     '''
