@@ -47,7 +47,7 @@ dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
 	var ctx = this;
         var pData="project_id=" + _gdv_info.project_id + "&term=" + field;
         var xhrArgs = {
-            url: _POST_URL_NAMES,
+            url: _gdv_info['proxy'] + '/database/search',
             postData: pData,
             handleAs: "json",
             load: function(data) {
@@ -60,7 +60,6 @@ dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
         }
         dojo.xhrPost(xhrArgs);
     },
-    
 
     /**
      * Build the POST query & send it
@@ -72,7 +71,7 @@ dojo.declare("ch.epfl.bbcf.gdv.Livesearch",null,{
         var _this = this;
         var pData="id=search_name&tracks=" + tracks + "&name=" + name + "&chr=" + chr;
         var xhrArgs = {
-            url: _POST_URL_NAMES,
+            url: _gdv_info['proxy'] + '/database/search',
             postData: pData,
             handleAs: "json",
             load: function(data) {
