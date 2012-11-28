@@ -130,11 +130,10 @@ class ProjectController(BaseController):
 
         project = handler.project.create(kw['name'], kw['assembly'], user.id)
         return reply.normal(request, 'Project successfully created.',  url('/tracks'), {'project': project})
-    
+
     @expose()
     def post(self, *args, **kw):
         return self.create(*args, **kw)
-
 
     @expose('json')
     def delete(self, *args, **kw):
@@ -147,8 +146,6 @@ class ProjectController(BaseController):
 
         handler.project.delete(project_id=project_id)
         return reply.normal(request, 'Project successfully deleted.', '/tracks', {'success': 'project deleted'})
-
-
 
     @expose('pygdv.templates.project_sharing')
     def share(self, *args, **kw):
