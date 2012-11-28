@@ -38,9 +38,7 @@ def init_model():
 
 DBSession = init_model()
 
-mappings = {
-
-}
+mappings = {}
 
 
 class TR(object):
@@ -364,17 +362,18 @@ _sqlite_dispatch = {'quantitative': lambda *args, **kw: _signal_database(*args, 
 
 
 def _signal_database(path, sha1, name):
-    '''
+    """
     Process a``signal`` database.
     @return the subtask associated
-    '''
+    """
     output_dir = json_directory()
     bin_dir = constants.bin_directory()
     path = os.path.abspath(path)
     print '[x] starting task ``compute scores``: db (%s), sha1(%s)' % (path, sha1)
     script = 'psd.jar'
     efile = os.path.join(bin_dir, script)
-    p = subprocess.Popen(['java', '-jar', efile, path, sha1, output_dir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(['java', '-jar', efile, path, sha1, output_dir], 
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     result = p.wait()
     if result == 1:
         err = ', '.join(p.stderr)
@@ -382,19 +381,19 @@ def _signal_database(path, sha1, name):
     jsongen.jsonify_quantitative(sha1, output_dir, path)
 
 def _features_database(path, sha1, name):
-    '''
+    """
     Launch the process to produce a JSON output for a ``feature`` database.
-    '''
+    """
     print 'json gen  db (%s), sha1(%s)' % (path, sha1)
     output_dir = json_directory()
     jsongen.jsonify(path, name, sha1, output_dir, '/data/jbrowse', '', False)
 
 
 def _relational_database(path, sha1, name):
-    '''
+    """
     Task for a ``relational`` database
     @return the subtask associated
-    '''
+    """
     print 'json gen  db (%s), sha1(%s)' % (path, sha1)
     output_dir = json_directory()
     jsongen.jsonify(path, name, sha1, output_dir, '/data/jbrowse', '', True)

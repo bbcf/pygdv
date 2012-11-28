@@ -10,7 +10,7 @@ from pygdv.model import DBSession, Project, Job
 from bbcflib.btrack import track
 import json
 from pygdv.lib import util, constants
-import sys, traceback
+import sys, traceback, tempfile
 
 __all__ = ['WorkerController']
 
@@ -48,8 +48,8 @@ class WorkerController(BaseController):
                         fields=['start','end']))
             
         task_id, track_id = handler.track.create_track(user.id, project.sequence, f=path, trackname='%s %s' 
-                                         % (job_name, job_description), project=project)
-        if task_id  == constants.NOT_SUPPORTED_DATATYPE :
+                                                       % (job_name, job_description), project=project)
+        if task_id  == constants.NOT_SUPPORTED_DATATYPE:
             return {'error' : "not supported datatype" % project_id}
         
         job_id = handler.job.new_sel(user.id, project.id, job_description, job_name, task_id=task_id)
