@@ -92,32 +92,27 @@ class ProjectController(BaseController):
         handler.project.e(project_id=project_id, name=kw.get('name'), track_ids=track_ids)
         raise redirect('/tracks/', {'pid': project_id})
 
-
-
-    @with_trailing_slash
     @expose('json')
     def get(self, project_key=None, project_id=None, **kw):
         if not project_key and not project_id:
             user = handler.user.get_user_in_session(request)
             projects = DBSession.query(Project).filter(Project.user_id == user.id).all()
-            return reply.normal(request, 'You can upload track on these projects', './', {'projects': projects})
+            return reply.normal(request, 'You can upload track on these projects', '/tracks', {'projects': projects})
         project = None
         if project_id is not None and project_id:
             user = handler.user.get_user_in_session(request)
             project = DBSession.query(Project).filter(Project.id == int(project_id)).first()
             if project is not None and not project.user_id == user.id:
-                reply.error(request, 'Not your project', './', {})
+                reply.error(request, 'Not your project', '/tracks', {})
         else:
             project = DBSession.query(Project).filter(Project.key == project_key).first()
         if project is None:
-            return reply.error(request, 'Wrong key', './', {})
+            return reply.error(request, 'Wrong key', '/tracks', {})
         user = handler.user.get_user_in_session(request)
         if not checker.check_permission_project(user.id, project.id, constants.right_upload_id):
-            return reply.error(request, 'Wrong key', './', {})
+            return reply.error(request, 'Wrong key', '/tracks', {})
         else:
-            return reply.normal(request, 'You can upload track on this project', './', {'project': project})
-        
-        
+            return reply.normal(request, 'You can upload track on this project', '/tracks', {'project': project})
 
     @expose('json')
     def create(self, *args, **kw):
@@ -125,7 +120,7 @@ class ProjectController(BaseController):
         user = handler.user.get_user_in_session(request)
         if not 'name' in kw:
             return reply.error(request, 'Missing project `name`.', url('/tracks'), {})
-        
+
         if not 'assembly' in kw:
             return reply.error(request, 'Missing project `assembly` identifier.',  url('/tracks'), {})
 

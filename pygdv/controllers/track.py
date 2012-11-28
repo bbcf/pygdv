@@ -22,7 +22,7 @@ import tw2.core as twc
 import json
 from pygdv.lib import filemanager
 
-DEBUG_LEVEL = 1
+DEBUG_LEVEL = 0
 
 
 def debug(s, t=0):
