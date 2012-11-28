@@ -102,7 +102,7 @@ class ProjectController(BaseController):
             projects = DBSession.query(Project).filter(Project.user_id == user.id).all()
             return reply.normal(request, 'You can upload track on these projects', './', {'projects': projects})
         project = None
-        if project_id is not None:
+        if project_id is not None and project_id:
             user = handler.user.get_user_in_session(request)
             project = DBSession.query(Project).filter(Project.id == int(project_id)).first()
             if project is not None and not project.user_id == user.id:
