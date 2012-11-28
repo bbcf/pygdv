@@ -43,7 +43,7 @@ def _lazy_output(directory,t,chrom,extended=False):
             subfs[rid][-1].append([row[n] for n in morxs])
         else:
             feats.append(rid)
-            subfs[rid] = [row[n] for n in idxs if n>0]+[[]]
+            subfs[rid] = [row[n] for n in idxs if n>=0]+[[]]
             subfs[rid][-1].append([row[n] for n in morxs])
     chunk_number = 0
     buffer = []
@@ -57,11 +57,11 @@ def _lazy_output(directory,t,chrom,extended=False):
         if first is None: first = start
         stop = _sf[1]
         if extended:
-            _sf = [_sf[n] if m>0 else 0.0 for n,m in enumerate(idxs)]\
+            _sf = [_sf[n] if m>=0 else 0.0 for n,m in enumerate(idxs)]\
                   +[dict((t.fields[m],x[n]) for n,m in enumerate(morxs))
                     for x in _sf[-1]]
         else:
-            _sf = [_sf[n] if m>0 else 0.0 for n,m in enumerate(idxs)]\
+            _sf = [_sf[n] if m>=0 else 0.0 for n,m in enumerate(idxs)]\
                   +[dict((t.fields[m],_sf[-1][0][n]) for n,m in enumerate(morxs))]
         buffer.append(_sf)
         pos_list.append((start,stop))
