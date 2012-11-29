@@ -27,7 +27,7 @@ DEBUG_LEVEL = 0
 
 def debug(s, t=0):
     if DEBUG_LEVEL > 0:
-        print '[track] %s%s' % ('\t' * t, s)
+        print '[track controller] %s%s' % ('\t' * t, s)
 
 
 class TrackController(BaseController):
@@ -74,7 +74,6 @@ class TrackController(BaseController):
             tracks = user.tracks
             track_list = [util.to_datagrid(datagrid.track_grid, tracks, "Track Listing", len(tracks) > 0)]
             kw['upload'] = True
-
         t = handler.help.help_address(url('/help'), 'main', 'track list help')
 
         # project list

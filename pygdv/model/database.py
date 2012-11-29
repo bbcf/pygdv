@@ -376,7 +376,7 @@ class Track(DeclarativeBase):
     task = relationship('Task', uselist=False, primaryjoin='Track.task_id == Task.task_id', foreign_keys='Task.task_id')
 
     def __repr__(self):
-        return '<Track: id=%r, name=%r, created=%r, vizu=%r, user_id=%r>' % (self.id, self.name, self.created, self.vizu, self.user_id)
+        return '<Track: id=%r, name=%r, created=%r, vizu=%r, user_id=%r, sequence_is=%r, parameters=%s>' % (self.id, self.name, self.created, self.vizu, self.user_id, self.sequence_id, self.parameters)
 
     def __unicode__(self):
         return self.name

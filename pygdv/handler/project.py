@@ -5,6 +5,7 @@ from pygdv.lib import constants, checker
 from sqlalchemy.types import Boolean
 from pygdv.handler import track
 
+
 def create(name, sequence_id, user_id, tracks=None, isPublic=False, circles=None):
     '''
     Create a new project.
@@ -194,26 +195,26 @@ def get_circle_right_assocs(circle_id, project_id):
     return DBSession.query(RightCircleAssociation).filter(
                         and_(RightCircleAssociation.circle_id == circle_id,
                             RightCircleAssociation.project_id == project_id)).all()
-                            
-                            
+
+
 def add_tracks(project, track_ids):
     '''
     Add a list of track to the project specified.
     '''
     for track_id in track_ids:
-        track = DBSession.query(Track).filter(Track.id == track_id).first()
-        project.tracks.append(track)
+        track_ = DBSession.query(Track).filter(Track.id == track_id).first()
+        project.tracks.append(track_)
     DBSession.add(project)
     DBSession.flush()
-    
-    
-    
+
+
 def get_projects_with_permission(user_id, right_name):
     right = DBSession.query(Right).filter(Right.name == right_name).first()
     return DBSession.query(Project).join(Project._circle_right).join(User.circles).filter(
                 and_(User.id == user_id, Right.id == right.id)
                      ).all()
-    
+
+
 def get_rights(project=None, project_id=None, user=None, user_id=None):
     if project is None:
         project = DBSession.query(Project).filter(Project.id == project_id).first()
@@ -225,22 +226,26 @@ def get_rights(project=None, project_id=None, user=None, user_id=None):
             return rights
     return []
 
+
+def is_shared(project, user):
+    for circle, rights in project.circles_with_rights.iteritems():
+        if circle in user.circles:
+            return True
+    return False
+
+
 def get_shared_projects(user):
     '''
     Get the shared projects with rights associated which are not in the user projects.
     :return: {project: [rights,]}
     '''
-    
-    
-    
     projects = DBSession.query(Project).distinct().join(
                                 Project._circle_right).join(User.circles).filter(
-                and_(User.id == user.id, or_(Right.id == constants.right_read_id, 
-                                             Right.id == constants.right_upload_id, 
+                and_(User.id == user.id, or_(Right.id == constants.right_read_id,
+                                             Right.id == constants.right_upload_id,
                                              Right.id == constants.right_download_id),
                      not_(Project.id.in_([p.id for p in user.projects])))
                      ).all()
-    
     data = {}
     for project in projects:
         for circle, rights in project.circles_with_rights.iteritems():
@@ -249,8 +254,8 @@ def get_shared_projects(user):
                     data[project] = []
                 data[project] += [right.name for right in rights if right.name not in data[project]]
     return data
-    
-    
+
+
 def copy(user_id, project_id):
     project = DBSession.query(Project).filter(Project.id == project_id).first()
     ts = []

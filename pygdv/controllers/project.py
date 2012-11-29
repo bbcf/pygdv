@@ -19,7 +19,7 @@ import json
 
 __all__ = ['ProjectController']
 
-DEBUG_LEVEL = 1
+DEBUG_LEVEL = 0
 
 
 def debug(s, t=0):
@@ -45,7 +45,6 @@ class ProjectController(BaseController):
     @expose('pygdv.templates.project_edit')
     def edit(self, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        debug("EDIT")
         if request.method == 'GET':
             project_id = args[0]
         else:
@@ -61,6 +60,7 @@ class ProjectController(BaseController):
         widget.value = {'pid': project_id}
         project = DBSession.query(Project).filter(Project.id == project_id).first()
 
+        # prendre les user tracks du meme sequence id
         tracks = DBSession.query(Track).join(User.tracks).filter(
             and_(User.id == user.id, Track.sequence_id == project.sequence_id,
                 not_(Track.id.in_([t.id for t in project.tracks])))

@@ -3,14 +3,19 @@ from __future__ import absolute_import
 Tracks handler.
 '''
 
-from pygdv.model import DBSession, Input, Track, TrackParameters, Task, Sequence, Project
-import os, shutil, tg
-from pygdv.lib import util, constants
-from pygdv.worker import tasks
-from track.util import determine_format
+from pygdv.model import DBSession, Track
+import os
+import shutil
+import tg
 from pygdv.lib import constants
-import track, urlparse
-from celery.task import task, chord, subtask, TaskSet
+import transaction
+
+DEBUG_LEVEL = 0
+
+
+def debug(s, t=0):
+    if DEBUG_LEVEL > 0:
+        print '[track handler] %s%s' % ('\t' * t, s)
 
 
 def delete_input(sha1):
@@ -55,12 +60,14 @@ def plugin_link(track):
 def edit(track=None, track_id=None, name=None, color=None):
     if track is None:
         track = DBSession.query(Track).filter(Track.id == track_id).first()
+    debug('edit track %s' % track)
     if name is not None:
         track.name = name
     if color is not None:
+        p = dict(track.parameters)
         if track.parameters is None:
-            track.parameters = {'color': color}
+            p = {'color': color}
         else:
-            track.parameters.update({'color': color})
-    DBSession.add(track)
+            p.update({'color': color})
+        track.parameters = p
     DBSession.flush()
