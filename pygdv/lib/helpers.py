@@ -156,7 +156,7 @@ def get_copy_track_link(obj_id, rights=None):
 def get_track_color(track):
     if track.parameters is not None:
         if 'color' in track.parameters:
-            return track.parameter['color']
+            return track.parameters['color']
 
 
 def track_color(track):
