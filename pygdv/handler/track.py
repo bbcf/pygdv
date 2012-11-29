@@ -64,10 +64,10 @@ def edit(track=None, track_id=None, name=None, color=None):
     if name is not None:
         track.name = name
     if color is not None:
-        p = dict(track.parameters)
-        if track.parameters is None:
-            p = {'color': color}
+        if not track.parameters:
+            p = {}
         else:
-            p.update({'color': color})
+            p = dict(track.parameters)
+        p.update({'color': color})
         track.parameters = p
     DBSession.flush()
