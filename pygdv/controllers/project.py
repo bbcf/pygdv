@@ -208,7 +208,7 @@ class ProjectController(BaseController):
     def view(self, project_id, *args, **kw):
         debug('VIEW')
         user = handler.user.get_user_in_session(request)
-        if not checker.check_permission_project(user.id, project_id, constants.right_read_id) and not checker.is_admin(user=user):
+        if not checker.check_permission(project_id=project_id, user=user, right_id=constants.rights['read']['id']):
             flash('You must have %s permission to view the project.' % constants.right_read, 'error')
             raise redirect(url('/'))
         d = handler.view.prepare_view(project_id, *args, **kw)

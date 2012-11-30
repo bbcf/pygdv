@@ -7,7 +7,7 @@ def can_edit_track(user, track_id):
     for track in user.tracks:
         if int(track_id) == track.id:
             return True
-    if user_is_admin(user):
+    if is_admin(user):
         return True
     track = DBSession.query(Track).filter(Track.id == track_id).first()
     for project in track.projects:
@@ -21,7 +21,7 @@ def can_download_track(user_id, track_id):
     for track in user.tracks:
         if int(track_id) == track.id:
             return True
-    if user_is_admin(user):
+    if is_admin(user):
         return True
     track = DBSession.query(Track).filter(Track.id == track_id).first()
     for project in track.projects:
@@ -40,7 +40,8 @@ def check_permission(project=None, project_id=None, user=None, user_id=None, rig
         user = DBSession.query(User).filter(User.id == user_id).first()
     if project is None or user is None:
         return False
-
+    if is_admin(user):
+        return True
     if own(user=user, project=project):
         return True
 
@@ -61,25 +62,10 @@ def own(user=None, user_id=None, project=None, project_id=None):
     return project.user_id == user_id
 
 
-def is_admin(user=None, user_id=None):
-    if user is None:
-        user = DBSession.query(User).filter(User.id == user_id).first()
-    admin_group = DBSession.query(Group).filter(Group.name == constants.group_admins).first()
+def is_admin(user):
+    admin_group = DBSession.query(Group).filter(Group.id == constants.groups['admin']['id']).first()
     return user in admin_group.users
 
-
-
-
-
-
-# def user_own_project(user_id, project_id):
-#     '''
-#     Look if the user own the project
-#     '''
-#     project = DBSession.query(Project).filter(Project.id == project_id).first()
-#     if project is not None:
-#         return project.user_id == user_id
-#     return False
 
 def user_own_track(user_id, track_id):
     '''
@@ -105,29 +91,10 @@ def user_own_circle(user_id, circle_id):
     return False
 
 
-def user_is_admin(user):
-    admin_group = DBSession.query(Group).filter(Group.name == constants.group_admins).first()
-    return user in admin_group.users
 
-
-# def check_permission_project(user_id, project_id, right_id):
-#     project = DBSession.query(Project).filter(Project.id == project_id).first()
-#     if project is None:
-#         return False
-#     if not user_own_project(user_id, project_id) and not user_is_admin(user_id):
-#         p = DBSession.query(Project).join(
-#                                 Project._circle_right).join(Right).join(User.circles).filter(
-#                 and_(User.id == user_id, Project.id == project_id, Right.id == right_id)
-#                 ).first()
-#         return p != None
-#     return True
-
-
-
-    
 def can_edit_job(user_id, job_id):
     user = DBSession.query(User).filter(User.id == user_id).first()
-    if not user_is_admin(user):
+    if is_admin(user):
         j = DBSession.query(Job).filter(and_(Job.id == job_id, Job.user_id == user_id)).first()
         return j != None
     return True
