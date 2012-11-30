@@ -16,14 +16,11 @@ def can_edit_track(user, track_id):
     return False
 
 
-def can_download_track(user_id, track_id):
-    user = DBSession.query(User).filter(User.id == user_id).first()
-    for track in user.tracks:
-        if int(track_id) == track.id:
-            return True
+def can_download(user, track):
+    if track in user.tracks:
+        return True
     if is_admin(user):
         return True
-    track = DBSession.query(Track).filter(Track.id == track_id).first()
     for project in track.projects:
         if check_permission(project=project, user=user, right_id=constants.right_download_id):
             return True

@@ -347,34 +347,30 @@ class TrackController(BaseController):
         handler.track.edit(track=track, name=kw.get('name', None), color=kw.get('color', None))
         raise redirect('/tracks')
 
-
-
-
-
     @expose('pygdv.templates.track_export')
     def export(self, track_id, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        if not checker.can_download_track(user.id, track_id):
+        trac = DBSession.query(Track).filter(Track.id == track_id).first()
+        if not checker.can_download(user, trac):
             flash("You haven't the right to export any tracks which is not yours")
             raise redirect('../')
-        track = DBSession.query(Track).filter(Track.id == track_id).first()
 
-        data = util.to_datagrid(track_grid, [track])
+        data = util.to_datagrid(track_grid, [trac])
         tmpl_context.form = track_export
-        kw['track_id']=track_id
+        kw['track_id'] = track_id
         return dict(page='tracks', model='Track', info=data, form_title='', value=kw)
 
     @expose()
-    def dump(self, track_id, format,  *args, **kw):
+    def dump(self, track_id, format, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        if not checker.can_download_track(user.id, track_id):
+        if not checker.can_download(user.id, track_id):
             flash("You haven't the right to export any tracks which is not yours", 'error')
             raise redirect('../')
         _track = DBSession.query(Track).filter(Track.id == track_id).first()
         if format == 'sqlite':
             response.content_type = 'application/x-sqlite3'
             return open(_track.path).read()
-        else :
+        else:
             tmp_file = tempfile.NamedTemporaryFile(delete=True)
             tmp_file.close()
             track.convert(_track.path, (tmp_file.name, format))
@@ -384,7 +380,8 @@ class TrackController(BaseController):
     @expose()
     def link(self, track_id, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        if not checker.user_own_track(user.id, track_id):
+        trac = DBSession.query(Track).filter(Track.id == track_id).first()
+        if not checker.can_download(user, trac):
             flash("You haven't the right to download any tracks which is not yours", 'error')
             raise redirect('/tracks/')
         track = DBSession.query(Track).filter(Track.id == track_id).first()
