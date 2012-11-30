@@ -47,7 +47,7 @@ class TrackController(BaseController):
             if project is None:
                 flash("Project doesn't exists", "error")
                 raise redirect('/tracks')
-            if not checker.check_permission(user=user, project=project, right_id=constants.right_read_id) and not checker.is_admin(user=user):
+            if not checker.check_permission(user=user, project=project, right_id=constants.right_read_id):
                 flash('You must have %s permission to view the project.' % constants.right_read, 'error')
                 raise redirect('/tracks')
             tracks = project.tracks
@@ -354,7 +354,7 @@ class TrackController(BaseController):
     @expose('pygdv.templates.track_export')
     def export(self, track_id, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        if not checker.can_download_track(user.id, track_id)  and not checker.user_is_admin(user.id):
+        if not checker.can_download_track(user.id, track_id):
             flash("You haven't the right to export any tracks which is not yours")
             raise redirect('../')
         track = DBSession.query(Track).filter(Track.id == track_id).first()
@@ -367,7 +367,7 @@ class TrackController(BaseController):
     @expose()
     def dump(self, track_id, format,  *args, **kw):
         user = handler.user.get_user_in_session(request)
-        if not checker.can_download_track(user.id, track_id) and not checker.user_is_admin(user.id):
+        if not checker.can_download_track(user.id, track_id):
             flash("You haven't the right to export any tracks which is not yours", 'error')
             raise redirect('../')
         _track = DBSession.query(Track).filter(Track.id == track_id).first()
@@ -384,7 +384,7 @@ class TrackController(BaseController):
     @expose()
     def link(self, track_id, *args, **kw):
         user = handler.user.get_user_in_session(request)
-        if not checker.user_own_track(user.id, track_id)  and not checker.user_is_admin(user.id):
+        if not checker.user_own_track(user.id, track_id):
             flash("You haven't the right to download any tracks which is not yours", 'error')
             raise redirect('/tracks/')
         track = DBSession.query(Track).filter(Track.id == track_id).first()
@@ -401,7 +401,7 @@ class TrackController(BaseController):
     def traceback(self, track_id):
         user = handler.user.get_user_in_session(request)
 
-        if not checker.user_own_track(user.id, track_id) and not checker.user_is_admin(user.id):
+        if not checker.user_own_track(user.id, track_id):
 
             flash("You haven't the right to look at any tracks which is not yours", 'error')
             raise redirect('/tracks')

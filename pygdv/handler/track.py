@@ -8,7 +8,7 @@ import os
 import shutil
 import tg
 from pygdv.lib import constants
-import transaction
+import copy
 
 DEBUG_LEVEL = 0
 
@@ -63,11 +63,33 @@ def edit(track=None, track_id=None, name=None, color=None):
     debug('edit track %s' % track)
     if name is not None:
         track.name = name
+    if track.parameters is None:
+        init(track)
     if color is not None:
-        if not track.parameters:
-            p = {}
-        else:
-            p = dict(track.parameters)
+        p = copy.deepcopy(track.parameters)
         p.update({'color': color})
         track.parameters = p
     DBSession.flush()
+
+
+def init(track, flush=False):
+    p = {}
+    doit = False
+    if track.parameters is None:
+        doit = True
+    elif 'url' not in track.parameters:
+        doit = True
+        p = copy.deepcopy(track.parameters)
+
+    if doit:
+        p.update({
+                'url': os.path.join(track.visualization, track.input.sha1, '{refseq}', constants.track_data),
+                'label': track.name,
+                'type': track.visualization == 'signal' and 'ImageTrack' or 'FeatureTrack',
+                'gdv_id': track.id,
+                'key': track.name,
+                'date': track.tiny_date
+                })
+        track.parameters = p
+        if flush:
+            DBSession.flush()

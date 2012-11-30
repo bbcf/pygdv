@@ -16,19 +16,9 @@ def prepare_view(project_id, *args, **kw):
     project = DBSession.query(Project).filter(Project.id == project_id).first()
     tracks = project.success_tracks
 
+    # prepare track that are not yet initialised
     for t in tracks:
-        if t.parameters is None:
-            t.parameters = {}
-        if not 'url' in t.parameters:
-            t.parameters.update({
-                    'url': os.path.join(t.visualization, t.input.sha1, '{refseq}', constants.track_data),
-                    'label': t.name,
-                    'type': t.visualization == 'signal' and 'ImageTrack' or 'FeatureTrack',
-                    'gdv_id': t.id,
-                    'key': t.name,
-                    'date': t.tiny_date
-                })
-            DBSession.add(t)
+        handler.track.init(t)
     DBSession.flush()
     seq = project.sequence
     default_tracks = [d for d in seq.default_tracks if d.status == constants.SUCCESS]

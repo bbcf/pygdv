@@ -21,14 +21,13 @@ class SelectionController(object):
     def index(self):
         return ''
 
-
-
     @expose()
     def save(self, project_id, color, description, locations):
         user = handler.user.get_user_in_session(request)
-        if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
+
+        if not checker.check_permission(user=user, project_id=project_id, right_id=constants.right_upload_id):
             flash('You must have %s permission to delete the project.' % constants.right_upload, 'error')
-            return {'save' : 'failed'}
+            return {'save': 'failed'}
 
         #print "save %s, color %s, desc %s loc %s" % (project_id, color, description, locations)
         ''' For the moment, there is only one selection per project'''
@@ -46,7 +45,7 @@ class SelectionController(object):
         # add locations
         for loc in json.loads(locations):
             obj = None
-            if loc.has_key('id'):
+            if 'id' in loc:
                 obj = DBSession.query(Location).join(Selection.locations).filter(
                         and_(Selection.id == sel.id, Location.id == loc.get('id'))).first()
 
@@ -66,23 +65,21 @@ class SelectionController(object):
         for l in loc_to_remove:
             DBSession.delete(l)
         DBSession.flush()
-        return {"saved" : "ok"}
-
-
+        return {"saved": "ok"}
 
     @expose()
     def delete(self, project_id, selection_id):
         user = handler.user.get_user_in_session(request)
-        if not checker.check_permission_project(user.id, project_id, constants.right_upload_id):
+        if not checker.check_permission(user=user, project_id=project_id, right_id=constants.right_upload_id):
             flash('You must have %s permission to delete the project.' % constants.right_upload, 'error')
-            return {'delete' : 'failed'}
+            return {'delete': 'failed'}
         selection = DBSession.query(Selection).filter(Selection.id == selection_id).first()
         if not selection.project_id == project_id:
-            flash('Bad project_id : %s' % project_id, 'error')
-            return {'delete' : 'failed'}
+            flash('Bad project_id: %s' % project_id, 'error')
+            return {'delete': 'failed'}
         DBSession.delete(selection)
         DBSession.flush()
-        return {'delete' : 'success'}
+        return {'delete': 'success'}
 
 
 
