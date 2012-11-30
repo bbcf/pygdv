@@ -46,6 +46,7 @@ job_grid = twf.DataGrid(fields=[
     }))
 ])
 
+
 def get_actions(track, user, rights):
     # user own the track => all actions
     if track.user.id == user.id:
@@ -55,17 +56,30 @@ def get_actions(track, user, rights):
             + helpers.delete_link(track.id, url('/tracks'))
         )
     right_ids = [r.id for r in rights]
+    if rights is None:
+        return hoover_actions('')
+
+    if constants.right_download_id in right_ids and constants.right_upload_id in right_ids:
+        return hoover_actions(
+            helpers.export_link(track.id, url('/tracks'))
+            + helpers.edit_link(track.id, url('/tracks'))
+    )
     # user have the download right
-    if rights is not None and constants.right_download_id in right_ids:
+    if constants.right_download_id in right_ids:
         return hoover_actions(
             helpers.export_link(track.id, url('/tracks'))
     )
-    # no actions possible
-    return  hoover_actions('')
+    # user have upload right
+    if constants.right_upload_id in right_ids:
+        return hoover_actions(
+            helpers.edit_link(track.id, url('/tracks'))
+    )
+    return hoover_actions('')
+
 
 def track_grid_permissions(user=None, rights=None):
     # hidden info on the track
-    h_info = lambda obj : hide_info({
+    h_info = lambda obj: hide_info({
         'tr_id' : obj.id,
         'tr_status': obj.status,
         'tr_color' : helpers.get_track_color(obj),
