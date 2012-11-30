@@ -60,8 +60,10 @@ class TrackController(BaseController):
             # view from a shared user
             else:
                 rights = handler.project.get_rights(project=project, user=user)
+                debug('find %s' % rights, 2)
                 if constants.right_upload_id in [r.id for r in rights]:
                     kw['upload'] = True
+                debug('view from a shared user %s' % rights)
                 grid = datagrid.track_grid_permissions(user=user, rights=rights)
                 shared_by = "%s %s" % (project.user.firstname, project.user.name[0].upper())
 

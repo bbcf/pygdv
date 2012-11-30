@@ -3,6 +3,12 @@ import tw.forms as twf
 import genshi
 from tg import url
 
+DEBUG_LEVEL = 0
+
+
+def debug(s, t=0):
+    if DEBUG_LEVEL > 0:
+        print '[datagrid] %s%s' % ('\t' * t, s)
 
 hidden_info = genshi.Markup("<span class='table_hidden'>hidden_info</span>")
 
@@ -59,22 +65,26 @@ def get_actions(track, user, rights):
     right_ids = [r.id for r in rights]
     if rights is None:
         return hoover_actions('')
-
-    if constants.right_download_id in right_ids and constants.right_upload_id in right_ids:
+    debug('Get actions %s' % right_ids)
+    if constants.rights['download']['id'] in right_ids and constants.rights['upload']['id'] in right_ids:
+        debug('Download & Upload', 1)
         return hoover_actions(
             helpers.export_link(track.id, url('/tracks'))
             + helpers.edit_link(track.id, url('/tracks'))
     )
     # user have the download right
-    if constants.right_download_id in right_ids:
+    if constants.rights['download']['id'] in right_ids:
+        debug('Download', 1)
         return hoover_actions(
             helpers.export_link(track.id, url('/tracks'))
     )
     # user have upload right
-    if constants.right_upload_id in right_ids:
+    if constants.rights['upload']['id'] in right_ids:
+        debug('Upload', 1)
         return hoover_actions(
             helpers.edit_link(track.id, url('/tracks'))
     )
+    debug('no rights', 1)
     return hoover_actions('')
 
 
@@ -85,7 +95,7 @@ def track_grid_permissions(user=None, rights=None):
         'tr_status': obj.status,
         'tr_color': helpers.get_track_color(obj),
         })
-
+    debug('Track grid permissions with %s' % rights)
     return twf.DataGrid(fields=[('Name', 'name'),
         (hoover_action, lambda obj: get_actions(obj, user, rights)),
         ('Color', lambda obj: genshi.Markup(helpers.track_color(obj))),
@@ -117,16 +127,16 @@ def etrack_grid_permissions(rights=None):
     if rights is not None:
         del_action = None
         right_ids = [r.id for r in rights]
-        if constants.right_download_id in right_ids and constants.right_upload_id in right_ids:
+        if constants.rights['download']['id'] in right_ids and constants.rights['upload']['id'] in right_ids:
             actions = lambda obj: hoover_actions(
                 helpers.export_link(obj.id, url('/tracks'))
                 #+ helpers.edit_link(obj.id, url('/tracks'))
                 #+ helpers.delete_link(obj.id, url('/tracks'))
                 )
-        elif  constants.right_download_id in right_ids:
+        elif constants.rights['download']['id'] in right_ids:
             actions = lambda obj: hoover_actions(
                 helpers.export_link(obj.id, url('/tracks')))
-        elif constants.right_upload_id in right_ids:
+        elif constants.rights['upload']['id'] in right_ids:
             actions = lambda obj: hoover_actions(
                 helpers.edit_link(obj.id, url('/tracks'))
                 + helpers.delete_link(obj.id, url('/tracks')))
@@ -202,12 +212,36 @@ project_sharing = twf.DataGrid(fields=[
         ])
 
 
+def get_project_right_sharing_form(circle_right):
+    options = ['Read', 'Download', 'Upload']
+    sstr = '''
+    <form class="required rightsharingform" method="post" action="%s">
+    <div><input type="hidden" value="%s" name='cid' class="hiddenfield"></div>
+    <div><input type="hidden" value="true" name='rights' class="hiddenfield"></div>
+    <div><input type="hidden" value="%s" name='pid' class="hiddenfield"></div>
+    <table cellspacing="0" cellpadding="2" border="0">
+    <tbody><tr title="" id="rights_checkboxes.container">
+    <td class="fieldcol"><table class="checkboxtable" id="rights_checkboxes">
+    <tbody><tr> ''' % (url('/projects/share/%s' % circle_right.project_id), circle_right.circle.id, circle_right.project_id)
+
+    for opt in options:
+        sstr += '<td>' + get_right_checkbok(circle_right, opt) + '</td>'
+
+    sstr += '''
+            </tr></tbody></table></td>
+            <td class="fieldcol" id="submit.container">
+            <input type="submit" value="change rights" class="submitbutton">
+            </td></tr></tbody></table>
+        </form>
+'''
+    return sstr
+
+
 def get_right_checkbok(obj, right_name):
-    circle = obj.circle
     rights = obj.rights
     checked = False
     for right in rights:
-        if right.name == right_name:
+        if right.name.lower() == right_name.lower():
             checked = True
     str = '''
     <input type="checkbox" name="rights_checkboxes" value="%s"
@@ -215,46 +249,9 @@ def get_right_checkbok(obj, right_name):
 ''' % (right_name)
 
     if checked:
-        str+=' checked="yes"'
-    str+='/><label >%s</label>' % (right_name)
+        str += ' checked="yes"'
+    str += '/><label >%s</label>' % (right_name)
     return str
-
-def get_project_right_sharing_form(circle_right):
-    options = ['Read', 'Download', 'Upload']
-    str = '''
-    <form class="required rightsharingform" method="post" action="%s">
-    <div><input type="hidden" value="%s" name='cid' class="hiddenfield"></div>
-    <div><input type="hidden" value="true" name='rights' class="hiddenfield"></div>
-    <div><input type="hidden" value="%s" name='pid' class="hiddenfield"></div>
-    <table cellspacing="0" cellpadding="2" border="0">
-        <tbody>
-            <tr title="" id="rights_checkboxes.container">
-                <td class="fieldcol">
-                    <table class="checkboxtable" id="rights_checkboxes">
-                        <tbody>
-                            <tr>
-                                ''' % (url('/projects/share/%s' % circle_right.project_id), circle_right.circle.id, circle_right.project_id)
-    for opt in options:
-        str+='<td>'+get_right_checkbok(circle_right, opt)+'</td>'
-
-
-    str+='''
-
-                            </tr>
-                        </tbody>
-                    </table>
-                </td>
-            <td class="fieldcol" id="submit.container">
-                <input type="submit" value="change rights" class="submitbutton">
-            </td>
-        </tr>
-    </tbody></table>
-</form>
-'''
-    return str
-
-
-
 
 circle_grid = twf.DataGrid(fields=[
     ('Name', 'name'),
@@ -264,7 +261,6 @@ circle_grid = twf.DataGrid(fields=[
     )),
     ('Description', 'description'),
     ('Members', 'get_users'),
-    
 ])
 
 circle_description_grid = twf.DataGrid(fields=[

@@ -5,6 +5,13 @@ from pygdv.lib import constants, checker
 from sqlalchemy.types import Boolean
 from pygdv.handler import track
 
+DEBUG_LEVEL = 0
+
+
+def debug(s, t=0):
+    if DEBUG_LEVEL > 0:
+        print '[project handler] %s%s' % ('\t' * t, s)
+
 
 def create(name, sequence_id, user_id, tracks=None, isPublic=False, circles=None):
     '''
@@ -68,13 +75,13 @@ def add_right(project=None, project_id=None, circle=None, circle_id=None, right=
     project._circle_right.append(cr_assoc)
 
 
-
 def delete(project=None, project_id=None):
     if project is None:
         project = DBSession.query(Project).filter(Project.id == project_id).first()
     remove_sharing(project=project)
     DBSession.delete(project)
     DBSession.flush()
+
 
 def edit(project, name, user_id, sequence_id=None, tracks=None, isPublic=False, circles=None):
     '''
@@ -221,10 +228,13 @@ def get_rights(project=None, project_id=None, user=None, user_id=None):
     if user is None:
         user = DBSession.query(User).filter(User.id == user_id).first()
 
+    debug('get rights %s' % project.get_circle_with_right_display)
+    r = []
     for circle, rights in project.circles_with_rights.iteritems():
+        debug('circle %s with rights %s' % (circle, rights), 1)
         if circle in user.circles:
-            return rights
-    return []
+            r.extend(rights)
+    return r
 
 
 def is_shared(project, user):

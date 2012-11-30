@@ -195,6 +195,7 @@ class ProjectController(BaseController):
                 if len(circle_ids) > 0 and '' in circle_ids: circle_ids.remove('')
                 handler.project.e(project=project, circle_ids=circle_ids)
 
+        debug(project.get_circle_with_right_display)
 
         cr_data = [util.to_datagrid(datagrid.project_sharing, project.circles_rights, "Sharing", len(project.circles_rights)>0)]
 
