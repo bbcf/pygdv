@@ -113,7 +113,7 @@ class TrackController(BaseController):
             new_form = form.NewTrack(action=url('/tracks/create')).req()
             species = DBSession.query(Species).all()
             sp_opts = [(sp.id, sp.name) for sp in species]
-            new_form.child.children[3].options = sp_opts
+            new_form.child.children[4].options = sp_opts
             mapping = json.dumps(dict([(sp.id, [(seq.id, seq.name) for seq in sp.sequences]) for sp in species]))
             value['smapping'] = mapping
 
@@ -173,7 +173,7 @@ class TrackController(BaseController):
         # get file name
         debug('Find track name', 1)
         trackname = None
-        if 'trackname' in kw and kw.get('trackname') is not None:
+        if 'trackname' in kw and kw.get('trackname'):
             debug('i params', 2)
             trackname = kw.get('trackname')
         else:

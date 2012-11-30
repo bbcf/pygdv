@@ -55,12 +55,13 @@ class ShareProject(twf.TableForm):
 
 def get_species():
         species = DBSession.query(Species).all()
-        return [(sp.id,sp.name) for sp in species]   
+        return [(sp.id, sp.name) for sp in species]
+
 
 def get_assemblies(species):
     if species and species[0] and species[0]:
         assemblies = DBSession.query(Sequence).join(Species).filter(Sequence.species_id == species[0][0]).all()
-        return [(nr.id,nr.name) for nr in assemblies]
+        return [(nr.id, nr.name) for nr in assemblies]
     return []
 
 
@@ -69,20 +70,23 @@ class MultipleFileUpload(twd.GrowingGridLayout):
     more = twf.CheckBox()
 
 
-
 class NewTrack(twf.TableForm):
     file_upload = twf.FileField(label='Upload : ', help_text='Upload file from filesystem')
     url = twf.TextField(label='Url : ', help_text='Provide an url')
     smapping = twf.HiddenField()
+    trackname = twf.TextField(label='Name : ')
     species = twf.SingleSelectField(label='Species :')
     assembly = twf.SingleSelectField(label='Assembly :', options=[])
     submit = twf.SubmitButton(id="submit", value="New")
 
+
 class NewTrackPrefilled(twf.TableForm):
     file_upload = twf.FileField(label='Upload : ', help_text='Upload file from filesystem')
     url = twf.TextField(label='Url : ', help_text='Provide an url')
+    trackname = twf.TextField(label='Name : ')
     project_id = twf.HiddenField()
     submit = twf.SubmitButton(id="submit", value="New")
+
 
 class NewTrackSequence(twf.TableForm):
     file_upload = twf.FileField(label='Upload : ', help_text='Upload file from filesystem')
@@ -91,12 +95,14 @@ class NewTrackSequence(twf.TableForm):
     track_admin = twf.HiddenField()
     submit = twf.SubmitButton(id="submit", value="New")
 
+
     # project
 class EditProject(twf.TableForm):
     pid = twf.HiddenField()
     name = twf.TextField(label='Name : ', validator=twc.Validator(required=True))
     tracks = twf.MultipleSelectField(label='Tracks : ', css_class='track_select')
     submit = twf.SubmitButton(id="submit", value="Edit")
+
 
 class NewProject(twf.TableForm):
     smapping = twf.HiddenField()

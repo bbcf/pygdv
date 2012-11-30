@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
 
-from tg import expose, flash, require, request, url
+from tg import expose, flash, require, request, url, response
 
 from pygdv.lib.base import BaseController
 from pygdv.model import DBSession
