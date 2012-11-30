@@ -12,10 +12,11 @@ hoover_action = genshi.Markup("<div class='table_hidden'>hidden_info</div>")
 def hoover_actions(actions):
     return genshi.Markup("<div class='hoover_actions table_hidden'>%s</div>" % actions)
 
+
 def hide_info(dict):
-    span=''
+    span = ''
     for k, v in dict.iteritems():
-        span +="<span class='table_hidden %s'>%s</span>" % (k, v)
+        span += "<span class='table_hidden %s'>%s</span>" % (k, v)
     return genshi.Markup("<div class='hidden_info'>%s</div>" % span)
 
 sequences_grid = twf.DataGrid(fields=[
@@ -87,10 +88,28 @@ def track_grid_permissions(user=None, rights=None):
 
     return twf.DataGrid(fields=[('Name', 'name'),
         (hoover_action, lambda obj: get_actions(obj, user, rights)),
+        ('Color', lambda obj: genshi.Markup(helpers.track_color(obj))),
         ('Created', 'created'),
         ('Assembly', 'sequence'),
         ('Type', 'vizu'),
         (hidden_info, h_info),
+    ])
+
+track_grid = twf.DataGrid(fields=[
+    ('Name', 'name'),
+    (hoover_action, lambda obj: hoover_actions(
+            helpers.export_link(obj.id, url('/tracks'))
+            + helpers.edit_link(obj.id, url('/tracks'))
+            + helpers.delete_link(obj.id, url('/tracks'))
+    )),
+    ('Color', lambda obj: genshi.Markup(helpers.track_color(obj))),
+     ('Created', 'created'),
+     ('Assembly', 'sequence'),
+     ('Type', 'vizu'),
+    (hidden_info, lambda obj: hide_info({
+        'tr_id': obj.id,
+        'tr_status': obj.status,
+        })),
     ])
 
 
@@ -131,24 +150,7 @@ def etrack_grid_permissions(rights=None):
 
     return twf.DataGrid(fields=fields)
 
-track_grid = twf.DataGrid(fields=[
-    ('Name', 'name'),
-    (hoover_action, lambda obj: hoover_actions(
-            helpers.export_link(obj.id, url('/tracks'))
-            + helpers.edit_link(obj.id, url('/tracks'))
-            + helpers.delete_link(obj.id, url('/tracks'))
-    )),
-    ('Color', lambda obj: genshi.Markup(helpers.track_color(obj))),
-     ('Created', 'created'),
-     ('Assembly', 'sequence'),
-     ('Type', 'vizu'),
-    (hidden_info, lambda obj: hide_info({
-        'tr_id': obj.id,
-        'tr_status': obj.status,
-        })),
 
-
-    ])
 
 track_admin_grid = twf.DataGrid(fields=[
     ('Name', 'name'),
