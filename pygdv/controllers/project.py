@@ -90,11 +90,10 @@ class ProjectController(BaseController):
         if len(track_ids) > 0 and '' in track_ids:
             track_ids.remove('')
 
-        # if the project is shared, add all project track_ids
-        if not checker.own(user=user, project=project):
-            for t in project.tracks:
-                if not checker.user_own_track(user.id, track=t) and t.id not in track_ids:
-                    track_ids.append(t.id)
+        # if the project is shared, some track cannot be removed
+        for t in project.tracks:
+            if not checker.user_own_track(user.id, track=t) and t.id not in track_ids:
+                track_ids.append(t.id)
 
         handler.project.e(project_id=project_id, name=kw.get('name'), track_ids=track_ids)
         raise redirect('/tracks/', {'pid': project_id})
