@@ -101,8 +101,8 @@ SequenceTrack.prototype.getRange = function(start, end, callback) {
                 callbacks: [callbackInfo]
             };
             this.chunks[i] = chunk;
-	    var chr_name = dojo.byId("GenomeBrowser").genomeBrowser.refSeq.name;
-	    var url = Operations.js + '/genrep/adn?ass=' + _gdv_info['sequence_id'] + '&chr=' + chr_name + '&id=' + i;
+        var chr_name = dojo.byId("GenomeBrowser").genomeBrowser.refSeq.name;
+        var url = _gdv_info['proxy'] + '/genrep/adn?ass=' + _gdv_info['sequence_id'] + '&chr=' + chr_name + '&id=' + i;
             dojo.xhrGet({
                             //url: this.baseUrl + i + ".txt",
 		url : url,

@@ -212,7 +212,6 @@ PrincipalContainer.prototype.navigationContainer = function(DomNode, DijitNode, 
 */
 PrincipalContainer.prototype.selectionContainer = function(DomNode, DijitNode){
     var cont = dojo.create('div', {}, DomNode);
-
     var sel_container = new dijit.layout.ContentPane({
         title: "Selections",
         id:'tab_sels'

@@ -104,41 +104,41 @@
 
   </body>
 
-<script>
-//<![CDATA[ 
-    window.onload = function(){
+// <script>
+// //<![CDATA[ 
+//     window.onload = function(){
         
-        var form_options = {
-          'bs_server_url' : _gdv_info['bioscript_url'],
-            'validation_successful' : function(plugin_id, task_id){
-              $.ajax({
-                'url': plug_url + 'validation?task_id=' + task_id + '&id=' + plugin_id,
-                'success': function(data){
-                  toggle_bs_form_container(data, plugin_id);
-                }
-              })
-            }
-        }
+//         var form_options = {
+//           'bs_server_url' : _gdv_info['bioscript_url'],
+//             'validation_successful' : function(plugin_id, task_id){
+//               $.ajax({
+//                 'url': plug_url + 'validation?task_id=' + task_id + '&id=' + plugin_id,
+//                 'success': function(data){
+//                   toggle_bs_form_container(data, plugin_id);
+//                 }
+//               })
+//             }
+//         }
   
 
 
-        var options = {
-            operation_list : oplist,
-            show_plugin : function(plugin_id){
-              $.ajax({
-                'url' : plug_url + '?id=' + plugin_id + '&key=' + _gdv_info['project_key'],
-                'dataType': 'html',
-                'success': function(data){
-                   toggle_bs_form_container(data, plugin_id);
-                   $('body').bioscript(form_options).bioscript('hack_submit');
-                }
-              })               
-            },
-            'root_name' : 'Operations'
-        }
-        $('#bs_operations').bioscript(options).bioscript('operation_list');
-    };
-// ]]>
-</script>
+//         var options = {
+//             operation_list : oplist,
+//             show_plugin : function(plugin_id){
+//               $.ajax({
+//                 'url' : plug_url + '?id=' + plugin_id + '&key=' + _gdv_info['project_key'],
+//                 'dataType': 'html',
+//                 'success': function(data){
+//                    toggle_bs_form_container(data, plugin_id);
+//                    $('body').bioscript(form_options).bioscript('hack_submit');
+//                 }
+//               })               
+//             },
+//             'root_name' : 'Operations'
+//         }
+//         $('#bs_operations').bioscript(options).bioscript('operation_list');
+//     };
+// // ]]>
+// </script>
 
 </html>

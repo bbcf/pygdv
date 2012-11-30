@@ -38,11 +38,12 @@ function ZoneSelection(gv) {
     // take the global variable "init_locations"
     if (init_locations){
         var ctx = this;
+
         dojo.addOnLoad(function(){
             ctx.addStoredSelections(init_locations, gv, handler);
         });
     }
-};
+}
 
 /**
 * Add the selections stored by GDV.

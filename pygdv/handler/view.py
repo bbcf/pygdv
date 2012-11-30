@@ -62,7 +62,6 @@ def prepare_view(project_id, *args, **kw):
             ''' % jb.features_style(all_tracks)
 
     selections = 'init_locations = %s' % handler.selection.selections(project_id)
-
     # prepare _gdv_info
     info = {}
     prefix = tg.config.get('prefix')
@@ -95,7 +94,6 @@ def prepare_view(project_id, *args, **kw):
             op = handler.job.operation_list()
         except urllib2.URLError:
             pass
-
     return dict(species_name=project.species.name,
         nr_assembly_id=project.sequence_id,
         project_id=project.id,
