@@ -446,6 +446,9 @@ class Track(DeclarativeBase):
     def rel_path(self):
         return self.input.sha1 + '.sql'
 
+    def shared(self, user_id):
+        return user_id != self.user_id
+
 
 class TrackParameters(DeclarativeBase):
     '''

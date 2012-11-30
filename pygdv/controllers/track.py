@@ -56,7 +56,7 @@ class TrackController(BaseController):
             if checker.own(user=user, project=project):
                 kw['own'] = True
                 kw['upload'] = True
-                grid = datagrid.track_grid
+                grid = datagrid.track_grid_user(user)
 
             # view from a shared user
             else:
@@ -76,7 +76,7 @@ class TrackController(BaseController):
         else:
             shared_with = ''
             tracks = user.tracks
-            track_list = [util.to_datagrid(datagrid.track_grid, tracks, "Track Listing", len(tracks) > 0)]
+            track_list = [util.to_datagrid(datagrid.track_grid_user(user), tracks, "Track Listing", len(tracks) > 0)]
             kw['upload'] = True
         t = handler.help.help_address(url('/help'), 'main', 'track list help')
 
