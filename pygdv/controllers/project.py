@@ -37,7 +37,7 @@ class ProjectController(BaseController):
         sp_opts = [(sp.id, sp.name) for sp in species]
         new_form.child.children[2].options = sp_opts
         mapping = json.dumps(dict([(sp.id, [(seq.id, seq.name) for seq in sp.sequences
-                                                               if seq.public or handler.genrep.checkright(seq, user)]) for sp in species]))
+                                    if seq.public or handler.genrep.checkright(seq, user)]) for sp in species]))
         new_form.value = {'smapping': mapping}
         return dict(page='projects', widget=new_form)
 
@@ -89,6 +89,13 @@ class ProjectController(BaseController):
             track_ids = [track_ids]
         if len(track_ids) > 0 and '' in track_ids:
             track_ids.remove('')
+
+        # if the project is shared, add all project track_ids
+        if not checker.own(user=user, project=project):
+            for t in project.tracks:
+                if not checker.user_own_track(user.id, track=t) and t.id not in track_ids:
+                    track_ids.append(t.id)
+
         handler.project.e(project_id=project_id, name=kw.get('name'), track_ids=track_ids)
         raise redirect('/tracks/', {'pid': project_id})
 
@@ -165,17 +172,14 @@ class ProjectController(BaseController):
 
         # public url
         pub = url('/public/project', {'id': project_id, 'k': project.key})
-       
         # download url
         if project.download_key is None:
             project.download_key = project.setdefaultkey()
         down = url('/public/project', {'id': project_id, 'k': project.download_key})
 
-
         widget.value = {'pid': project_id}
 
         tl = handler.help.help_address(url('help'), '#share', 'sharing projects')
-
 
         if request.method == 'POST':
             if kw.has_key('rights'):
@@ -215,12 +219,10 @@ class ProjectController(BaseController):
         d = handler.view.prepare_view(project_id, *args, **kw)
         return d
 
-
     @require(has_permission('admin', msg='Only for admins'))
     @expose('pygdv.templates.admin_project')
     def admin(self):
         projects = DBSession.query(Project).all()
-        data_projects = [util.to_datagrid(project_admin_grid, projects, "All projects", len(projects)>0)]
+        data_projects = [util.to_datagrid(project_admin_grid, projects, "All projects", len(projects) > 0)]
         t = handler.help.tooltip['project']
         return dict(page='projects', model='project', tooltip=t, form_title="new project", projects=data_projects, value={})
-

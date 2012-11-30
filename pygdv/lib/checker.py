@@ -1,4 +1,4 @@
-from pygdv.model import DBSession, Project, User, Track, Circle, Right, Group, Job
+from pygdv.model import DBSession, Project, User, Track, Circle, Group, Job
 from pygdv.lib import constants
 from sqlalchemy.sql import and_
 
@@ -64,11 +64,12 @@ def is_admin(user):
     return user in admin_group.users
 
 
-def user_own_track(user_id, track_id):
+def user_own_track(user_id, track_id=None, track=None):
     '''
     Look if the user own the track
     '''
-    track = DBSession.query(Track).filter(Track.id == track_id).first()
+    if track is None:
+        track = DBSession.query(Track).filter(Track.id == track_id).first()
     if track is not None:
         return track.user_id == user_id
     return False

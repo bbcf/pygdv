@@ -17,7 +17,8 @@ from pygdv.widgets import datagrid, form
 from pygdv import handler
 from pygdv.lib import util, constants, checker, reply
 from pygdv.worker import tasks
-import tempfile, track
+import tempfile
+import track
 import tw2.core as twc
 import json
 from pygdv.lib import filemanager
@@ -239,17 +240,15 @@ class TrackController(BaseController):
         debug('End create')
         return reply.normal(request, 'Processing launched.', '/tracks/', {'track_id': t.id})
 
-
         # determine processes to launch
-
 
         # # check if multiples url or if zipped file
         # if util.is_compressed(extension) or (kw.get('url', None)!=None and len(kw.get('url', '').split())>1):
         #     async = tasks.multiple_track_input.delay(kw.get('uploaded', None), kw.get('file', None), kw.get('url', None), kw.get('fsys', None),
         #         sequence_id, user.email, user.key, project_id, kw.get('force', False), kw.get('delfile', False),
         #         constants.callback_track_url(), extension)
-        #     return reply.normal(request, 'Processing launched.', '/tracks/', {'task_id' : async.task_id})
-        # else :
+        #     return reply.normal(request, 'Processing launched.', '/tracks/', {'task_id': async.task_id})
+        # else:
         #     # create a new track
         #     _track = handler.track.new_track(user.id, track_name, sequence_id=sequence_id, admin=admin, project_id=project_id)
 
@@ -272,14 +271,13 @@ class TrackController(BaseController):
         #         _track_id, _user_mail, _user_key, sequence_id, _delfile)
 
         #     # update the track
-        #     handler.track.update(track=_track, params={'task_id' : async.task_id})
+        #     handler.track.update(track=_track, params={'task_id': async.task_id})
 
         #     if project_id is not None:
-        #         return reply.normal(request,'Processing launched.', tg.url('/tracks/', {'pid' : project_id}), {'task_id' : async.task_id,
-        #                                                                                                           'track_id' : _track.id})
-        #     return reply.normal(request, 'Processing launched.', '/tracks/', {'task_id' : async.task_id,
-        #                                                                 'track_id' : _track.id})
-
+        #         return reply.normal(request,'Processing launched.', tg.url('/tracks/', {'pid': project_id}), {'task_id': async.task_id,
+        #                                                                                                           'track_id': _track.id})
+        #     return reply.normal(request, 'Processing launched.', '/tracks/', {'task_id': async.task_id,
+        #                                                                 'track_id': _track.id})
     @expose('json')
     def post(self, *args, **kw):
         print 'post %s' % kw
@@ -293,7 +291,7 @@ class TrackController(BaseController):
 
         print 'before create'
         return self.create(*args, **kw)
-    
+
     @expose('json')
     def post2(self, *args, **kw):
         project_id = kw.get('project_id', None)
@@ -301,7 +299,7 @@ class TrackController(BaseController):
         fu = kw.get('file_upload', None)
         if (fu is None or fu == '') and (urls is None or urls == ''):
             flash('Missing field', 'error')
-            raise redirect('/tracks/new', {'pid' : project_id})
+            raise redirect('/tracks/new', {'pid': project_id})
         print 'posted2'
         return self.create(*args, **kw)
 
@@ -311,10 +309,10 @@ class TrackController(BaseController):
     def delete(self, track_id, **kw):
         user = handler.user.get_user_in_session(request)
         if track_id is not None:
-            if not checker.can_edit_track(user, track_id) :
-                return reply.error(request, "You haven't the right to delete any tracks which is not yours", '/tracks', {'error' : 'wrong credential'})
+            if not checker.can_edit_track(user, track_id):
+                return reply.error(request, "You haven't the right to delete any tracks which is not yours", '/tracks', {'error': 'wrong credential'})
             handler.track.delete_track(track_id=track_id)
-        return reply.normal(request, 'Track successfully deleted.', '/tracks', {'success' : 'track deleted'})
+        return reply.normal(request, 'Track successfully deleted.', '/tracks', {'success': 'track deleted'})
 
     @with_trailing_slash
     @expose('pygdv.templates.track_edit')
@@ -446,10 +444,10 @@ class TrackController(BaseController):
             kw['pn'] = project.name
             track_list = [util.to_datagrid(grid, tracks, "Track Listing", len(tracks)>0)]
 
-        else :
+        else:
             if 'user_id' in kw:
                 tracks = DBSession.query(Track).filter(Track.user_id == kw['user_id']).all()
-            else :
+            else:
                 tracks = DBSession.query(Track).all()
             track_list = [util.to_datagrid(grid, tracks, "Track Listing", len(tracks)>0)]
             kw['upload'] = True
@@ -480,44 +478,44 @@ class TrackController(BaseController):
         Else the input will go in the second part of the process.
         The input can be 'forced' to be recomputed
         """
-        try :
+        try:
             _input = DBSession.query(Input).filter(Input.sha1 == sha1).first()
             do_process = True
-            if util.str2bool(force) and _input is not None :
+            if util.str2bool(force) and _input is not None:
                 handler.track.delete_input(_input.sha1)
                 DBSession.delete(_input)
                 DBSession.flush()
             elif _input is not None:
                 do_process = False
                 handler.track.update(track_id=track_id,
-                    params={'new_input_id' : _input.id})
+                    params={'new_input_id': _input.id})
                 handler.track.finalize_track_creation(track_id=track_id)
 
-            if do_process :
+            if do_process:
 
-                handler.track.update(track_id=track_id, params={'sha1' : sha1})
+                handler.track.update(track_id=track_id, params={'sha1': sha1})
                 sequence = DBSession.query(Sequence).filter(Sequence.id == sequence_id).first()
                 async = tasks.track_process.delay(mail, key, old_task_id, fname, sha1, callback_url, track_id, sequence.name, extension, trackname, callback_url)
 
                 handler.track.update(track_id=track_id,
-                    params={'new_task_id' : async.task_id})
-            return {'success' : 'to second process'}
+                    params={'new_task_id': async.task_id})
+            return {'success': 'to second process'}
         except Exception as e:
             etype, value, tb = sys.exc_info()
             traceback.print_exception(etype, value, tb)
 
 
-            return {'error' : str(e)}
+            return {'error': str(e)}
 
 
     @expose('json')
     def after_process(self, mail, key, old_task_id, track_id, datatype):
         print '[x] after process [x] %s' % track_id
         task = DBSession.query(Task).filter(Task.task_id == old_task_id).first()
-        if task is not None :
+        if task is not None:
             DBSession.delete(task)
             DBSession.flush()
         if not track_id == 'None':
-            handler.track.update(track_id=track_id, params={'datatype' : datatype})
+            handler.track.update(track_id=track_id, params={'datatype': datatype})
             handler.track.finalize_track_creation(track_id=track_id)
-        return {'success' : 'end'}
+        return {'success': 'end'}
