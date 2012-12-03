@@ -5,7 +5,7 @@ from pygdv.lib import constants, checker
 from sqlalchemy.types import Boolean
 from pygdv.handler import track
 
-DEBUG_LEVEL = 0
+DEBUG_LEVEL = 1
 
 
 def debug(s, t=0):
@@ -232,6 +232,7 @@ def get_rights(project=None, project_id=None, user=None, user_id=None):
     r = []
     for circle, rights in project.circles_with_rights.iteritems():
         debug('circle %s with rights %s' % (circle, rights), 1)
+
         if circle in user.circles:
             r.extend(rights)
     return r
