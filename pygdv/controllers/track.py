@@ -162,8 +162,8 @@ class TrackController(BaseController):
             debug('fsys', 2)
             filetoget = kw.get('fsys')
             inputtype = 'fsys'
-        elif 'file_upload' in kw and kw.get('file_upload') is not None:
-            debug('file upload', 2)
+        elif 'file_upload' in kw and kw.get('file_upload') is not None and kw['file_upload'] != '':
+            debug('file upload %s' % kw.get('file_upload'), 2)
             filetoget = kw.get('file_upload')
             inputtype = 'fu'
         if filetoget is None:
