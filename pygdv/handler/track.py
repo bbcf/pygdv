@@ -27,7 +27,7 @@ def delete_input(sha1):
     '''
     if sha1 is not None:
         trackdir = os.path.join(constants.storage['data']['sql'], sha1)
-        shutil.rmtree(trackdir)
+        shutil.rmtree(trackdir, ignore_errors=True)
         for v in constants.visualisations_list:
             shutil.rmtree(os.path.join(constants.jsons_store_path, v, sha1), ignore_errors=True)
 
