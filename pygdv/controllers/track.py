@@ -204,7 +204,7 @@ class TrackController(BaseController):
             return reply.error(request, 'No extension found', tg.url('./new'), {'pid': project_id})
         if extension.startswith('.'):
             extension = extension[1:]
-
+        extension = extension.lower()
         # is the track "admin"
         admin = False
         if 'track_admin' in kw and kw.get('track_admin'):
