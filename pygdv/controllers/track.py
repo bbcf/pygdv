@@ -44,7 +44,7 @@ class TrackController(BaseController):
         user = handler.user.get_user_in_session(request)
         shared_by = None
         # view on a specific project
-        if 'pid' in kw:
+        if 'pid' in kw and kw.get('pid'):
             project_id = kw.get('pid')
             project = DBSession.query(Project).filter(Project.id == project_id).first()
             if project is None:
@@ -76,6 +76,8 @@ class TrackController(BaseController):
 
         # view all user tracks
         else:
+            if 'pid' in kw:
+                del kw['pid']
             shared_with = ''
             tracks = user.tracks
             track_list = [util.to_datagrid(datagrid.track_grid_user(user), tracks, "Track Listing", len(tracks) > 0)]
