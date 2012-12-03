@@ -160,8 +160,16 @@ def new_input(user_info, fileinfo, sequence_info, track_id, project_id=None):
         # get the input
         inp = DBSession.query(model.Input).filter(model.Input.sha1 == s).first()
 
+        transf = False
         if inp is None:
-            inp = model.Input()
+            transf = True
+        else:
+            # input exist but check file is really here
+            if not os.path.exists(inp.path):
+                transf = True
+        if transf:
+            if inp is None:
+                inp = model.Input()
             inp.sha1 = s
             inp.path = fileinfo.paths['store']
             inp.task_id = new_input.request.id
