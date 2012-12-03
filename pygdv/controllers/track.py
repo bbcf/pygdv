@@ -412,12 +412,11 @@ class TrackController(BaseController):
         return open(track.path).read()
 
 
-
     @expose()
     def traceback(self, track_id):
         user = handler.user.get_user_in_session(request)
 
-        if not checker.user_own_track(user.id, track_id):
+        if not checker.user_own_track(user.id, track_id) and not checker.is_admin(user):
 
             flash("You haven't the right to look at any tracks which is not yours", 'error')
             raise redirect('/tracks')
