@@ -200,7 +200,17 @@ class TrackController(BaseController):
             extension = kw.get('ext')
         else:
             extension = os.path.splitext(trackname)[-1]
-        if extension is None:
+            if extension is None or extension == '':
+                if inputtype == 'url':
+                    debug('extension from url', 2)
+                    extension = os.path.splitext(os.path.split(filetoget)[1].split('?')[0])[-1]
+                elif inputtype == 'fsys':
+                    debug('extension from fsys', 2)
+                    extension = os.path.splitext(os.path.split(filetoget)[-1])[-1]
+                elif inputtype == 'fu':
+                    debug('extension from fu', 2)
+                    extension = os.path.splitext(filetoget.filename)[-1]
+        if extension is None or extension == '':
             return reply.error(request, 'No extension found', tg.url('./new'), {'pid': project_id})
         if extension.startswith('.'):
             extension = extension[1:]
