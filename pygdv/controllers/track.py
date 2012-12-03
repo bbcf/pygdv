@@ -6,7 +6,9 @@ from tgext.crud import CrudRestController
 
 
 from repoze.what.predicates import not_anonymous, has_any_permission, has_permission
-import tg, sys, traceback
+import tg
+import sys
+import traceback
 import os
 from tg import expose, flash, require, tmpl_context, validate, request, response, url
 from tg.controllers import redirect
@@ -56,7 +58,7 @@ class TrackController(BaseController):
             if checker.own(user=user, project=project):
                 kw['own'] = True
                 kw['upload'] = True
-                grid = datagrid.track_grid_user(user)
+                grid = datagrid.track_grid_user(user, project)
 
             # view from a shared user
             else:
@@ -65,7 +67,7 @@ class TrackController(BaseController):
                 if constants.right_upload_id in [r.id for r in rights]:
                     kw['upload'] = True
                 debug('view from a shared user %s' % rights)
-                grid = datagrid.track_grid_permissions(user=user, rights=rights)
+                grid = datagrid.track_grid_permissions(user=user, rights=rights, project=project)
                 shared_by = "%s %s" % (project.user.firstname, project.user.name[0].upper())
 
             kw['pn'] = project.name
@@ -145,7 +147,7 @@ class TrackController(BaseController):
                 return reply.error(request, 'Project with id %s not found on GDV.' % project_id, tg.url('./new', {'pid': project_id}), {})
             sequence = DBSession.query(Sequence).filter(Sequence.id == project.sequence_id).first()
         if not sequence:
-            return reply.error(request, 'Sequence not found on GDV.', tg.url('./new'), {})
+            return reply.error(request, 'Sequence not found on GDV.', tg.url('./new'), {'pid': project_id})
         debug('%s' % sequence.name, 2)
 
         # know if file is comming from url, fileupload or filsystem
@@ -167,7 +169,7 @@ class TrackController(BaseController):
             filetoget = kw.get('file_upload')
             inputtype = 'fu'
         if filetoget is None:
-            return reply.error(request, 'No file to upload', tg.url('./new'), {})
+            return reply.error(request, 'No file to upload', tg.url('./new'), {'pid': project_id})
 
         debug('file2get: %s, intype: %s' % (filetoget, inputtype), 2)
         # get file name
@@ -187,7 +189,7 @@ class TrackController(BaseController):
                 debug('trackname from fu', 2)
                 trackname = filetoget.filename
         if trackname is None:
-            return reply.error(request, 'No trackname found', tg.url('./new'), {})
+            return reply.error(request, 'No trackname found', tg.url('./new'), {'pid': project_id})
 
         debug('%s' % trackname, 2)
         # get extension
@@ -199,7 +201,7 @@ class TrackController(BaseController):
         else:
             extension = os.path.splitext(trackname)[-1]
         if extension is None:
-            return reply.error(request, 'No extension found', tg.url('./new'), {})
+            return reply.error(request, 'No extension found', tg.url('./new'), {'pid': project_id})
         if extension.startswith('.'):
             extension = extension[1:]
 
@@ -238,7 +240,7 @@ class TrackController(BaseController):
         DBSession.add(t)
         DBSession.flush()
         debug('End create')
-        return reply.normal(request, 'Processing launched.', '/tracks/', {'track_id': t.id})
+        return reply.normal(request, 'Processing launched.', '/tracks/', {'track_id': t.id, 'pid': project_id})
 
         # determine processes to launch
 
@@ -312,7 +314,10 @@ class TrackController(BaseController):
             if not checker.can_edit_track(user, track_id):
                 return reply.error(request, "You haven't the right to delete any tracks which is not yours", '/tracks', {'error': 'wrong credential'})
             handler.track.delete_track(track_id=track_id)
-        return reply.normal(request, 'Track successfully deleted.', '/tracks', {'success': 'track deleted'})
+        red = '/tracks'
+        if 'pid' in kw:
+            red += '?pid=%s' % kw['pid']
+        return reply.normal(request, 'Track successfully deleted.', red, {'success': 'track deleted'})
 
     @with_trailing_slash
     @expose('pygdv.templates.track_edit')
@@ -335,6 +340,8 @@ class TrackController(BaseController):
             cc = track.parameters['color']
         d['track_id'] = track_id
         d['color'] = cc
+        if 'pid' in kw:
+            d['pid'] = kw['pid']
         widget.value = d
         if request.method == 'GET':
             return dict(title='Edit track', page='track', widget=widget, color=cc)
@@ -345,7 +352,7 @@ class TrackController(BaseController):
             except twc.ValidationError as e:
                 return dict(title='Edit track', page='track', widget=e.widget, color=cc)
         handler.track.edit(track=track, name=kw.get('name', None), color=kw.get('color', None))
-        raise redirect('/tracks')
+        raise redirect('/tracks', {'pid': kw.get('pid', None)})
 
     @expose('pygdv.templates.track_export')
     def export(self, track_id, *args, **kw):

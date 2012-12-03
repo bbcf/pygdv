@@ -9,18 +9,15 @@ from tg import url
 from pygdv.lib import constants
 
 
-
-
-
-
-
 def get_circles_edit_link(obj_id, img_src='../images/pencil.png'):
     return '''
     <a class="action" title="edit" href="circles/edit/%s" style="text-decoration:none"><img src="%s" width="16px" height="16px"/></a>
            ''' % (obj_id, img_src)
 
 
-def edit_link(id, model, img_src='../images/pencil.png'):
+def edit_link(id, model, img_src='../images/pencil.png', project=None):
+    if project is not None:
+        id = '%s?pid=%s' % (id, project.id)
     return '''<a class="action" title="edit" href="%s/edit/%s" style="text-decoration:none"><img src="%s" width="16px" height="16px"/>Edit</a>''' % (model, id, img_src)
 
 
@@ -30,15 +27,19 @@ def share_link(id):
     '''
     return ''' <a class='action share_link' title="share" href="share/%s"></a>''' % id
 
+
 def project_link(name, id=None):
     if id is None:
         return '''<a class="project_link" href="/tracks">%s</a> ''' % (name)
     return '''<a class="project_link" href="/tracks?pid=%s">%s</a> ''' % (id, name)
 
 
-def delete_link(id, model, img_src='../images/delete.png'):
+def delete_link(id, model, img_src='../images/delete.png', project=None):
+    if project is not None:
+        id = '%s?pid=%s' % (id, project.id)
     return '''<a class="action" onclick="return confirm('Are you sure?')"; title="delete" href="%s/delete/%s" style="text-decoration:none"><img src="%s"
      width="15px" height="15px"/>Delete</a>''' % (model, id, img_src)
+
 
 def get_job_results_display(job, u):
     def link(rid, rname):
@@ -48,16 +49,17 @@ def get_job_results_display(job, u):
 
 def get_remove_user_from_sequence_link(user_id, sequence_id):
     return '''<a class="action" onclick="return confirm('Are you sure?')"; title="delete" href="%s" style="text-decoration:none"><img src="images/delete.png"
-     width="15px" height="15px"/>Delete</a>''' % (url('/sequences/delete_user', params={'sequence_id': sequence_id, 'user_id' :user_id }))
+     width="15px" height="15px"/>Delete</a>''' % (url('/sequences/delete_user', params={'sequence_id': sequence_id, 'user_id': user_id}))
 
 
 def get_remove_track_from_sequence_link(track_id, sequence_id):
     return '''<a class="action" onclick="return confirm('Are you sure?')"; title="delete" href="%s" style="text-decoration:none"><img src="images/delete.png"
-     width="15px" height="15px"/>Delete</a>''' % (url('/sequences/delete_track', params={'track_id': track_id, 'sequence_id' :sequence_id }))
+     width="15px" height="15px"/>Delete</a>''' % (url('/sequences/delete_track', params={'track_id': track_id, 'sequence_id': sequence_id}))
+
 
 def get_delete_circle_description_link(user_id, circle_id):
     return '''<a class="action" onclick="return confirm('Are you sure?')"; title="delete" href="%s" style="text-decoration:none"><img src="images/delete.png"
-     width="15px" height="15px"/>Delete</a>''' % (url('/circles/delete_user', params={'id':circle_id, 'user_id' :user_id }))
+     width="15px" height="15px"/>Delete</a>''' % (url('/circles/delete_user', params={'id': circle_id, 'user_id': user_id}))
 
     '''
 # <form method="POST" action=%s class="button-to">
@@ -68,10 +70,13 @@ def get_delete_circle_description_link(user_id, circle_id):
 #    <input type="hidden" name='id' value="%s"/>
 #        ''' % (action, id)
 
-def export_link(obj_id, model, img_src='../images/export.png'):
+
+def export_link(obj_id, model, img_src='../images/export.png', project=None):
     '''
     Return a HTML export link.
     '''
+    if project is not None:
+        obj_id = '%s?pid=%s' % (obj_id, project.id)
     return ''' <a class='action' title="download the track" href="%s/link/%s"><img src="%s" width="16px" height="16px"/>Download</a>''' % (model, obj_id, img_src)
 
 
@@ -110,7 +115,7 @@ def get_delete_link(obj_id, rights = None):
 
 
 def get_track_delete_link(obj_id, tmp = False, rights = None):
-    if rights is not None and constants.right_upload in rights :
+    if rights is not None and constants.right_upload in rights:
         if rights[constants.right_upload]:
             return '''
     <form method="POST" action=%s class="button-to">
@@ -183,7 +188,7 @@ def get_share_link(obj_id, param, rights = None):
     '''
     Return a HTML share link.
     '''
-    if rights is not None and constants.right_upload in rights :
+    if rights is not None and constants.right_upload in rights:
         if rights[constants.right_upload]:
             return ''' <a class='action share_link' title="%s" href="%s"></a>''' % ('share with others', url('./share', params={param:obj_id}))
     return ''
@@ -192,7 +197,7 @@ def get_edit_link(obj_id, rights = None, link='', tmp=False):
     if tmp:
         return ''
     edit = url('%s%s/edit' % (link, obj_id))
-    if rights is not None and constants.right_upload in rights :
+    if rights is not None and constants.right_upload in rights:
         if rights[constants.right_upload]:
             return '''
     <a class="action edit_link" title="%s" href="%s%s/edit" style="text-decoration:none"></a>
@@ -213,15 +218,15 @@ def get_right_checkbok(obj, right_name):
     circle = obj.circle
     rights = obj.rights
     checked = False
-    for right in rights :
-        if right.name == right_name : 
+    for right in rights:
+        if right.name == right_name: 
             checked = True
     str = '''
     <input type="checkbox" name="rights_checkboxes" value="%s"
    
 ''' % (right_name)
     
-    if checked :
+    if checked:
         str+=' checked="yes"'
     str+='/><label >%s</label>' % (right_name)
     return str
@@ -281,9 +286,9 @@ def get_project_right_sharing_form(circle_right):
 
 def get_task_status(track=None):
     '''
-    Get a output for the status of a task : a link to the traceback if the status is ``FAILURE``,
+    Get a output for the status of a task: a link to the traceback if the status is ``FAILURE``,
     else the string representing the status.
-    @param track : the track to get the status from
+    @param track: the track to get the status from
     '''
     obj = track
     if obj.status != constants.ERROR: return obj.status

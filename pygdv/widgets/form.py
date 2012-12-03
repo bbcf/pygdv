@@ -12,7 +12,7 @@ class AddUser(twf.TableForm):
     cid = twf.HiddenField()
     mail = twf.TextField(
         label='e-mail : ',
-        help_text = 'Enter the user e-mail.',
+        help_text='Enter the user e-mail.',
         validator=twc.EmailValidator(required=True))
     submit = twf.SubmitButton(id="submit", value="Add")
 
@@ -29,10 +29,10 @@ class NewCircle(twf.TableForm):
     submit = twf.SubmitButton(id="submit", value="New")
 
 
-
 # track
 class EditTrack(twf.TableForm):
     color = twf.HiddenField()
+    pid = twf.HiddenField()
     track_id = twf.HiddenField()
     name = twf.TextField(label='Name : ',
         help_text="Enter the track's name",

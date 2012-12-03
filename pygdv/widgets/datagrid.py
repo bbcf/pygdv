@@ -54,13 +54,13 @@ job_grid = twf.DataGrid(fields=[
 ])
 
 
-def get_actions(track, user, rights):
+def get_actions(track, user, rights, project=None):
     # user own the track => all actions
     if track.user.id == user.id:
         return hoover_actions(
-            helpers.export_link(track.id, url('/tracks'))
-            + helpers.edit_link(track.id, url('/tracks'))
-            + helpers.delete_link(track.id, url('/tracks'))
+            helpers.export_link(track.id, url('/tracks'), project=project)
+            + helpers.edit_link(track.id, url('/tracks'), project=project)
+            + helpers.delete_link(track.id, url('/tracks'), project=project)
         )
     right_ids = [r.id for r in rights]
     if rights is None:
@@ -69,8 +69,8 @@ def get_actions(track, user, rights):
     if constants.rights['download']['id'] in right_ids and constants.rights['upload']['id'] in right_ids:
         debug('Download & Upload', 1)
         return hoover_actions(
-            helpers.export_link(track.id, url('/tracks'))
-            + helpers.edit_link(track.id, url('/tracks'))
+            helpers.export_link(track.id, url('/tracks'), project=project)
+            + helpers.edit_link(track.id, url('/tracks'), project=project)
     )
     # user have the download right
     if constants.rights['download']['id'] in right_ids:
@@ -88,7 +88,7 @@ def get_actions(track, user, rights):
     return hoover_actions('')
 
 
-def track_grid_permissions(user=None, rights=None):
+def track_grid_permissions(user=None, rights=None, project=None):
     # hidden info on the track
     h_info = lambda obj: hide_info({
         'tr_id': obj.id,
@@ -97,7 +97,7 @@ def track_grid_permissions(user=None, rights=None):
         })
     debug('Track grid permissions with %s' % rights)
     return twf.DataGrid(fields=[('Name', 'name'),
-        (hoover_action, lambda obj: get_actions(obj, user, rights)),
+        (hoover_action, lambda obj: get_actions(obj, user, rights, project)),
         ('Color', lambda obj: genshi.Markup(helpers.track_color(obj))),
         ('Own', lambda obj: not obj.shared(user.id)),
         ('Created', 'created'),
@@ -107,13 +107,13 @@ def track_grid_permissions(user=None, rights=None):
     ])
 
 
-def track_grid_user(user):
+def track_grid_user(user, project=None):
     return twf.DataGrid(fields=[
     ('Name', 'name'),
     (hoover_action, lambda obj: hoover_actions(
-            helpers.export_link(obj.id, url('/tracks'))
-            + helpers.edit_link(obj.id, url('/tracks'))
-            + helpers.delete_link(obj.id, url('/tracks'))
+            helpers.export_link(obj.id, url('/tracks'), project=project)
+            + helpers.edit_link(obj.id, url('/tracks'), project=project)
+            + helpers.delete_link(obj.id, url('/tracks'), project=project)
     )),
     ('Color', lambda obj: genshi.Markup(helpers.track_color(obj))),
     ('Own', lambda obj: not obj.shared(user.id)),
