@@ -35,7 +35,7 @@ def download_url(url, to, block_sz=2048 * 4):
 
 
 def download_fsys(infile, to):
-    shutil.cp(infile, to)
+    shutil.copy(infile, to)
 
 
 class FileInfo(object):
