@@ -37,9 +37,9 @@
 <py:def function="mainmenu">
     <ul id="navigation">
       <!-- <li class="first"><a href="${tg.url('/')}" class="${('', 'active')[defined('page') and page=='index']} menu_home">Home</a></li> -->
-      <li><a href="${tg.url('/tracks')}" class="${('', 'active')[defined('page') and page=='tracks']} menu_tracks">Main</a></li>      
+      <li><a href="${tg.url('/tracks')}" class="${('', 'active')[defined('page') and page=='tracks']} menu_tracks">Projects</a></li>      
       <li><a href="${tg.url('/circles')}" class="${('', 'active')[defined('page') and page=='circles']} menu_circles">Circles</a></li>
-       <li><a href="${tg.url('/jobs')}" class="${('', 'active')[defined('page') and page=='jobs']} menu_jobs">Data</a></li>
+       <li><a href="${tg.url('/jobs')}" class="${('', 'active')[defined('page') and page=='jobs']} menu_jobs">Analysis</a></li>
         <!-- <li><a href="${tg.url('/jobs')}" class="${('', 'active')[defined('page') and page=='jobs']} menu_jobs">Jobs</a></li>  -->
       <li><a href="${tg.url('/help')}" class="${('', 'active')[defined('page') and page=='help']} menu_help">Help</a></li>           
       <span py:if="tg.auth_stack_enabled" py:strip="True">
