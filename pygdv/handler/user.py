@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """user handler"""
 from pygdv.model.auth import User, Group
-from pygdv.model import DBSession
+from pygdv.model import DBSession, Project, RightCircleAssociation
 from pygdv.lib import constants
 from tg import abort
 from sqlalchemy import and_
@@ -43,5 +43,13 @@ def create_tmp_user(mail):
     return user
 
 
-def is_authorized():
-    pass
+def shared_projects(user_id, right_id):
+    return DBSession.query(Project).join(RightCircleAssociation).join(User.circles).filter(
+        and_(User.id == user_id, RightCircleAssociation.right_id == right_id)).all()
+
+
+def shared_tracks(user_id, right_id):
+    shared = []
+    for project in shared_projects(user_id, right_id):
+        shared.extend((t for t in project.tracks if t.user_id != user_id))
+    return list(set(shared))

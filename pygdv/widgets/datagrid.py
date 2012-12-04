@@ -99,7 +99,7 @@ def track_grid_permissions(user=None, rights=None, project=None):
     return twf.DataGrid(fields=[('Name', 'name'),
         (hoover_action, lambda obj: get_actions(obj, user, rights, project)),
         ('Color', lambda obj: genshi.Markup(helpers.track_color(obj))),
-        ('Own', lambda obj: not obj.shared(user.id)),
+        ('Owner', 'owner'),
         ('Created', 'created'),
         ('Assembly', 'sequence'),
         ('Type', 'vizu'),
@@ -116,7 +116,7 @@ def track_grid_user(user, project=None):
             + helpers.delete_link(obj.id, url('/tracks'), project=project)
     )),
     ('Color', lambda obj: genshi.Markup(helpers.track_color(obj))),
-    ('Own', lambda obj: not obj.shared(user.id)),
+    ('Owner', 'owner'),
      ('Created', 'created'),
      ('Assembly', 'sequence'),
      ('Type', 'vizu'),

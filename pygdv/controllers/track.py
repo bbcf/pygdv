@@ -25,7 +25,7 @@ import tw2.core as twc
 import json
 from pygdv.lib import filemanager
 
-DEBUG_LEVEL = 0
+DEBUG_LEVEL = 1
 
 
 def debug(s, t=0):
@@ -79,9 +79,15 @@ class TrackController(BaseController):
             if 'pid' in kw:
                 del kw['pid']
             shared_with = ''
-            tracks = user.tracks
+            tracks = list(user.tracks)
+            # shared tracks
+            shared_tracks = handler.user.shared_tracks(user.id, constants.rights['download']['id'])
+            tracks.extend(shared_tracks)
+            debug('shared tracks : %s' % ', '.join((str(x) for x in shared_tracks)))
+
             track_list = [util.to_datagrid(datagrid.track_grid_user(user), tracks, "Track Listing", len(tracks) > 0)]
             kw['upload'] = True
+
         t = handler.help.help_address(url('/help'), 'main', 'track list help')
 
         # project list
@@ -91,7 +97,6 @@ class TrackController(BaseController):
         shared_with_rights = handler.project.get_shared_projects(user)
         sorted_projects = sorted(shared_with_rights.iteritems(), key=lambda k: k[0].name)
         shared_project_list = [(p.id, p.name, ''.join([r[0] for r in rights])) for p, rights in sorted_projects]
-
         return dict(page='tracks', model='track', form_title="new track", track_list=track_list,
             project_list=project_list, shared_project_list=shared_project_list, value=kw,
             tooltip=t, project_id=kw.get('pid', None), upload=kw.get('upload', None), project_name=kw.get('pn', None),
@@ -294,7 +299,6 @@ class TrackController(BaseController):
         #                                                                 'track_id': _track.id})
     @expose('json')
     def post(self, *args, **kw):
-        print 'post %s' % kw
         project_id = kw.get('project_id', None)
         urls = kw.get('urls', None)
         fu = kw.get('file_upload', None)
@@ -303,7 +307,6 @@ class TrackController(BaseController):
             flash('Missing field', 'error')
             raise redirect('/tracks/new')
 
-        print 'before create'
         return self.create(*args, **kw)
 
     @expose('json')
@@ -314,7 +317,6 @@ class TrackController(BaseController):
         if (fu is None or fu == '') and (urls is None or urls == ''):
             flash('Missing field', 'error')
             raise redirect('/tracks/new', {'pid': project_id})
-        print 'posted2'
         return self.create(*args, **kw)
 
     #@expose('genshi:tgext.crud.templates.post_delete')

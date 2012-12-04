@@ -362,6 +362,7 @@ class Track(DeclarativeBase):
     _last_access = Column(DateTime, default=datetime.now, nullable=False)
     input_id = Column(Integer, ForeignKey('Input.id', ondelete="CASCADE"), nullable=True)
     user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=True)
+
     input = relationship('Input', backref='tracks', primaryjoin='Input.id == Track.input_id')
     #input = relationship('Input', backref='tracks')
     sequence_id = Column(Integer, ForeignKey('Sequence.id', ondelete="CASCADE"), nullable=False)
@@ -406,7 +407,7 @@ class Track(DeclarativeBase):
     @property
     def status(self):
         if self.task is None:
-            return 'PENDING'
+            return 'RUNNING'
         return self.task.status
 
     @property
@@ -448,6 +449,10 @@ class Track(DeclarativeBase):
 
     def shared(self, user_id):
         return user_id != self.user_id
+
+    @property
+    def owner(self):
+        return '%s %s' % (self.user.firstname, self.user.name)
 
 
 class TrackParameters(DeclarativeBase):

@@ -186,7 +186,7 @@ def _get_circle_right_assoc(right, circle_id, project_id):
                                          RightCircleAssociation.circle_id == circle_id,
                                          RightCircleAssociation.project_id == project_id
                                          )).first()
-    if cr_assoc is None :
+    if cr_assoc is None:
         cr_assoc = RightCircleAssociation()
         cr_assoc.circle_id = circle_id
         cr_assoc.right = right
@@ -243,6 +243,11 @@ def is_shared(project, user):
         if circle in user.circles:
             return True
     return False
+
+
+def get_shared(user, right_id):
+    return DBSession.query(Project).join(RightCircleAssociation).join(User.circles).filter(
+        and_(User.id == user.id, RightCircleAssociation.right_id == right_id)).all()
 
 
 def get_shared_projects(user):
