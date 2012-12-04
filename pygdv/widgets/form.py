@@ -75,6 +75,7 @@ class NewTrack(twf.TableForm):
     url = twf.TextField(label='Url : ', help_text='Provide an url')
     smapping = twf.HiddenField()
     trackname = twf.TextField(label='Name : ')
+    extension = twf.TextField(label='Extension : ', help_text="Specify the extension of your file if it's not already provided by your file name.")
     species = twf.SingleSelectField(label='Species :')
     assembly = twf.SingleSelectField(label='Assembly :', options=[])
     submit = twf.SubmitButton(id="submit", value="New")
@@ -84,6 +85,7 @@ class NewTrackPrefilled(twf.TableForm):
     file_upload = twf.FileField(label='Upload : ', help_text='Upload file from filesystem')
     url = twf.TextField(label='Url : ', help_text='Provide an url')
     trackname = twf.TextField(label='Name : ')
+    extension = twf.TextField(label='Extension : ', help_text="Specify the extension of your file if it's not already provided by your file name.")
     project_id = twf.HiddenField()
     submit = twf.SubmitButton(id="submit", value="New")
 
