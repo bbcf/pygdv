@@ -100,25 +100,24 @@ class ProjectController(BaseController):
 
     @expose('json')
     def get(self, project_key=None, project_id=None, **kw):
+        # get all user projects
         if not project_key and not project_id:
             user = handler.user.get_user_in_session(request)
             projects = DBSession.query(Project).filter(Project.user_id == user.id).all()
             return reply.normal(request, 'You can upload track on these projects', '/tracks', {'projects': projects})
         project = None
+        # get one specific user project
         if project_id is not None and project_id:
             user = handler.user.get_user_in_session(request)
             project = DBSession.query(Project).filter(Project.id == int(project_id)).first()
             if project is not None and not project.user_id == user.id:
                 reply.error(request, 'Not your project', '/tracks', {})
-        else:
-            project = DBSession.query(Project).filter(Project.key == project_key).first()
+            return reply.normal(request, 'You can upload track on this project', '/tracks', {'project': project})
+        # get a project by it's key
+        project = DBSession.query(Project).filter(Project.key == project_key).first()
         if project is None:
             return reply.error(request, 'Wrong key', '/tracks', {})
-        user = handler.user.get_user_in_session(request)
-        if not checker.check_permission(user=user, project=project, right_id=constants.rights['upload']['id']):
-            return reply.error(request, 'Wrong key', '/tracks', {})
-        else:
-            return reply.normal(request, 'You can upload track on this project', '/tracks', {'project': project})
+        return reply.normal(request, 'You can upload track on this project', '/tracks', {'project': project})
 
     @expose('json')
     def create(self, *args, **kw):
