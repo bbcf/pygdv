@@ -105,9 +105,8 @@ class RootController(BaseController):
     @expose()
     def home(self, *args, **kw):
         raise redirect('/')
-    
+
     ## DEVELOPMENT PAGES ##
-    
     @require(has_permission('admin', msg='Only for admins'))
     @expose('pygdv.templates.environ')
     def environ(self):
@@ -128,3 +127,9 @@ class RootController(BaseController):
         user = handler.user.get_user_in_session(request)
         return user.key
 
+    @require(has_any_permission('user', 'admin', msg='You must be logged'))
+    @expose('pygdv.templates.me')
+    def me(self):
+        from pygdv import handler
+        user = handler.user.get_user_in_session(request)
+        return {'user': user, 'page': 'user'}

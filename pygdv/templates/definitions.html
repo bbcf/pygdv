@@ -41,6 +41,7 @@
       <li><a href="${tg.url('/circles')}" class="${('', 'active')[defined('page') and page=='circles']} menu_circles">Circles</a></li>
        <li><a href="${tg.url('/jobs')}" class="${('', 'active')[defined('page') and page=='jobs']} menu_jobs">Analysis</a></li>
         <!-- <li><a href="${tg.url('/jobs')}" class="${('', 'active')[defined('page') and page=='jobs']} menu_jobs">Jobs</a></li>  -->
+      <li><a href="${tg.url('/me')}" class="${('', 'active')[defined('page') and page=='user']} menu_user">User</a></li>
       <li><a href="${tg.url('/help')}" class="${('', 'active')[defined('page') and page=='help']} menu_help">Help</a></li>           
       <span py:if="tg.auth_stack_enabled" py:strip="True">
 	<li py:if="request.identity and request.identity['userdata'].split('|')[1] == True" id="login" class="loginlogout ${('', 'active')[defined('page') and page=='admin']}"><a href="${tg.url('/admin')}">Admin</a></li>

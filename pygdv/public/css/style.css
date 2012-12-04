@@ -77,22 +77,30 @@ ul#navigation li a:hover{
 li > a.menu_home{
     background: url('../img/menu_home.png') no-repeat left center;
 }
+
 li > a.menu_tracks{
     background: url('../img/menu_tracks.png') no-repeat left center;
 }
+
 li > a.menu_projects{
     background: url('../img/menu_projects.png') no-repeat left center;
 }
+
 li > a.menu_help{
     background: url('../img/menu_help.png') no-repeat left center;
 }
+
 li > a.menu_jobs{
     background: url('../img/menu_jobs.png') no-repeat left center;
 }
+
 li > a.menu_circles{
     background: url('../img/menu_circles.png') no-repeat left center;
 }
 
+li > a.menu_user{
+    background: url('../img/menu_user.png') no-repeat left center;
+}
 
 
 #content {
