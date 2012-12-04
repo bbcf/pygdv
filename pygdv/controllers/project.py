@@ -115,7 +115,7 @@ class ProjectController(BaseController):
         if project is None:
             return reply.error(request, 'Wrong key', '/tracks', {})
         user = handler.user.get_user_in_session(request)
-        if not checker.check_permission_project(user.id, project.id, constants.right_upload_id):
+        if not checker.check_permission(user=user, project=project, right_id=constants.rights['upload']['id']):
             return reply.error(request, 'Wrong key', '/tracks', {})
         else:
             return reply.normal(request, 'You can upload track on this project', '/tracks', {'project': project})
