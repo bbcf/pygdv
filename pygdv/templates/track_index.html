@@ -31,11 +31,18 @@
         <div class="ui-layout-center">
             <div class="heade">Projects</div>
 
+            <!-- whole tracks link -->
+            <div py:choose="">
+                <span py:when="project_id == None"><li class="selected"><a href="${tg.url('/tracks/')}">Whole tracks</a></li></span>
+                <span py:otherwise=""><li><a href="${tg.url('/tracks/')}">Whole tracks</a></li></span>
+            </div>
+
             <!-- PROJECT LIST -->
             <py:for each="dic in project_list">
                 <div py:choose="">
                   <span py:when="project_id == None"><li><a href="${tg.url('/tracks/', {'pid' :dic[0]})}">${dic[1]}</a></li></span>
-                  <span py:when="dic[0] == int(project_id)"><li class="selected"><a href="${tg.url('/tracks/')}?pid=${dic[0]}">${dic[1]}</a></li></span>
+                  <span py:when="dic[0] == int(project_id)"><li class="selected"><a href="${tg.url('/tracks/')}?pid=${dic[0]}">${dic[1]}</a></li>
+                  </span>
                   <span py:otherwise=""><li><a href="${tg.url('/tracks/')}?pid=${dic[0]}">${dic[1]}</a></li></span>
                 </div>
             </py:for>
