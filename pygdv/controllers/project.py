@@ -19,7 +19,7 @@ import json
 
 __all__ = ['ProjectController']
 
-DEBUG_LEVEL = 0
+DEBUG_LEVEL = 1
 
 
 def debug(s, t=0):
@@ -66,6 +66,12 @@ class ProjectController(BaseController):
                 not_(Track.id.in_([t.id for t in project.tracks])))
         ).all()
 
+        # prendre les sared tracks du meme sequence id
+        shared_tracks = handler.user.shared_tracks(user.id, constants.rights['download']['id'])
+        shared_tracks = [t for t in shared_tracks if (t.sequence_id == project.sequence_id and t.id not in [tr.id for tr in project.tracks])]
+
+        tracks.extend(shared_tracks)
+
         if request.method == 'GET':
             debug("GET", 2)
             widget.child.children[1].value = project.name
@@ -92,7 +98,7 @@ class ProjectController(BaseController):
 
         # if the project is shared, some track cannot be removed
         for t in project.tracks:
-            if not checker.user_own_track(user.id, track=t) and t.id not in track_ids:
+            if not checker.user_own_track(user.id, track=t) and t.id not in track_ids and t.id in [s.id for s in shared_tracks]:
                 track_ids.append(t.id)
 
         handler.project.e(project_id=project_id, name=kw.get('name'), track_ids=track_ids)

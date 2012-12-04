@@ -51,5 +51,5 @@ def shared_projects(user_id, right_id):
 def shared_tracks(user_id, right_id):
     shared = []
     for project in shared_projects(user_id, right_id):
-        shared.extend((t for t in project.tracks if t.user_id != user_id))
+        shared.extend([t for t in project.tracks if t.user_id != user_id])
     return list(set(shared))
