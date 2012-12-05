@@ -527,12 +527,9 @@ class Job(DeclarativeBase):
     _created = Column(DateTime, nullable=False, default=datetime.now)
     user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=False)
     project_id = Column(Integer, ForeignKey('Project.id', ondelete="CASCADE"), nullable=True)
-
     status = Column(Unicode(255))
-
     ext_task_id = Column(VARCHAR(255), unique=True)
     bioscript_url = Column(VARCHAR(255))
-
     traceback = Column(Text, nullable=True)
 
     def _get_date(self):

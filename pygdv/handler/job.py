@@ -84,10 +84,6 @@ def update_job(job, name, description, user_id, project_id, output, task_id, sha
     session.add(job)
     session.flush()
     return job
-    
-
-
-
 
 
 def jobs(project_id):
@@ -96,8 +92,9 @@ def jobs(project_id):
             'name': job.name,
             'description': job.description,
             'output': job.output} for job in jobs]
-    
+
     return json.dumps({'jobs': out})
+
 
 def delete(job_id):
     job = model.DBSession.query(model.Job).filter(model.Job.id == job_id).first()

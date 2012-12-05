@@ -19,7 +19,6 @@ dev.ini
 
 /build
 *.egg
-*.db
 *.DS_Store
 /doc/build/
 /prod.ini
