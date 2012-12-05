@@ -1,0 +1,29 @@
+Control database migration
+<parameters> can be found in migrate.cfg file.
+
+1 - put the database under version control if not already:
+
+    migrate version_control <database_url> <repository_id>
+
+2 - check if the table is created in the database:
+    
+    psql <database>
+    select * from <version_table>;
+
+3 - set to the version you are:
+    
+    psql <database>
+    ALTER TABLE <version_table> set "version" = <version>;
+
+4 - test upgrade script:
+    
+    migrate test <database_url> <repository_id>
+
+5 - run the upgrade (or downgrade)
+
+     migrate upgrade <database_url> <repository_id>
+
+6 - verify the version 
+    
+    psql <database>
+    select * from <version_table>;
