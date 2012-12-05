@@ -8,12 +8,12 @@ Control database migration
 2 - check if the table is created in the database:
     
     psql <database>
-    select * from <version_table>;
+    SELECT * FROM <version_table>;
 
 3 - set to the version you are:
     
     psql <database>
-    ALTER TABLE <version_table> set "version" = <version>;
+    UPDATE <version_table> SET "version" = <version>;
 
 4 - test upgrade script:
     
@@ -26,4 +26,4 @@ Control database migration
 6 - verify the version 
     
     psql <database>
-    select * from <version_table>;
+    SELECT * FROM <version_table>;
