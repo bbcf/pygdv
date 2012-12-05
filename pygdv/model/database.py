@@ -528,17 +528,12 @@ class Job(DeclarativeBase):
     user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=False)
     project_id = Column(Integer, ForeignKey('Project.id', ondelete="CASCADE"), nullable=True)
 
-    #task_id = Column(Integer, ForeignKey('celery_taskmeta.id', ondelete="CASCADE"), nullable=False)
-    #task = relationship('Task', uselist=False, backref='job')
-    #task_id = Column(VARCHAR(255))
-    #task = relationship('Task', uselist=False, primaryjoin='Job.task_id == Task.task_id', foreign_keys='Task.task_id')
     status = Column(Unicode(255))
-    # external task_id from bs
+
     ext_task_id = Column(VARCHAR(255), unique=True)
-    # the result of the job
-    data = Column(Text())
-    # the job "type": image, file, ...
-    output = Column(VARCHAR(255))
+    bioscript_url = Column(VARCHAR(255))
+
+    traceback = Column(Text, nullable=True)
 
     def _get_date(self):
         return self._created.strftime(constants.date_format)
@@ -548,25 +543,30 @@ class Job(DeclarativeBase):
 
     created = synonym('_created', descriptor=property(_get_date, _set_date))
 
-    @property
-    def traceback(self):
-        return self.data
-
-    @property
-    def get_type(self):
-        return self.parameters.type
-
     def __repr__(self):
-        return 'Job < id: %s, name %s, desc: %s, data: %s , , output: %s>' % (
-                        self.id, self.name, self.description, self.data, self.output)
+        return 'Job < id: %s, name %s, desc: %s, bs url: %s , traceback: %s>' % (
+                        self.id, self.name, self.description, self.bioscript_url, self.traceback)
 
-    @property
-    def output_display(self):
-        if self.output == constants.JOB_IMAGE:
-            return 'Image'
-        if self.output == constants.JOB_TRACK:
-            return 'Track'
-        return self.output
+
+class Bresults(DeclarativeBase):
+    """
+    Results from bioscript.
+    """
+    __tablename__ = 'Bresult'
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    job_id = Column(Integer, ForeignKey('Job.id', ondelete="CASCADE"), nullable=False)
+    job = relationship('Job')
+    output_type = Column(VARCHAR(255))
+    is_file = Column(Boolean, default=True, nullable=False)
+    # file
+    path = Column(VARCHAR(255), nullable=True)
+    name = Column(VARCHAR(255), nullable=True)
+    # nope
+    data = Column(Text, nullable=True)
+
+    is_track = Column(Boolean, default=False, nullable=False)
+    track_id = Column(Integer, ForeignKey('Track.id'),
+                           nullable=True)
 
 
 class Location(DeclarativeBase):

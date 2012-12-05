@@ -1,18 +1,17 @@
-from tg import expose, flash, require, request, redirect, url, validate
+from tg import expose, request
 import tg
-from pygdv.lib import constants, checker, plugin
-
+from pygdv.lib import constants
 from pygdv.lib.base import BaseController
-from pygdv.model import DBSession, Project, Track, Sequence
+from pygdv.model import DBSession, Project
 from repoze.what.predicates import has_any_permission
-from pylons import tmpl_context
-from formencode import Invalid
 from pygdv import handler
-import json, urllib, urllib2, os
-from pygdv import handler
-from pygdv.model import DBSession, Job, Result
+import json
+import urllib
+import urllib2
+import os
+from pygdv.model import Job, Result
 
-file_tags = ['track', 'wig', 'bed']
+file_tags = handler.job.file_tags()
 
 
 class PluginController(BaseController):
@@ -46,7 +45,11 @@ class PluginController(BaseController):
 
     @expose()
     def validation(*args, **kw):
+        print file_tags
         print 'validation %s, %s' % (args, kw)
+        '''
+        {'plugin_id': u'902ff1b6faeb24ea9e2574b3d4d6af3a82fa5130', 'task_id': u'62bc47e5-83c8-4abd-b631-317641f2237b'}
+        '''
         return {}
 
     @expose()

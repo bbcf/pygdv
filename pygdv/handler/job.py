@@ -11,6 +11,20 @@ bioscript_url = tg.config['plugin.service.url']
 shared_key = tg.config['plugin.shared.key']
 
 
+def file_tags():
+    """
+    Fetch files tags from bioscript
+    """
+    tags = ['track']
+    try:
+        vocab_url = bioscript_url + '/vocab?tag=i'
+        vocab = json.load(urllib2.urlopen(vocab_url))
+        tags.extend(vocab[tags[0]])
+    except urllib2.URLError:
+        pass
+    return tags
+
+
 def operation_list():
     operations = "{}"
     try:
