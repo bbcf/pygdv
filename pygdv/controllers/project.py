@@ -19,7 +19,7 @@ import json
 
 __all__ = ['ProjectController']
 
-DEBUG_LEVEL = 1
+DEBUG_LEVEL = 0
 
 
 def debug(s, t=0):

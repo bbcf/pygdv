@@ -1067,4 +1067,20 @@
      height : 17px;
  }
 
+/* bioscript styling */
+#bs_operations_form_container{
+  background-image: url("../img/bkgnd_light.png");
+  background-size: 100%;
+  display: none;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  width: 50%;
+  z-index: 10000;
+}
 
+ul#bs_menubar {
+  background-image: url("../img/bkgnd_light.png");
+  background-size: 100%;
+  left:-20px;
+}

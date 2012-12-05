@@ -20,25 +20,11 @@ class PluginController(BaseController):
 
     @expose()
     def get(self, *args, **kw):
-        bs_server_url = tg.config.get('main.proxy') + url('/')
-        bs_url = bs_server_url + 'plugins/get?id=' + id
-
-        # we want to prefill 'file' some fields in the form
-        # aka we want to prefill FileField with SingleSelectField with
-        # files from our application
-        # here we generate test data
-        # data is formatted like that : [(file_url, file_name), (file_url, file_name), ...]
-        file_url = tg.config.get('main.proxy') + url('/test')
-        prefill_data = [(file_url + '/' + fname, fname) for fname in ('file1.txt', 'file2.txt', 'file3.txt')]
-        # as we don't really which form will be displayed
-        # we tell to prefill "file" field type.
-        prefill = {'prefill': json.dumps({'file': prefill_data})}
-        post_data = urllib.urlencode(prefill)
-        # get the form back  send via POST
-        req = urllib2.urlopen(url=bs_url, data=post_data)
+        bsurl = handler.job.bioscript_url
+        bsrequesturl = bsurl + '/plugins/get?id=' + kw['id']
+        req = urllib2.urlopen(url=bsrequesturl)
         # display the form in template
         return req.read()
-        return ''
 
     @expose()
     def index(self, id, key, *args, **kw):

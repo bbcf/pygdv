@@ -8,6 +8,27 @@ import tg
 import os
 from tg import url
 
+DEBUG_LEVEL = 1
+
+
+def debug(s, t=0):
+    if DEBUG_LEVEL > 0:
+        print '[view handler] %s%s' % ('\t' * t, s)
+
+
+def bioscript_parameters(tag):
+    from pygdv import handler
+    p = {}
+    if tag == 'oplist':
+        if 'plugin.service.url' in tg.config:
+            p['url'] = handler.job.bioscript_url + '/'
+            p['oplist'] = handler.job.operation_list()
+            p['methods'] = {}
+            p['methods']['get'] = url('/plugins/get') + '/'
+            p['methods']['validation'] = url('/plugins/validation') + '/'
+
+    return p
+
 
 def prepare_view(project_id, *args, **kw):
     from pygdv import handler
@@ -72,8 +93,7 @@ def prepare_view(project_id, *args, **kw):
     info['admin'] = kw.get('admin', True)
     info['plug_url'] = url('/plugins')
     info['project_key'] = project.key
-    if 'plugin.service.url' in tg.config:
-        info['bioscript_url'] = handler.job.bioscript_url
+    info['bioscript'] = bioscript_parameters('oplist')
 
     if 'mode' in kw:
         info['mode'] = kw.get('mode')

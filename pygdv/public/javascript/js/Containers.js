@@ -35,10 +35,10 @@ PrincipalContainer.prototype.reset = function(){
 *     or stopped
 */
 PrincipalContainer.prototype.tab_selected = function(tab_name){
-    switch (tab_name){
-        case "Jobs"      :  this.jobs.routine(true);break;
-        default: this.jobs.routine(false);
-    }
+    // switch (tab_name){
+    //     case "Jobs"      :  this.jobs.routine(true);break;
+    //     default: this.jobs.routine(false);
+    // }
 };
 
 
@@ -71,13 +71,15 @@ PrincipalContainer.prototype.createContainer = function(browser, menuLeftContain
 	this.navigationContainer(principal, principal_dijit, ['Home', 'Copy']);
 	this.trackContainer(browser);
 	this.selectionContainer(principal, principal_dijit);
-	this.jobContainer(principal, principal_dijit);
+	//this.jobContainer(principal, principal_dijit);
+    this.operationContainer(principal, principal_dijit);
 
     } else {
-	this.navigationContainer(principal, principal_dijit, ['Home', 'Tracks', 'Projects', 'Circles', 'Jobs']);
+	this.navigationContainer(principal, principal_dijit, ['Home', 'Circles', 'Jobs']);
 	this.trackContainer(browser);
 	this.selectionContainer(principal, principal_dijit);
-	this.jobContainer(principal, principal_dijit);
+	//this.jobContainer(principal, principal_dijit);
+    this.operationContainer(principal, principal_dijit);
 
     }
     //}
@@ -235,8 +237,8 @@ PrincipalContainer.prototype.operationContainer = function(DomNode, DijitNode,  
         title: "Operations",
         id: 'bs_operations'
     }, cont);
-
- //   $('body').append($('<div/>', {id : 'bs_operations_form_container'}));
+     console.log('operation container');
+    $('body').append($('<div/>', {id : 'bs_operations_form_container'}));
    
 };
 
@@ -297,10 +299,10 @@ PrincipalContainer.prototype.jobContainer = function(DomNode, DijitNode){
     this.jobs = job_manager;
 
     $('body').append($('<div/>', {id : 'bs_operations_form_container'}));
-    $('#bs_operations_form_container').toggle('fast');
-    $('#bs_operations_form_container').attr('showed', '');
-
-    // var formc = dojo.create('div', {}, DomNode);
+    // $('#bs_operations_form_container').toggle('fast');
+    // $('#bs_operations_form_container').attr('showed', '');
+    console.log('job container');
+    //var formc = dojo.create('div', {}, DomNode);
     // var formcont = new dijit.layout.ContentPane({
     //     id:'bs_operations_form_container'
     // }, formc);
