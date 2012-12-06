@@ -39,13 +39,6 @@ class JobController(BaseController):
 
         return dict(page='jobs', model='job', form_title="new job", item=data, value=kw, tooltip=t)
 
-    @without_trailing_slash
-    @expose()
-    def new(self, *args, **kw):
-        return "You can launch jobs from project view"
-
-
-    
     @expose('pygdv.templates.job')
     def result(self, id):
 
@@ -58,42 +51,19 @@ class JobController(BaseController):
         src = constants.extra_url() + '/' + res.rpath
         return dict(page='jobs', model='Job', src=src)
 
-    
-    @expose('genshi:tgext.crud.templates.post_delete')
-    def post_delete(self, *args, **kw):
-        user = handler.user.get_user_in_session(request)
-        _id = args[0]
-        if not checker.can_edit_job(user.id, _id):
-            flash("You haven't the right to edit a job which is not yours")
-            raise redirect('../')
-        handler.job.delete(_id)
-        raise redirect('./')
-
     @expose('json')
-    def _delete(self, _id):
+    def delete(self, _id):
         user = handler.user.get_user_in_session(request)
         if not checker.can_edit_job(user.id, _id):
             return {'error': "You have don't have the right to delete this job"}
-        handler.job.delete(_id)
-        return {'success': 'job deleted'}
-    
-    @expose('json')
-    def get_jobs(self, project_id, *args, **ke):
-        user = handler.user.get_user_in_session(request)
-        if not checker.check_permission(user=user, project_id=project_id, right_id=constants.right_read_id):
-            return {'error': "You haven't the right to read this project"}
-        
-        jobs = DBSession.query(Job).filter(and_(Job.user_id == user.id, Job.project_id == project_id, not_(and_(Job.output == constants.job_output_reload, Job.status == 'SUCCESS')))).all()
-        return {'jobs': jobs}
-    
-        
+        job = DBSession.query(Job).filter(Job.id == _id).first()
+        # TODO delete results (DB + filesystem)
+        DBSession.delete(job)
+        raise redirect('./')
+
     @expose()
     def traceback(self, id):
         job = DBSession.query(Job).filter(Job.id == id).first()
-        return job.traceback
-    
-    
-    
-    
-    
-    
+        if job.traceback:
+            return job.traceback
+        return 'no traceback.'

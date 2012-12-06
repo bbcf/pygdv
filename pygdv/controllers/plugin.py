@@ -61,7 +61,7 @@ class PluginController(BaseController):
         for arg in args_list:
             if arg not in kw:
                 raise Exception('Missing args for the validation %s' % kw)
-        user = DBSession.query(User).filter(User.mail == str(kw['mail'])).first()
+        user = DBSession.query(User).filter(User.email == str(kw['mail'])).first()
         if user.key != str(kw['key']):
             raise Exception('User not valid %s' % kw)
         project = DBSession.query(Project).filter(Project.id == int(kw['pid'])).first()
@@ -80,59 +80,14 @@ class PluginController(BaseController):
         else:
             job.name = 'Job %s from bioscript' % kw['task_id']
             job.description = 'Description available at %s' % handler.job.task_url(kw['task_id'])
-        DBSession.add(Job)
+        DBSession.add(job)
         DBSession.flush()
         return {}
 
     @expose()
-    def callback(self, mail, key, project_id, fid, tid, st, tn, td, *args, **kw):
+    def callback(self, *args, **kw):
         print '##############################################'
-        print 'got callback %s (%s)' % (tid, st)
-        print '%s, %s, %s, %s, %s' % (fid, tn, td, args, kw)
-        print '##############################################'
-        user = handler.user.get_user_in_session(request)
-        if st == 'RUNNING':
-            # a new request is launched
-            job = handler.job.new_job(name=tn, description=td, user_id=user.id, project_id=project_id, output='RUNNING', ext_task_id=tid)
-            return {}
-
-        elif st == 'SUCCESS':
-            # a request is finished
-            # look if there is file output
-            job = DBSession.query(Job).filter(Job.ext_task_id == tid).first()
-
-            if kw.has_key('fo'):
-                fos = json.loads(kw.get('fo'))
-                result_output = os.path.join(constants.extra_directory(), tid)
-                result_files = os.listdir(result_output)
-                for f in fos:
-                    r = Result()
-                    r.rtype = f[1]
-                    r.rpath = os.path.join(result_output, f[0])
-                    r.job_id = job.id
-
-                    if r.rtype in constants.track_types:
-                        res = gdv.single_track(mail=mail, key=key, serv_url=tg.config.get('main.proxy')+ tg.url('/'),
-                            project_id=project_id, fsys=r.rpath, delfile=True)
-                        r.rmore = res
-                        track_id = res.get('track_id')
-                        r.track_id = track_id
-                    DBSession.add(Result)
-
-            # job finished
-            job.output = constants.SUCCESS
-            # data will reference directoy where job outputs will be found
-            DBSession.add(job)
-            DBSession.flush()
-            return {}
-
-        elif st == 'ERROR' :
-
-            job = DBSession.query(Job).filter(Job.ext_task_id == tid).first()
-            job.output = constants.ERROR
-            job.data = kw.get('error', 'an unknown error occurred')
-            DBSession.add(job)
-            DBSession.flush()
-            return {}
+        print 'got callback %s (%s)' % (args, kw)
+        return {}
 
 

@@ -37,18 +37,32 @@ sequences_grid = twf.DataGrid(fields=[
     ('USERS', lambda obj: ', '.join(['%s' % (u.email) for u in obj.users]))
 
 ])
+"""
+ #column
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    name = Column(Unicode(255), nullable=False)
+    description = Column(Text(), nullable=False)
 
+    _created = Column(DateTime, nullable=False, default=datetime.now)
+    user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=False)
+    project_id = Column(Integer, ForeignKey('Project.id', ondelete="CASCADE"), nullable=True)
+    status = Column(Unicode(255))
+    ext_task_id = Column(VARCHAR(255), unique=True)
+    bioscript_url = Column(VARCHAR(255))
+    traceback = Column(Text, nullable=True)
+"""
 
 job_grid = twf.DataGrid(fields=[
     ('Name', 'name'),
-    ('Description', 'description'),
+    (hoover_action, lambda obj: hoover_actions(
+        helpers.delete_link(obj.id, url('/jobs'))
+    )),
     ('Status', 'status'),
-    ('Results', lambda obj: genshi.Markup(helpers.get_job_results_display(obj,  url('/jobs')))),
-    ('Output', 'output_display'),
-
+    ('Project', 'project.name'),
+    ('Bioscript', lambda x: genshi.Markup(helpers.bioscript(x.bioscript_url))),
+    ('Traceback', lambda x: genshi.Markup('''<a href="%s">traceback</a>''' % url('/jobs/traceback?id=%s' % x.id))),
     (hidden_info, lambda obj: hide_info({
         'tr_status': obj.status,
-        'tr_actions': helpers.delete_link(obj.id, url('/jobs')),
         'tr_info': obj.traceback
     }))
 ])

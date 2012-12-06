@@ -9,6 +9,10 @@ from tg import url
 from pygdv.lib import constants
 
 
+def bioscript(u):
+    return '''Your analysis is launched via <a href="%s"> BioScript</a>.''' % u
+
+
 def get_circles_edit_link(obj_id, img_src='../images/pencil.png'):
     return '''
     <a class="action" title="edit" href="circles/edit/%s" style="text-decoration:none"><img src="%s" width="16px" height="16px"/></a>
