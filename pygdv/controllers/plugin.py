@@ -2,7 +2,7 @@ from tg import expose, request
 import tg
 from pygdv.lib import constants
 from pygdv.lib.base import BaseController
-from pygdv.model import DBSession, Project
+from pygdv.model import DBSession, Project, Job, Bresults
 from repoze.what.predicates import has_any_permission
 from pygdv import handler
 import json
@@ -19,9 +19,16 @@ class PluginController(BaseController):
 
     @expose()
     def get(self, *args, **kw):
+        print 'get %s, %s' % (args, kw)
         bsurl = handler.job.bioscript_url
         bsrequesturl = bsurl + '/plugins/get?id=' + kw['id']
-        req = urllib2.urlopen(url=bsrequesturl)
+        user = handler.user.get_user_in_session(request)
+        project = DBSession.query(Project).filter(Project.id == kw['pid']).first()
+        # add private parameters
+        pp = {"key": user.key, "mail": user.email, "pid": project.id, "pkey": project.key}
+        # add prefill parameters
+        # TODO fetch tracks & selections
+        req = urllib2.urlopen(url=bsrequesturl, data={'bs_private': {'app': pp, 'bs_cfg': handler.job.bioscript_config}})
         # display the form in template
         return req.read()
 
@@ -50,6 +57,7 @@ class PluginController(BaseController):
         '''
         {'plugin_id': u'902ff1b6faeb24ea9e2574b3d4d6af3a82fa5130', 'task_id': u'62bc47e5-83c8-4abd-b631-317641f2237b'}
         '''
+
         return {}
 
     @expose()
