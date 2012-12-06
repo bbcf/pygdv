@@ -113,7 +113,8 @@
             'validation_url': _gdv_info['bioscript']['methods']['validation'],
             'bs_server_url': _gdv_info['bioscript']['url'],
             'bs_form_container_selector': '#bs_operations_form_container',
-            'root_name' : 'Operations'
+            'root_name' : 'Operations',
+            'app': {'pid': _gdv_info['project_id']}
         }
         $('#bs_operations').bioscript(options).bioscript('operation_list');
     });

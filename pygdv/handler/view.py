@@ -93,6 +93,7 @@ def prepare_view(project_id, *args, **kw):
     info['admin'] = kw.get('admin', True)
     info['plug_url'] = url('/plugins')
     info['project_key'] = project.key
+    info['project_id'] = project.id
     info['bioscript'] = bioscript_parameters('oplist')
 
     if 'mode' in kw:
@@ -107,7 +108,7 @@ def prepare_view(project_id, *args, **kw):
         control += 'b.navigateTo("%s");' % kw.get('loc')
 
     # prepare jobs list
-    jobs = 'init_jobs = %s' % handler.job.jobs(project_id)
+    jobs = 'init_jobs = {}'
     op = '{}'
     if 'plugin.service.url' in tg.config:
         try:

@@ -340,6 +340,7 @@ class CustomCommandLinePlugin(object):
         request = Request(environ)
 
         if 'mail' in request.str_POST and 'key' in request.str_POST:
+            print 'MAIL & KEY'
             user = handler.user.get_user(request.str_POST['key'], request.str_POST['mail'])
             if user is None : return {}
             identity = {}

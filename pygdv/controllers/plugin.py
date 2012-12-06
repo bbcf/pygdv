@@ -2,16 +2,17 @@ from tg import expose, request
 import tg
 from pygdv.lib import constants
 from pygdv.lib.base import BaseController
-from pygdv.model import DBSession, Project, Job, Bresults
+from pygdv.model import DBSession, Project, Job, Bresults, User
 from repoze.what.predicates import has_any_permission
 from pygdv import handler
 import json
 import urllib
 import urllib2
 import os
-from pygdv.model import Job, Result
 
 file_tags = handler.job.file_tags()
+
+args_list = ['key', 'mail', 'pid', 'pkey', 'plugin_id', 'task_id']
 
 
 class PluginController(BaseController):
@@ -27,8 +28,13 @@ class PluginController(BaseController):
         # add private parameters
         pp = {"key": user.key, "mail": user.email, "pid": project.id, "pkey": project.key}
         # add prefill parameters
+        prefill = []
         # TODO fetch tracks & selections
-        req = urllib2.urlopen(url=bsrequesturl, data={'bs_private': {'app': pp, 'bs_cfg': handler.job.bioscript_config}})
+        # add shared key
+        req = urllib2.urlopen(url=bsrequesturl, data=urllib.urlencode({
+            'key': handler.job.shared_key,
+            'bs_private': json.dumps({'app': pp, 'cfg': handler.job.bioscript_config,
+            'prefill': prefill})}))
         # display the form in template
         return req.read()
 
@@ -52,12 +58,30 @@ class PluginController(BaseController):
 
     @expose()
     def validation(*args, **kw):
-        print file_tags
-        print 'validation %s, %s' % (args, kw)
-        '''
-        {'plugin_id': u'902ff1b6faeb24ea9e2574b3d4d6af3a82fa5130', 'task_id': u'62bc47e5-83c8-4abd-b631-317641f2237b'}
-        '''
-
+        for arg in args_list:
+            if arg not in kw:
+                raise Exception('Missing args for the validation %s' % kw)
+        user = DBSession.query(User).filter(User.mail == str(kw['mail'])).first()
+        if user.key != str(kw['key']):
+            raise Exception('User not valid %s' % kw)
+        project = DBSession.query(Project).filter(Project.id == int(kw['pid'])).first()
+        if project.key != str(kw['pkey']):
+            raise Exception('Project not valid %s' % kw)
+        job = Job()
+        job.user_id = user.id
+        job.project_id = project.id
+        job.status = 'RUNNING'
+        job.ext_task_id = kw['task_id']
+        job.bioscript_url = handler.job.task_url(kw['task_id'])
+        if 'plugin_info' in kw:
+            info = json.loads(kw['plugin_info'])
+            job.name = info['title']
+            job.description = info['description']
+        else:
+            job.name = 'Job %s from bioscript' % kw['task_id']
+            job.description = 'Description available at %s' % handler.job.task_url(kw['task_id'])
+        DBSession.add(Job)
+        DBSession.flush()
         return {}
 
     @expose()
@@ -87,7 +111,7 @@ class PluginController(BaseController):
                     r.rpath = os.path.join(result_output, f[0])
                     r.job_id = job.id
 
-                    if r.rtype  in constants.track_types:
+                    if r.rtype in constants.track_types:
                         res = gdv.single_track(mail=mail, key=key, serv_url=tg.config.get('main.proxy')+ tg.url('/'),
                             project_id=project_id, fsys=r.rpath, delfile=True)
                         r.rmore = res

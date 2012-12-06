@@ -11,7 +11,8 @@
         get_url: 'htpp://localhost:8080/get',
         bs_form_container_selector: '#bs_form_container',
         show_plugin: false,
-        validation_successful: false
+        validation_successful: false,
+        app: ''
     };
 
     /* inside call */
@@ -28,6 +29,7 @@
                 $.extend(settings, options);
                 var $this = $(this),
                     data = $this.data(bs_namespace);
+
                 if(!data){
                     $(this).data(bs_namespace,{
                         target : $this,
@@ -39,7 +41,8 @@
                         vsuccess : settings.validation_successful,
                         vurl: settings.validation_url,
                         geturl: settings.get_url,
-                        bsform: settings.bs_form_container_selector
+                        bsform: settings.bs_form_container_selector,
+                        app: settings.app
                     });
                     data = $this.data(bs_namespace);
                 }
@@ -142,11 +145,10 @@
                     type : 'POST',
                     datatype:'jsonp',
                     data : formData,
-                    async: true,
                     processData:false,
                     contentType:false
                     });
-                    return true;
+                    return false;
                 });
         },
 
@@ -172,9 +174,9 @@
                     } else {
                         var data = $(this).data(bs_namespace);
                         if (data.vsuccess){
-                            data.vsuccess(jsonp.plugin_id, jsonp.task_id);
+                            data.vsuccess(jsonp.plugin_id, jsonp.task_id, jsonp.plugin_info);
                         } else {
-                            _incall($this, 'validation_success', [jsonp.plugin_id, jsonp.task_id]);
+                            _incall($this, 'validation_success', [jsonp.plugin_id, jsonp.task_id, jsonp.plugin_info, jsonp.app]);
                         }
                         
                     }
@@ -191,9 +193,13 @@
         show_plugin: function(plugin_id){
             var $this = $(this);
             var data = $this.data(bs_namespace);
+            var pdata = data.app;
             $.ajax({
                 'url' : data.geturl + '?id=' + plugin_id,
                 'dataType': 'html',
+                type : 'POST',
+                datatype:'json',
+                data : pdata,
                 'success': function(data){
                     _incall($this, 'toggle_bs_form',[plugin_id, data]);
                     _incall($this, 'hack_submit');
@@ -202,11 +208,19 @@
             });
          },
 
-         validation_success: function(plugin_id, task_id){
+         validation_success: function(plugin_id, task_id, plugin_info, app){
             var $this = $(this);
             var data = $this.data(bs_namespace);
+            u = data.vurl + '?task_id=' + task_id + '&plugin_id=' + plugin_id;
+            var pdata = app;
+            if (plugin_info){
+                pdata['plugin_info'] = plugin_info;
+            }
             $.ajax({
-                'url': data.vurl + '?task_id=' + task_id + '&plugin_id=' + plugin_id,
+                'url': u,
+                type: 'POST',
+                datatype: 'json',
+                data: pdata,
                 'success': function(data){
                     console.log(data);
                     _incall($this, 'toggle_bs_form', [plugin_id]);

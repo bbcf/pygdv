@@ -10,7 +10,14 @@ import urllib2
 bioscript_url = tg.config['plugin.service.url']
 shared_key = tg.config['plugin.shared.key']
 
-bioscript_config = {}
+bioscript_config = {
+    'key': shared_key,
+    'plugin_info': 'full'
+}
+
+
+def task_url(task_id):
+    return bioscript_url + '/jobs?task_id=%s' % task_id
 
 
 def file_tags():
