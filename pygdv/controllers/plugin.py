@@ -30,7 +30,6 @@ class PluginController(BaseController):
         # add prefill parameters
         prefill = []
         # TODO fetch tracks & selections
-        # add shared key
         req = urllib2.urlopen(url=bsrequesturl, data=urllib.urlencode({
             'key': handler.job.shared_key,
             'bs_private': json.dumps({'app': pp, 'cfg': handler.job.bioscript_config,

@@ -19,16 +19,9 @@ storage = {
         'relational': os.path.join(jsons_store_path, 'relational'),
         'features': os.path.join(jsons_store_path, 'features'),
         'bam_coverage': os.path.join(jsons_store_path, 'bam_coverage'),
-    }
+    },
+    'bioscript': os.path.join(data_store_path, 'bioscript')
 }
-
-
-
-
-
-
-
-
 
 
 bin_directory_path = os.path.join(PROJECT_ROOT, 'bin')
