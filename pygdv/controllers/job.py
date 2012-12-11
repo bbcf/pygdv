@@ -4,7 +4,7 @@ from pygdv.lib import constants
 from pygdv.lib.base import BaseController
 from tg import expose, url, flash, request
 from tg.controllers import redirect
-from pygdv.model import DBSession, Job, Result
+from pygdv.model import DBSession, Job, Bresults
 from repoze.what.predicates import has_any_permission
 from pygdv import handler
 from pygdv.lib import util, checker
@@ -31,9 +31,6 @@ class JobController(BaseController):
 
         jobs = DBSession.query(Job).filter(Job.user_id == user.id).all()
 
-        data = [{'title': job.name,
-                 'isFolder': True,
-                 'children': [{'title': res.rtype} for res in job.results]} for job in jobs]
         data = util.to_datagrid(datagrid.job_grid, jobs, "Job Listing", grid_display=len(jobs) > 0)
         t = handler.help.help_address(url('/help'), 'jobs', 'How to compute new data')
 
@@ -42,7 +39,7 @@ class JobController(BaseController):
     @expose('pygdv.templates.job')
     def result(self, id):
 
-        res = DBSession.query(Result).filter(Result.id == id).first()
+        res = DBSession.query(Bresults).filter(Bresults.id == id).first()
         checker.check_permission(user=handler.user.get_user_in_session(request),
             project=res.job.project, right_id=constants.right_download_id)
         if res.rtype in constants.track_types:
@@ -59,7 +56,7 @@ class JobController(BaseController):
         job = DBSession.query(Job).filter(Job.id == _id).first()
         # TODO delete results (DB + filesystem)
         DBSession.delete(job)
-        raise redirect('./')
+        raise redirect('/jobs')
 
     @expose()
     def traceback(self, id):

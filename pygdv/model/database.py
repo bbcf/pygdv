@@ -496,23 +496,6 @@ class TrackParameters(DeclarativeBase):
             self.type = constants.IMAGE_TRACK
 
 
-class Result(DeclarativeBase):
-    """
-    Represent each result of a bioscript job
-    """
-    __tablename__='JobResult'
-    id = Column(Integer, autoincrement=True, primary_key=True)
-    job_id = Column(Integer, ForeignKey('Job.id',  onupdate='CASCADE', ondelete="CASCADE"),
-        nullable=False)
-    job = relationship('Job', uselist=False, backref='results', cascade='delete')
-    name = Column(Unicode(255), nullable=False)
-    rtype = Column(Unicode(255), nullable=False)
-    rpath = Column(Unicode(255), nullable=False)
-    rmore = Column(Unicode(255), nullable=True)
-    track_id = Column(Integer, ForeignKey('Track.id',  onupdate='CASCADE', ondelete="CASCADE"),
-        nullable=True)
-
-
 class Job(DeclarativeBase):
     '''
     Represent external jobs submitted by GDV to BioScript.
