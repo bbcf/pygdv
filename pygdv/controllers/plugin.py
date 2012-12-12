@@ -95,8 +95,9 @@ class PluginController(BaseController):
 
         status = str(kw['status'])
         job.status = status
-
-        if status == 'SUCCESS':
+        if status.lower() in ['error', 'failed']:
+            job.traceback = kw['error']
+        elif status == 'SUCCESS':
             results = json.loads(kw['results'])
             for result in results:
                 bres = Bresults()

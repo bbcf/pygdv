@@ -263,7 +263,7 @@ def guess_vizualisations(fileinfo):
         fileinfo.vizualisations.extend(mappings['viz'][dt.lower()])
         debug(', '.join(fileinfo.vizualisations), 4)
         return fileinfo
-    raise Exception('Cannot guess the vizualisation for fileinfo "%s".' % fileinfo)
+    raise Exception('Cannot guess the vizualisation for file "%s".' % fileinfo.trackname)
 
 
 @task()
@@ -280,7 +280,7 @@ def guess_extension(fileinfo):
             fileinfo.extension = 'sql'
             debug(fileinfo.extension, 4)
             return fileinfo
-    raise Exception('Cannot guess the extension for fileinfo "%s".' % fileinfo)
+    raise Exception('Cannot guess the extension for file "%s".' % fileinfo.trackname)
 
 
 @task()

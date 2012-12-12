@@ -20,7 +20,7 @@ function show_status(event, node, status, enter){
         } else {
             st['border'] = '1px solid red';
             st['color'] = 'red';
-            $(n).attr('href', 'traceback?track_id=' + $(node).find('.hidden_info').find('.tr_id').html());
+            $(n).attr('href', 'traceback?id=' + $(node).find('.hidden_info').find('.tr_id').html());
         }
         st['top'] = o['top'] + 3;
         st['left'] = o['left'] + 200;

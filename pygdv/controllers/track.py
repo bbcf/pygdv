@@ -413,16 +413,15 @@ class TrackController(BaseController):
         response.headerlist.append(('Content-Disposition', 'attachment;filename=%s.sqlite' % track.name))
         return open(track.path).read()
 
-
     @expose()
-    def traceback(self, track_id):
+    def traceback(self, id):
         user = handler.user.get_user_in_session(request)
 
-        if not checker.user_own_track(user.id, track_id) and not checker.is_admin(user):
+        if not checker.user_own_track(user.id, id) and not checker.is_admin(user):
 
             flash("You haven't the right to look at any tracks which is not yours", 'error')
             raise redirect('/tracks')
-        track = DBSession.query(Track).filter(Track.id == track_id).first()
+        track = DBSession.query(Track).filter(Track.id == id).first()
         return track.traceback
 
     @expose()
