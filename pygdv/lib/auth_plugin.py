@@ -341,7 +341,8 @@ class CustomCommandLinePlugin(object):
 
         if 'mail' in request.str_POST and 'key' in request.str_POST:
             user = handler.user.get_user(request.str_POST['key'], request.str_POST['mail'])
-            if user is None : return {}
+            if user is None :
+                return {}
             identity = {}
             identity['repoze.who.userid'] = user.email
             environ['auth'] = True
