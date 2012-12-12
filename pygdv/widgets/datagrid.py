@@ -57,7 +57,6 @@ job_grid = twf.DataGrid(fields=[
     (hoover_action, lambda obj: hoover_actions(
         helpers.delete_link(obj.id, url('/jobs'))
     )),
-    ('Status', 'status'),
     ('Project', 'project.name'),
     ('Bioscript', lambda x: genshi.Markup(helpers.bioscript(x.bioscript_url))),
     ('Traceback', lambda x: genshi.Markup('''<a href="%s">traceback</a>''' % url('/jobs/traceback?id=%s' % x.id))),
