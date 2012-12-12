@@ -61,6 +61,7 @@ job_grid = twf.DataGrid(fields=[
     ('Project', 'project.name'),
     ('Bioscript', lambda x: genshi.Markup(helpers.bioscript(x.bioscript_url))),
     ('Traceback', lambda x: genshi.Markup('''<a href="%s">traceback</a>''' % url('/jobs/traceback?id=%s' % x.id))),
+    ('Created', 'created'),
     (hidden_info, lambda obj: hide_info({
         'tr_status': obj.status,
         'tr_info': obj.traceback
