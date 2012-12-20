@@ -5,7 +5,7 @@ from pygdv.lib import constants, checker
 from sqlalchemy.types import Boolean
 from pygdv.handler import track
 
-DEBUG_LEVEL = 1
+DEBUG_LEVEL = 0
 
 
 def debug(s, t=0):
