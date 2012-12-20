@@ -7,6 +7,7 @@ import tw.dynforms as oldtwd
 from pygdv.model import DBSession, Species, Sequence
 from tg import url
 
+
 # circle
 class AddUser(twf.TableForm):
     cid = twf.HiddenField()
@@ -39,13 +40,6 @@ class EditTrack(twf.TableForm):
         validator=twc.Validator(required=True))
     submit = twf.SubmitButton(id="submit", value="Edit")
 
-
-# project
-class EditProject(twf.TableForm):
-    pid = twf.HiddenField()
-    name = twf.TextField(label='Name : ', validator=twc.Validator(required=True))
-    tracks = twf.MultipleSelectField(label='Tracks : ', css_class='track_select')
-    submit = twf.SubmitButton(id="submit", value="Edit")
 
 class ShareProject(twf.TableForm):
     pid = twf.HiddenField()

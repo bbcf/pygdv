@@ -10,7 +10,7 @@ from pygdv.lib import constants
 
 
 def bioscript(u):
-    return '''Your analysis is launched via <a href="%s"> BioScript</a>.''' % u
+    return '''Your can retrieve analysis result(s) <a href="%s">here</a>.''' % u
 
 
 def get_circles_edit_link(obj_id, img_src='../images/pencil.png'):
@@ -236,20 +236,13 @@ def get_right_checkbok(obj, right_name):
     return str
 
 
-
-
-
 '''
-
 <input type="checkbox" name="rights_checkboxes" value="Download" id="rights_checkboxes_1">
                         <label for="rights_checkboxes_1">Download</label>
                         </td><td>
                         <input type="checkbox" name="rights_checkboxes" value="Upload" id="rights_checkboxes_2">
                         <label for="rights_checkboxes_2">Upload</label>
-                        
                         '''
-
-
 
 
 
@@ -261,18 +254,16 @@ def get_project_right_sharing_form(circle_right):
     <div><input type="hidden" value="%s" name='project_id' class="hiddenfield"></div>
     <table cellspacing="0" cellpadding="2" border="0">
         <tbody>
-            <tr title="" id="rights_checkboxes.container">    
+            <tr title="" id="rights_checkboxes.container">
                 <td class="fieldcol">
                     <table class="checkboxtable" id="rights_checkboxes">
                         <tbody>
                             <tr>
                                 ''' % (circle_right.circle.id, circle_right.project_id)
     for opt in options:
-        str+='<td>'+get_right_checkbok(circle_right, opt)+'</td>'
-        
-        
-    str+='''
-                        
+        str += '<td>' + get_right_checkbok(circle_right, opt) + '</td>'
+
+    str += '''
                             </tr>
                         </tbody>
                     </table>
@@ -283,9 +274,8 @@ def get_project_right_sharing_form(circle_right):
         </tr>
     </tbody></table>
 </form>
-''' 
+'''
     return str
-
 
 
 def get_task_status(track=None):
@@ -295,10 +285,8 @@ def get_task_status(track=None):
     @param track: the track to get the status from
     '''
     obj = track
-    if obj.status != constants.ERROR: return obj.status
-    return genshi.Markup('<a href="%s">%s</a>' % (url('./traceback', params={'track_id':obj.id, 'tmp':obj.tmp}),
+    if obj.status != constants.ERROR:
+        return obj.status
+    return genshi.Markup('<a href="%s">%s</a>' % (url('./traceback', params={'track_id': obj.id, 'tmp': obj.tmp}),
                                                   constants.ERROR
                                                   ))
-
-
-

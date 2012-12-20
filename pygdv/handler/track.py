@@ -53,8 +53,10 @@ def link(track):
     return tg.config.get('main.proxy') + tg.url('/tracks/link?track_id=%s' % track.id)
 
 
-def plugin_link(track):
-    return tg.config.get('main.proxy') + tg.url('/') + track.rel_path
+def plugin_link(track, selection_id=None):
+    if selection_id is not None:
+        return tg.config.get('main.proxy') + '/' + tg.url('selections/get?selection_id=') + str(selection_id)
+    return tg.config.get('main.proxy') + '/' + tg.url('tracks/sql/') + track.rel_path
 
 
 def edit(track=None, track_id=None, name=None, color=None):

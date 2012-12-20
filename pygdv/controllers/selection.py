@@ -81,5 +81,10 @@ class SelectionController(object):
         DBSession.flush()
         return {'delete': 'success'}
 
-
-
+    @expose()
+    def get(self, selection_id):
+        sel = DBSession.query(Selection).filter(Selection.id == selection_id).first()
+        b = ''
+        for loc in sel.locations:
+            b += '%s\t%s\t%s' % (loc.chromosome, loc.start, loc.end)
+        return b

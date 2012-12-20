@@ -154,6 +154,8 @@ class Project(DeclarativeBase):
 
     tracks = relationship('Track', secondary=project_track_table, backref='projects')
 
+    selections = relationship('Selection', backref='projects')
+
     _circle_right = relationship('RightCircleAssociation', backref='project', cascade="all, delete, delete-orphan")
 
     jobs = relationship('Job', backref='project')
@@ -242,6 +244,7 @@ class Project(DeclarativeBase):
     def circles_rights(self):
         data = self.circles_with_rights
         return [CircleRights(self.id, circle, rights) for circle, rights in data.iteritems()]
+
 
 
 class Sequence(DeclarativeBase):
@@ -445,7 +448,7 @@ class Track(DeclarativeBase):
 
     @property
     def rel_path(self):
-        return self.input.sha1 + '.sql'
+        return os.path.join(self.input.sha1, os.path.split(self.path)[-1])
 
     def shared(self, user_id):
         return user_id != self.user_id

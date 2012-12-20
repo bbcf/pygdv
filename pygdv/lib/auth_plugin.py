@@ -22,13 +22,16 @@ from repoze.who.interfaces import IIdentifier, IChallenger, IAuthenticator, IReq
 import zope.interface
 
 _NOW_TESTING = None  # unit tests can replace
-def _now():  #pragma NO COVERAGE
+
+
+def _now():  # pragma NO COVERAGE
     '''
     For unit tests purpose
     '''
     if _NOW_TESTING is not None:
         return _NOW_TESTING
     return datetime.datetime.now()
+
 
 def make_plugin(secret=None,
                 secretfile=None,
@@ -42,7 +45,7 @@ def make_plugin(secret=None,
     '''
     Build the identifier plugin
     '''
-   
+
     if (secret is None and secretfile is None):
         raise ValueError("One of 'secret' or 'secretfile' must not be None.")
     if (secret is not None and secretfile is not None):
@@ -69,19 +72,12 @@ def make_plugin(secret=None,
     return plugin
 
 
-
 def make_plugin_auth(check_fn=None):
     return CustomAuthPlugin(check_fn)
 
 
-
 def make_plugin_cl(*args, **kw):
     return CustomCommandLinePlugin()
-
-
-
-
-
 
 
 class CustomCookiePlugin(object):
@@ -89,10 +85,10 @@ class CustomCookiePlugin(object):
     A custom cookie plugin for authentication.
     '''
     implements(IIdentifier, IChallenger)
-   
+
     userid_type_decoders = {
-        'int':int,
-        'unicode':lambda x: utf_8_decode(x)[0],
+        'int': int,
+        'unicode': lambda x: utf_8_decode(x)[0],
         }
 
     userid_type_encoders = {
@@ -100,8 +96,7 @@ class CustomCookiePlugin(object):
         long: ('int', str),
         unicode: ('unicode', lambda x: utf_8_encode(x)[0]),
         }
-    
-  
+
     def __init__(self, secret, cookie_name='auth_tkt',
                  secure=False, include_ip=False,
                  timeout=None, reissue_time=None, userid_checker=None):
@@ -109,7 +104,7 @@ class CustomCookiePlugin(object):
         self.cookie_name = cookie_name
         self.include_ip = include_ip
         self.secure = secure
-        if timeout and ( (not reissue_time) or (reissue_time > timeout) ):
+        if timeout and ((not reissue_time) or (reissue_time > timeout)):
             raise ValueError('When timeout is specified, reissue_time must '
                              'be set to a lower value')
         self.timeout = timeout
@@ -121,7 +116,6 @@ class CustomCookiePlugin(object):
         '''
         Identify the user
         '''
-
         remotes = environ['REMOTE_ADDR'].split(', ')
         environ['REMOTE_ADDR'] = remotes[0]
 
@@ -136,7 +130,7 @@ class CustomCookiePlugin(object):
             remote_addr = environ['REMOTE_ADDR']
         else:
             remote_addr = '0.0.0.0'
-        
+
         try:
             timestamp, userid, tokens, user_data = auth_tkt.parse_ticket(
                 self.secret, cookie.value, remote_addr)
@@ -146,7 +140,7 @@ class CustomCookiePlugin(object):
         if self.userid_checker and not self.userid_checker(userid):
             return None
 
-        if self.timeout and ( (timestamp + self.timeout) < time.time() ):
+        if self.timeout and ((timestamp + self.timeout) < time.time()):
             return None
 
         userid_typename = 'userid_type:'
@@ -157,7 +151,7 @@ class CustomCookiePlugin(object):
                 decoder = self.userid_type_decoders.get(userid_type)
                 if decoder:
                     userid = decoder(userid)
-            
+
         environ['REMOTE_USER_TOKENS'] = tokens
         environ['REMOTE_USER_DATA'] = user_data
         environ['AUTH_TYPE'] = 'cookie'
@@ -205,7 +199,7 @@ class CustomCookiePlugin(object):
         # return a set of expires Set-Cookie headers
         #identity = None
         return self._get_cookies(environ, 'INVALID', 0)
-    
+
     # IIdentifier
     def remember(self, environ, identity):
         '''
@@ -240,7 +234,7 @@ class CustomCookiePlugin(object):
             encoding, encoder = encoding_data
             who_userid = encoder(who_userid)
             who_userdata = 'userid_type:%s' % encoding
-        
+
         if not isinstance(tokens, basestring):
             tokens = ','.join(tokens)
         if not isinstance(who_tokens, basestring):
@@ -249,7 +243,7 @@ class CustomCookiePlugin(object):
         new_data = (who_userid, who_tokens, who_userdata)
 
         if old_data != new_data or (self.reissue_time and
-                ( (timestamp + self.reissue_time) < time.time() )):
+                ((timestamp + self.reissue_time) < time.time())):
             ticket = auth_tkt.AuthTicket(
                 self.secret,
                 who_userid,
@@ -259,7 +253,7 @@ class CustomCookiePlugin(object):
                 cookie_name=self.cookie_name,
                 secure=self.secure)
             new_cookie_value = ticket.cookie_value()
-            
+
             #cur_domain = environ.get('HTTP_HOST', environ.get('SERVER_NAME'))
             #wild_domain = '.' + cur_domain
             if old_cookie_value != new_cookie_value:
@@ -268,7 +262,8 @@ class CustomCookiePlugin(object):
 
     def __repr__(self):
         return '<%s %s>' % (self.__class__.__name__,
-                            id(self)) #pragma NO COVERAGE
+                            id(self))
+                            #pragma NO COVERAGE
 
     # IChallenger
     def challenge(self, environ, status, app_headers, forget_headers):
@@ -288,10 +283,9 @@ class CustomCookiePlugin(object):
             addon = environ['SCRIPT_NAME']
         if addon is not None:
             res.location = addon + '/login_needed'
-        else :
+        else:
             res.location = 'login_needed'
         return res
-            
 
 
 def _bool(value):
@@ -303,28 +297,26 @@ def _bool(value):
     return value
 
 
-
-
-
 class CustomAuthPlugin(object):
     '''
     A custom authenticator.
     '''
     implements(IAuthenticator)
+
     def __init__(self, check):
         self.check = check
     # IAuthenticatorPlugin
+
     def authenticate(self, environ, identity):
         '''
         Authenticate
         '''
         pass
-    
+
     def __repr__(self):
         return '<%s %s>' % (self.__class__.__name__,
-                            id(self)) #pragma NO COVERAGE
-
-
+                            id(self))
+                            #pragma NO COVERAGE
 
 
 class CustomCommandLinePlugin(object):
@@ -332,6 +324,7 @@ class CustomCommandLinePlugin(object):
     A custom plugin for authentication from command line.
     '''
     implements(IIdentifier, IChallenger)
+
     # IIdentifier
     def identify(self, environ):
         '''
@@ -341,7 +334,7 @@ class CustomCommandLinePlugin(object):
 
         if 'mail' in request.str_POST and 'key' in request.str_POST:
             user = handler.user.get_user(request.str_POST['key'], request.str_POST['mail'])
-            if user is None :
+            if user is None:
                 return {}
             identity = {}
             identity['repoze.who.userid'] = user.email
@@ -356,11 +349,12 @@ class CustomCommandLinePlugin(object):
         '''
         pass
     # IIdentifier
+
     def remember(self, environ, identity):
         '''
         Remember the user. (no remember from command line)
         '''
-        
+
     # IChallenger
     def challenge(self, environ, status, app_headers, forget_headers):
         '''
@@ -372,15 +366,11 @@ class CustomCommandLinePlugin(object):
         res.unicode_body = u"{error:'wrong credentials'}"
         res.status = 403
         return res
-   
-   
-
-
 
 
 def request_classifier(environ):
     '''
-    Returns one of the classifiers 'command_line' or 'browser',                                                                                                                                     
+    Returns one of the classifiers 'command_line' or 'browser',
     depending on the imperative logic below
     '''
     request_method = REQUEST_METHOD(environ)
@@ -391,10 +381,5 @@ def request_classifier(environ):
             return constants.REQUEST_TYPE_COMMAND_LINE
     environ[constants.REQUEST_TYPE] = constants.REQUEST_TYPE_BROWSER
     return constants.REQUEST_TYPE_BROWSER
+
 zope.interface.directlyProvides(request_classifier, IRequestClassifier)
-
-
-
-
-
-

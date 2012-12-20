@@ -28,7 +28,16 @@ class PluginController(BaseController):
         # add private parameters
         pp = {"key": user.key, "mail": user.email, "pid": project.id, "pkey": project.key}
         # add prefill parameters
-        prefill = []
+        tracks = list(project.tracks)
+        selections = list(project.selections)
+        gtrack = [(handler.track.plugin_link(t), t.name) for t in tracks]
+        if len(selections) > 0:
+            s = selections[0]
+            if len(s.locations) > 0:
+                gtrack.append((handler.track.plugin_link(s, selection_id=s.id), 'selection'))
+
+        prefill = json.dumps({'track': gtrack})
+
         # TODO fetch tracks & selections
         req = urllib2.urlopen(url=bsrequesturl, data=urllib.urlencode({
             'key': handler.job.shared_key,
@@ -88,7 +97,7 @@ class PluginController(BaseController):
         print kw
         job = DBSession.query(Job).filter(Job.ext_task_id == kw['task_id']).first()
         project = DBSession.query(Project).filter(Project.id == int(kw['pid'])).first()
-        if project.key != str(kw['pkey']):
+        if project is None or project.key != str(kw['pkey']):
             raise Exception('Project not valid')
         if job.project_id != project.id:
             raise Exception('Job not valid')
@@ -133,4 +142,3 @@ class PluginController(BaseController):
                 DBSession.add(bres)
         DBSession.flush()
         return {}
-

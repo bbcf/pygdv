@@ -25,7 +25,7 @@ import tw2.core as twc
 import json
 from pygdv.lib import filemanager
 
-DEBUG_LEVEL = 1
+DEBUG_LEVEL = 0
 
 
 def debug(s, t=0):
@@ -412,6 +412,24 @@ class TrackController(BaseController):
         response.content_type = 'application/x-sqlite3'
         response.headerlist.append(('Content-Disposition', 'attachment;filename=%s.sqlite' % track.name))
         return open(track.path).read()
+
+    @expose()
+    def sql(self, sha1, name):
+        user = handler.user.get_user_in_session(request)
+        inp = DBSession.query(Input).filter(Input.sha1 == sha1).first()
+        if inp is None:
+            flash("Doesn't exist", 'error')
+            raise redirect('/tracks')
+        if not os.path.split(inp.path)[-1] == name:
+            flash("Doesn't exist", 'error')
+            raise redirect('/tracks')
+        for t in inp.tracks:
+            if user.id == t.user_id:
+                response.content_type = 'application/x-sqlite3'
+                response.headerlist.append(('Content-Disposition', 'attachment;filename=%s.sqlite' % t.name))
+                return open(t.path).read()
+        flash("You haven't the right to download any tracks which is not yours", 'error')
+        raise redirect('/tracks')
 
     @expose()
     def traceback(self, id):
