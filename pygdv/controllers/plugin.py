@@ -22,7 +22,7 @@ class PluginController(BaseController):
     @expose()
     def get(self, *args, **kw):
         bsurl = handler.job.bioscript_url
-        bsrequesturl = bsurl + '/plugins/get?id=' + kw['id']
+        bsrequesturl = bsurl + '/plugins/fetch?oid=' + kw['oid']
         user = handler.user.get_user_in_session(request)
         project = DBSession.query(Project).filter(Project.id == kw['pid']).first()
         # add private parameters
