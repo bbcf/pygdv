@@ -8,7 +8,7 @@
         bs_server_url: 'http://localhost:8080/',
         form_selector: 'div.bs_form',
         validation_url: 'htpp://localhost:8080/validation',
-        get_url: 'htpp://localhost:8080/get',
+        fetch_url: 'htpp://localhost:8080/fetch',
         bs_form_container_selector: '#bs_form_container',
         show_plugin: false,
         validation_successful: false,
@@ -38,13 +38,17 @@
                         plugin : settings.show_plugin,
                         bsurl : settings.bs_server_url,
                         fselector : settings.form_selector,
-                        vsuccess : settings.validation_successful,
                         vurl: settings.validation_url,
-                        geturl: settings.get_url,
+                        vsuccess : settings.validation_successful,
+                        geturl: settings.fetch_url,
                         bsform: settings.bs_form_container_selector,
                         app: settings.app
                     });
                     data = $this.data(bs_namespace);
+                    // $.ajaxSetup({
+                    //     beforeSend: function(xhr) {
+                    //     xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'));
+                    // }});
                 }
             });
         },
@@ -107,7 +111,10 @@
          * form to perform a JSONP query instead
          */
         hack_submit : function(){
-            var data = $(this).data(bs_namespace);
+            var $this = $(this);
+            var data = $this.data(bs_namespace);
+            console.log("HACK SUBMIT");
+            console.log(data);
             var bs_url = data.bsurl;
             var fselector = data.fselector;
             $(fselector).children('form').submit(function(e){
@@ -123,8 +130,7 @@
 //        //your validation
 //    });
 
-            /* get data from form */
-            var pdata = $(this).serialize() + '&callback=bs_jsonp_cb';
+            
             /* build form data objet to upload files if any */
             var formData = new FormData();
             var files = $(':file');
@@ -138,18 +144,40 @@
                     }
                 }
             }
+            
+            /* get data from form */
 
+            var pdata = $(this).serializeArray();
+            console.log(pdata);
+            $.each(pdata, function(i, v){
+                formData.append(v.name, v.value);
+            });
+            console.log(formData);
             /* submit query */
             $.ajax({
-                    url: bs_url + 'plugins/validate?' + pdata,
+                    url: bs_url + 'plugins/validate',
                     type : 'POST',
-                    datatype:'jsonp',
                     data : formData,
                     processData:false,
                     contentType:false
+                    }).done(function(d) {
+                        console.log("POST DONE");
+                        console.log(data);
+                        _incall($this, 'jsonp_callback', [d]);
+                    }).error(function(error){
+                        console.log("POST ERROR");
+                        console.error(error);
                     });
-                    return false;
+                    return true;
                 });
+            // $.getJSON(
+            //     bs_url + 'plugins/validate?' + pdata,
+            //     {},
+            //     function(data){
+            //         console.log(data);
+            //         _incall($this, 'jsonp_callback', [data]);
+            //     });
+            // });
         },
 
         /**
@@ -158,11 +186,14 @@
          */
         jsonp_callback : function(jsonp){
             var $this = $(this);
+            var data = $this.data(bs_namespace);
+            console.log("JSONP CALLBACK");
+            console.log(data);
             if (jsonp){
+                jsonp = $.parseJSON(jsonp);
                 var val = jsonp.validation;
                 if (val == 'failed'){
                     // validation failed : display the form with errors
-                   var data = $(this).data(bs_namespace);
                     var fselector = data.fselector;
                     $(fselector).children('form').replaceWith(jsonp.widget);
                     _incall($this, 'hack_submit');
@@ -172,7 +203,6 @@
                         // but there is an error
                         alert(jsonp.error);
                     } else {
-                        var data = $(this).data(bs_namespace);
                         if (data.vsuccess){
                             data.vsuccess(jsonp.plugin_id, jsonp.task_id, jsonp.plugin_info);
                         } else {
@@ -193,15 +223,17 @@
         show_plugin: function(plugin_id){
             var $this = $(this);
             var data = $this.data(bs_namespace);
+            console.log("SHOW PLUGIN");
+            console.log(data);
             var pdata = data.app;
             $.ajax({
-                'url' : data.geturl + '?id=' + plugin_id,
+                'url' : data.geturl + '?oid=' + plugin_id,
                 'dataType': 'html',
                 type : 'POST',
                 datatype:'json',
                 data : pdata,
-                'success': function(data){
-                    _incall($this, 'toggle_bs_form',[plugin_id, data]);
+                'success': function(r){
+                    _incall($this, 'toggle_bs_form',[plugin_id, r]);
                     _incall($this, 'hack_submit');
                    //$('body').bioscript(form_options).bioscript('hack_submit');
                 }
@@ -211,6 +243,8 @@
          validation_success: function(plugin_id, task_id, plugin_info, app){
             var $this = $(this);
             var data = $this.data(bs_namespace);
+            console.log("VAL SUCCESS");
+            console.log(data);
             u = data.vurl + '?task_id=' + task_id + '&plugin_id=' + plugin_id;
             var pdata = app;
             if (plugin_info){
@@ -221,15 +255,16 @@
                 type: 'POST',
                 datatype: 'json',
                 data: pdata,
-                'success': function(data){
-                    console.log(data);
+                'success': function(r){
+                    console.log(r);
                     _incall($this, 'toggle_bs_form', [plugin_id]);
                 }
             });
          },
 
          toggle_bs_form: function(plugin_id, form_data){
-            var data = $(this).data(bs_namespace);
+            var $this = $(this);
+            var data = $this.data(bs_namespace);
             var $cont = $(data.bsform);
             var showed = $cont.attr('showed');
             if (showed == plugin_id){
