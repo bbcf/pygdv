@@ -1,4 +1,4 @@
-from tg import expose, request
+from tg import expose, request, response
 import tg
 from pygdv.lib import constants, filemanager
 from pygdv.lib.base import BaseController
@@ -36,14 +36,21 @@ class PluginController(BaseController):
             if len(s.locations) > 0:
                 gtrack.append((handler.track.plugin_link(s, selection_id=s.id), 'selection'))
 
-        prefill = json.dumps({'track': gtrack})
+        prefill = {'track': gtrack}
 
-        # TODO fetch tracks & selections
-        req = urllib2.urlopen(url=bsrequesturl, data=urllib.urlencode({
+        # prepare parameters
+        parameters = {
             'key': handler.job.shared_key,
-            'bs_private': json.dumps({'app': pp, 'cfg': handler.job.bioscript_config,
-            'prefill': prefill})}))
+            'bs_private': json.dumps({
+                'app': pp,
+                'cfg': handler.job.bioscript_config,
+                'prefill': prefill
+                })
+        }
+        # TODO fetch tracks & selections
+        req = urllib2.urlopen(url=bsrequesturl, data=urllib.urlencode(parameters))
         # display the form in template
+        response.headerlist.append(('Access-Control-Allow-Origin', '*'))
         return req.read()
 
     # @expose()

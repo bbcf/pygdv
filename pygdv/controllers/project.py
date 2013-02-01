@@ -2,7 +2,7 @@
 
 from repoze.what.predicates import has_any_permission, has_permission
 from pygdv.lib.base import BaseController
-from tg import expose, flash, require, request, url
+from tg import expose, flash, require, request, url, response
 from tg.controllers import redirect
 from tg.decorators import with_trailing_slash
 from pygdv.widgets import datagrid
@@ -221,6 +221,7 @@ class ProjectController(BaseController):
             flash('You must have %s permission to view the project.' % constants.right_read, 'error')
             raise redirect(url('/'))
         d = handler.view.prepare_view(project_id, *args, **kw)
+        response.headerlist.append(('Access-Control-Allow-Origin', '*'))
         return d
 
     @require(has_permission('admin', msg='Only for admins'))
