@@ -30,7 +30,7 @@ class PluginController(BaseController):
         # add prefill parameters
         tracks = list(project.tracks)
         selections = list(project.selections)
-        gtrack = [(handler.track.plugin_link(t), t.name) for t in tracks]
+        gtrack = [(json.dumps({'p':handler.track.plugin_link(t), 'n':os.path.split(handler.track.plugin_link(t))[-1]}), t.name) for t in tracks]
         if len(selections) > 0:
             s = selections[0]
             if len(s.locations) > 0:
