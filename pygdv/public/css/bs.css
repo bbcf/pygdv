@@ -1,9 +1,3 @@
-/* reset */
-* {
-  margin: 0;
-  padding: 0;
-  list-style: none; }
-
 .error {
   color: red; }
 
@@ -38,6 +32,7 @@
 #bs_menubar {
   width: 150px;
   margin: 30px;
+  list-style-type: none;
   position: fixed; }
 
 /* clear floats */
@@ -150,3 +145,103 @@ ul#bs_menubar ul ul li:first-child a:hover:after {
 
 ul#bs_menubar ul li:last-child > a {
   border-radius: 0 0 3px 3px; }
+
+.loading-wrap {
+  width: 20px;
+  height: 20px;
+  position: relative;
+  margin: -10 0 0 10;
+  background: #6e7476;
+  animation: rotation ease-in-out 2s infinite;
+  border-radius: 20px;
+  position: relative; }
+
+.triangle1, .triangle2, .triangle3 {
+  border-width: 0 6.66667px 10px 6.66667px;
+  border-style: solid;
+  border-color: transparent;
+  border-bottom-color: #aab3b6;
+  height: 0;
+  width: 0;
+  position: absolute;
+  left: 3.33333px;
+  top: -3.33333px;
+  animation: fadecolor 2s 1s infinite; }
+
+.triangle2, .triangle3 {
+  content: "";
+  top: 6.66667px;
+  left: 10px;
+  animation-delay: 0.5s; }
+
+.triangle3 {
+  left: -3.33333px;
+  animation-delay: 0.8s; }
+
+@-webkit-keyframes rotation {
+  0% {
+    transform: rotate(0deg); }
+
+  20% {
+    transform: rotate(360deg); }
+
+  100% {
+    transform: rotate(360deg); } }
+
+@-moz-keyframes rotation {
+  0% {
+    transform: rotate(0deg); }
+
+  20% {
+    transform: rotate(360deg); }
+
+  100% {
+    transform: rotate(360deg); } }
+
+@-ms-keyframes rotation {
+  0% {
+    transform: rotate(0deg); }
+
+  20% {
+    transform: rotate(360deg); }
+
+  100% {
+    transform: rotate(360deg); } }
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg); }
+
+  20% {
+    transform: rotate(360deg); }
+
+  100% {
+    transform: rotate(360deg); } }
+
+@-webkit-keyframes fadecolor {
+  0% {
+    border-bottom-color: #e6f1f5; }
+
+  100% {
+    border-bottom-color: #aab3b6; } }
+
+@-moz-keyframes fadecolor {
+  0% {
+    border-bottom-color: #e6f1f5; }
+
+  100% {
+    border-bottom-color: #aab3b6; } }
+
+@-ms-keyframes fadecolor {
+  0% {
+    border-bottom-color: #e6f1f5; }
+
+  100% {
+    border-bottom-color: #aab3b6; } }
+
+@keyframes fadecolor {
+  0% {
+    border-bottom-color: #e6f1f5; }
+
+  100% {
+    border-bottom-color: #aab3b6; } }

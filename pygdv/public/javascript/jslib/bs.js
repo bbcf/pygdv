@@ -12,6 +12,7 @@
         bs_form_container_selector: '#bs_form_container',
         show_plugin: false,
         validation_successful: false,
+        fsizemax: 100,
         app: ''
     };
 
@@ -42,6 +43,7 @@
                         vsuccess : settings.validation_successful,
                         geturl: settings.fetch_url,
                         bsform: settings.bs_form_container_selector,
+                        fsizemax: settings.fsizemax,
                         app: settings.app
                     });
                     data = $this.data(bs_namespace);
@@ -113,10 +115,9 @@
         hack_submit : function(){
             var $this = $(this);
             var data = $this.data(bs_namespace);
-            console.log("HACK SUBMIT");
-            console.log(data);
             var bs_url = data.bsurl;
             var fselector = data.fselector;
+            var fsizemax = data.fsizemax;
             $(fselector).children('form').submit(function(e){
                 e.preventDefault();
                 /* fetch form id from form */
@@ -129,8 +130,13 @@
 //        type = file.type;
 //        //your validation
 //    });
+            var waitdiv = $('<div class="loading-wrap"><span class="triangle1"></span><span class="triangle2"></span><span class="triangle3"></span></div>');
+            waitdiv.css('left', $(this).find('input').width() + 'px');
+            waitdiv.css('top', -$(this).find('input').height() + 'px');
+            $(this).append(waitdiv);
 
-            
+
+
             /* build form data objet to upload files if any */
             var formData = new FormData();
             var files = $(':file');
@@ -140,19 +146,26 @@
                 for(var j=0;j<fs.length;j++){
                     var f = fs[j];
                     if(f){
+                        // file size max
+                        if (f.size > fsizemax * 1000000 ){
+                            alert('File is too big. You cannot upload files greater than '+ fsizemax + ' Mo.');
+                            $('.loading-wrap').remove();
+                            return false;
+                        }
                         formData.append(fid, f);
                     }
                 }
             }
-            
             /* get data from form */
-
             var pdata = $(this).serializeArray();
-            console.log(pdata);
             $.each(pdata, function(i, v){
                 formData.append(v.name, v.value);
             });
-            console.log(formData);
+            /* disable the form button and show waiting stuff */
+            var fo = $(this).find('#submit');
+            fo.attr('disabled', true);
+            fo.addClass('waiting');
+
             /* submit query */
             $.ajax({
                     url: bs_url + 'plugins/validate',
@@ -161,23 +174,18 @@
                     processData:false,
                     contentType:false
                     }).done(function(d) {
-                        console.log("POST DONE");
-                        console.log(data);
+                        fo.attr('disabled', false);
+                        $('.loading-wrap').remove();
                         _incall($this, 'jsonp_callback', [d]);
+                        
                     }).error(function(error){
-                        console.log("POST ERROR");
+                        fo.attr('disabled', false);
+                        $('.loading-wrap').remove();
+                        console.error("POST ERROR");
                         console.error(error);
                     });
                     return true;
                 });
-            // $.getJSON(
-            //     bs_url + 'plugins/validate?' + pdata,
-            //     {},
-            //     function(data){
-            //         console.log(data);
-            //         _incall($this, 'jsonp_callback', [data]);
-            //     });
-            // });
         },
 
         /**
@@ -187,8 +195,6 @@
         jsonp_callback : function(jsonp){
             var $this = $(this);
             var data = $this.data(bs_namespace);
-            console.log("JSONP CALLBACK");
-            console.log(data);
             if (jsonp){
                 jsonp = $.parseJSON(jsonp);
                 var val = jsonp.validation;
@@ -223,12 +229,13 @@
         show_plugin: function(plugin_id){
             var $this = $(this);
             var data = $this.data(bs_namespace);
-            console.log("SHOW PLUGIN");
-            console.log(data);
             var pdata = data.app;
             $.ajax({
                 'url' : data.geturl + '?oid=' + plugin_id,
                 'dataType': 'html',
+                'beforeSend': function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'));
+                },
                 type : 'POST',
                 datatype:'json',
                 data : pdata,
@@ -243,8 +250,6 @@
          validation_success: function(plugin_id, task_id, plugin_info, app){
             var $this = $(this);
             var data = $this.data(bs_namespace);
-            console.log("VAL SUCCESS");
-            console.log(data);
             u = data.vurl + '?task_id=' + task_id + '&plugin_id=' + plugin_id;
             var pdata = app;
             if (plugin_info){
@@ -256,7 +261,6 @@
                 datatype: 'json',
                 data: pdata,
                 'success': function(r){
-                    console.log(r);
                     _incall($this, 'toggle_bs_form', [plugin_id]);
                 }
             });
