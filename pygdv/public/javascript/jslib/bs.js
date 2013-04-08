@@ -12,7 +12,7 @@
         bs_form_container_selector: '#bs_form_container',
         show_plugin: false,
         validation_successful: false,
-        fsizemax: 100,
+        fsizemax: 255,
         app: ''
     };
 
@@ -30,7 +30,9 @@
                 $.extend(settings, options);
                 var $this = $(this),
                     data = $this.data(bs_namespace);
-
+                if (settings.bs_server_url.indexOf('/', settings.bs_server_url.length - 1) == -1){
+                    settings.bs_server_url += '/';
+                }
                 if(!data){
                     $(this).data(bs_namespace,{
                         target : $this,
@@ -141,7 +143,7 @@
             var formData = new FormData();
             var files = $(':file');
             for(var i = 0; i < files.length; i++) {
-                var fid = files[i].id;
+                var fid = files[i].name;
                 var fs = files[i].files;
                 for(var j=0;j<fs.length;j++){
                     var f = fs[j];
@@ -177,7 +179,6 @@
                         fo.attr('disabled', false);
                         $('.loading-wrap').remove();
                         _incall($this, 'jsonp_callback', [d]);
-                        
                     }).error(function(error){
                         fo.attr('disabled', false);
                         $('.loading-wrap').remove();
@@ -193,6 +194,8 @@
          * BioScript server
          */
         jsonp_callback : function(jsonp){
+            console.log("RESPONSE");
+            console.log(jsonp);
             var $this = $(this);
             var data = $this.data(bs_namespace);
             if (jsonp){
@@ -214,7 +217,6 @@
                         } else {
                             _incall($this, 'validation_success', [jsonp.plugin_id, jsonp.task_id, jsonp.plugin_info, jsonp.app]);
                         }
-                        
                     }
 
                 } else {
@@ -234,8 +236,8 @@
                 'url' : data.geturl + '?oid=' + plugin_id,
                 'dataType': 'html',
                 'beforeSend': function(xhr) {
-                    xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'));
-                },
+                    xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'));
+                },
                 type : 'POST',
                 datatype:'json',
                 data : pdata,
