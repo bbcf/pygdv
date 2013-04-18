@@ -51,7 +51,8 @@ class PluginController(BaseController):
         req = urllib2.urlopen(url=bsrequesturl, data=urllib.urlencode(parameters))
         # display the form in template
         response.headerlist.append(('Access-Control-Allow-Origin', '*'))
-        return req.read()
+        data = req.read()
+        return data
 
     # @expose()
     # def index(self, id, key, *args, **kw):

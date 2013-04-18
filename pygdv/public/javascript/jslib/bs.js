@@ -269,21 +269,27 @@
          },
 
          toggle_bs_form: function(plugin_id, form_data){
+            console.log("Toggle");
+            console.log(form_data);
             var $this = $(this);
             var data = $this.data(bs_namespace);
             var $cont = $(data.bsform);
             var showed = $cont.attr('showed');
             if (showed == plugin_id){
+                console.log('hide');
                 $cont.html('');
                 $cont.hide('normal');
                 $cont.attr('showed', '');
             } else if (showed){
                 $cont.html(form_data);
                 $cont.attr('showed', plugin_id);
+                console.log('show other');
             } else {
                 $cont.html(form_data);
                 $cont.attr('showed', plugin_id);
                 $cont.show('slow');
+                console.log('show');
+
             }
         }
     };
